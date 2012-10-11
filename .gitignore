@@ -1,0 +1,4 @@
+node_modules/
+public/contents/user_project/
+public/log/yt_upload_log_*.*
+public/uploads/

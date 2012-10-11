@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
+<head>
+  <meta charset="UTF-8"/>
+  <title>註冊大明星</title>
+  <script type="text/javascript" src = "https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+  <script>
+    $(document).ready(function(){
+        $('#signup').submit(function(){
+            var pfjson = null,
+                str = "{";
+            
+            $('#signup :text').each(function(){
+                if($(this).attr('id') != "email")
+                    str += '"' + $(this).attr('id') + '":"' + $(this).val() + '", ';
+                else
+                    str += '"' + $(this).attr('id') + '":"' + $(this).val() + '"';
+            });
+            
+            str += "}";
+            pfjson = JSON.parse(str);
+            console.log("pfjson = " + JSON.stringify(pfjson));
+        });        
+    }); // End ready
+  </script>
+</head>
+<body>
+    <form id="signup" method='POST'>
+      姓名<input type="text" id="name" value="empty" /><br/>
+      帳號<input type="text" id="memberID" value="empty" /><br/>
+      密碼<input type="text" id="password" value="empty" /><br/>
+      手機<input type="text" id="mPhone" value="empty" /><br/>
+      Email<input type="text" id="email" value="empty" /><br/>
+      <input type="submit" id="submit" value="註冊"/>
+    </form>
+</body>
+</html>

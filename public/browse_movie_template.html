@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="/jquery.js"></script>
+	<script type="text/javascript" src="/common.js"></script>	
+	<script type="text/javascript">
+	$(document).ready( function(){
+		var req = { "sessionToken": "abcedef" };  
+		
+
+		$.get( serverURL+'/get_template_list', req, function(result){
+			//console.log(result);
+			for (var i in result) {
+				$("#content").append('<p>'+result[i]+'<button id="testBtn___'+result[i]+'" type="button">選擇</button></p>');
+			}
+
+			$("button").click(function(){
+				var indexOfClicked = ($(this).attr('id')).split('___');
+				indexOfClicked = indexOfClicked[ indexOfClicked.length-1 ];
+				
+				$("#trace").html(indexOfClicked);
+				localStorage.setItem("selectedTemplateID", indexOfClicked); 
+				document.location.href = '/make_movie.html';
+			});	
+			
+		});
+	});
+	</script>
+</head>
+<body>
+<!--
+	<button id='testBtn___memory' type="button">1</button>
+	<button id='testBtn___2' type="button">2</button>
+	<button id='testBtn___3' type="button">3</button>  
+	<p id="trace"/>	-->
+	<h1>影片模板</h1>
+	<div id="content">
+
+	</div>
+
+</body>
+</html>	

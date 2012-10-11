@@ -1,0 +1,44 @@
+if user
+    form(method='post', action='/')
+        input(name="_method", type="hidden", value="DELETE")
+        p #{user.name}! Ready to Rock'n Roll! 
+        a(href='javascript:', onClick='forms[0].submit()') [logout]
+    br
+    br
+    a(href='/browse_movie_template.html') Make Your Own Video!
+    br
+    br
+    a(href="http://www.feltmeng.com/gab_test", target="_blank")
+        img(src="/images/facebook_do_you.jpg", alt="#{title} with Facebook", width="94", height="81")
+    br
+    p
+    form(method='post', action='addEvent')
+        fieldset
+            legend #{reserve}
+            p
+                label(for="evtVideo") #{videoSelect}:
+                select(id="evtVideo", name="event[idx]")
+                    each videoWork, i in videoWorks
+                        option(value="#{i}") #{videoWork.title}
+            p
+                label(for="evtDate") #{dateSelect}:
+                input(type="date", id="evtDate", name="event[date]")
+            p
+                label(for="evtTime") #{timeSelect}:
+                input(type="text", id="evtTime", name="event[time]")
+            input(type="submit")
+    
+    include video.jade
+
+else
+  form(method='post', action='signin')
+    fieldset
+      legend #{signin}
+      p
+        label(for="member[name]") #{usernameLb}:
+        input(type="text", id="memberID", name="member[memberID]")
+      p
+        label(for="member[pwd]") #{passwordLb}:
+        input(type="password", id="password", name="member[password]")
+          
+      input(type="submit")

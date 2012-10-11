@@ -1,0 +1,12 @@
+﻿extends layout
+
+block content
+  h1= title
+  br
+  each event in week
+    p VideoId: #{event.videoId} ProjectID: #{event.projectId}
+    p #{timeSelect}: #{event.time}
+    p #{previewLb}:
+    iframe( width="420", height="345", src = event.videoUrl)
+    p #{locationLb}@ #{event.location}    
+    br

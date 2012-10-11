@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<ae_replace_args>
+	<template_AEP>D:\nodejs_projects\i_am_a_super_star\public\contents\template\template_memory\memory.aep</template_AEP>
+	<project_AEP>D:\nodejs_projects\i_am_a_super_star\public\contents\user_project\memory_xyz_01.aep</project_AEP>
+	<customizd_content_XML>D:\nodejs_projects\i_am_a_super_star\public\contents\user_data\user_data_xyz\customized_content.xml</customizd_content_XML>
+</ae_replace_args>

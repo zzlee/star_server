@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script type="text/javascript" src="/jquery.js"></script>
+	<script type="text/javascript" src="/common.js"></script>	
+	<script type="text/javascript">
+	$(document).ready( function(){
+
+		var selectedTemplate = localStorage.getItem("selectedTemplateID");;  //ID of seleted template
+		
+		var req = { "templateID": selectedTemplate };  
+		$.get( serverURL+'/get_template_description', req, function(result){
+			//console.dir(result);
+			if (result.template_raw_data) {
+				var templateID = result.template_raw_data.ID;
+				if ( result.userName ) {
+					var userID = result.userName;
+				}
+				else {
+					var userID = 'anonymous'; 
+				}
+				var projectID = templateID +'-'+ userID +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
+							
+				//$("#trace").html(result.customizable_object_list.customizable_object[0].description);
+				//$("#content").append("<p>temp= "+temp+"</p>");
+				$("#content").append("<p>模板名稱："+result.template_raw_data.name+"</p>");
+				$("#content").append("<p>模板簡介："+result.template_raw_data.description+"</p>");
+				$("#content").append('<p><input type="text" name="template_ID" value="'+templateID+'"></p>');
+				$("#content").append('<p><input type="text" name="project_ID" value="'+projectID+'"></p>');
+								
+				$.get( serverURL+'/get_template_customizable_object_list', req, function(result){
+					//console.dir(result);
+					if (result.customizable_object_list) {
+						var customizable_objects = result.customizable_object_list.customizable_object;
+						if( Object.prototype.toString.call( customizable_objects ) === '[object Array]' ) {
+							for (var i in customizable_objects) {
+								$("#content").append('<p>'+customizable_objects[i].description+'</p>');
+								$("#content").append('<p><img src= "'+serverURL+'/contents/template/'+selectedTemplate+'/raw_data/'+customizable_objects[i].key_frame+'" width="300"/></p>');
+								$("#content").append('<p><input type="text" name="customizable_object_ID" value="'+customizable_objects[i].ID+'"></p>');
+								$("#content").append('<p><input type="text" name="format" value="'+customizable_objects[i].format+'"></p>');
+								$("#content").append('<p><input type="file" name="'+customizable_objects[i].ID+'"/></p>');
+							}
+						}
+						else {
+							$("#content").append('<p>'+customizable_objects.description+'</p>');
+							$("#content").append('<p><img src= "'+serverURL+'/contents/template/'+selectedTemplate+'/raw_data/'+customizable_objects.key_frame+'" width="300"/></p>');
+							$("#content").append('<p><input type="text" name="customizable_object_ID" value="'+customizable_objects.ID+'"></p>');
+							$("#content").append('<p><input type="text" name="format" value="'+customizable_objects.format+'"></p>');
+							$("#content").append('<p><input type="file" name="'+customizable_objects.ID+'"/></p>');
+						}
+						$("#content").append('<input type="submit" value="Generate my movie">');
+										
+					}
+					else {
+						$("#content").append('<p>No valid data is returned in the request to /get_template_customizable_object_list!</p>');
+					}
+				});
+			}
+			else {
+				$("#content").append('<p>No valid data is returned in the request to /get_template_description!</p>');
+			}
+		});
+
+		
+		/*
+		$.get( serverURL+'/get_template_raw_data', req, function(result){
+			if (result.ID) {
+				var templateID = result.ID;
+				var userID = 'gance'; //TODO: get the user ID (from previous view)
+				var projectID = templateID +'-'+ userID +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
+							
+				//$("#trace").html(result.customizable_object_list.customizable_object[0].description);
+				//$("#content").append("<p>temp= "+temp+"</p>");
+				$("#content").append("<p>模板名稱："+result.name+"</p>");
+				$("#content").append("<p>模板簡介："+result.description+"</p>");
+				$("#content").append('<p><input type="text" name="template_ID" value="'+templateID+'"></p>');
+				$("#content").append('<p><input type="text" name="project_ID" value="'+projectID+'"></p>');
+				
+				
+				var customizable_objects = result.customizable_object_list.customizable_object;
+				if( Object.prototype.toString.call( customizable_objects ) === '[object Array]' ) {
+					for (var i in customizable_objects) {
+						$("#content").append('<p>'+customizable_objects[i].description+'</p>');
+						$("#content").append('<p><img src= "'+serverURL+'/contents/template/'+selectedTemplate+'/raw_data/'+customizable_objects[i].key_frame+'" width="300"/></p>');
+						$("#content").append('<p><input type="text" name="customizable_object_ID" value="'+customizable_objects[i].ID+'"></p>');
+						$("#content").append('<p><input type="text" name="format" value="'+customizable_objects[i].format+'"></p>');
+						$("#content").append('<p><input type="file" name="'+customizable_objects[i].ID+'"/></p>');
+					}
+				}
+				else {
+					$("#content").append('<p>'+customizable_objects.description+'</p>');
+					$("#content").append('<p><img src= "'+serverURL+'/contents/template/'+selectedTemplate+'/raw_data/'+customizable_objects.key_frame+'" width="300"/></p>');
+					$("#content").append('<p><input type="text" name="customizable_object_ID" value="'+customizable_objects.ID+'"></p>');
+					$("#content").append('<p><input type="text" name="format" value="'+customizable_objects.format+'"></p>');
+					$("#content").append('<p><input type="file" name="'+customizable_objects.ID+'"/></p>');
+				}
+				$("#content").append('<input type="submit" value="Generate my movie">');
+			}
+			else {
+				$("#content").append('<p>No templateID is specified in the request to /get_template_raw_data!</p>');
+			}
+		});
+		*/
+		  
+	});
+	</script>
+</head>
+<body>
+	<form method="post" enctype="multipart/form-data" action="/upload_user_data">
+		<p><div id="content"/></p>
+		<p><a href='/'>Go back</a></p>
+		
+	</form>	
+</body>
+</html>

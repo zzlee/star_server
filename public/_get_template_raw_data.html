@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+$(document).ready( function(){
+	$("button").click(function(){
+	/*
+	  $.ajax({url:"http://localhost:3000/get_template_raw_data",success:function(result){
+		//$("div").html(result.customizable_object_list.customizable_object[0].description);
+	  }});
+	*/
+	$("p").html("button clicked");
+	
+	$.get('http://localhost:3000/get_template_raw_data', 'templatID=12', function(result){
+		//$("#result").text("Get the response from Server");
+		$("div").html(result.customizable_object_list.customizable_object[0].description);
+	  });
+	});
+	  
+});
+</script>
+</head>
+<body>
+	<p id="result"> the result message 1</p>
+	<button>get template raw data</button>
+</body>
+</html>

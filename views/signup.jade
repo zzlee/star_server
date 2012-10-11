@@ -1,0 +1,24 @@
+if user
+ console.log("show nothing!");
+
+else
+  form(method='post', action='signup')
+    fieldset
+      legend #{signup}
+      p
+        label #{fullnameLb}:
+        input(type="text", id="fullname", name='member[fullname]',  value="")
+      p
+        label #{usernameLb}:
+        input(type="text", id="memberID", name='member[memberID]', value="")
+      p
+        label #{passwordLb}:
+        input(type="password", id="password", name='member[password]', value="")
+      p
+        label #{mobileLb}:
+        input(type="text", id="mPhone", name='member[mPhone]', value="")
+      p
+        label #{emailLb}:
+        input(type="email", id="email", name='member[email]', value="")
+          
+      input(type="submit")
