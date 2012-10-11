@@ -1,15 +1,16 @@
 ﻿//GZ  
-var routsMovieGen = require('./movie_generation.js'); 
-exports.getTemplateList_cb = routsMovieGen.getTemplateList_cb;
-exports.getTemplateRawData_cb = routsMovieGen.getTemplateRawData_cb;
-exports.getTemplateDescription_cb = routsMovieGen.getTemplateDescription_cb;
-exports.getTemplateCustomizableObjectList_cb = routsMovieGen.getTemplateCustomizableObjectList_cb;
-exports.uploadUserData_cb = routsMovieGen.uploadUserData_cb;
+var movieGeneration = require('./movie_generation.js'); 
+exports.uploadUserData_cb = movieGeneration.uploadUserData_cb;
+
+var movieTemplate = require('./movie_template.js'); 
+exports.getTemplateList_cb = movieTemplate.getTemplateList_cb;
+exports.getTemplateDescription_cb = movieTemplate.getTemplateDescription_cb;
+exports.getTemplateCustomizableObjectList_cb = movieTemplate.getTemplateCustomizableObjectList_cb;
 
 var youtube = require('./youtube.js');
 exports.YoutubeOAuth2_cb = youtube.YoutubeOAuth2_cb;
 
-var upload = require('./_upload.js');
+var upload = require('./upload.js');
 exports.upload_cb = upload.upload_cb;
 
 //GL

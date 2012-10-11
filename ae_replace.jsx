@@ -1,7 +1,7 @@
 ﻿{
 
 	function replace() {
-		var projectPath = "D:\\nodejs_projects\\i_am_a_super_star";  //TODO: get current project directory
+		var projectPath = "D:\\nodejs_projects\\star_server";  //TODO: get current project directory
 
 		var templateAep_path, projectAep_path, customizdContentXML_path, projectID;
 		var fileOK;
