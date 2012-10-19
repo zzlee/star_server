@@ -16,6 +16,7 @@ FM.DB = (function(){
             connection = connectDB(),
             eduLv = 'elem jrHigh srHigh college university master doctor'.split(' '),
             occupationList = 'gov student edu industry business service'.split(' ');
+            evtStatus = 'waiting proved'.split(' ');;
         
         var MemberSchema = new Schema({
             fb_id: {type: String},      //  Facebook ID
@@ -46,7 +47,8 @@ FM.DB = (function(){
             hitRate: {type: Number, min:0},
             commentIds: {type: [ObjectID]},
             vote: {type: Number, min:0},
-            likes: {type: Number, min:0}
+            likes: {type: Number, min:0},
+            status: {type: String}
         }); //  videos collection
 
         var CommentSchema = new Schema({
@@ -63,7 +65,8 @@ FM.DB = (function(){
             start: {type: Number, min:1325376000001},   // 1325376000001 2012/01/01 08:00:00
             end: {type: Number, min:1325376000001},
             videoUrl: {type: String},
-            location: {type: String}    //location: {type: ObjectID},
+            location: {type: String},    //location: {type: ObjectID},
+            status: {type: String, enum: evtStatus}
         }); //  events collection for schedule
         
               
@@ -264,12 +267,9 @@ FM.DB = (function(){
                 });
             },
             
-            deleteAdoc: function(docModel, docid){
-                docModel.findByIdAndRemove(docid, function(err){
-                    if(err){
-                        console.log('deleteAdoc() error: '+ err);
-                    }
-                });
+            deleteAdoc: function(docModel, docid, cb){
+                console.log("Delete a Doc: " + docid);
+                docModel.findByIdAndRemove(docid, cb);
             },
 
             getValueOfById: function(docModel, docid, path, cb){

@@ -1,0 +1,20 @@
+extends layout
+
+block append head
+    script(src='/javascripts/censorship.js')
+    
+  block content
+      script
+        censorship.setList(waitingList);
+        test();
+      h1= title
+      br
+      each event, i in waitingList
+        div(id="evt#{i}")
+            p VideoId: #{event.videoId} ProjectID: #{event.projectId}
+            p #{timeSelect}: #{event.time}
+            p #{previewLb}:
+            iframe( width="420", height="345", src = event.videoUrl)
+            p #{locationLb}@ #{event.location}
+            button( type="button", data-index="#{i}", value="proved", name="proved", onclick="censorship.proved()" ) Proved
+            button( type="button", data-index="#{i}", value="reject", name="reject", onclick="censorship.reject()" ) Reject

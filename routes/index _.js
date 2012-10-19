@@ -18,12 +18,12 @@ exports.upload_cb = upload.upload_cb;
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
     videoDB = require("../video.js"),
-    api = require("./api.js");
+    api = require("./api.js";
     
     //$ = require('jQuery'),
     //jsdom = require('jsdom').jsdom;
     
-exports.api = api;
+
 
 exports.signin = function (req, res, next) {
     /*
@@ -51,8 +51,6 @@ exports.signin = function (req, res, next) {
     }
 };
 
-
-
 exports.signout = function (req, res, next) {
     console.log(req.session.user.name + " Log-Out!");
     delete req.session.user;
@@ -75,7 +73,9 @@ exports.signup = function(req, res, next){
                     pwd: member.password,
                     userId: oid};
                  
-                var vjson1 = {  "title":"Darth vader funny commercial",
+				next();
+                /*
+				var vjson1 = {  "title":"Darth vader funny commercial",
                                 "ownerId": oid,
                                 "url": {"youtube":"http://www.youtube.com/embed/YRQyS_8sShw"},
                                 "projectId": "8608"};
@@ -90,6 +90,8 @@ exports.signup = function(req, res, next){
                         next();
                     });
                 });
+				*/
+				
             }
         });
         
@@ -124,23 +126,17 @@ exports.signup = function(req, res, next){
  *            "projectId": projectId };
  */
 exports.addVideo = function(req, res, next){
-    
     var ownerId = req.session.user.userId,
+        url = {"youtube":"http://www.youtube.com/embed/SvkQ3iSXyMA"},
         projectId = "2711";
         
-    if(req.body && req.body.member){
-        var vurl = req.body.link;
-        var vjson = {
-                        "ownerId": ownerId,
-                        "url": vurl,
-                        "projectId":projectId,
-                        "title": "From Facebook"
-                    };
-                    
-        videoDB.addVideo(vjson, function(err, vdoc){
-            next();
-        });
-    }  
+    var vjson = {"ownerId": ownerId,
+                 "url": url,
+                 "projectId":projectId};
+    //console.log("video " + JSON.stringify(vjson));
+    videoDB.addVideo(vjson, function(err, vdoc){
+        next();
+    });
 };
 
 exports.addEvent = function(req, res, next){
@@ -152,7 +148,7 @@ exports.addEvent = function(req, res, next){
             end: {type: Number, min:0},
             location: {type: ObjectID}
      */
-    //evtList = [];
+    week = [];
     if(req.body && req.body.event.time){
         var event = req.body.event;
         var yearday = event.date,   
@@ -179,13 +175,11 @@ exports.addEvent = function(req, res, next){
                     "start": start,
                     "end": end,
                     "videoUrl": videoWorks[idx].url.youtube,
-                    "location": "小巨蛋",
-                    "status": "waiting"
+                    "location": "小巨蛋"
                   };
                   
         console.log("addEvent: " + start.toLocaleString()+ " to " + end.toLocaleString());
 		
-		/*
 		//GZ
 		//send to DOOH for play
 		var doohControl = require("../dooh_control.js");
@@ -193,8 +187,8 @@ exports.addEvent = function(req, res, next){
 		var movieProjectID = videoWorks[idx].projectId;
 		doohControl.sendPlayRequest(doohURL, movieProjectID, start );
 		console.log('Movie %s is requested to send to DOOH %s!', movieProjectID, doohURL );
-		*/
-                  
+
+ 
         scheduleDB.reserve(evt, function(err, result){
             
             next();
@@ -206,39 +200,10 @@ exports.addEvent = function(req, res, next){
     }
 };
 
-exports.censorship = function(req, res){
-
-    scheduleDB.listOfWaiting(function(err, result){
-    
-        if(err) throw err;
-        eventAdapter(result);
-        console.log("Event Waitling List: " + evtList);
-        
-        res.render( "censorship", { 
-                                title: "審查表",
-                                timeSelect: "時段",
-                                previewLb: "預覽",
-                                locationLb: "地點",
-                                waitingList: evtList
-                              }  );
-    });
-    
-    
-};
-
-exports.reject = function(req, res){
-    scheduleDB.reject(evtid, cb);
-};
-
-exports.proved = function(req, res){
-    scheduleDB.proved(evtid, cb);
-};
-
 var videoWorks = null,
-    evtList = [];
+    week = [];
 
 exports.event = function(req, res, next){
-
     var range = null;
     var now = new Date();
     var start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0);
@@ -272,11 +237,10 @@ exports.profile = function(req, res, next){
 
 
 var eventAdapter = function(events){
-    evtList = [];
     for( var i in events ){
         var st = new Date(events[i].start);
         events[i].time = st.toLocaleString();
-        evtList.push(events[i]);
+        week.push(events[i]);
     }
 };
 
@@ -288,7 +252,7 @@ exports.schedule = function(req, res){
                                 timeSelect: "時段",
                                 previewLb: "預覽",
                                 locationLb: "地點",
-                                week: evtList
+                                week: week
                             } );
 };
 

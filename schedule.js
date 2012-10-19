@@ -15,7 +15,7 @@ FM.SCHEDULE = (function(){
             listOfReservated : function(range, cb){
 
                 var query = events.find();
-                query.or( [ 
+                query.where("status", "proved").or( [ 
                             { start: {$gte: range.start, $lt: range.end} },
                             { end: {$gt: range.start, $lte: range.end} },
                             { $and: [ {start: {$lte: range.start}}, {end: {$gte: range.end}} ] } 
@@ -31,8 +31,21 @@ FM.SCHEDULE = (function(){
                  */    
             },
             
+            listOfWaiting : function(cb){
+                var query = events.find();
+                query.where("status", "waiting").sort({start: 1}).exec(cb);
+            },
+            
             reserve : function(evt, cb){
                 FMDB.createAdoc(events, evt, cb);
+            },
+            
+            reject : function(evtid, cb){
+                FMDB.deleteAdoc(events, evtid, cb); 
+            },
+            
+            prove : function(evtid, cb){
+                FMDB.updateAdoc(events, evtid, {"status":"proved"});
             }
         };
     } //    End of Constructor

@@ -53,12 +53,20 @@ app.post('/upload', routes.upload_cb );
 app.post('/upload_user_data_info',routes.uploadUserDataInfo_cb);
 
 //GL
-app.get('/', routes.profile, routes.index);
-app.post('/', routes.profile, routes.index);
-app.post('/signin', routes.signin, routes.profile, routes.index);
-app.post('/signup', routes.signup, routes.profile, routes.index);
-app.post('/addEvent', routes.addEvent, routes.event, routes.schedule);
-app.del('/', routes.signout, routes.index);
+app.get('/([a-zA-Z0-9]+)', routes.api.profile);
+app.get('/api/eventsOfWaiting', routes.api.eventsOfWaiting);
+app.get('/api/schedule', routes.api.eventsOfPeriod);
+app.get('/api/userProfile', routes.api.userProfile);
+app.get('/api/profile', routes.api.profile);
+app.post('/api/signin', routes.api.signin);
+
+//app.post('/', routes.profile, routes.index);
+app.post('/api/signup', routes.api.signup);
+app.post('/api/addEvent', routes.api.addEvent);
+app.post('/api/reject', routes.api.reject);
+app.post('/api/prove', routes.api.prove);
+
+app.del('/', routes.api.signout);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

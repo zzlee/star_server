@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  h1= videoWork.title
+  br
+  iframe( width="420", height="345", src = videoWork.url.youtube)
+  img(src="fb_share.jpg", width="60", height="20")
+  br
+  img(src="/images/logo2.png")
