@@ -165,3 +165,8 @@ exports.uploadUserData_cb = function(req, res) {
 
 };
 
+
+exports.uploadUserDataInfo_cb = function(req, res) {
+
+
+};

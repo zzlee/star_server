@@ -41,7 +41,24 @@ exports.upload_cb = function(req, res){
 	//get the temporary location of the file
 	var tmp_path = req.files['file'].path;
 	//set where the file should actually exists 
-	var target_path = path.join( workingPath, 'public/uploads', req.files['file'].name);  
+	var target_path;
+	
+	console.log('req.body.fileObjectID= %s', req.body.fileObjectID);
+	
+	if ( req.body.projectID ) {
+		var projectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectID);
+		var userDataDir = path.join( projectDir, 'user_data');
+		if ( !fs.existsSync(projectDir) ) {
+			fs.mkdirSync( projectDir );  //TODO: check if this is expensive... 
+		}
+		if ( !fs.existsSync(userDataDir) ) {
+			fs.mkdirSync( userDataDir );  //TODO: check if this is expensive... 
+		}
+		target_path = path.join( userDataDir, req.files['file'].name);
+	}
+	else {
+		target_path = path.join( workingPath, 'public/uploads', req.files['file'].name);  
+	}
 
 	moveFile( tmp_path, target_path );
 };
