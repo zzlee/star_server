@@ -50,6 +50,7 @@ app.get('/get_template_customizable_object_list', routes.getTemplateCustomizable
 app.post('/upload_user_data', routes.uploadUserData_cb );
 app.get('/oauth2callback', routes.YoutubeOAuth2_cb );
 app.post('/upload', routes.upload_cb );
+app.post('/upload_user_data_info',routes.uploadUserDataInfo_cb);
 
 //GL
 app.get('/', routes.profile, routes.index);

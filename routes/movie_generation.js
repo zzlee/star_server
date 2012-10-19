@@ -1,4 +1,5 @@
 var fs = require('fs');
+var path = require('path');
 var workingPath = process.env.AE_PROJECT;
 var movieMaker = require(workingPath+'/ae_render.js');
 
@@ -123,33 +124,14 @@ exports.uploadUserData_cb = function(req, res) {
 
 	if( Object.prototype.toString.call( req.body.customizable_object_ID ) === '[object Array]' ) {
 		for (var i in req.body.customizable_object_ID) {
-		
-			/*
-			//get the temporary location of the file
-			var tmp_path = uploadedFiles[req.body.customizable_object_ID[i]].path;
-			//set where the file should actually exists - in this case it is in the "images" directory
-			var target_path = targetDir + '/' + uploadedFiles[req.body.customizable_object_ID[i]].name;  
-			//move the uploaded file to ./public/contents/[movie project ID]/user_data
-			moveUploadedFileToUserDataFolder( tmp_path, target_path, uploadedFiles[req.body.customizable_object_ID[i]].size);
-			*/
-		
 			//append the content in customized_content.xml
 			var customizableObjectXml = customizableObjectListXml.ele('customizable_object');
 			customizableObjectXml.ele('ID', req.body.customizable_object_ID[i] );
 			customizableObjectXml.ele('format', req.body.format[i]);
 			customizableObjectXml.ele('content', uploadedFiles[req.body.customizable_object_ID[i]].name);
-
 		}
 	}
 	else {
-		/*
-		//get the temporary location of the file
-		var tmp_path = uploadedFiles[req.body.customizable_object_ID].path;
-		//set where the file should actually exists - in this case it is in the "images" directory
-		var target_path = targetDir + '/' + uploadedFiles[req.body.customizable_object_ID].name;  
-		//move the uploaded file to ./public/contents/[movie project ID]/user_data
-		moveUploadedFileToUserDataFolder( tmp_path, target_path, uploadedFiles[req.body.customizable_object_ID].size);
-		*/
 		//append the content in customized_content.xml
 		var customizableObjectXml = customizableObjectListXml.ele('customizable_object');
 		customizableObjectXml.ele('ID', req.body.customizable_object_ID );
@@ -168,5 +150,67 @@ exports.uploadUserData_cb = function(req, res) {
 
 exports.uploadUserDataInfo_cb = function(req, res) {
 
+	var movieProjectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectID);
+	var userDataDir = path.join( movieProjectDir, 'user_data');
+	
+	var writeTo_customized_content_xml_cb = function (err) {
+		if (!err) {
+			console.log('customized_content.xml is generated.');
+			
+			//check if all the user data exist; (if yes, start generating the movie in startGeneratingMovie()
+			var allUserContentExist = true;
+			if( Object.prototype.toString.call( req.body.customizableObjects ) === '[object Array]' ) {
+				for (var i in req.body.customizableObjects) {
+					allUserContentExist = allUserContentExist && fs.existsSync( path.join( userDataDir, req.body.customizableObjects[i].content) );
+				}
+			}
+			else {
+				allUserContentExist = fs.existsSync( path.join( userDataDir, req.body.customizableObjects.content) );
+			}
+
+			if ( allUserContentExist ) {
+				console.log('Start generating movie!');
+				movieMaker.renderMovie(req.body.projectID, req.body.userID);
+				res.send(null);
+			}
+			else {
+				res.send("Some or all user contents are missing.");
+			}
+			
+		}
+	}
+	
+
+
+	//==append the content in customized_content.xml==
+	var builder = require('xmlbuilder');
+	var userDataXml = builder.create('customized_content',{'version': '1.0', 'encoding': 'UTF-8', 'standalone': true});
+	userDataXml.ele('template_ID', req.body.templateID);
+	var customizableObjectListXml = userDataXml.ele('customizable_object_list');
+	
+
+	if( Object.prototype.toString.call( req.body.customizableObjects ) === '[object Array]' ) {
+		for (var i in req.body.customizableObjects) {
+			//append the content in customized_content.xml
+			var customizableObjectXml = customizableObjectListXml.ele('customizable_object');
+			customizableObjectXml.ele('ID', req.body.customizableObjects[i].ID );
+			customizableObjectXml.ele('format', req.body.customizableObjects[i].format);
+			customizableObjectXml.ele('content', req.body.customizableObjects[i].content);
+		}
+	}
+	else {
+		//append the content in customized_content.xml
+		var customizableObjectXml = customizableObjectListXml.ele('customizable_object');
+		customizableObjectXml.ele('ID', req.body.customizableObjects.ID );
+		customizableObjectXml.ele('format', req.body.customizableObjects.format);
+		customizableObjectXml.ele('content', req.body.customizableObjects.content);
+	}
+	
+	//finalize customized_content.xml 
+	var xmlString = userDataXml.end({ 'pretty': true, 'indent': '  ', 'newline': '\n' });
+	//console.log(userDataXml);
+	if ( fs.existsSync(userDataDir) ) {
+		fs.writeFile(userDataDir+'/customized_content.xml', xmlString, writeTo_customized_content_xml_cb );	
+	}
 
 };

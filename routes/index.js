@@ -1,6 +1,7 @@
 ﻿//GZ  
 var movieGeneration = require('./movie_generation.js'); 
 exports.uploadUserData_cb = movieGeneration.uploadUserData_cb;
+exports.uploadUserDataInfo_cb = movieGeneration.uploadUserDataInfo_cb;
 
 var movieTemplate = require('./movie_template.js'); 
 exports.getTemplateList_cb = movieTemplate.getTemplateList_cb;

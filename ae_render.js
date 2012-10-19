@@ -55,7 +55,7 @@ var performRenderingTask = function(movieProjectID, ownerID) {
 			//console.log('result of parsing customized_content.xml =');
 			//console.dir(result);
 			//_templateID = result.template_ID;
-			_templateID = result.customizd_content.template_ID;
+			_templateID = result.customized_content.template_ID;
 			
 			if (_templateID) {
 				/*
