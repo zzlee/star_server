@@ -1,4 +1,4 @@
-var FmBackend = window.FmBackend || {};
+﻿var FmBackend = window.FmBackend || {};
 
 var DEBUG = true;
 var local = false,
@@ -54,8 +54,13 @@ FmBackend.censorshipPg = {
                     
                     $("<br>").appendTo(event);
                     
-                    var rejectBtn = $("<button>").attr("id", "rjt"+i).html("�ڵ�").on("click", FmBackend.censorshipPg.reject).appendTo(event);
-                    var proveBtn = $("<button>").attr("id", "prv"+i).html("�q�L").on("click", FmBackend.censorshipPg.prove).appendTo(event);
+                    var rejectBtn = $("<button>").attr("id", "rjt"+i).html("拒絕").on("click", FmBackend.censorshipPg.reject).appendTo(event);
+                    //var proveBtn = $("<button>").attr("id", "prv"+i).html("通過").on("click", FmBackend.censorshipPg.prove).appendTo(event);
+                    var proveBtn = $("<button>").attr("id", "prv"+i).html("通過").click({
+																						projectID: _waitingEvents[i].projectId, 
+																						start: _waitingEvents[i].start
+																						}, 
+																						FmBackend.censorshipPg.prove).appendTo(event);  //GZ
                     
                 }
             }
@@ -67,7 +72,7 @@ FmBackend.censorshipPg = {
         var idx = parseInt(event.target.id.substring(3), 10);
         var url = domain + "/api/reject",
             evtid = _waitingEvents[idx]._id,
-            data = {"event": {"oid": evtid} };
+            data = {"event": {"oid": evtid} }; 
             
         if(DEBUG) console.log("Reject " + event.target.id + " events: "+ JSON.stringify(evtid) );  
         
@@ -84,7 +89,7 @@ FmBackend.censorshipPg = {
         var idx = parseInt(event.target.id.substring(3), 10);
         var url = domain + "/api/prove",
             evtid = _waitingEvents[idx]._id,
-            data = {"event": {"oid": evtid} };
+            data = {"event": {"oid": evtid, "projectID": event.data.projectID, "start":event.data.start }  };  //GZ
             
         if(DEBUG) console.log("Prove " + event.target.id + " events: "+ JSON.stringify(evtid) );
         

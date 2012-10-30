@@ -67,7 +67,8 @@ FM.api.signup = function(req, res){
                     pwd: member.password,
                     userId: oid};
                  
-                var vjson1 = {  "title":"Darth vader funny commercial",
+                /*
+				var vjson1 = {  "title":"Darth vader funny commercial",
                                 "ownerId": oid,
                                 "url": {"youtube":"http://www.youtube.com/embed/YRQyS_8sShw"},
                                 "projectId": "8608"};
@@ -82,6 +83,8 @@ FM.api.signup = function(req, res){
                         FM.api.profile(req, res);
                     });
                 });
+				*/
+				FM.api.profile(req, res); //GZ
             }
         });
         
@@ -204,6 +207,16 @@ FM.api.prove = function(req, res){
 
     var evtid = req.body.event.oid;
     console.log("\nProve " + JSON.stringify(evtid) );
+	
+	//GZ
+	//send to DOOH for play
+	var doohControl = require("../dooh_control.js");
+	var doohURL = '192.168.5.101';  //TODO: query from doohDB
+	var movieProjectID = req.body.event.projectID;
+	var start = req.body.event.start;
+	doohControl.sendPlayRequest(doohURL, movieProjectID, start );
+	console.log('Movie %s is requested to send to DOOH %s!', movieProjectID, doohURL );
+	
     scheduleDB.prove(evtid, function(err, result){
     
         if(err){
@@ -212,6 +225,8 @@ FM.api.prove = function(req, res){
             res.send( {"Prove Event": result} );
         }
     });
+	
+	
 };
 
 
@@ -254,6 +269,7 @@ FM.api.profile = function(req, res){
     //console.log("api.profile: " + JSON.stringify(req.session));
     if(req.session.user){
         videoDB.getVideoListById(req.session.user.userId, function(err, result){
+		//videoDB.getVideoListById(req.session.user.name, function(err, result){  //GZ
         
             if(err) throw err;
             var data = {

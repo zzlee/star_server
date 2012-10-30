@@ -44,9 +44,57 @@
 			}
 		}
 
+		function generatePreviewKeyFrame( _customizableObjectID, _keyFramePreviewStart, _keyFramePreviewEnd  ) {
+			$.writeln("Generating key frame for "+_customizableObjectID+" ....");
+			app.project.renderQueue.items.add(myCompo);
+			var myRenderQueueItem = app.project.renderQueue.item(1);
+			myRenderQueueItem.applyTemplate("5fps_setting");
+			myRenderQueueItem.timeSpanDuration = Number(_keyFramePreviewEnd) - Number(_keyFramePreviewStart);
+			myRenderQueueItem.timeSpanStart = Number( _keyFramePreviewStart );
+			myRenderQueueItem.outputModule(1).applyTemplate("one_shot");
+			myRenderQueueItem.outputModule(1).file = new File(AepDir.toString()+"\\raw_data\\preview_keyframe_"+_customizableObjectID+"_[#####].png");
+			app.project.renderQueue.render();
+			myRenderQueueItem.remove();
+			
+		}
+
+		function generatePreviewKeyFrameDesXmlFile( _customizableObjectID  ) {
+			
+			var PreviewKeyFrameDesXmlFile = new File(AepDir.toString()+"\\raw_data\\"+_customizableObjectID+".xml")
+			var file5OK = PreviewKeyFrameDesXmlFile.open("w");
+			PreviewKeyFrameDesXmlFile.encoding = "UTF-8";
 		
-		//app.open(File("D:\\nodejs_projects\\i_am_a_super_star\\public\\contents\\template\\coffee_time\\coffee_time.aep"));  //for test only
-		//app.open(File("D:\\nodejs_projects\\i_am_a_super_star\\public\\contents\\template\\memory\\memory.aep"));  //for test only
+			if (file5OK) {
+				var PreviewKeyFrameDesXml = new XML ("<template_preview/>");
+				
+				var foundPreviewFiles = rawDataFolder.getFiles("preview_keyframe_"+_customizableObjectID+"_?????.png");
+				if ( foundPreviewFiles.length> 1 ) {
+				
+					for (var k in foundPreviewFiles) {
+						var aPreviewKeyFrameDes = new XML("<preview_key_frame/>");
+						var previewKeyFrameFilename = foundPreviewFiles[k].toString();
+						aPreviewKeyFrameDes.source = previewKeyFrameFilename.substr(previewKeyFrameFilename.lastIndexOf('/')+1);
+						//aPreviewKeyFrameDes.x = 
+						//aPreviewKeyFrameDes.y = 
+						//aPreviewKeyFrameDes.width = 
+						//aPreviewKeyFrameDes.height = 
+						
+						PreviewKeyFrameDesXml.appendChild(aPreviewKeyFrameDes);
+					}
+					
+				}
+				else {
+				
+					//TODO
+				}
+				PreviewKeyFrameDesXmlFile.write(PreviewKeyFrameDesXml.toXMLString());
+				PreviewKeyFrameDesXmlFile.close();
+			}
+		}
+
+		
+		//app.open(File("D:\\nodejs_projects\\star_server\\public\\contents\\template\\coffee_time\\coffee_time.aep"));  //for test only
+		app.open(File("D:\\nodejs_projects\\star_server\\public\\contents\\template\\memory\\memory.aep"));  //for test only
 		if (!app.project) {
 			alert ("A templat AEP must be open to use this script.");
 			return "The templat AEP is not yet opened. ";
@@ -54,6 +102,9 @@
 
 
 		var AepDir = File(app.project.file).parent.toString();
+		var rawDataFolder = new Folder(AepDir+"\\raw_data");
+		if (!rawDataFolder.create())
+			return "Cannot create raw_data folder";
 		
 		//TODO: make sure the render queue is empty
 
@@ -64,33 +115,24 @@
 			var templateDefinitionXmlString =  templateDefinitionXmlFile.read();
 			var templateDefinitionXml = new XML (templateDefinitionXmlString);
 			templateDefinitionXmlFile.close();
-			
-			var rawDataFolder = new Folder(AepDir+"\\raw_data");
-			if (!rawDataFolder.create())
-				return "Cannot create raw_data folder";
-			
+						
 			var AepItems = app.project.items;
 			var myCompo = getItem(AepItems, templateDefinitionXml.composition);
 			if ( myCompo == null ) {
 				return "Cannot find the specified compositon";
 			}
 		
-
-			//generate template_raw_data_description.xml
-			$.writeln("Generating template_raw_data_description.xml ...");
-			var rawDataXmlFile = new File(AepDir.toString()+"\\raw_data\\template_raw_data_description.xml")
-			var file2OK = rawDataXmlFile.open("w");
-			rawDataXmlFile.encoding = "UTF-8";
-			
+			$.writeln("Generating template_description.xml ...");
 			var DescriptionXmlFile = new File(AepDir.toString()+"\\raw_data\\template_description.xml")
 			var file3OK = DescriptionXmlFile.open("w");
 			DescriptionXmlFile.encoding = "UTF-8";
 			
+			$.writeln("Generating template_customizable_object_list.xml ...");
 			var customizableObjectListXmlFile = new File(AepDir.toString()+"\\raw_data\\template_customizable_object_list.xml")
 			var file4OK = customizableObjectListXmlFile.open("w");
 			customizableObjectListXmlFile.encoding = "UTF-8";
 			
-			if (file2OK && file3OK&&file4OK){
+			if (file3OK&&file4OK){
 				var rawDataXml = new XML ("<template_raw_data/>");
 				rawDataXml.ID = templateDefinitionXml.ID;
 				rawDataXml.name = templateDefinitionXml.name;
@@ -114,10 +156,25 @@
 						//aCustomizableObjectInRawData.y = 
 						//aCustomizableObjectInRawData.width = 
 						//aCustomizableObjectInRawData.height = 
+						
+						
+						//generate the corresponding preview key frames
+						generatePreviewKeyFrame( customizableObjects[j].ID, customizableObjects[j].key_frame_preview_start, customizableObjects[j].key_frame_preview_end );
+						generatePreviewKeyFrameDesXmlFile( customizableObjects[j].ID );
+						/*
+						var foundPreviewFiles = rawDataFolder.getFiles("preview_keyframe_"+customizableObjects[j].ID+"_?????.png");
+						for (var k in foundPreviewFiles) {
+							var previewKeyFrameFilename = foundPreviewFiles[k].toString();
+							aCustomizableObjectInRawData.preview_key_frame = previewKeyFrameFilename.substr(previewKeyFrameFilename.lastIndexOf('/')+1);
+						}
+						*/
+						
+							
 						customizableObjectListXml.appendChild(aCustomizableObjectInRawData);
 						
 						//generate the corresponding key frame
 						generateKeyFrame( customizableObjects[j].ID, customizableObjects[j].key_frame_time );
+						
 					}
 				}
 				else {
@@ -135,13 +192,13 @@
 					
 					//generate the corresponding key frame
 					generateKeyFrame( aCustomizableObject.ID, aCustomizableObject.key_frame_time );
-				}
+
+					//generate the corresponding preview key frames
+					generatePreviewKeyFrame( customizableObjects.ID, customizableObjects.key_frame_preview_start, customizableObjects.key_frame_preview_end );
+					}
 				customizableObjectListXmlFile.write(customizableObjectListXml.toXMLString());
 				customizableObjectListXmlFile.close();
 								
-				rawDataXml.appendChild(customizableObjectListXml);
-				rawDataXmlFile.write(rawDataXml.toXMLString());
-				rawDataXmlFile.close();
 			}		
 			else {
 				return "Cannot create template_raw_data_description.xml";
@@ -153,7 +210,7 @@
 			return "Cannot open template_definition.xml";
 		}
 		
-		//app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES);  //for test only
+		app.project.close(CloseOptions.DO_NOT_SAVE_CHANGES);  //for test only
 		
 		return "Raw data is generated successfully.";
 	}
