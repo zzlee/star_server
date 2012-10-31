@@ -1,8 +1,15 @@
 ﻿{
 	//ag_gen_raw_data
-	//NOTE: "one shot" and "H264" outputModule template must be manually set in After Effects before running ag_gen_raw_data.jsx
+	//NOTE: "one shot" outputModule template must be manually set in After Effects before running ag_gen_raw_data.jsx
+	
+	var samplingRate = 5; //fps
+	var samplingPeriod = 1/samplingRate; //sec
 	
 	function genRawData() {
+
+		var AepItems;
+		var myCompo;
+	
 	
 		function getItem(_items, _name) {
 			var itemIndex = -1;
@@ -58,7 +65,7 @@
 			
 		}
 
-		function generatePreviewKeyFrameDesXmlFile( _customizableObjectID  ) {
+		function generatePreviewKeyFrameDesXmlFile( _customizableObjectID, _keyFramePreviewStart, _videoWithTracker, _TrackerID, _trackPointUL, _trackPointUR, _trackPointLL, _trackPointLR  ) {
 			
 			var PreviewKeyFrameDesXmlFile = new File(AepDir.toString()+"\\raw_data\\"+_customizableObjectID+".xml")
 			var file5OK = PreviewKeyFrameDesXmlFile.open("w");
@@ -69,15 +76,26 @@
 				
 				var foundPreviewFiles = rawDataFolder.getFiles("preview_keyframe_"+_customizableObjectID+"_?????.png");
 				if ( foundPreviewFiles.length> 1 ) {
-				
+					
+					var time = Number(_keyFramePreviewStart);
 					for (var k in foundPreviewFiles) {
 						var aPreviewKeyFrameDes = new XML("<preview_key_frame/>");
 						var previewKeyFrameFilename = foundPreviewFiles[k].toString();
 						aPreviewKeyFrameDes.source = previewKeyFrameFilename.substr(previewKeyFrameFilename.lastIndexOf('/')+1);
-						//aPreviewKeyFrameDes.x = 
-						//aPreviewKeyFrameDes.y = 
-						//aPreviewKeyFrameDes.width = 
-						//aPreviewKeyFrameDes.height = 
+
+						aPreviewKeyFrameDes.time = time.toString();
+						aPreviewKeyFrameDes.x = myCompo.layer(_customizableObjectID).position.valueAtTime( time, false )[0];
+						aPreviewKeyFrameDes.y = myCompo.layer(_customizableObjectID).position.valueAtTime( time, false )[1];
+						aPreviewKeyFrameDes.upper_left_corner_x = myCompo.layer(_videoWithTracker)("Motion Trackers")(_TrackerID)(_trackPointUL)("Feature Center").valueAtTime(time, false)[0];
+						aPreviewKeyFrameDes.upper_left_corner_y = myCompo.layer(_videoWithTracker)("Motion Trackers")(_TrackerID)(_trackPointUL)("Feature Center").valueAtTime(time, false)[1];
+						aPreviewKeyFrameDes.upper_right_corner_x = myCompo.layer(_videoWithTracker)("Motion Trackers")(_TrackerID)(_trackPointUR)("Feature Center").valueAtTime(time, false)[0];
+						aPreviewKeyFrameDes.upper_right_corner_y = myCompo.layer(_videoWithTracker)("Motion Trackers")(_TrackerID)(_trackPointUR)("Feature Center").valueAtTime(time, false)[1];
+						aPreviewKeyFrameDes.lower_left_corner_x = myCompo.layer(_videoWithTracker)("Motion Trackers")(_TrackerID)(_trackPointLL)("Feature Center").valueAtTime(time, false)[0];
+						aPreviewKeyFrameDes.lower_left_corner_y = myCompo.layer(_videoWithTracker)("Motion Trackers")(_TrackerID)(_trackPointLL)("Feature Center").valueAtTime(time, false)[1];
+						aPreviewKeyFrameDes.lower_right_corner_x = myCompo.layer(_videoWithTracker)("Motion Trackers")(_TrackerID)(_trackPointLR)("Feature Center").valueAtTime(time, false)[0];
+						aPreviewKeyFrameDes.lower_right_corner_y = myCompo.layer(_videoWithTracker)("Motion Trackers")(_TrackerID)(_trackPointLR)("Feature Center").valueAtTime(time, false)[1];
+						
+						time += samplingPeriod;
 						
 						PreviewKeyFrameDesXml.appendChild(aPreviewKeyFrameDes);
 					}
@@ -94,7 +112,8 @@
 
 		
 		//app.open(File("D:\\nodejs_projects\\star_server\\public\\contents\\template\\coffee_time\\coffee_time.aep"));  //for test only
-		app.open(File("D:\\nodejs_projects\\star_server\\public\\contents\\template\\memory\\memory.aep"));  //for test only
+		//app.open(File("D:\\nodejs_projects\\star_server\\public\\contents\\template\\memory\\memory.aep"));  //for test only
+		app.open(File("D:\\nodejs_projects\\star_server\\public\\contents\\template\\\photo\\\photo.aep"));  //for test only
 		if (!app.project) {
 			alert ("A templat AEP must be open to use this script.");
 			return "The templat AEP is not yet opened. ";
@@ -115,12 +134,14 @@
 			var templateDefinitionXmlString =  templateDefinitionXmlFile.read();
 			var templateDefinitionXml = new XML (templateDefinitionXmlString);
 			templateDefinitionXmlFile.close();
-						
-			var AepItems = app.project.items;
-			var myCompo = getItem(AepItems, templateDefinitionXml.composition);
+            
+			AepItems = app.project.items;
+			myCompo = getItem(AepItems, templateDefinitionXml.composition);
 			if ( myCompo == null ) {
 				return "Cannot find the specified compositon";
 			}
+	
+						
 		
 			$.writeln("Generating template_description.xml ...");
 			var DescriptionXmlFile = new File(AepDir.toString()+"\\raw_data\\template_description.xml")
@@ -138,6 +159,8 @@
 				rawDataXml.name = templateDefinitionXml.name;
 				rawDataXml.description = templateDefinitionXml.description;
 				rawDataXml.composition = templateDefinitionXml.composition;
+				rawDataXml.composition_width = myCompo.width;
+				rawDataXml.composition_height = myCompo.height;
 				rawDataXml.raw_video = rawDataXml.ID+".avi"; //NOT yet generated
 				
 				DescriptionXmlFile.write(rawDataXml.toXMLString());
@@ -156,11 +179,26 @@
 						//aCustomizableObjectInRawData.y = 
 						//aCustomizableObjectInRawData.width = 
 						//aCustomizableObjectInRawData.height = 
+
+						var theFootage = getItem(AepItems, customizableObjects[j].ID);
+						if ( theFootage == null ) {
+							return "Cannot find the specified footage";
+						}
+						aCustomizableObjectInRawData.original_width = theFootage.width;
+						aCustomizableObjectInRawData.original_height = theFootage.height;
 						
 						
 						//generate the corresponding preview key frames
 						generatePreviewKeyFrame( customizableObjects[j].ID, customizableObjects[j].key_frame_preview_start, customizableObjects[j].key_frame_preview_end );
-						generatePreviewKeyFrameDesXmlFile( customizableObjects[j].ID );
+						generatePreviewKeyFrameDesXmlFile( customizableObjects[j].ID, 
+															customizableObjects[j].key_frame_preview_start, 
+															customizableObjects[j].video_with_tracker,
+															customizableObjects[j].tracker_ID,
+															customizableObjects[j].track_point_upper_left,
+															customizableObjects[j].track_point_upper_right,
+															customizableObjects[j].track_point_lower_left,
+															customizableObjects[j].track_point_lower_right
+															);
 						/*
 						var foundPreviewFiles = rawDataFolder.getFiles("preview_keyframe_"+customizableObjects[j].ID+"_?????.png");
 						for (var k in foundPreviewFiles) {
@@ -188,14 +226,34 @@
 					//aCustomizableObjectInRawData.y = 
 					//aCustomizableObjectInRawData.width = 
 					//aCustomizableObjectInRawData.height = 
-					customizableObjectListXml.appendChild(aCustomizableObjectInRawData);
+
+					var theFootage = getItem(AepItems, aCustomizableObject.ID);
+					if ( theFootage == null ) {
+						return "Cannot find the specified footage";
+					}
+					aCustomizableObjectInRawData.original_width = theFootage.width;
+					aCustomizableObjectInRawData.original_height = theFootage.height;
+						
 					
+					//generate the corresponding preview key frames
+					generatePreviewKeyFrame( aCustomizableObject.ID, aCustomizableObject.key_frame_preview_start, aCustomizableObject.key_frame_preview_end );
+					generatePreviewKeyFrameDesXmlFile( aCustomizableObject.ID, 
+														aCustomizableObject.key_frame_preview_start, 
+														aCustomizableObject.video_with_tracker,
+														aCustomizableObject.tracker_ID,
+														aCustomizableObject.track_point_upper_left,
+														aCustomizableObject.track_point_upper_right,
+														aCustomizableObject.track_point_lower_left,
+														aCustomizableObject.track_point_lower_right
+														);
+				
+					customizableObjectListXml.appendChild(aCustomizableObjectInRawData);
+
 					//generate the corresponding key frame
 					generateKeyFrame( aCustomizableObject.ID, aCustomizableObject.key_frame_time );
 
-					//generate the corresponding preview key frames
-					generatePreviewKeyFrame( customizableObjects.ID, customizableObjects.key_frame_preview_start, customizableObjects.key_frame_preview_end );
-					}
+				}
+				
 				customizableObjectListXmlFile.write(customizableObjectListXml.toXMLString());
 				customizableObjectListXmlFile.close();
 								

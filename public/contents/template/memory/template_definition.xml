@@ -12,7 +12,6 @@
 			<key_frame_time>2.0</key_frame_time><!--key frame是出現在第幾秒的畫面-->
 			<key_frame_preview_start>1.0</key_frame_preview_start><!--key frame預覽是在第幾秒開始-->
 			<key_frame_preview_end>2.2</key_frame_preview_end><!--key frame預覽是在第幾秒開始-->
-			<key_frame_preview_sampling_rate>10</key_frame_preview_sampling_rate><!--key frame預覽的取樣頻率 (fps)-->
 		</customizable_object>
 		<customizable_object>
 			<ID>photo2</ID> <!-- 在.aep中的footage ID-->
@@ -21,7 +20,6 @@
 			<key_frame_time>4.0</key_frame_time><!--出現在第幾秒的畫面-->
 			<key_frame_preview_start>3.9</key_frame_preview_start><!--key frame預覽是在第幾秒開始-->
 			<key_frame_preview_end>4.5</key_frame_preview_end><!--key frame預覽是在第幾秒開始-->
-			<key_frame_preview_sampling_rate>10</key_frame_preview_sampling_rate><!--key frame預覽的取樣頻率 (fps)-->
 		</customizable_object>
 	</customizable_object_list>
 </template_definition>
