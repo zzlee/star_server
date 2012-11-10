@@ -33,18 +33,18 @@
 			app.project.renderQueue.items.add(myCompo);
 			var myRenderQueueItem = app.project.renderQueue.item(1);
 			myRenderQueueItem.applyTemplate("Best Settings");
-			myRenderQueueItem.timeSpanDuration = 0.034;
+			myRenderQueueItem.timeSpanDuration = 0.05;
 			myRenderQueueItem.timeSpanStart = Number( _keyFrameTime );
 			myRenderQueueItem.outputModule(1).applyTemplate("one_shot");
-			myRenderQueueItem.outputModule(1).file = new File(AepDir.toString()+"\\raw_data\\_keyframe_"+_customizableObjectID+"_[#####].png");
+			myRenderQueueItem.outputModule(1).file = new File(AepDir.toString()+"\\raw_data\\_keyframe_"+_customizableObjectID+"_[#####].jpg");
 			app.project.renderQueue.render();
 			myRenderQueueItem.remove();
 			
-			var foundFiles1 = rawDataFolder.getFiles("_keyframe_"+_customizableObjectID+"_?????.png");
-			if ( !foundFiles1[1].rename("keyframe_"+_customizableObjectID+".png") )
-				return "Fail to rename generated .png file"; 
-			//delete rest of other duplicated .png files	
-			var foundFiles2 = rawDataFolder.getFiles("_*.png");
+			var foundFiles1 = rawDataFolder.getFiles("_keyframe_"+_customizableObjectID+"_?????.jpg");
+			if ( !foundFiles1[1].rename("keyframe_"+_customizableObjectID+".jpg") )
+				return "Fail to rename generated .jpg file"; 
+			//delete rest of other duplicated .jpg files	
+			var foundFiles2 = rawDataFolder.getFiles("_*.jpg");
 			for (var k in foundFiles2) {
 				if ( !foundFiles2[k].remove() )
 					return "Cannot remove "+foundFiles2[k].toString();
@@ -58,8 +58,8 @@
 			myRenderQueueItem.applyTemplate("5fps_setting");
 			myRenderQueueItem.timeSpanDuration = Number(_keyFramePreviewEnd) - Number(_keyFramePreviewStart);
 			myRenderQueueItem.timeSpanStart = Number( _keyFramePreviewStart );
-			myRenderQueueItem.outputModule(1).applyTemplate("one_shot");
-			myRenderQueueItem.outputModule(1).file = new File(AepDir.toString()+"\\raw_data\\preview_keyframe_"+_customizableObjectID+"_[#####].png");
+			myRenderQueueItem.outputModule(1).applyTemplate("jpg_preview");
+			myRenderQueueItem.outputModule(1).file = new File(AepDir.toString()+"\\raw_data\\preview_keyframe_"+_customizableObjectID+"_[#####].jpg");
 			app.project.renderQueue.render();
 			myRenderQueueItem.remove();
 			
@@ -74,7 +74,7 @@
 			if (file5OK) {
 				var PreviewKeyFrameDesXml = new XML ("<template_preview/>");
 				
-				var foundPreviewFiles = rawDataFolder.getFiles("preview_keyframe_"+_customizableObjectID+"_?????.png");
+				var foundPreviewFiles = rawDataFolder.getFiles("preview_keyframe_"+_customizableObjectID+"_?????.jpg");
 				if ( foundPreviewFiles.length> 1 ) {
 					
 					var time = Number(_keyFramePreviewStart);
@@ -113,7 +113,8 @@
 		
 		//app.open(File("D:\\nodejs_projects\\star_server\\public\\contents\\template\\coffee_time\\coffee_time.aep"));  //for test only
 		//app.open(File("D:\\nodejs_projects\\star_server\\public\\contents\\template\\memory\\memory.aep"));  //for test only
-		app.open(File("D:\\nodejs_projects\\star_server\\public\\contents\\template\\\photo\\\photo.aep"));  //for test only
+		//app.open(File("D:\\nodejs_projects\\star_server\\public\\contents\\template\\\photo\\\photo.aep"));  //for test only
+        app.open(File("D:\\nodejs_projects\\star_server\\public\\contents\\template\\rotate\\rotate.aep"));  //for test only
 		if (!app.project) {
 			alert ("A templat AEP must be open to use this script.");
 			return "The templat AEP is not yet opened. ";
@@ -174,7 +175,7 @@
 						aCustomizableObjectInRawData.ID = customizableObjects[j].ID;
 						aCustomizableObjectInRawData.format = customizableObjects[j].format;
 						aCustomizableObjectInRawData.description = customizableObjects[j].description;
-						aCustomizableObjectInRawData.key_frame = "keyframe_"+customizableObjects[j].ID+".png";
+						aCustomizableObjectInRawData.key_frame = "keyframe_"+customizableObjects[j].ID+".jpg";
 						//aCustomizableObjectInRawData.x =
 						//aCustomizableObjectInRawData.y = 
 						//aCustomizableObjectInRawData.width = 
@@ -200,7 +201,7 @@
 															customizableObjects[j].track_point_lower_right
 															);
 						/*
-						var foundPreviewFiles = rawDataFolder.getFiles("preview_keyframe_"+customizableObjects[j].ID+"_?????.png");
+						var foundPreviewFiles = rawDataFolder.getFiles("preview_keyframe_"+customizableObjects[j].ID+"_?????.jpg");
 						for (var k in foundPreviewFiles) {
 							var previewKeyFrameFilename = foundPreviewFiles[k].toString();
 							aCustomizableObjectInRawData.preview_key_frame = previewKeyFrameFilename.substr(previewKeyFrameFilename.lastIndexOf('/')+1);
@@ -221,7 +222,7 @@
 					aCustomizableObjectInRawData.ID = aCustomizableObject.ID;
 					aCustomizableObjectInRawData.format = aCustomizableObject.format;
 					aCustomizableObjectInRawData.description = aCustomizableObject.description;
-					aCustomizableObjectInRawData.key_frame = "keyframe_"+aCustomizableObject.ID+".png";
+					aCustomizableObjectInRawData.key_frame = "keyframe_"+aCustomizableObject.ID+".jpg";
 					//aCustomizableObjectInRawData.x =
 					//aCustomizableObjectInRawData.y = 
 					//aCustomizableObjectInRawData.width = 
