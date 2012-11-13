@@ -161,20 +161,20 @@ exports.uploadUserDataInfo_cb = function(req, res) {
 			var allUserContentExist = true;
 			if( Object.prototype.toString.call( req.body.customizableObjects ) === '[object Array]' ) {
 				for (var i in req.body.customizableObjects) {
-					allUserContentExist = allUserContentExist && fs.existsSync( path.join( userDataDir, req.body.customizableObjects[i].content) );
+					allUserContentExist = allUserContentExist && fs.existsSync( path.join( userDataDir, "_"+req.body.customizableObjects[i].content) );
 				}
 			}
 			else {
-				allUserContentExist = fs.existsSync( path.join( userDataDir, req.body.customizableObjects.content) );
+				allUserContentExist = fs.existsSync( path.join( userDataDir, "_"+req.body.customizableObjects.content) );
 			}
 
 			if ( allUserContentExist ) {
-				console.log('Start generating movie!');
-				movieMaker.renderMovie(req.body.projectID, req.body.userID);
+				console.log('Start generating movie %s !', req.body.projectID);
 				res.send(null);
+				movieMaker.renderMovie(req.body.projectID, req.body.userID);
 			}
 			else {
-				res.send("Some or all user contents are missing.");
+				res.send( {err:"Some or all user contents are missing."} );
 			}
 			
 		}
@@ -195,7 +195,7 @@ exports.uploadUserDataInfo_cb = function(req, res) {
 			var customizableObjectXml = customizableObjectListXml.ele('customizable_object');
 			customizableObjectXml.ele('ID', req.body.customizableObjects[i].ID );
 			customizableObjectXml.ele('format', req.body.customizableObjects[i].format);
-			customizableObjectXml.ele('content', req.body.customizableObjects[i].content);
+			customizableObjectXml.ele('content', "_"+req.body.customizableObjects[i].content);
 		}
 	}
 	else {
@@ -203,7 +203,7 @@ exports.uploadUserDataInfo_cb = function(req, res) {
 		var customizableObjectXml = customizableObjectListXml.ele('customizable_object');
 		customizableObjectXml.ele('ID', req.body.customizableObjects.ID );
 		customizableObjectXml.ele('format', req.body.customizableObjects.format);
-		customizableObjectXml.ele('content', req.body.customizableObjects.content);
+		customizableObjectXml.ele('content', "_"+req.body.customizableObjects.content);
 	}
 	
 	//finalize customized_content.xml 
