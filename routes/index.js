@@ -25,6 +25,11 @@ var memberDB = require("../member.js"),
     
 exports.api = api;
 
+exports.signinFB = function(req, res){
+	console.log("\n[FM] [signin_fb] ");
+    res.render('signinFB', { title: "導向Facebook認證頁！" });
+};
+
 exports.signin = function (req, res, next) {
     /*
      *  Once member sign-in, we should save profile in session to be used in same session.

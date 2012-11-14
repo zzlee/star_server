@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  *  Ajax APIs
  */
 
@@ -6,11 +6,383 @@ var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
     videoDB = require("../video.js");
     
-var FM = {api:{}};
+var ObjectID = require('mongodb').ObjectID;
 
-var mongodb = require('mongodb'),
-            ObjectID = require('mongodb').ObjectID;
+var DEBUG = true,
+    FM_LOG = (DEBUG) ? function(str){ console.log( typeof(str)==='string' ? str : JSON.stringify(str) ); } : function(str){} ;
+    
+var FM = { api: {} };
 
+FM.api.reply = [];  // Queue Res callback according to sessionID.
+
+// GET
+FM.api.fbStatus = function(req, res){
+    
+    var sid = req.sessionID;
+    FM_LOG("\n[Get LongPolling] sessionID: " + sid);
+    FM_LOG("Session: " + JSON.stringify(req.session) );
+    var date = new Date();
+    
+    if(date - req.socket._idleStart.getTime() > 59999){
+        res.send("Keep Polling");
+    }
+    
+    FM.api.reply[sid] = res;
+};
+
+// Inter
+FM.api._fbStatusAck = function(response){
+    FM_LOG("\n[fbStatusAck]:");
+    
+    var sid = response.data.sessionID;
+    if(response.data._id){
+        response.data._id = response.data._id.toHexString();
+    }
+    FM.api.reply[sid].send(response);
+        
+    delete FM.api.reply[sid];
+};
+
+// Inter - TODO
+FM.api._fbExtendToken = function(accessToken, callback){
+
+    FM_LOG("\n[_fbExtendToken]: ");
+    
+    var https = require('https');
+    var path = "/oauth/access_token?grant_type=fb_exchange_token"
+        + "&client_id=116813818475773"
+        + "&client_secret=b8f94311a712b98531b292165884124a"
+        + "&fb_exchange_token=" + accessToken
+        + "&scope=read_stream,publish_stream";
+        
+    var host = "graph.facebook.com",
+        urlOpts = {
+            host: host,
+            port: 443,
+            path: path,
+            method: 'POST'
+        },
+        req = https.request(urlOpts, function(res){
+            res.setEncoding('utf8');
+            res.on('data', function(result){
+            
+                if(typeof(result) != 'string'){
+                    FM_LOG("Error: " + result.error.message);
+                    
+                }else{
+                    FM_LOG("\nGot longer lived token: ");
+                    FM_LOG(result);
+                    
+                    var longerToken = result.substring( result.indexOf("=")+1, result.indexOf("&expires") );
+                    var longerExpiresIn = parseInt(result.substring( result.lastIndexOf("=")+1 ), 10);
+                    var now = new Date();
+                    var data = { "data":{
+                        "accessToken": longerToken,
+                        "expiresIn": now.getTime() + longerExpiresIn * 1000
+                    }};
+                
+                    callback(data);
+                }
+            });                  
+        });
+                
+    req.on('error', function(e){
+        FM_LOG("[Failed to Extend Token]: " + e.message );
+    });
+    
+    req.end();
+    
+};
+
+
+/* where = /PROFILE_ID/ or /OBJECT_ID/
+             * what = 
+             * {    "message": "",
+             *      "picture": "",
+             *         "link": "",
+             *         "name": "",
+             *      "caption": "",
+             *  "description": "",
+             *       "source": "",
+             *        "place": "",
+             *         "tags": "" };
+             */
+
+// Inter
+FM.api.fbPostVideo = function(projectID, content){
+        
+    videoDB.getValueByProject(projectID, "ownerId _id url.youtube", function(err, result){    
+        if(result){
+            var ownerId = result["ownerId"];
+            var v_oid = result["_id"];
+            var link = result["url"].youtube;
+            
+            memberDB.getFBAccessTokenById(ownerId, function(err, result){
+    
+                if(err) throw err;
+                if(result){
+                    var userID = result.fb.userID;
+                    var accessToken = result.fb.auth.accessToken;
+                        path = "/" + userID + "/feed",
+                        query = "?" + "access_token=" + accessToken
+                        + "&message=" + content.message
+                        + "&link=" + link;
+                    path += query.replace(/\s/g, "+");
+                    
+                    FM_LOG("[POST req to FB with:]\n" + JSON.stringify(path) );
+                    //  Post on FB.
+                    FM.api._fbPost(path, function(response){     
+                        
+                        //  Get Object_id of Post Item on FB, then update db.
+                        if(response.error){
+                            FM_LOG("[POST on FB:ERROR] " + response.error.message );
+                            
+                        }else{
+                            var fb_id = response.id;    // Using full_id to get detail info.  full_id = userID + item_id
+                            FM_LOG("\n[Response after POST on FB:]\n" + JSON.stringify(response) ); 
+                            //var fb_id = full_id.substring(full_id.lastIndexOf("_")+1);
+                            var newdata = {"fb_id": fb_id};
+                            videoDB.update(v_oid, newdata);
+                        }
+                    });
+                }
+            });
+        }
+    });
+};
+
+
+// POST
+FM.api.fbPostCommentReq = function(req, res){
+    FM_LOG("[api.fbPostCommentReq]");
+    if(req.body && req.body.post){
+    
+        var path = post.path,
+            token = post.token;
+            
+        var path = "/" + fb_oid + "/comments",
+            data = "?" + "access_token=" + token;
+        
+        for(var key in post.data){
+            data += "&" + key + "=" + post.data[key];
+        }
+        path += data;
+        FM.api._fbPost( path, function(response){
+        
+            if(response.error){
+                FM_LOG(error);
+            }else{
+                FM_LOG(response.id);
+                res.send({"res":"Succeed"});
+            }
+        });
+    }
+};
+
+// GET
+FM.api.fbGetCommentReq = function(req, res){
+    FM_LOG("[api.fbGetCommentReq]");
+    if(req.query && req.query.fb_id && req.query.accessToken){
+        FM_LOG(req.query);
+        var fb_id = req.query.fb_id;
+            accessToken = req.query.accessToken;
+            
+        var fields = "comments,likes";
+        var path = "/" + fb_id 
+            + "?access_token=" + accessToken 
+            + "&fields=" + fields;
+            
+        FM.api._fbGet(path, function(response){
+            if(response.error){
+                FM_LOG(response.error.message);
+                res.send(response.error);
+            }else{
+                res.send(response); // "comments" and "likes"
+            }
+        });
+    }else{
+        res.send({error: "fb_id, token are MUST-Have."});
+    }
+};
+
+// Inter
+FM.api._fbPost = function( path, cb){
+
+    var https = require('https'),
+        host = "graph.facebook.com",
+        urlOpts = {
+            host: host,
+            port: 443,
+            path: path,
+            method: 'POST'
+        };
+    var req = https.request(urlOpts, function(res){
+            res.setEncoding('utf8');
+            res.on('data', function(chunk){
+                cb(JSON.parse(chunk));
+            });                  
+        });
+                
+    req.on('error', function(e){
+        FM_LOG("[Error from FB after POST]: " + e.message );
+    });
+    
+    req.end();
+};
+
+// Inter
+FM.api._fbGet = function( path, cb){
+
+    var host = "graph.facebook.com",
+        https = require('https'),
+        urlOpts = {
+            host: host,
+            port: 443,
+            path: path,
+            method: 'GET'
+        };
+        
+    var req = https.request(urlOpts, function(res){
+            res.setEncoding('utf8');
+            res.on('data', function(chunk){
+                cb(JSON.parse(chunk));
+            });                  
+        });
+                
+    req.on('error', function(e){
+        FM_LOG("[Error from FB after GET]: " + e.message );
+    });
+    
+    req.end();
+
+};
+
+// POST
+FM.api.signupwithFB = function(req, res){
+    
+    var sid = req.sessionID;
+    FM_LOG("\n[signupwithFB] sessionID: " + sid);
+    
+    if(req.body && req.body.authResponse){
+    
+        FM_LOG("\n[Got Token]: ");
+        FM_LOG(req.body.authResponse);
+        
+        var authRes = req.body.authResponse;
+        var userID = authRes.userID,
+            accessToken = authRes.accessToken,
+            expiresIn = authRes.expiresIn,
+            auth = {"accessToken": accessToken,
+                    "expiresIn": expiresIn,
+            },
+            meta = {"userID": userID,
+                      "auth": auth
+            },
+            member = {"fb": meta};
+            
+        
+        /* New FB User or Exsited User */
+        memberDB.isFBValid( userID, function(err, result){
+        
+            if(err) throw err;      
+            
+            if(result){ //  fb user existed.
+                FM_LOG("[signupwithFB] FB user[" + userID + "] Existed!");
+                
+                var oid = result._id;
+                
+                // if expire within 20days.
+                if( parseInt(expiresIn) - Date.now() < 20*24*60*60*1000 ){
+                    
+                    FM.api._fbExtendToken(authRes.accessToken, function(response){
+                    
+                        if(response.data){
+                            
+                            member.fb.auth = response.data;
+                            var data = response.data;
+                            var newdata = result.fb;
+                            newdata.auth = data;
+                            
+                            memberDB.updateMember( oid, { fb: newdata }, function(err, result){
+                                if(err) FM_LOG(err);
+                                if(result) FM_LOG(result);
+                            });
+                            
+                            res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "expiresIn": data.expiresIn  }, "message":"success"} );
+                        }
+                    });
+                    
+                }else{
+                    res.send({"message":"success"});
+                }
+                
+                /* ACK LongPolling from Client
+                var ack = { "data":{"sessionID": sid, "accessToken": accessToken, "userID": userID, "_id": oid} };
+                FM.api._fbStatusAck(ack);
+                */
+                
+                
+            }else{  //  New fb user signup.
+                FM_LOG("[signupwithFB:] NEW FB User[" + userID + "] Signup!");
+                
+                FM.api._fbExtendToken(authRes.accessToken, function(response){
+                    
+                    if(response.data){
+                        member.fb.auth = response.data;
+                    }
+                    
+                    memberDB.addMember(member, function(err, result){
+        
+                        FM_LOG("with userId " + result["_id"]);
+                        if(result){
+                            FM_LOG("\n[addMember]:");
+                            FM_LOG(result);
+                            
+                            oid = result["_id"];
+                            /* ACK LongPolling from Client
+                            var ack = { "data":{"sessionID": sid, "accessToken": accessToken, "userID": userID, "_id": oid} };
+                            FM.api._fbStatusAck(ack);
+                            */
+                            
+                            req.session.user = {
+                                userID: member.fb.userID,
+                                _id: oid,
+                                accessToken: member.fb.auth.accessToken
+                            };
+                             
+                            var vjson1 = {  "title":"Star Tours: Darth Vader goes to Disneyland",
+                                            "ownerId": {"_id": oid, "userID": userID},
+                                            "url": {"youtube":"http://www.youtube.com/embed/t4_dZPVg8KI"},
+                                            "projectId": "8608"};
+                            
+                            var vjson2 = {  "title":"A Awesome World",
+                                            "ownerId": {"_id": oid, "userID": userID},
+                                            "url": {"youtube":"http://www.youtube.com/embed/oZmtwUAD1ds"},
+                                            "projectId": "5376"};
+                            
+                            videoDB.addVideo(vjson1, function(err, vdoc){
+                                videoDB.addVideo(vjson2, function(err, vdoc){
+                                    
+                                });
+                            });
+                            
+                            res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn}, 
+								"message":"success"} );
+                        } //else{}
+                    });
+                });
+            }
+        });
+        
+    }else{
+    
+        /* ACK LongPolling - Facebook Authentication Failed!
+        var ack = {"data": {"sessionID": sid, "message":req.body.fail} };
+        FM.api._fbStatusAck(ack);
+        */
+    }
+};           
+            
 FM.api.signin = function (req, res) {
     /*
      *  Once member sign-in, we should save profile in session to be used in same session.
@@ -43,7 +415,7 @@ FM.api.signin = function (req, res) {
 };
 
 
-
+// GET
 FM.api.signout = function (req, res) {
     var username = req.session.user.name;
     console.log(username + " Log-Out!");
@@ -51,6 +423,7 @@ FM.api.signout = function (req, res) {
     res.redirect("/");
 };
 
+// POST
 FM.api.signup = function(req, res){
     console.log("Get POST SignUp Req: " + JSON.stringify(req.body));
     
@@ -67,8 +440,7 @@ FM.api.signup = function(req, res){
                     pwd: member.password,
                     userId: oid};
                  
-                /*
-				var vjson1 = {  "title":"Darth vader funny commercial",
+                var vjson1 = {  "title":"Darth vader funny commercial",
                                 "ownerId": oid,
                                 "url": {"youtube":"http://www.youtube.com/embed/YRQyS_8sShw"},
                                 "projectId": "8608"};
@@ -83,8 +455,6 @@ FM.api.signup = function(req, res){
                         FM.api.profile(req, res);
                     });
                 });
-				*/
-				FM.api.profile(req, res); //GZ
             }
         });
         
@@ -136,6 +506,7 @@ FM.api.addVideo = function(req, res){
     }  
 };*/
 
+// POST
 FM.api.addEvent = function(req, res){
     console.log("addEvent Req: " + JSON.stringify(req.body) );
     if(req.body.event){
@@ -165,7 +536,7 @@ FM.api.addEvent = function(req, res){
                     "start": start,
                     "end": end,
                     "videoUrl": videoWorks[idx].url.youtube,
-                    "location": "¤p¥¨³J",
+                    "location": "å°å·¨è›‹",
                     "status": "waiting"
                   };
                   
@@ -186,7 +557,7 @@ FM.api.addEvent = function(req, res){
 };
 
 
-
+// POST
 FM.api.reject = function(req, res){
 
     var evtid = req.body.event.oid;
@@ -203,20 +574,11 @@ FM.api.reject = function(req, res){
     });
 };
 
+// POST
 FM.api.prove = function(req, res){
 
     var evtid = req.body.event.oid;
     console.log("\nProve " + JSON.stringify(evtid) );
-	
-	//GZ
-	//send to DOOH for play
-	var doohControl = require("../dooh_control.js");
-	var doohURL = '192.168.5.101';  //TODO: query from doohDB
-	var movieProjectID = req.body.event.projectID;
-	var start = req.body.event.start;
-	doohControl.sendPlayRequest(doohURL, movieProjectID, start );
-	console.log('Movie %s is requested to send to DOOH %s!', movieProjectID, doohURL );
-	
     scheduleDB.prove(evtid, function(err, result){
     
         if(err){
@@ -225,11 +587,9 @@ FM.api.prove = function(req, res){
             res.send( {"Prove Event": result} );
         }
     });
-	
-	
 };
 
-
+// GET
 FM.api.eventsOfWaiting = function(req, res){
     
     scheduleDB.listOfWaiting(function(err, result){
@@ -242,7 +602,7 @@ FM.api.eventsOfWaiting = function(req, res){
     });
 };
 
-
+// GET
 FM.api.eventsOfPeriod = function(req, res){
     
     if(req.body && req.body.period){
@@ -264,47 +624,54 @@ FM.api.eventsOfPeriod = function(req, res){
 };
 
 
-
+// GET
 FM.api.profile = function(req, res){
-    //console.log("api.profile: " + JSON.stringify(req.session));
-    if(req.session.user){
-        videoDB.getVideoListById(req.session.user.userId, function(err, result){
-		//videoDB.getVideoListById(req.session.user.name, function(err, result){  //GZ
+    FM_LOG("[api.profile]: ");
+    FM_LOG(req.query);
+	
+    if(req.query && req.query.userID){
+    
+        var userID = req.query.userID;
+        
+        videoDB.getVideoListByFB(userID, function(err, result){
         
             if(err) throw err;
-            var data = {
-                //"profile": {"_id": req.session.user.userId},
-                "profile": {"_id": req.session.user.userId, "_userName": req.session.user.name},  //GZ
-                "videoWorks": result
-            };
-            //console.log("profile: " + JSON.stringify(data));
-            
+            FM_LOG("[getVideoListByFB] " + JSON.stringify(result));
+            var data;
+            if(result){
+               data = {"videoWorks": result};
+            }else{
+                data = {"message": "No video"};
+            }
             res.send(data);
         });
     }
 };
 
+// GET
 FM.api.userProfile = function(req, res){
     
-    if(req.body && req.body.member){
-        var member = req.body.member.memberID,
-            oid = null;
-
-        memberDB.getObjectId(member, function(err, result){
-            var oid = result["_id"];
+    if(req.query && req.query.user){
+        var user = req.query.user;
+        user._id = ObjectID.createFromHexString(user._id);  // cast String to ObjectID before using.
        
-            videoDB.getVideoListById(oid, function(err, result){
-        
-                if(err) throw err;
-                //console.log("videoWorks: " + result);
-                
-                res.send(result);
-            });
+        videoDB.getVideoListById(user._id, function(err, result){
+            if(err) throw err;        
+            res.send(result);
         });
     }
 };
 
+// Inter
+FM.api._test = function(){
+   
+    FM.api._fbGet( "/100004053532907_279951222125024?fields=comments,likes&access_token=AAABqPdYntP0BAOFEGvPN9P5pMqWTdBfmUXByy8r9faPw1sG1quRN1wgogVwjioFaIm5gFg4MyaAaje6WtZAX9quFiYnT0t1ONqabfmQZDZD"
+        , function(res){
+        
+        });
+    
+};
 
-
+//FM.api._test();
 
 module.exports = FM.api;

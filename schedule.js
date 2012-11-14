@@ -45,7 +45,7 @@ FM.SCHEDULE = (function(){
             },
             
             prove : function(evtid, cb){
-                FMDB.updateAdoc(events, evtid, {"status":"proved"});
+                FMDB.updateAdoc(events, evtid, {"status":"proved"}, cb);
             }
         };
     } //    End of Constructor

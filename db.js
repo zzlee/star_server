@@ -1,4 +1,8 @@
 //  var FM = window.FM || {}; Using in Browser
+
+var DEBUG = true,
+    FM_LOG = (DEBUG) ? function(str){ console.log(str); } : function(str){} ;
+    
 var FM = {};
 
 //  A Singleton of MongoDB
@@ -10,42 +14,51 @@ FM.DB = (function(){
         var mongodb = require('mongodb'),
             mongoose = require('mongoose'),
             assert = require('assert'),
-            ObjectID = mongoose.Schema.Types.ObjectId,
             Schema = mongoose.Schema,
+            ObjectID = Schema.Types.ObjectId,
+            Mixed = Schema.Types.Mixed,
             DB = 'feltmeng',
             connection = connectDB(),
             eduLv = 'elem jrHigh srHigh college university master doctor'.split(' '),
             occupationList = 'gov student edu industry business service'.split(' ');
             evtStatus = 'waiting proved'.split(' ');;
         
+        /*  fb: { userID: {type: String},
+         *          auth: { accessToken: {type: String},
+         *                  expiresIn: {type: Number},
+         *                  signedRequest: {type: String}
+         *          },
+         *  }
+         *
+         */
+        
         var MemberSchema = new Schema({
-            fb_id: {type: String},      //  Facebook ID
-            fb_token: {type: String},   //  Facebook Token
+            fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
             fullname: {type: String},
             memberID: {type: String},
             password: {type: String},
-            mPhone: {type: String},
+            mPhone: { num: String, proved: {type: Boolean, default: false} },
             email: {type: String},
             birthday: {type: Number, min:19110101},
             occupation: {type: String, enum: occupationList},
             gender: {type: Boolean},    //  0:Male 1:Female
             education: {type: String, enum: eduLv},
             notification: {type: Boolean, default: true},
-            video_ids:{type: [ObjectID]},
-            activity_ids:{type: [ObjectID]},
-            thumbnail:{type: String}    //  path/filename
+            video_ids: {type: [ObjectID]},
+            activity_ids: {type: [ObjectID]},
+            thumbnail: {type: String}    //  path/filename
         }); //  members collection
         
         var VideoSchema = new Schema({
             fb_id: {type: String},
             title: {type: String},
             description: {type: String},
-            url: {youtube: String, tudou: String},  //  Youtube, Tudou
-            ownerId: {type: ObjectID},
+            url: { youtube: String, tudou: String },  //  Youtube, Tudou
+            ownerId: { _id:ObjectID, userID: String },
             locationId: {type: ObjectID},
             projectId: {type: String},  //  AE project ID
             hitRate: {type: Number, min:0},
-            commentIds: {type: [ObjectID]},
+            comments: {type: Mixed},    //  "data": []
             vote: {type: Number, min:0},
             likes: {type: Number, min:0},
             status: {type: String}
@@ -61,7 +74,7 @@ FM.DB = (function(){
         var EventSchema = new Schema({
             videoId: {type: ObjectID},
             projectId: {type: String},
-            ownerId: {type: ObjectID},
+            ownerId: { _id:ObjectID, userID: String },
             start: {type: Number, min:1325376000001},   // 1325376000001 2012/01/01 08:00:00
             end: {type: Number, min:1325376000001},
             videoUrl: {type: String},
@@ -144,51 +157,6 @@ FM.DB = (function(){
                 });
             },
             
-            userDBDump: function(){
-                var member = new Member();
-                member.fb_id = '1609171038';  //gabriel@gmail
-                member.fb_token = 'AAADdkgZCw4VMBALbOyseWQ4GU2CCfJhONZCOvVdiYAlYMtZApSx0iTwXYhkExINmgjQ59YDHmiZCzlmSMeKSLZAHOyZBZC1mkWwNRYKq5vB7BAC52akxDIu';
-                member.first_name = 'Gabriel';
-                member.last_name = 'Lo';
-                member.nick_name = 'chikun';
-                member.mPhone = '0912345678';
-                member.email = 'gabriel@feltmeng.com';
-                member.birthday = '19780101';
-                member.occupation = 'gov';
-                member.gender = true;
-                member.education = 'master';
-                member.notification = true;
-                member.thumbnail = 'gab.jpg';
-                member.save(function(err){
-                    if(err){
-                        console.log('Could not save Video.'+err+' '+member);
-                    }else{
-                        console.log('Created a Object: '+ member);
-                    }
-                });
-                
-                member = new Member();
-                member.fb_id = '100004053532907';  //gabriel@feltmeng
-                member.fb_token = 'AAADdkgZCw4VMBALbOyseWQ4GU2CCfJhONZCOvVdiYAlYMtZApSx0iTwXYhkExINmgjQ59YDHmiZCzlmSMeKSLZAHOyZBZC1mkWwNRYKq5vB7BAC52akxDIu';
-                member.first_name = 'Casa';
-                member.last_name = 'Proodle';
-                member.nick_name = 'Casa';
-                member.mPhone = '0987654321';
-                member.email = 'casa@proodle.com';
-                member.birthday = '20011231';
-                member.occupation = 'gov';
-                member.gender = false;
-                member.education = 'elem';
-                member.notification = true;
-                member.thumbnail = 'casa.jpg';
-                member.save(function(err){
-                    if(err){
-                        console.log('Could not save Video.'+err+' '+member);
-                    }else{
-                        console.log('Created a Object: '+ member);
-                    }
-                });
-            },
            
             getDocModel2: function(collection){
                 switch(collection){
@@ -232,20 +200,24 @@ FM.DB = (function(){
              * 
              */
             createAdoc: function(docModel, jsonObj, callback){
+                
                 if(arguments.length == 1)
                     throw new error('Must have 2 arguments.');
                 
                 var doc = new docModel(jsonObj);
-                ('undefined' === typeof callback) ? doc.save() : doc.save(callback);
                 
-                console.log("Create a Doc: " + doc);
+                if(jsonObj.fb) {
+                    FM_LOG("\n[doc.fb markModified]");
+                    doc.markModified('fb');
+                }
+                ('undefined' === typeof callback) ? doc.save() : doc.save(callback);
                 
             },
 
             //  function createAmember(collection, jsonObj){ createAdoc(collection, jsonObj, null); }  //for Member doc without ID neccesary
             readAdocById: function(docModel, docid, cb){
-                if(typeof(docid) === 'undefined'){
-                    throw new Error('_id of Doc is Undefined.');
+                if(arguments.length != 3){
+                    throw new Error('Must have 3 arguments.');
                     
                 }else{
                     docModel.findById(docid, cb);
@@ -254,7 +226,7 @@ FM.DB = (function(){
             
             readAdoc: function(docModel, condition, cb){
                 if(arguments.length != 3)
-                    throw new error('Must have 3 arguments');
+                    throw new error('Must have 3 arguments.');
                 docModel.findOne(condition, cb);
             },
 
@@ -282,7 +254,7 @@ FM.DB = (function(){
             },
             
             getValueOf: function(docModel, condition, field, cb){
-                //var field = JSON.parse('{"'+path+'":'+1+'}');
+                
                 docModel.findOne(condition, field, cb);
             },
             

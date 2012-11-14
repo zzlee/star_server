@@ -2,6 +2,8 @@ var FMDB = require('./db.js'),
     videoDB = require('./video.js');
     
 var FM = {};
+var DEBUG = true,
+    FM_LOG = (DEBUG) ? function(str){ console.log(str); } : function(str){} ;
 
 FM.MEMBER = (function(){
     var uInstance = null;
@@ -15,7 +17,6 @@ FM.MEMBER = (function(){
          */
             addMember: function(pfjson, callback){
                 FMDB.createAdoc(members, pfjson, callback);
-                console.log("addMember " + pfjson.fullname);
             },
             
             deleteMember: function(memberID){
@@ -27,12 +28,35 @@ FM.MEMBER = (function(){
                 });
             },
             
+            updateMember: function(oid, newdata, cb){
+                
+                FMDB.updateAdoc(members, oid, newdata, cb);
+            },
+            
             isValid: function(memberID, cb){
-                //var field = "password";
-                var field = { "password":1,
-                              "_id":1
+               
+                var field = { "password": 1,
+                              "_id": 1
                             };
                 FMDB.getValueOf(members, {"memberID":memberID}, field, cb);
+            },
+            
+            isFBValid: function(userID, cb){
+                
+                var field = { "_id":1, "fb": 1};
+                FMDB.getValueOf(members, {"fb.userID":userID}, field, cb);
+            },
+            
+            getFBAccessTokenByFBId: function(userID, cb){
+            
+                var field = {"fb.auth": 1};
+                FMDB.getValueOf(members, {"fb.userID":userID}, field, cb);
+            },
+            
+            getFBAccessTokenById: function(oid, cb){
+            
+                var field = {"fb.userID":1, "fb.auth": 1};
+                FMDB.getValueOf(members, {"_id":oid}, field, cb);
             },
             
             listOfMembers: function(cb){
