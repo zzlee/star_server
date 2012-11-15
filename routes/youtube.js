@@ -69,7 +69,7 @@ exports.uploadVideo = function( videoFile, videoTitle, movieProjectID, ownerID, 
 					var url = {"youtube":"http://www.youtube.com/embed/"+youtubeVideoID};
 						
 					var vjson = {"title": movieProjectID,
-								 "ownerId": ownerID,
+								 "ownerId": {"_id": ownerID._id, "userID": ownerID.userID},
 								 "url": url,
 								 "projectId":movieProjectID};
 					//console.log("video " + JSON.stringify(vjson));

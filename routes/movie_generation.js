@@ -171,7 +171,7 @@ exports.uploadUserDataInfo_cb = function(req, res) {
 			if ( allUserContentExist ) {
 				console.log('Start generating movie %s !', req.body.projectID);
 				res.send(null);
-				movieMaker.renderMovie(req.body.projectID, req.body.userID);
+				movieMaker.renderMovie(req.body.projectID, req.body.ownerID);
 			}
 			else {
 				res.send( {err:"Some or all user contents are missing."} );
