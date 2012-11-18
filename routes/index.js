@@ -14,6 +14,9 @@ exports.YoutubeOAuth2_cb = youtube.YoutubeOAuth2_cb;
 var upload = require('./upload.js');
 exports.upload_cb = upload.upload_cb;
 
+var aeServerHandler = require('./ae_server_handler.js');
+exports.reportRenderingResult_cb = aeServerHandler.reportRenderingResult_cb;
+
 //GL
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),

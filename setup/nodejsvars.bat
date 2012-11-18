@@ -1,15 +1,25 @@
 @echo off
 
-rem added by GZ
+rem settings for star_server
+set STAR_SERVER_PROJECT=D:\nodejs_projects\star_server
+set HOST_STAR_AE_SERVER=http://192.168.5.101
+
+rem settings for star_ae_server
+set STAR_AE_SERVER_PROJECT=D:\nodejs_projects\star_ae_server
 set AE_BIN=C:\Program Files\Adobe\Adobe After Effects CS6\Support Files
-set AE_PROJECT=D:\nodejs_projects\i_am_a_super_star
 set FFMPEG_BIN=C:\ffmpeg\bin
-set HOME=C:\Users\feltmengtest
-set DOOH_PROJECT=D:\nodejs_projects\star_dooh
+
+rem settings for star_dooh
+set SATR_DOOH_PROJECT=D:\nodejs_projects\star_dooh
 set DOOH_PLAYER=C:\Program Files\Windows Media Player\wmplayer.exe
-set STAR_SERVER=www.feltmeng.idv.tw
+
+rem settings for star_dooh & star_ae_server
+set HOST_STAR_SERVER=http://www.feltmeng.idv.tw:3000
+
+rem Not used for now
 set STAR_FTP_ID=i_am_a_super_star
 set STAR_FTP_PSW=fm@27111650
+set HOME=C:\Users\Gance
 
 
 rem Ensure this Node.js and NPM are first in the PATH
@@ -29,4 +39,4 @@ rem If we're in the node.js directory, change to the user's home dir.
 ::if "%CD%\"=="%~dp0" cd /d "%HOMEDRIVE%%HOMEPATH%"
 
 rem If we're in the node.js directory, change to AE project  dir.
-if "%CD%\"=="%~dp0" d: && cd /d "%AE_PROJECT%"
+if "%CD%\"=="%~dp0" d: && cd /d "%STAR_SERVER_PROJECT%"

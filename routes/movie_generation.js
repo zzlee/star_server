@@ -1,8 +1,9 @@
 var fs = require('fs');
 var path = require('path');
-var workingPath = process.env.AE_PROJECT;
-var movieMaker = require(workingPath+'/ae_render.js');
-
+var workingPath = process.env.STAR_SERVER_PROJECT;
+//var movieMaker = require(workingPath+'/ae_render.js');
+var aeServerManager = require(workingPath+'/ae_server_manager.js');
+var aeServer = 'http://192.168.5.101';
 
 exports.uploadUserData_cb = function(req, res) {
 	var resultMsg = '';
@@ -16,7 +17,10 @@ exports.uploadUserData_cb = function(req, res) {
 		var html = '';
 		if ( req.session.user.userId ) {
 			html += '<p>Start generating the movie! <p/>'; 	
-			movieMaker.renderMovie(req.body.project_ID, req.session.user.userId);
+			//movieMaker.renderMovie(req.body.project_ID, req.session.user.userId);
+			//TODO: get movie Title from req
+			aeServerManager.createMovie(aeServer, req.body.project_ID, req.session.user.userId._id, req.session.user.userId.userID, 'video to test');
+
 		}
 		else {
 			html += '<p>Fail to retrieve userID from session; movie generation halt ! <p/>'; 	

@@ -24,7 +24,7 @@ var http = require('http'),
   
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 80);
+  app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
@@ -73,6 +73,7 @@ app.post('/upload_user_data', routes.uploadUserData_cb );
 app.get('/oauth2callback', routes.YoutubeOAuth2_cb );
 app.post('/upload', routes.upload_cb );
 app.post('/upload_user_data_info',routes.uploadUserDataInfo_cb);
+app.get('/report_rendering_result', routes.reportRenderingResult_cb);
 
 //GL
 /*
@@ -111,3 +112,11 @@ app.del('/', routes.api.signout);
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
+
+/*
+//test
+var ae_serv_mgr = require('./ae_server_manager.js');
+setTimeout(function(){ 
+ae_serv_mgr.createMovie('http://192.168.5.101', 'rotate-anonymous-20121115T004014395Z', 'aa', 'aa_fb', 'video to test');
+}, 3000);
+*/
