@@ -24,6 +24,7 @@ FM.DB = (function(){
             evtStatus = 'waiting proved'.split(' ');;
         
         /*  fb: { userID: {type: String},
+				  userName: {type: String},
          *          auth: { accessToken: {type: String},
          *                  expiresIn: {type: Number},
          *                  signedRequest: {type: String}

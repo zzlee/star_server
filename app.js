@@ -97,6 +97,7 @@ app.get('/api/userProfile', routes.api.userProfile);
 app.get('/api/profile', routes.api.profile);
 app.get('/api/fbStatus', routes.api.fbStatus);
 app.get('/api/fbGetComment', routes.api.fbGetCommentReq);
+app.get('/api/fbGetThumbnail' , routes.api.fbGetThumbnail);
 
 app.post('/api/signin', routes.api.signin);
 
