@@ -424,7 +424,9 @@ FM.api.signupwithFB = function(req, res){
                     });
                     
                 }else{
-                    res.send({"message":"success"});
+                    //res.send({"message":"success"});
+					res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn}, 
+								"message":"success"} );
                 }
                 
                 /* ACK LongPolling from Client

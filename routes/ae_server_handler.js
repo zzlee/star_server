@@ -1,3 +1,4 @@
+var workingPath = process.env.STAR_SERVER_PROJECT;
 
 exports.reportRenderingResult_cb = function(req, res) {
 
@@ -11,6 +12,20 @@ exports.reportRenderingResult_cb = function(req, res) {
 		
 		console.log('[%s] Got response from AE Server:', movieProjectID )
 		console.dir(req.headers);
+
+		//add to video DB
+		var videoDB = require(workingPath+'/video.js');
+		var url = {"youtube":"http://www.youtube.com/embed/"+youtubeVideoID};
+			
+		var vjson = {"title": movieTitle,
+					 "ownerId": {"_id": ownerStdID, "userID": ownerFbID},
+					 "url": url,
+					 "projectId":movieProjectID};
+		//console.log("video " + JSON.stringify(vjson));
+		videoDB.addVideo(vjson, function(err, vdoc){
+			console.log('Seccessfully add %s to videoDB!', movieProjectID);
+		});
+
 	}
 	
 

@@ -18,8 +18,8 @@ exports.uploadUserData_cb = function(req, res) {
 		if ( req.session.user.userId ) {
 			html += '<p>Start generating the movie! <p/>'; 	
 			//movieMaker.renderMovie(req.body.project_ID, req.session.user.userId);
-			//TODO: get movie Title from req
-			aeServerManager.createMovie(aeServer, req.body.project_ID, req.session.user.userId._id, req.session.user.userId.userID, 'video to test');
+			var videoTitle = req.body.userId.fb_name + "的MiixCard影片";
+			aeServerManager.createMovie(aeServer, req.body.project_ID, req.body.userId._id, req.body.userId.fb_userID, videoTitle);
 
 		}
 		else {
@@ -175,7 +175,9 @@ exports.uploadUserDataInfo_cb = function(req, res) {
 			if ( allUserContentExist ) {
 				console.log('Start generating movie %s !', req.body.projectID);
 				res.send(null);
-				movieMaker.renderMovie(req.body.projectID, req.body.ownerID);
+				//movieMaker.renderMovie(req.body.projectID, req.body.ownerID);
+				var videoTitle = req.body.ownerID.fb_name + "的MiixCard影片";
+				aeServerManager.createMovie(aeServer, req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
 			}
 			else {
 				res.send( {err:"Some or all user contents are missing."} );
