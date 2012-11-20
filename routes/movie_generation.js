@@ -1,4 +1,4 @@
-var fs = require('fs');
+ï»¿var fs = require('fs');
 var path = require('path');
 var workingPath = process.env.STAR_SERVER_PROJECT;
 //var movieMaker = require(workingPath+'/ae_render.js');
@@ -18,7 +18,7 @@ exports.uploadUserData_cb = function(req, res) {
 		if ( req.session.user.userId ) {
 			html += '<p>Start generating the movie! <p/>'; 	
 			//movieMaker.renderMovie(req.body.project_ID, req.session.user.userId);
-			var videoTitle = req.body.userId.fb_name + "ªºMiixCard¼v¤ù";
+			var videoTitle =  "MiixCard movie of" + req.body.userId.fb_name;
 			aeServerManager.createMovie(aeServer, req.body.project_ID, req.body.userId._id, req.body.userId.fb_userID, videoTitle);
 
 		}
@@ -176,7 +176,7 @@ exports.uploadUserDataInfo_cb = function(req, res) {
 				console.log('Start generating movie %s !', req.body.projectID);
 				res.send(null);
 				//movieMaker.renderMovie(req.body.projectID, req.body.ownerID);
-				var videoTitle = req.body.ownerID.fb_name + "ªºMiixCard¼v¤ù";
+				var videoTitle = req.body.ownerID.fb_name + "çš„MiixCardå½±ç‰‡";
 				aeServerManager.createMovie(aeServer, req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
 			}
 			else {
