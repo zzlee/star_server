@@ -3,7 +3,8 @@ var path = require('path');
 var workingPath = process.env.STAR_SERVER_PROJECT;
 //var movieMaker = require(workingPath+'/ae_render.js');
 var aeServerManager = require(workingPath+'/ae_server_manager.js');
-var aeServer = 'http://192.168.5.101';
+//var aeServer = 'http://192.168.5.101';
+var aeServer = 'http://192.168.5.189';
 
 exports.uploadUserData_cb = function(req, res) {
 	var resultMsg = '';
@@ -176,7 +177,7 @@ exports.uploadUserDataInfo_cb = function(req, res) {
 				console.log('Start generating movie %s !', req.body.projectID);
 				res.send(null);
 				//movieMaker.renderMovie(req.body.projectID, req.body.ownerID);
-				var videoTitle = req.body.ownerID.fb_name + "的MiixCard影片";
+				var videoTitle =  "MiixCard movie";
 				aeServerManager.createMovie(aeServer, req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
 			}
 			else {

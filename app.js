@@ -108,6 +108,7 @@ app.post('/api/addEvent', routes.api.addEvent);
 app.post('/api/reject', routes.api.reject);
 app.post('/api/prove', routes.api.prove);
 app.post('/api/signupwithFB', routes.api.signupwithFB);
+app.post('/api/deviceToken', routes.api.deviceToken);
 
 app.del('/', routes.api.signout);
 

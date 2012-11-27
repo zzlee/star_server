@@ -43,10 +43,15 @@ FM.MEMBER = (function(){
             
             isFBValid: function(userID, cb){
                 
-                var field = { "_id":1, "fb": 1};
+                var field = { "_id":1, "fb": 1, "deviceToken":1 };
                 FMDB.getValueOf(members, {"fb.userID":userID}, field, cb);
             },
             
+			getDeviceTokenById: function(oid, cb){
+				var field = {"deviceToken": 1};
+                FMDB.getValueOf(members, {"_id":oid}, field, cb);
+			},
+			
             getFBAccessTokenByFBId: function(userID, cb){
             
                 var field = {"fb.auth": 1};

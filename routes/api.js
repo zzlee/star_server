@@ -1,11 +1,13 @@
 ﻿/*
  *  Ajax APIs
  */
+// device_toekn = f822bb371e2d328d5a0f7ba1094269154f69027ac5ce4d4d04bd470cbd8001f1
 
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
     videoDB = require("../video.js");
-    
+
+
 var ObjectID = require('mongodb').ObjectID;
 
 var DEBUG = true,
@@ -14,6 +16,40 @@ var DEBUG = true,
 var FM = { api: {} };
 
 FM.api.reply = [];  // Queue Res callback according to sessionID.
+
+
+FM.api._pushNotification = function( device_token ){
+	// Apple Push Notification Service.	
+	var apns = require('apn');
+	var options = {
+			cert: '../apns/app-dev-cert.pem',  			/* Certificate file path */
+			certData: null,                   			/* String or Buffer containing certificate data, if supplied uses this instead of cert file path */
+			key:  '../apns/app-dev-key-noenc.pem',		/* Key file path */
+			keyData: null,                    			/* String or Buffer containing key data, as certData */
+			passphrase: null,                 			/* A passphrase for the Key file */
+			ca: null,                         			/* String or Buffer of CA data to use for the TLS connection */
+			gateway: 'gateway.sandbox.push.apple.com',	/* gateway address 'Production' - gateway.push.apple.com */
+			port: 2195,                   				/* gateway port */
+			enhanced: true,               				/* enable enhanced format */
+			errorCallback: undefined,     				/* Callback when error occurs function(err,notification) */
+			cacheLength: 100              				/* Number of notifications to cache for error purposes */
+	};
+
+	
+	var apnsConnection = new apns.Connection(options);
+	var device = new apns.Device(device_token);
+	var note = new apns.Notification();
+	note.expiry = Math.floor(Date.now() / 1000) + 3600*24; // Expires 1 day from now.
+	note.badge = 1;
+	note.sound = "ping.aiff";
+	note.alert = "You have a new video!";
+	note.payload = {'messageFrom': 'Miix.tv'};
+	note.device = device;
+	
+	apnsConnection.sendNotification(note);
+
+};
+
 
 // GET
 FM.api.fbStatus = function(req, res){
@@ -122,8 +158,9 @@ FM.api._fbPostVideoThenAdd = function(vjson){
 	var vjsonData = vjson;				
     var can_msg = "參加MiixCard活動初體驗！";
 	var link = vjsonData.url.youtube;
+	var oid = vjsonData.ownerId._id;
 	
-	memberDB.getFBAccessTokenById(vjsonData.ownerId._id, function(err, result){
+	memberDB.getFBAccessTokenById(oid, function(err, result){
     
         if(err) throw err;
         if(result){
@@ -153,6 +190,16 @@ FM.api._fbPostVideoThenAdd = function(vjson){
 					videoDB.addVideo(vjsonData, function(err, vdoc){
 						if(err)
 							FM_LOG(err);
+						
+						memberDB.getDeviceTokenById(oid, function(err, result){
+							if(err) throw err;
+							if(result){
+								FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
+								for( var device in result.deviceToken){
+									FM.api._pushNotification(result.deviceToken[device]);
+								}
+							}
+						});
 					});
                 }
             });
@@ -365,6 +412,32 @@ FM.api._fbGetHttp = function( path, cb){
 
 };
 
+// POST
+FM.api.deviceToken =  function(req, res){
+	FM_LOG("[Receive deviceToken POST] ");
+	
+	if(req.body && req.body.user){
+		var user = req.body.user;
+		FM_LOG(user);
+		FM_LOG("\n[Got Device_Token] device: " + user.device + "; dvc_token: " + user.deviceToken);
+		
+		var oid = ObjectID.createFromHexString(user._id);
+		var deviceToken = {};
+		deviceToken[user.device] = user.deviceToken;
+		
+		var jsonStr = '{"deviceToken.' + user.device +'":"'+ user.deviceToken + '"}';
+		var json = JSON.parse(jsonStr);
+		
+		memberDB.updateMember( oid, json, function(err, result){
+            if(err) FM_LOG(err);
+            if(result) FM_LOG(result);
+			res.send({"message": "Update Device Token!"});
+        });
+	}else{
+		res.send({"message": "Failed!"});
+	}
+};
+
 
 // POST
 FM.api.signupwithFB = function(req, res){
@@ -374,7 +447,7 @@ FM.api.signupwithFB = function(req, res){
     
     if(req.body && req.body.authResponse){
     
-        FM_LOG("\n[Got Token]: ");
+        FM_LOG("\n[Got FB_Token]: ");
         FM_LOG(req.body.authResponse);
         
         var authRes = req.body.authResponse;
@@ -382,6 +455,8 @@ FM.api.signupwithFB = function(req, res){
 			userName = authRes.userName,
             accessToken = authRes.accessToken,
             expiresIn = authRes.expiresIn,
+			device = authRes.device,
+			dvc_Token = authRes.deviceToken,
             auth = {"accessToken": accessToken,
                     "expiresIn": expiresIn,
             },
@@ -391,6 +466,7 @@ FM.api.signupwithFB = function(req, res){
             },
             member = {"fb": meta};
             
+			
         
         /* New FB User or Exsited User */
         memberDB.isFBValid( userID, function(err, result){
@@ -401,7 +477,10 @@ FM.api.signupwithFB = function(req, res){
                 FM_LOG("[signupwithFB] FB user[" + userID + "] Existed!");
                 
                 var oid = result._id;
-                
+				var deviceToken = result.deviceToken;
+                deviceToken[device] = dvc_Token;
+				member.deviceToken = deviceToken;
+				
                 // if expire within 20days.
                 if( parseInt(expiresIn) - Date.now() < 20*24*60*60*1000 ){
                     
@@ -438,6 +517,10 @@ FM.api.signupwithFB = function(req, res){
             }else{  //  New fb user signup.
                 FM_LOG("[signupwithFB:] NEW FB User[" + userID + "] Signup!");
                 
+				var deviceToken = [];
+				deviceToken[device] = dvc_Token;
+				member.deviceToken= deviceToken;
+				
                 FM.api._fbExtendToken(authRes.accessToken, function(response){
                     
                     if(response.data){
@@ -462,22 +545,6 @@ FM.api.signupwithFB = function(req, res){
                                 _id: oid,
                                 accessToken: member.fb.auth.accessToken
                             };
-                             
-                            var vjson1 = {  "title":"Star Tours: Darth Vader goes to Disneyland",
-                                            "ownerId": {"_id": oid, "userID": userID},
-                                            "url": {"youtube":"http://www.youtube.com/embed/t4_dZPVg8KI"},
-                                            "projectId": "8608"};
-                            
-                            var vjson2 = {  "title":"A Awesome World",
-                                            "ownerId": {"_id": oid, "userID": userID},
-                                            "url": {"youtube":"http://www.youtube.com/embed/oZmtwUAD1ds"},
-                                            "projectId": "5376"};
-                            
-                            videoDB.addVideo(vjson1, function(err, vdoc){
-                                videoDB.addVideo(vjson2, function(err, vdoc){
-                                    
-                                });
-                            });
                             
                             res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn}, 
 								"message":"success"} );
@@ -778,7 +845,16 @@ FM.api.userProfile = function(req, res){
 // Inter
 FM.api._test = function(){
    
-    FM.api._fbPostVideoThenAdd();
+	var oid = ObjectID.createFromHexString("50b34c4a8198caec0e000001"); 
+    memberDB.getDeviceTokenById(oid, function(err, result){
+		if(err) throw err;
+		if(result){
+			FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
+			for( var device in result.deviceToken){
+				FM.api._pushNotification(result.deviceToken[device]);
+			}
+		}
+	});
     
 };
 

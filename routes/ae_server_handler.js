@@ -16,6 +16,8 @@ exports.reportRenderingResult_cb = function(req, res) {
 		if ( req.headers.err == 'null' || (!req.headers.err) ) {
 			//add to video DB
 			var videoDB = require(workingPath+'/video.js');
+			var fmapi= require(workingPath+'/routes/api.js');
+			
 			var url = {"youtube":"http://www.youtube.com/embed/"+youtubeVideoID};
 				
 			var vjson = {"title": movieTitle,
@@ -23,9 +25,12 @@ exports.reportRenderingResult_cb = function(req, res) {
 						 "url": url,
 						 "projectId":movieProjectID};
 			//console.log("video " + JSON.stringify(vjson));
+			fmapi._fbPostVideoThenAdd(vjson);
+			/*
 			videoDB.addVideo(vjson, function(err, vdoc){
 				console.log('Seccessfully add %s to videoDB!', movieProjectID);
 			});
+			*/
 		}
 
 	}

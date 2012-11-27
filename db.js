@@ -38,6 +38,7 @@ FM.DB = (function(){
             fullname: {type: String},
             memberID: {type: String},
             password: {type: String},
+			deviceToken: {type: Mixed},
             mPhone: { num: String, proved: {type: Boolean, default: false} },
             email: {type: String},
             birthday: {type: Number, min:19110101},
@@ -231,13 +232,9 @@ FM.DB = (function(){
                 docModel.findOne(condition, cb);
             },
 
-            updateAdoc: function(docModel, docid, jsonObj){
+            updateAdoc: function(docModel, docid, jsonObj, cb){
                 console.log("\n updateAdoc " + " fields: " + JSON.stringify(jsonObj));
-                docModel.findByIdAndUpdate(docid, jsonObj, function(err, doc){
-                    if(err) throw err;
-                    if(doc)
-                        console.log('updateAdoc succeed. ' + JSON.stringify(doc));
-                });
+                docModel.findByIdAndUpdate(docid, jsonObj, cb);
             },
             
             deleteAdoc: function(docModel, docid, cb){
