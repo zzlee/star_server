@@ -18,20 +18,28 @@ var FM = { api: {} };
 FM.api.reply = [];  // Queue Res callback according to sessionID.
 
 
+FM.api._pushErrorCallback = function(err, notification){
+	FM_LOG("[_pushErrorCallback] ");
+	if(err)
+		FM_LOG("[error] " + JSON.stringify(err) );
+	if(notification)
+		FM_LOG("[notification] "+ JSON.stringify(notification) );
+};
+
 FM.api._pushNotification = function( device_token ){
 	// Apple Push Notification Service.	
 	var apns = require('apn');
 	var options = {
-			cert: '../apns/app-dev-cert.pem',  			/* Certificate file path */
+			cert: './apns/app-dev-cert.pem',  			/* Certificate file path */
 			certData: null,                   			/* String or Buffer containing certificate data, if supplied uses this instead of cert file path */
-			key:  '../apns/app-dev-key-noenc.pem',		/* Key file path */
+			key:  './apns/app-dev-key-noenc.pem',		/* Key file path */
 			keyData: null,                    			/* String or Buffer containing key data, as certData */
 			passphrase: null,                 			/* A passphrase for the Key file */
 			ca: null,                         			/* String or Buffer of CA data to use for the TLS connection */
 			gateway: 'gateway.sandbox.push.apple.com',	/* gateway address 'Production' - gateway.push.apple.com */
 			port: 2195,                   				/* gateway port */
 			enhanced: true,               				/* enable enhanced format */
-			errorCallback: undefined,     				/* Callback when error occurs function(err,notification) */
+			errorCallback: FM.api._pushErrorCallback,	/* Callback when error occurs function(err,notification) */
 			cacheLength: 100              				/* Number of notifications to cache for error purposes */
 	};
 
@@ -46,6 +54,7 @@ FM.api._pushNotification = function( device_token ){
 	note.payload = {'messageFrom': 'Miix.tv'};
 	note.device = device;
 	
+	FM_LOG("PUSH to Device[" + device_token +"]");
 	apnsConnection.sendNotification(note);
 
 };
@@ -193,7 +202,7 @@ FM.api._fbPostVideoThenAdd = function(vjson){
 						
 						memberDB.getDeviceTokenById(oid, function(err, result){
 							if(err) throw err;
-							if(result){
+							if(result.deviceToken){
 								FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
 								for( var device in result.deviceToken){
 									FM.api._pushNotification(result.deviceToken[device]);
@@ -477,9 +486,17 @@ FM.api.signupwithFB = function(req, res){
                 FM_LOG("[signupwithFB] FB user[" + userID + "] Existed!");
                 
                 var oid = result._id;
-				var deviceToken = result.deviceToken;
-                deviceToken[device] = dvc_Token;
-				member.deviceToken = deviceToken;
+				var deviceToken;
+				if(dvc_Token){
+					if(result.deviceToken){
+						deviceToken = result.deviceToken;
+					}else{
+						deviceToken = {};
+					}
+					deviceToken[device] = dvc_Token;
+					member.deviceToken = deviceToken;
+					
+				}
 				
                 // if expire within 20days.
                 if( parseInt(expiresIn) - Date.now() < 20*24*60*60*1000 ){
@@ -493,7 +510,7 @@ FM.api.signupwithFB = function(req, res){
                             var newdata = result.fb;
                             newdata.auth = data;
                             
-                            memberDB.updateMember( oid, { fb: newdata }, function(err, result){
+                            memberDB.updateMember( oid, { fb: newdata, deviceToken: deviceToken }, function(err, result){
                                 if(err) FM_LOG(err);
                                 if(result) FM_LOG(result);
                             });
@@ -503,6 +520,12 @@ FM.api.signupwithFB = function(req, res){
                     });
                     
                 }else{
+					if(dvc_Token){
+						memberDB.updateMember( oid, { "deviceToken": deviceToken }, function(err, result){
+                            if(err) FM_LOG(err);
+                            if(result) FM_LOG(result);
+                        });
+					}
                     //res.send({"message":"success"});
 					res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn}, 
 								"message":"success"} );
@@ -517,9 +540,11 @@ FM.api.signupwithFB = function(req, res){
             }else{  //  New fb user signup.
                 FM_LOG("[signupwithFB:] NEW FB User[" + userID + "] Signup!");
                 
-				var deviceToken = [];
-				deviceToken[device] = dvc_Token;
-				member.deviceToken= deviceToken;
+				if(dvc_Token){
+					var deviceToken = {};
+					deviceToken[device] = dvc_Token;
+					member.deviceToken= deviceToken;
+				}
 				
                 FM.api._fbExtendToken(authRes.accessToken, function(response){
                     
@@ -845,7 +870,8 @@ FM.api.userProfile = function(req, res){
 // Inter
 FM.api._test = function(){
    
-	var oid = ObjectID.createFromHexString("50b34c4a8198caec0e000001"); 
+   /*
+	var oid = ObjectID.createFromHexString("50b58c7cef173af40e000001"); // Gance
     memberDB.getDeviceTokenById(oid, function(err, result){
 		if(err) throw err;
 		if(result){
@@ -854,8 +880,8 @@ FM.api._test = function(){
 				FM.api._pushNotification(result.deviceToken[device]);
 			}
 		}
-	});
-    
+	});*/
+    FM.api._pushNotification("f822bb371e2d328d5a0f7ba1094269154f69027ac5ce4d4d04bd470cbd8001f1");
 };
 
 //FM.api._test();

@@ -81,6 +81,8 @@ exports.upload_cb = function(req, res){
 			
 		};
 		
+		//Client side can correctly preview the image with EXIF tags now
+		/*
 		if ( _osVersion == "iOS_6.0" || _osVersion == "iOS_6.0.1" ) { //for subsampling issue of iOS 6.0 & 6.0.1
 			var fileRemovedProfile = path.join( _userDataDir, "temp_profile_removed."+fileNameExt );
 			
@@ -111,6 +113,14 @@ exports.upload_cb = function(req, res){
 			});
 		
 		}
+		*/
+		
+		cropAndResize( fileToProcess, function() {
+			if (_callback1) {
+				_callback1();
+			}
+		});
+		
 	}
 
 	var moveFile = function( _tmp_path, _target_path, _moveFile_cb )  {

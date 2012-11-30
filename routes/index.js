@@ -8,7 +8,7 @@ exports.getTemplateList_cb = movieTemplate.getTemplateList_cb;
 exports.getTemplateDescription_cb = movieTemplate.getTemplateDescription_cb;
 exports.getTemplateCustomizableObjectList_cb = movieTemplate.getTemplateCustomizableObjectList_cb;
 
-var youtube = require('./youtube.js');
+var youtube = require('./yt_oauth2_handler.js');
 exports.YoutubeOAuth2_cb = youtube.YoutubeOAuth2_cb;
 
 var upload = require('./upload.js');

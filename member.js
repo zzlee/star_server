@@ -60,7 +60,7 @@ FM.MEMBER = (function(){
             
             getFBAccessTokenById: function(oid, cb){
             
-                var field = {"fb.userID":1, "fb.auth": 1};
+                var field = {"fb.userID":1, "fb.auth": 1, "fb.userName": 1};
                 FMDB.getValueOf(members, {"_id":oid}, field, cb);
             },
             
