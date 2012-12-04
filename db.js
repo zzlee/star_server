@@ -63,7 +63,8 @@ FM.DB = (function(){
             comments: {type: Mixed},    //  "data": []
             vote: {type: Number, min:0},
             likes: {type: Number, min:0},
-            status: {type: String}
+            status: {type: String},
+			createdOn: {type: Date, default: Date.now()}
         }); //  videos collection
 
         var CommentSchema = new Schema({

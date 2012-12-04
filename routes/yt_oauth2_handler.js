@@ -1,6 +1,6 @@
 var fs = require('fs');
 var path = require('path');
-var workingPath = process.env.STAR_AE_SERVER_PROJECT;
+var workingPath = process.env.STAR_SERVER_PROJECT;
 var ytToken;
 
 

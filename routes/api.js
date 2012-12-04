@@ -853,6 +853,32 @@ FM.api.profile = function(req, res){
     }
 };
 
+FM.api.newVideoList = function(req, res){
+	FM_LOG("[api.newVideoList]: ");
+    FM_LOG(req.query);
+	
+    if(req.query && req.query.userID){
+    
+        var userID = req.query.userID;
+		var after = new Date(req.query.after);
+		
+        
+        videoDB.getNewVideoListByFB(userID, after, function(err, result){
+        
+            if(err) throw err;
+            FM_LOG("[getNewVideoListByFB] " + JSON.stringify(result));
+            var data;
+            if(result){
+               data = {"videoWorks": result};
+            }else{
+                data = {"message": "No video"};
+            }
+            res.send(data);
+        });
+    }
+};
+
+
 // GET
 FM.api.userProfile = function(req, res){
     

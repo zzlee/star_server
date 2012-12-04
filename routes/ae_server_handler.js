@@ -35,5 +35,11 @@ exports.reportRenderingResult_cb = function(req, res) {
 
 	}
 	
-
 } 
+
+
+exports.aeConnection_cb = function(req, res) {
+	console.log('Got HTTP request from AE Server:' )
+	console.dir(req);
+
+}

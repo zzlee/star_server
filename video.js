@@ -1,5 +1,6 @@
 var FMDB = require('./db.js'),
-    memberDB = require('./member.js');
+    memberDB = require('./member.js'),
+	ObjectID = require('mongodb').ObjectID;
     
 var FM = {};
 var DEBUG = true,
@@ -56,6 +57,16 @@ FM.VIDEO = (function(){
             
             getVideoListByFB: function(userID, cb){
                 videos.find({"ownerId.userID":userID}, cb );
+            },
+			
+			getNewVideoListByFB : function(userID, after, cb){
+
+                var query = videos.find();
+				query.where("ownerId.userID", userID).where("createdOn").gt(after).exec(cb);
+                /*query.where("ownerId.userID", userID).$where(function(after){
+					var createTime = Math.floor(new Date(this._id.getTimestamp()).getTime()/1000);
+					return createTime > after;
+				}).exec(cb);*/  
             },
             
             update: function(oid, newdata){
