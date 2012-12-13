@@ -110,6 +110,7 @@ app.post('/api/reject', routes.api.reject);
 app.post('/api/prove', routes.api.prove);
 app.post('/api/signupwithFB', routes.api.signupwithFB);
 app.post('/api/deviceToken', routes.api.deviceToken);
+app.post('/api/submitAVideo', routes.api.submitAVideo);
 
 app.del('/', routes.api.signout);
 

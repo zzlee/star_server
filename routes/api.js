@@ -168,6 +168,7 @@ FM.api._fbPostVideoThenAdd = function(vjson){
     var can_msg = "參加MiixCard活動初體驗！";
 	var link = vjsonData.url.youtube;
 	var oid = vjsonData.ownerId._id;
+	var pid = vjsonData.projectId;
 	
 	memberDB.getFBAccessTokenById(oid, function(err, result){
     
@@ -196,7 +197,7 @@ FM.api._fbPostVideoThenAdd = function(vjson){
                     //var fb_id = full_id.substring(full_id.lastIndexOf("_")+1);
                     var newdata = {"fb_id": fb_id};
 					vjsonData.fb_id = fb_id;
-					videoDB.addVideo(vjsonData, function(err, vdoc){
+					videoDB.updateOne({"projectId":pid}, vjsonData, {"upsert": true}, function(err, vdoc){
 						if(err)
 							FM_LOG(err);
 						
@@ -204,8 +205,8 @@ FM.api._fbPostVideoThenAdd = function(vjson){
 							if(err) throw err;
 							if(result.deviceToken){
 								FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
-								for( var device in result.deviceToken){
-									FM.api._pushNotification(result.deviceToken[device]);
+								for( var devicePlatform in result.deviceToken){
+									FM.api._pushNotification(result.deviceToken[devicePlatform]);
 								}
 							}
 						});
@@ -292,7 +293,8 @@ FM.api.fbGetCommentReq = function(req, res){
     if(req.query && req.query.fb_id && req.query.accessToken){
         FM_LOG(req.query);
         var fb_id = req.query.fb_id;
-            accessToken = req.query.accessToken;
+            accessToken = req.query.accessToken,
+			projectId = req.query.projectId;
             
         var fields = "comments,likes";
         var path = "/" + fb_id 
@@ -428,13 +430,13 @@ FM.api.deviceToken =  function(req, res){
 	if(req.body && req.body.user){
 		var user = req.body.user;
 		FM_LOG(user);
-		FM_LOG("\n[Got Device_Token] device: " + user.device + "; dvc_token: " + user.deviceToken);
+		FM_LOG("\n[Got Device_Token] devicePlatform: " + user.devicePlatform + "; dvc_token: " + user.deviceToken);
 		
 		var oid = ObjectID.createFromHexString(user._id);
 		var deviceToken = {};
-		deviceToken[user.device] = user.deviceToken;
+		deviceToken[user.devicePlatform] = user.deviceToken;
 		
-		var jsonStr = '{"deviceToken.' + user.device +'":"'+ user.deviceToken + '"}';
+		var jsonStr = '{"deviceToken.' + user.devicePlatform +'":"'+ user.deviceToken + '"}';
 		var json = JSON.parse(jsonStr);
 		
 		memberDB.updateMember( oid, json, function(err, result){
@@ -465,6 +467,7 @@ FM.api.signupwithFB = function(req, res){
             accessToken = authRes.accessToken,
             expiresIn = authRes.expiresIn,
 			device = authRes.device,
+			devicePlatform = authRes.devicePlatform,
 			dvc_Token = authRes.deviceToken,
             auth = {"accessToken": accessToken,
                     "expiresIn": expiresIn,
@@ -493,7 +496,7 @@ FM.api.signupwithFB = function(req, res){
 					}else{
 						deviceToken = {};
 					}
-					deviceToken[device] = dvc_Token;
+					deviceToken[devicePlatform] = dvc_Token;
 					member.deviceToken = deviceToken;
 					
 				}
@@ -542,7 +545,7 @@ FM.api.signupwithFB = function(req, res){
                 
 				if(dvc_Token){
 					var deviceToken = {};
-					deviceToken[device] = dvc_Token;
+					deviceToken[devicePlatform] = dvc_Token;
 					member.deviceToken= deviceToken;
 				}
 				
@@ -853,6 +856,7 @@ FM.api.profile = function(req, res){
     }
 };
 
+//	GET
 FM.api.newVideoList = function(req, res){
 	FM_LOG("[api.newVideoList]: ");
     FM_LOG(req.query);
@@ -860,8 +864,8 @@ FM.api.newVideoList = function(req, res){
     if(req.query && req.query.userID){
     
         var userID = req.query.userID;
-		var after = new Date(req.query.after);
-		
+		var after = new Date(parseInt(req.query.after));
+		FM_LOG(">>>>>>>>>>>>>>>[AFTER]: " + after.toISOString());
         
         videoDB.getNewVideoListByFB(userID, after, function(err, result){
         
@@ -878,6 +882,34 @@ FM.api.newVideoList = function(req, res){
     }
 };
 
+/*
+var vjson2 = {  "title":"A Awesome World",
+                    "ownerId": {"_id": "509ba9395a5ce36006000001", "userID": "100004053532907"},
+                    "url": {"youtube":"http://www.youtube.com/embed/oZmtwUAD1ds"},
+                    "projectId": "rotate-anonymous-20121115T004014395Z"};*/
+
+// POST
+FM.api.submitAVideo = function(req, res){
+	FM_LOG("[api.submitAVideo]");
+	
+	if(req.body && req.body.userID && req.body.pid && req.body._id){
+		var _id = ObjectID.createFromHexString(req.body._id);
+		var userID = req.body.userID;
+		var pid = req.body.pid;
+		FM_LOG("User[" + userID + "] submit a VideoMaking[" + pid +"]");
+		var vjson = {"ownerId": {"_id": _id, "userID": userID},
+                    "projectId": pid};
+					
+		videoDB.addVideo(vjson, function(err, result){
+			if(err) throw err;
+			if(result)
+				res.send(result);
+		});
+		
+	}else{
+		res.send({"message": "_id, userID, pid MUST HAVE!"});
+	}
+};
 
 // GET
 FM.api.userProfile = function(req, res){
@@ -907,7 +939,13 @@ FM.api._test = function(){
 			}
 		}
 	});*/
-    FM.api._pushNotification("f822bb371e2d328d5a0f7ba1094269154f69027ac5ce4d4d04bd470cbd8001f1");
+    //FM.api._pushNotification("f822bb371e2d328d5a0f7ba1094269154f69027ac5ce4d4d04bd470cbd8001f1");
+	var vjson2 = {  "title":"A Awesome World",
+                    "url": {"youtube":"http://www.youtube.com/embed/oZmtwUAD1ds"},
+                    "projectId": "miixcard-50b82149157d80e80d000002-20121206T080743992Z"};
+	videoDB.updateOne({"projectId":"miixcard-50b82149157d80e80d000002-20121206T080743992Z"}, vjson2, function(err, vdoc){
+		FM_LOG(vdoc);
+	});
 };
 
 //FM.api._test();

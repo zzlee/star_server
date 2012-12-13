@@ -64,7 +64,7 @@ FM.DB = (function(){
             vote: {type: Number, min:0},
             likes: {type: Number, min:0},
             status: {type: String},
-			createdOn: {type: Date, default: Date.now()}
+			createdOn: {type: Date, default: Date.now}
         }); //  videos collection
 
         var CommentSchema = new Schema({
@@ -238,6 +238,11 @@ FM.DB = (function(){
                 docModel.findByIdAndUpdate(docid, jsonObj, cb);
             },
             
+			updateOne: function(docModel, condition, jsonObj, options, cb){
+				FM_LOG("\n[updateOne]");
+				docModel.findOneAndUpdate(condition, jsonObj, options, cb);
+			},
+			
             deleteAdoc: function(docModel, docid, cb){
                 console.log("Delete a Doc: " + docid);
                 docModel.findByIdAndRemove(docid, cb);

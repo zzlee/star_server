@@ -1,6 +1,5 @@
 var FMDB = require('./db.js'),
-    memberDB = require('./member.js'),
-	ObjectID = require('mongodb').ObjectID;
+    memberDB = require('./member.js');
     
 var FM = {};
 var DEBUG = true,
@@ -58,22 +57,26 @@ FM.VIDEO = (function(){
             getVideoListByFB: function(userID, cb){
                 videos.find({"ownerId.userID":userID}, cb );
             },
-			
+            
 			getNewVideoListByFB : function(userID, after, cb){
 
                 var query = videos.find();
-				query.where("ownerId.userID", userID).where("createdOn").gt(after).exec(cb);
+				query.where("ownerId.userID", userID).ne("fb_id", null).where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(cb);
                 /*query.where("ownerId.userID", userID).$where(function(after){
 					var createTime = Math.floor(new Date(this._id.getTimestamp()).getTime()/1000);
 					return createTime > after;
 				}).exec(cb);*/  
             },
-            
+			
             update: function(oid, newdata){
                 FMDB.updateAdoc(videos, oid, newdata, function(res){
                     FM_LOG("[Video Update Succeed!] " + JSON.stringify(res) );
                 });
             },
+			
+			updateOne: function(condition, newdata, options, cb){
+				FMDB.updateOne(videos, condition, newdata, options, cb);
+			},
             
             
             /*  ownerId must be included in vjson. [callback]  */
