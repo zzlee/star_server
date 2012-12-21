@@ -2,6 +2,7 @@
  *  Ajax APIs
  */
 // device_toekn = f822bb371e2d328d5a0f7ba1094269154f69027ac5ce4d4d04bd470cbd8001f1
+// HTC ONE device_token = "APA91bFNoc98ei3m6mcRdNQFyBY34i4TjNd_Sqw7B5C3XKYqNeHcycE8MzJ9ONJTE79NI9d57RX9rUQiumzDXOfxT6tXSs8Xr_nZD7tN_qy4yo-62RxV06ZNJHfAuPipuLJmdl3CcuBH"
 
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
@@ -26,13 +27,46 @@ FM.api._pushErrorCallback = function(err, notification){
 		FM_LOG("[notification] "+ JSON.stringify(notification) );
 };
 
+/**
+ * Google Cloud Messaging, a.k.a, GCM.
+ * GCM sender_ID: 46997187553
+ * API Key: AIzaSyC7E2uLgv9zZ3ctdgVKW19u2oBoimAss58
+ */
+FM.api._GCM_PushNotification = function( device_token ){
+
+	var gcm = require('node-gcm');
+
+	var message = new gcm.Message();
+	var sender = new gcm.Sender('AIzaSyC7E2uLgv9zZ3ctdgVKW19u2oBoimAss58');
+	var registrationIds = [];
+
+	// Optional
+	message.addData('title', 'MiixCard');
+	message.addData('message','Hello Android');
+	message.addData('msgcnt','1');
+	message.collapseKey = 'MiixCard';
+	message.delayWhileIdle = true;
+	message.timeToLive = 3;
+
+	// At least one required
+	registrationIds.push(device_token);
+	//registrationIds.push('regId2'); 
+
+	/**
+	 * Parameters: message-literal, registrationIds-array, No. of retries, callback-function
+	 */
+	sender.send(message, registrationIds, 4, function (result) {
+		console.log(result);
+	});
+};
+
+// Apple Push Notification Service.	
 FM.api._pushNotification = function( device_token ){
-	// Apple Push Notification Service.	
 	var apns = require('apn');
 	var options = {
-			cert: './apns/app-dev-cert.pem',  			/* Certificate file path */
+			cert: './apns-prod/apns-prod-cert.pem',  			/* Certificate file path */
 			certData: null,                   			/* String or Buffer containing certificate data, if supplied uses this instead of cert file path */
-			key:  './apns/app-dev-key-noenc.pem',		/* Key file path */
+			key:  './apns-prod/apns-prod-key-noenc.pem',		/* Key file path */
 			keyData: null,                    			/* String or Buffer containing key data, as certData */
 			passphrase: null,                 			/* A passphrase for the Key file */
 			ca: null,                         			/* String or Buffer of CA data to use for the TLS connection */
@@ -195,23 +229,29 @@ FM.api._fbPostVideoThenAdd = function(vjson){
                     var fb_id = response.id;    // Using full_id to get detail info.  full_id = userID + item_id
                     FM_LOG("\n[Response after POST on FB:]\n" + JSON.stringify(response) ); 
                     //var fb_id = full_id.substring(full_id.lastIndexOf("_")+1);
-                    var newdata = {"fb_id": fb_id};
+                   
 					vjsonData.fb_id = fb_id;
-					videoDB.updateOne({"projectId":pid}, vjsonData, {"upsert": true}, function(err, vdoc){
-						if(err)
-							FM_LOG(err);
-						
-						memberDB.getDeviceTokenById(oid, function(err, result){
-							if(err) throw err;
-							if(result.deviceToken){
-								FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
-								for( var devicePlatform in result.deviceToken){
-									FM.api._pushNotification(result.deviceToken[devicePlatform]);
+					
+                }
+				videoDB.updateOne({"projectId":pid}, vjsonData, {"upsert": true}, function(err, vdoc){
+					if(err)
+						FM_LOG(err);
+					
+					memberDB.getDeviceTokenById(oid, function(err, result){
+						if(err) throw err;
+						if(result.deviceToken){
+							FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
+							for( var devicePlatform in result.deviceToken){
+								if(result.deviceToken[devicePlatform]){
+									if(devicePlatform == 'Android')
+										FM.api._GCM_PushNotification(result.deviceToken[devicePlatform]);
+									else
+										FM.api._pushNotification(result.deviceToken[devicePlatform]);
 								}
 							}
-						});
+						}
 					});
-                }
+				});
             });
         }
     });
@@ -928,24 +968,24 @@ FM.api.userProfile = function(req, res){
 // Inter
 FM.api._test = function(){
    
-   /*
-	var oid = ObjectID.createFromHexString("50b58c7cef173af40e000001"); // Gance
-    memberDB.getDeviceTokenById(oid, function(err, result){
-		if(err) throw err;
-		if(result){
-			FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
-			for( var device in result.deviceToken){
-				FM.api._pushNotification(result.deviceToken[device]);
-			}
-		}
-	});*/
-    //FM.api._pushNotification("f822bb371e2d328d5a0f7ba1094269154f69027ac5ce4d4d04bd470cbd8001f1");
-	var vjson2 = {  "title":"A Awesome World",
-                    "url": {"youtube":"http://www.youtube.com/embed/oZmtwUAD1ds"},
-                    "projectId": "miixcard-50b82149157d80e80d000002-20121206T080743992Z"};
-	videoDB.updateOne({"projectId":"miixcard-50b82149157d80e80d000002-20121206T080743992Z"}, vjson2, function(err, vdoc){
-		FM_LOG(vdoc);
-	});
+   var oid = ObjectID.createFromHexString("50c9afd0064d2b8412000013");
+   memberDB.getDeviceTokenById(oid, function(err, result){
+							if(err) throw err;
+							if(result.deviceToken){
+								FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
+								for( var devicePlatform in result.deviceToken){
+									if(result.deviceToken[devicePlatform]){
+										if(devicePlatform == 'Android')
+											FM.api._GCM_PushNotification(result.deviceToken[devicePlatform]);
+										else
+											FM.api._pushNotification(result.deviceToken[devicePlatform]);
+									}
+								}
+							}
+						});
+   //HTC_Desire FM.api._GCM_PushNotification("APA91bFsZZUk2lH_Ud-oOCqSbVsHSOiePVM7NG_Prdw8Q-_ubJXII1F7QewGlK-2GY1MzJYQsf-U3QprSaS8iSaoHKKzODL_vXVguGJg1LisWG5cohC3OMujDvs3kbyJ0QnWOeD951UX");
+   //HTC_ONE FM.api._GCM_PushNotification("APA91bH3fugF50nw0sb1zsVQrLx6BDRApdTUHj9-3XiLHc-2fSTqRDVXYJr9cxkkNXtn6X2bb163q_-Sh1yuB7H0BKaMlNZO_BL3qmrPmrDdGEzVqs4L3YIywprv90bBa95k4YaPdZ_t");
+	
 };
 
 //FM.api._test();
