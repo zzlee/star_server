@@ -23,6 +23,8 @@ FM.DB = (function(){
             occupationList = 'gov student edu industry business service'.split(' ');
             evtStatus = 'waiting proved'.split(' ');;
         
+		/****************** DB Schema ******************/
+		
         /*  fb: { userID: {type: String},
 				  userName: {type: String},
          *          auth: { accessToken: {type: String},
@@ -32,7 +34,8 @@ FM.DB = (function(){
          *  }
          *
          */
-        
+
+		
         var MemberSchema = new Schema({
             fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
             fullname: {type: String},
@@ -85,23 +88,38 @@ FM.DB = (function(){
             status: {type: String, enum: evtStatus}
         }); //  events collection for schedule
         
-              
+		
+		var AnalysisSchema = new Schema({
+			time: {type: Date},
+			user_id: {type: ObjectID},
+			userName: {type: String},
+			fb_id: {type: String},
+			action: {type: String},
+			platform: {type: String},
+			os_version: {type: String}
+		}); 
+		
+        /****************** End of DB Schema ******************/
+		
         var Member = connection.model('Member', MemberSchema, 'member'),
             Video = connection.model('Video', VideoSchema, 'video'),
             Comment = connection.model('Comment', CommentSchema, 'comment'),
-            Event = connection.model('Event', EventSchema, 'event');
+            Event = connection.model('Event', EventSchema, 'event'),
+			Analysis = connection.model('Analysis', AnalysisSchema, 'analysis');
             
         var dbModels = [];
         dbModels["member"] = Member;
         dbModels["video"] = Video;
         dbModels["comment"] = Comment;
         dbModels["event"] = Event;
+		dbModels["analysis"] = Analysis;
         
         var dbSchemas = [];
         dbSchemas["member"] = MemberSchema;
         dbSchemas["video"] = VideoSchema;
         dbSchemas["comment"] = CommentSchema;
         dbSchemas["event"] = EventSchema;
+		dbSchemas["analysis"] = AnalysisSchema;
             
         function connectDB(){
                 try{
