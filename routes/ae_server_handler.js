@@ -1,3 +1,4 @@
+var events = require("events");
 var workingPath = process.env.STAR_SERVER_PROJECT;
 
 exports.reportRenderingResult_cb = function(req, res) {
@@ -37,9 +38,35 @@ exports.reportRenderingResult_cb = function(req, res) {
 	
 } 
 
+var eventEmitter = new events.EventEmitter();
 
-exports.aeConnection_cb = function(req, res) {
+exports.sendRequestToAeServer = function( targetID, reqToAeServer ) {
+
+	eventEmitter.emit('COMMAND_'+targetID, reqToAeServer);
+
+}
+
+exports.longPollingFromAeServer_cb = function(req, res) {
 	console.log('Got HTTP request from AE Server:' )
-	console.dir(req);
+	//console.dir(req);
+	
+	var messageToAeServer = new Object();
+	
+	var callback = function(reqToAeServer){
+		//console.log(reqToAeServer);
+		clearTimeout(timer);
+		messageToAeServer.type = "COMMAND";
+		messageToAeServer.body = reqToAeServer;
+		res.send(messageToAeServer);
+	}
 
+	var timer = setTimeout(function(){ 
+		eventEmitter.removeListener('COMMAND_'+req.headers.star_ae_server_id, callback);
+		messageToAeServer.type = "LONG_POLLING_TIMEOUT";
+		messageToAeServer.body = null;
+		res.send(messageToAeServer);
+	}, 39999);	
+	//}, 5000);	
+	
+	eventEmitter.once('COMMAND_'+req.headers.star_ae_server_id, callback);	
 }

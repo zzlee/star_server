@@ -2,6 +2,8 @@ var workingPath = process.env.STAR_SERVER_PROJECT;
 var path = require('path');
 var http = require('http');
 var url = require('url');
+var fs = require('fs');
+var routes = require('./routes');
 
 exports.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, ownerFbID, movieTitle) {
 
@@ -51,5 +53,19 @@ exports.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, owne
 	httpReq.end();
 		
 
+
+}
+
+
+exports.createMovie_longPolling = function(starAeServerID, movieProjectID, ownerStdID, ownerFbID, movieTitle, ytAccessToken) {
+	
+	var commandParameters = {
+		movieProjectID: movieProjectID,
+		ownerStdID: ownerStdID,
+		ownerFbID: ownerFbID,
+		movieTitle: movieTitle,
+		ytAccessToken: ytAccessToken };
+	
+	routes.sendRequestToAeServer( starAeServerID, { command: "RENDER_MOVIE", parameters: commandParameters } );
 
 }

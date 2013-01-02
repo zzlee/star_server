@@ -16,7 +16,8 @@ exports.upload_cb = upload.upload_cb;
 
 var aeServerHandler = require('./ae_server_handler.js');
 exports.reportRenderingResult_cb = aeServerHandler.reportRenderingResult_cb;
-exports.aeConnection_cb = aeServerHandler.aeConnection_cb;
+exports.sendRequestToAeServer = aeServerHandler.sendRequestToAeServer;
+exports.longPollingFromAeServer_cb = aeServerHandler.longPollingFromAeServer_cb;
 
 var analyticsHandler = require('./analytics_handler.js');
 exports.recordUserAction_cb = analyticsHandler.recordUserAction_cb;
