@@ -5,3 +5,4 @@ ae_replace_args.xml
 yt_token.json
 apns-prod/apns-prod-cert.pem
 apns-prod/apns-prod-key-noenc.pem
+yt_refresh_token.json

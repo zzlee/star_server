@@ -24,7 +24,7 @@ var http = require('http'),
   
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 3030);
+  app.set('port', process.env.PORT || 80);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
@@ -120,13 +120,13 @@ http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
 
-
+/*
 //test
 var ae_serv_mgr = require('./ae_server_manager.js');
-
-setInterval(function(){ 
+setTimeout(function(){
+//setInterval(function(){ 
 	//ae_serv_mgr.createMovie('http://192.168.5.101', 'rotate-anonymous-20121115T004014395Z', 'aa', 'aa_fb', 'video to test');
 	//routes.sendRequestToAeServer( "gance_Feltmeng_pc", { command: "RENDER", movieProjectID: "1234", time: (new Date()).toString()} );
-	ae_serv_mgr.createMovie_longPolling("gance_Feltmeng_pc", "movieProjectID", "ownerStdID", "ownerFbID", "movieTitle", "ytAccessToken")
-}, 10000);
-/**/
+	ae_serv_mgr.createMovie_longPolling("gance_Feltmeng_pc", "greeting-50c85019e6b209a80f000004-20121213T015823474Z", "ownerStdID", "ownerFbID", "movieTitle")
+}, 15000);
+*/

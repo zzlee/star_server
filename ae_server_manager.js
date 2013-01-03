@@ -4,6 +4,7 @@ var http = require('http');
 var url = require('url');
 var fs = require('fs');
 var routes = require('./routes');
+var youtubeManager = require( './youtube_manager.js' );
 
 exports.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, ownerFbID, movieTitle) {
 
@@ -57,15 +58,27 @@ exports.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, owne
 }
 
 
-exports.createMovie_longPolling = function(starAeServerID, movieProjectID, ownerStdID, ownerFbID, movieTitle, ytAccessToken) {
+exports.createMovie_longPolling = function(starAeServerID, movieProjectID, ownerStdID, ownerFbID, movieTitle) {
+
+	youtubeManager.getAccessToken( function(ytAccessToken){
+		if (ytAccessToken) {
+			var userDataFolder = path.join( workingPath, 'public/contents/user_project', movieProjectID, 'user_data');
+			
+			var commandParameters = {
+				userFileList: fs.readdirSync(userDataFolder),
+				movieProjectID: movieProjectID,
+				ownerStdID: ownerStdID,
+				ownerFbID: ownerFbID,
+				movieTitle: movieTitle,
+				ytAccessToken: ytAccessToken 
+			};
+			
+			routes.sendRequestToAeServer( starAeServerID, { command: "RENDER_MOVIE", parameters: commandParameters } );
+		}
+		else {
+			console.log('[%s] Cannot get Youtube access token!', movieProjectID);
+		}
 	
-	var commandParameters = {
-		movieProjectID: movieProjectID,
-		ownerStdID: ownerStdID,
-		ownerFbID: ownerFbID,
-		movieTitle: movieTitle,
-		ytAccessToken: ytAccessToken };
-	
-	routes.sendRequestToAeServer( starAeServerID, { command: "RENDER_MOVIE", parameters: commandParameters } );
+	});
 
 }
