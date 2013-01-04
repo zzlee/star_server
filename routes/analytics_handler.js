@@ -1,4 +1,6 @@
 var analysisDB = require('../analysis.js');
+var ObjectID = require('mongodb').ObjectID;
+
 
 exports.recordUserAction_cb = function(req, res) {
 	
@@ -7,7 +9,7 @@ exports.recordUserAction_cb = function(req, res) {
 		
 		for (var i in records) {		
 			var actionTime = new Date(Number(records[i].time)),
-				user_id = (records[i].user_id) ? records[i].user_id : "Not-Login",
+				user_id = (records[i].user_id) ? ObjectID.createFromHexString(records[i].user_id) : null,
 				fb_id = (records[i].user_fb_id) ? records[i].user_fb_id : "Not-Login",
 				userName = (records[i].user_fb_name) ? records[i].user_fb_name : "Not-Login",
 				action = records[i].action,

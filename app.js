@@ -125,3 +125,19 @@ setTimeout(function(){
 ae_serv_mgr.createMovie('http://192.168.5.101', 'rotate-anonymous-20121115T004014395Z', 'aa', 'aa_fb', 'video to test');
 }, 3000);
 */
+
+//test of Jeff
+app.get('/test', function(req, res) {
+	//get message.
+	user = req.headers.message;
+	res.writeHead(200, { "Content-Type": "text/plain" });
+	if(user) {
+		console.log('Client message: ' + user);
+		//send to client.
+		res.write('Hello.');
+	} else {
+		console.log(user);
+		console.log('No data.');
+	}
+	res.end();
+});

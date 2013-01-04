@@ -29,15 +29,15 @@ FM.api._pushErrorCallback = function(err, notification){
 
 /**
  * Google Cloud Messaging, a.k.a, GCM.
- * GCM sender_ID: 46997187553
- * API Key: AIzaSyC7E2uLgv9zZ3ctdgVKW19u2oBoimAss58
+ * GCM sender_ID: 701982981612
+ * API Key: AIzaSyDn_H-0W251CKUjDCl-EkBLV0GunnWwpZ4
  */
 FM.api._GCM_PushNotification = function( device_token ){
 
 	var gcm = require('node-gcm');
 
 	var message = new gcm.Message();
-	var sender = new gcm.Sender('AIzaSyC7E2uLgv9zZ3ctdgVKW19u2oBoimAss58');
+	var sender = new gcm.Sender('AIzaSyDn_H-0W251CKUjDCl-EkBLV0GunnWwpZ4');
 	var registrationIds = [];
 
 	// Optional
@@ -70,7 +70,7 @@ FM.api._pushNotification = function( device_token ){
 			keyData: null,                    			/* String or Buffer containing key data, as certData */
 			passphrase: null,                 			/* A passphrase for the Key file */
 			ca: null,                         			/* String or Buffer of CA data to use for the TLS connection */
-			gateway: 'gateway.sandbox.push.apple.com',	/* gateway address 'Production' - gateway.push.apple.com */
+			gateway: 'gateway.push.apple.com',	/* gateway address 'Sand-box' - gateway.sandbox.push.apple.com */
 			port: 2195,                   				/* gateway port */
 			enhanced: true,               				/* enable enhanced format */
 			errorCallback: FM.api._pushErrorCallback,	/* Callback when error occurs function(err,notification) */
