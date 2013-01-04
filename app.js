@@ -64,6 +64,7 @@ app.configure('production', function(){
 
 app.get('/users', user.list);
 
+
 //GZ 
 app.get('/get_template_list', routes.getTemplateList_cb );
 app.get('/get_template_raw_data', routes.getTemplateRawData_cb );
@@ -74,6 +75,7 @@ app.get('/oauth2callback', routes.YoutubeOAuth2_cb );
 app.post('/upload', routes.upload_cb );
 app.post('/upload_user_data_info',routes.uploadUserDataInfo_cb);
 app.get('/report_rendering_result', routes.reportRenderingResult_cb);
+app.get('/long_polling_from_ae_server', routes.longPollingFromAeServer_cb);
 app.post('/record_user_action', routes.recordUserAction_cb );
 
 //GL
@@ -121,9 +123,12 @@ http.createServer(app).listen(app.get('port'), function(){
 /*
 //test
 var ae_serv_mgr = require('./ae_server_manager.js');
-setTimeout(function(){ 
-ae_serv_mgr.createMovie('http://192.168.5.101', 'rotate-anonymous-20121115T004014395Z', 'aa', 'aa_fb', 'video to test');
-}, 3000);
+setTimeout(function(){
+//setInterval(function(){ 
+	//ae_serv_mgr.createMovie('http://192.168.5.101', 'rotate-anonymous-20121115T004014395Z', 'aa', 'aa_fb', 'video to test');
+	//routes.sendRequestToAeServer( "gance_Feltmeng_pc", { command: "RENDER", movieProjectID: "1234", time: (new Date()).toString()} );
+	ae_serv_mgr.createMovie_longPolling("gance_Feltmeng_pc", "greeting-50c85019e6b209a80f000004-20121213T015823474Z", "ownerStdID", "ownerFbID", "movieTitle")
+}, 30000);
 */
 
 //test of Jeff

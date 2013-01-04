@@ -1,6 +1,5 @@
 var fs = require('fs');
 var workingPath = process.env.STAR_SERVER_PROJECT;
-var movieMaker = require(workingPath+'/ae_render.js');
 
 exports.getTemplateList_cb = function(req, res){
 	fs.readdir(workingPath+'/public/contents/template', function(err, files) {
