@@ -65,7 +65,7 @@ exports.longPollingFromAeServer_cb = function(req, res) {
 		messageToAeServer.type = "LONG_POLLING_TIMEOUT";
 		messageToAeServer.body = null;
 		res.send(messageToAeServer);
-	}, 39999);	
+	}, 60000);	
 	//}, 5000);	
 	
 	eventEmitter.once('COMMAND_'+req.headers.star_ae_server_id, callback);	
