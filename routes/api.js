@@ -242,7 +242,7 @@ FM.api._fbPostVideoThenAdd = function(vjson){
 						if(result.deviceToken){
 							FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
 							for( var devicePlatform in result.deviceToken){
-								if(result.deviceToken[devicePlatform]){
+								if(result.deviceToken[devicePlatform] != 'undefined'){
 									if(devicePlatform == 'Android')
 										FM.api._GCM_PushNotification(result.deviceToken[devicePlatform]);
 									else
