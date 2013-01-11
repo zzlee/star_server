@@ -12,7 +12,7 @@ module.exports = function (req, res, next) {
   if (login || logout) {    
     routes.forEach(function (route) {
       if (!(req.url.match(route.regexp))) {
-        console.log(req.url);
+        logger.info(req.url);
         req.method = 'GET';
       }
     });

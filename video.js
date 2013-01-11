@@ -3,7 +3,7 @@ var FMDB = require('./db.js'),
     
 var FM = {};
 var DEBUG = true,
-    FM_LOG = (DEBUG) ? function(str){ console.log(str); } : function(str){} ;
+    FM_LOG = (DEBUG) ? function(str){ logger.log(str); } : function(str){} ;
 
 FM.VIDEO = (function(){
     var uInstance;
@@ -19,9 +19,9 @@ FM.VIDEO = (function(){
                 var query = videos.find({});
                 query.sort('timestamp', -1).exec(function(err, doc){
                     if(err){
-                        console.log('locationQuery failed: '+err);
+                        logger.log('locationQuery failed: '+err);
                     }else{
-                        console.log('locationQuery '+locationUID+': '+doc);
+                        logger.log('locationQuery '+locationUID+': '+doc);
                     }
                 });
             },

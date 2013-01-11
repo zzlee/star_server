@@ -25,20 +25,15 @@ exports.recordUserAction_cb = function(req, res) {
 				platform: platform,
 				os_version: os_version
 			};
-			//console.log('[%s] %s %s on %s %s.', actionTime, records[i].user_fb_name, records[i].action, records[i].platform, records[i].os_version );
-			//console.log("Record: "+ JSON.stringify(record));
+			
+			/*
 			analysisDB.updateRecord( {time: actionTime, user_id: user_id}, record, {upsert: true}, function(err, vdoc){
 				if(err)
-					console.log(err);
+					logger.log(err);
 				if(vdoc)
-					console.log('[%s] %s %s on %s %s.', vdoc.time, vdoc.userName, vdoc.action, vdoc.platform, vdoc.os_version);
-					//console.log(JSON.stringify(vdoc));
-			});
+					logger.log('[%s] %s %s on %s %s.', vdoc.time, vdoc.userName, vdoc.action, vdoc.platform, vdoc.os_version);
+					
+			}); */
 		}
-		//console.log("user action");
-		//console.dir(req.body.records);
 	}
-	
-	//console.log("user action");
-	//console.dir(req.body);
 }

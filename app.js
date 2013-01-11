@@ -19,8 +19,21 @@ var http = require('http'),
     server = http.createServer(app),
     secureServer = https.createServer(app),
     sio = require('socket.io').listen(server),
-    ssio = require('socket.io').listen(secureServer);
+    ssio = require('socket.io').listen(secureServer),
+	winston = require('winston');
   
+
+require('winston-mongodb').MongoDB;
+var logger = new(winston.Logger)({
+	transports: [ 
+		new winston.transports.MongoDB({ db: 'feltmeng', level: 'info'}),
+		new winston.transports.File({ filename: './log/winston.log'})	
+	],
+	exceptionHandlers: [new winston.transports.File({filename: './log/exceptions.log'})]
+	
+});  
+
+global.logger = logger;  
   
 
 app.configure(function(){
@@ -28,7 +41,7 @@ app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
-  app.use(express.logger('dev'));
+  //app.use(express.logger('dev'));
   app.use(express.bodyParser());
  
   //GL
@@ -117,7 +130,7 @@ app.post('/api/submitAVideo', routes.api.submitAVideo);
 app.del('/', routes.api.signout);
 
 http.createServer(app).listen(app.get('port'), function(){
-  console.log("Express server listening on port " + app.get('port'));
+  logger.info("Express server listening on port " + app.get('port'));
 });
 
 /*
@@ -137,12 +150,12 @@ app.get('/test', function(req, res) {
 	user = req.headers.message;
 	res.writeHead(200, { "Content-Type": "text/plain" });
 	if(user) {
-		console.log('Client message: ' + user);
+		logger.info('Client message: ' + user);
 		//send to client.
 		res.write('Hello.');
 	} else {
-		console.log(user);
-		console.log('No data.');
+		logger.info(user);
+		logger.info('No data.');
 	}
 	res.end();
 });

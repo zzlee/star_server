@@ -25,13 +25,13 @@ exports.upload_cb = function(req, res){
 				.resize(_resizeTo.width, _resizeTo.height)
 				.write(fileResized, function (err) {
 					if (!err) {
-						console.log('File cropping/resizing done');
+						logger.log('File cropping/resizing done');
 						fs.unlink(fileCropped);
 						if ( _callback2 )
 							_callback2();
 					}
 					else  {
-						console.log(err);
+						logger.log(err);
 						res.send( {err:'Fail to resize the image file: '+err } );
 					}
 				});
@@ -49,7 +49,7 @@ exports.upload_cb = function(req, res){
 						fs.unlink(fileAutoOrinted);
 					}
 					else  {
-						console.log(err);
+						logger.log(err);
 						res.send( {err:'Fail to crop the image file: '+err } );
 					}
 				});
@@ -71,7 +71,7 @@ exports.upload_cb = function(req, res){
 						getSize();
 					}
 					else  {
-						console.log(err);
+						logger.log(err);
 						res.send( {err:'Fail to auto orient the image file: '+err } );
 					}
 				});
@@ -98,7 +98,7 @@ exports.upload_cb = function(req, res){
 					});
 				}
 				else  {
-					console.log(err);
+					logger.log(err);
 					res.send( {err:'Fail to remove EXIF in image file: '+err } );
 				}
 			});
@@ -133,20 +133,20 @@ exports.upload_cb = function(req, res){
 			if (!err) {
 				fs.unlink(_tmp_path, function() {
 					if (!err) {
-						console.log( 'Finished uploading to ' + _target_path );
+						logger.log( 'Finished uploading to ' + _target_path );
 						
 						if ( _moveFile_cb ) {
 							_moveFile_cb();
 						}
 					}
 					else {
-						console.log('Fail to delete temporary uploaded file: '+err);
+						logger.log('Fail to delete temporary uploaded file: '+err);
 						res.send( {err:'Fail to delete temporary uploaded file: '+err});
 					}
 				});
 			}
 			else {
-				console.log('Fail to do util.pump(): '+err);
+				logger.log('Fail to do util.pump(): '+err);
 				res.send( {err:'Fail to do util.pump(): '+err } );
 			}
 		});			
@@ -157,7 +157,7 @@ exports.upload_cb = function(req, res){
 	//set where the file should actually exists 
 	var target_path;
 	
-	console.log('req.body.fileObjectID= %s', req.body.fileObjectID);
+	logger.log('req.body.fileObjectID= '+ req.body.fileObjectID);
 	
 	var areaToCrop, resizeTo;
 	

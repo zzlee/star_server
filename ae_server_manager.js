@@ -42,26 +42,26 @@ exports.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, owne
 			}
 
 			var httpReq = http.request(options, function(res) {
-				console.log('STATUS: ' + res.statusCode);
-				console.log('HEADERS: ' + JSON.stringify(res.headers));
+				logger.info('STATUS: ' + res.statusCode);
+				logger.info('HEADERS: ' + JSON.stringify(res.headers));
 				res.setEncoding('utf8');
 				res.on('data', function (chunk) {
-					console.log('[%s] BODY: '+chunk, movieProjectID);
+					logger.info('[%s] BODY: '+chunk, movieProjectID);
 				}).on('end', function() {
-					console.log('[%s] Successfully ask AE Server to render movie', movieProjectID);
+					logger.info('[%s] Successfully ask AE Server to render movie', movieProjectID);
 				});
 			});
 
 			httpReq.on('error', function(e) {
-				console.log('[%s] error send http GET to AE Server:', movieProjectID);
-				console.dir(e);
+				logger.info('[%s] error send http GET to AE Server:', movieProjectID);
+				logger.info(JSON.stringify(e));
 			});
 
 			httpReq.end();
 		
 		}
 		else {
-			console.log('[%s] Cannot get Youtube access token!', movieProjectID);
+			logger.info('[%s] Cannot get Youtube access token!', movieProjectID);
 		}
 	});
 
@@ -86,7 +86,7 @@ exports.createMovie_longPolling = function(starAeServerID, movieProjectID, owner
 			routes.sendRequestToAeServer( starAeServerID, { command: "RENDER_MOVIE", parameters: commandParameters } );
 		}
 		else {
-			console.log('[%s] Cannot get Youtube access token!', movieProjectID);
+			logger.info('[%s] Cannot get Youtube access token!', movieProjectID);
 		}
 	
 	});

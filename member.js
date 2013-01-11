@@ -3,7 +3,7 @@ var FMDB = require('./db.js'),
     
 var FM = {};
 var DEBUG = true,
-    FM_LOG = (DEBUG) ? function(str){ console.log(str); } : function(str){} ;
+    FM_LOG = (DEBUG) ? function(str){ logger.info(str); } : function(str){} ;
 
 FM.MEMBER = (function(){
     var uInstance = null;
@@ -24,7 +24,7 @@ FM.MEMBER = (function(){
                 FMDB.getValueOf(members, {"memberID":memberID}, field, function(err, result){
                     if(err) throw err;
                     FMDB.deleteAdoc(members, result[field]);
-                    console.log("deleteMember " + memberID + result[field]);
+                    logger.info("deleteMember " + memberID + result[field]);
                 });
             },
             

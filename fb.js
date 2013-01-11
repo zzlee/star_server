@@ -25,13 +25,13 @@ window.fbAsyncInit = function(){
 	});
 }
 */
-console.log("Loading fb.js");
+logger.info("Loading fb.js");
 
 var FMDB = require('./db');
 
 var FB = null;
 function loadFBObject(fb){
-    console.log("fb.js loadFBObject");
+    logger.info("fb.js loadFBObject");
     FB = fb;
     
     //  Listen to and handle auth.statusChange events to take a fresh AccessToken.
@@ -57,7 +57,7 @@ function loadFBObject(fb){
             document.getElementById('auth-loggedin').style.display = 'none';
         }
         
-        console.log("auth.statusChang: " + JSON.stringify(response));
+        logger.info("auth.statusChang: " + JSON.stringify(response));
     });
 
     //  responed to click on the login and logout links.
@@ -80,34 +80,34 @@ function loadFBObject(fb){
              */
             fbid = response.authResponse.userID;
             accessToken = response.authResponse.accessToken;
-            console.log("User "+ fbid + " is logged and has authenticated APP with token: " + accessToken);
+            logger.info("User "+ fbid + " is logged and has authenticated APP with token: " + accessToken);
             //post("/1609171038/feed", "http://vimeo.com/44338220", cb);
             like("1609171038_452124074827971", cb);
                     
         }else if (response.status === "not_authorized"){
         
             //  The user is logged in Facebook, but has not authenticated your app
-            console.log('User is logged without authenticaing APP.');
+            logger.info('User is logged without authenticaing APP.');
             FB.login(function(response){
                 if(response.authResponse){
-                console.log('Welcome! Fetching your information....');
+                logger.info('Welcome! Fetching your information....');
                     FB.api('/me', function(response){
-                        console.log('Good to see you, ' + response.name+'.');
+                        logger.info('Good to see you, ' + response.name+'.');
                     });
                 }}, {scope: 'read_stream, publish_stream'}
             );
             
         }else{
             //  The user isn't logged in to Facebook.
-            console.log('User isn\'t logged.');
+            logger.info('User isn\'t logged.');
             FB.login(function(response){
                 if (response.authResponse) {
-                    console.log('Welcome! Fetching your information....');
+                    logger.info('Welcome! Fetching your information....');
                             FB.api('/me', function(response){
-                                console.log('Good to see you, '+response.name+'.');
+                                logger.info('Good to see you, '+response.name+'.');
                             });
                 } else {
-                    console.log('User cancelled login or did not fully authrize.');
+                    logger.info('User cancelled login or did not fully authrize.');
                 }
             }, {scope: 'read_stream, publish_stream'});
         }
@@ -117,10 +117,10 @@ function loadFBObject(fb){
 function cb(response){
     var postid = null;
     if(!response || response.error){
-        console.log("Like Error: " + JSON.stringify(response.error));
+        logger.info("Like Error: " + JSON.stringify(response.error));
     }else{
         postid = response.id;
-        console.log("Like Succeed: " + JSON.stringify(response));
+        logger.info("Like Succeed: " + JSON.stringify(response));
     }
 }
 
@@ -161,11 +161,11 @@ function postShare(){
 FB.api("/oauth/access_token?client_id=243619402408275&client_secret=c35e27572a71efcd3035247c024c9d4b&grant_type=client_credentials&response_type=token",
     function(response){
         if(!response || response.error){
-            console.log('Request AppAccessToken Error: '+ response.error.message+' type: '+response.error.type);
-            console.log('Response: '+response[0].access_token+' '+response[1].access_token);
+            logger.info('Request AppAccessToken Error: '+ response.error.message+' type: '+response.error.type);
+            logger.info('Response: '+response[0].access_token+' '+response[1].access_token);
         
         }else{
-            console.log('AppAccessToken: '+ response);
+            logger.info('AppAccessToken: '+ response);
         }
     }
 );

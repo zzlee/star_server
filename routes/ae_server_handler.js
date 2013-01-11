@@ -11,8 +11,8 @@ exports.reportRenderingResult_cb = function(req, res) {
 		var ownerFbID = req.headers.owner_fb_id;
 		var movieTitle = req.headers.movie_title;
 		
-		console.log('[%s] Got response from AE Server:', movieProjectID )
-		console.dir(req.headers);
+		logger.info('[%s] Got response from AE Server:', movieProjectID )
+		logger.info(JSON.stringify(req.headers));
 		
 		if ( req.headers.err == 'null' || (!req.headers.err) ) {
 			//add to video DB
@@ -25,11 +25,11 @@ exports.reportRenderingResult_cb = function(req, res) {
 						 "ownerId": {"_id": ownerStdID, "userID": ownerFbID},
 						 "url": url,
 						 "projectId":movieProjectID};
-			//console.log("video " + JSON.stringify(vjson));
+			//logger.info("video " + JSON.stringify(vjson));
 			fmapi._fbPostVideoThenAdd(vjson);
 			/*
 			videoDB.addVideo(vjson, function(err, vdoc){
-				console.log('Seccessfully add %s to videoDB!', movieProjectID);
+				logger.info('Seccessfully add %s to videoDB!', movieProjectID);
 			});
 			*/
 		}
@@ -47,13 +47,13 @@ exports.sendRequestToAeServer = function( targetID, reqToAeServer ) {
 }
 
 exports.longPollingFromAeServer_cb = function(req, res) {
-	console.log('[%s] Got long-polling HTTP request from AE Server: %s', new Date(), req.headers.star_ae_server_id )
+	logger.info('['+ new Date() +']Got long-polling HTTP request from AE Server: '+ req.headers.star_ae_server_id )
 	//console.dir(req);
 	
 	var messageToAeServer = new Object();
 	
 	var callback = function(reqToAeServer){
-		//console.log(reqToAeServer);
+		//logger.info(reqToAeServer);
 		clearTimeout(timer);
 		messageToAeServer.type = "COMMAND";
 		messageToAeServer.body = reqToAeServer;

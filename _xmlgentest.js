@@ -4,10 +4,10 @@ var xml = builder.create('root')
     .ele('repo', {'type': 'git'}, 'git://github.com/oozcitak/xmlbuilder-js.git')
   .end({ pretty: true});
 
-console.log(xml);
+logger.log(xml);
 
 var fs = require('fs');
 fs.writeFile('mytest.xml', xml, function (err) {
   if (err) throw err;
-  console.log('It\'s saved!');
+  logger.log('It\'s saved!');
 });

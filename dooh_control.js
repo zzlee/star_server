@@ -15,11 +15,11 @@ exports.sendPlayRequest = function( doohURL, movieProjectID, timeToPlay) {
 
 	http.get(options, function(res) {
 		res.on('data', function(data) {
-				console.log( 'data: '+data);
+				logger.info( 'data: '+data);
 			}).on('end', function() {
-				console.log("done");
+				logger.info("done");
 			}).on('error', function(e) {
-				console.log("Got error: " + e.message);
+				logger.info("Got error: " + e.message);
 			});
 	});
 

@@ -34,7 +34,7 @@ var memberDB = require("../member.js"),
 exports.api = api;
 
 exports.signinFB = function(req, res){
-	console.log("\n[FM] [signin_fb] ");
+	logger.log("\n[FM] [signin_fb] ");
     res.render('signinFB', { title: "導向Facebook認證頁！" });
 };
 
@@ -47,7 +47,7 @@ exports.signin = function (req, res, next) {
             oid = null;
 
         memberDB.isValid(member.memberID, function(err, result){
-            if(err) console.log(memberID+" is invalid " + err);
+            if(err) logger.log(memberID+" is invalid " + err);
             if(result && member.password === result["password"]){
                 oid = result["_id"];
                 req.session.user = {
@@ -55,7 +55,7 @@ exports.signin = function (req, res, next) {
                     pwd: member.password,
                     userId: oid 
                 };             
-                console.log(member.memberID + " Log-In! with userId " + oid.toHexString());
+                logger.log(member.memberID + " Log-In! with userId " + oid.toHexString());
             }
             next();
         });
@@ -67,20 +67,20 @@ exports.signin = function (req, res, next) {
 
 
 exports.signout = function (req, res, next) {
-    console.log(req.session.user.name + " Log-Out!");
+    logger.log(req.session.user.name + " Log-Out!");
     delete req.session.user;
     next();
 };
 
 exports.signup = function(req, res, next){
-    console.log("Get POST SignUp Req: " + JSON.stringify(req.body));
+    logger.log("Get POST SignUp Req: " + JSON.stringify(req.body));
     
     if(req.body && req.body.member){
         var member = req.body.member,
             oid = null;
-        console.log(JSON.stringify(member));
+        logger.log(JSON.stringify(member));
         memberDB.addMember(member, function(err, result){
-            console.log("with userId " + result["_id"]);
+            logger.log("with userId " + result["_id"]);
             if(result){
                 oid = result["_id"];
                 req.session.user = {
@@ -122,7 +122,7 @@ exports.signup = function(req, res, next){
                 
                 
                 res.send("Thanks for registering " + req.body.user);
-                console.log(userStore);
+                logger.log(userStore);
             });
         });
         */
@@ -175,10 +175,10 @@ exports.addEvent = function(req, res, next){
             date = parseInt(yearday.substring(8), 10),
             hr = parseInt(time.substring(0, 2), 10),
             min = parseInt(time.substring(2), 10);
-        //console.log("Select " + event.idx);
+        //logger.log("Select " + event.idx);
         var idx = parseInt(event.idx, 10);
             
-        console.log("Year "+year+" Mon "+mon+" Date "+date+" Hr "+hr+ " Min "+min);
+        logger.log("Year "+year+" Mon "+mon+" Date "+date+" Hr "+hr+ " Min "+min);
         var slot = new Date(year, mon-1, date, hr, min);    // month: 0~11
         var start = slot.getTime();
         //slot.setMinutes(min+5);
@@ -196,7 +196,7 @@ exports.addEvent = function(req, res, next){
                     "status": "waiting"
                   };
                   
-        console.log("addEvent: " + start.toLocaleString()+ " to " + end.toLocaleString());
+        logger.log("addEvent: " + start.toLocaleString()+ " to " + end.toLocaleString());
 		
 		/*
 		//GZ
@@ -205,7 +205,7 @@ exports.addEvent = function(req, res, next){
 		var doohURL = '192.168.5.109';  //TODO: query from doohDB
 		var movieProjectID = videoWorks[idx].projectId;
 		doohControl.sendPlayRequest(doohURL, movieProjectID, start );
-		console.log('Movie %s is requested to send to DOOH %s!', movieProjectID, doohURL );
+		logger.log('Movie %s is requested to send to DOOH %s!', movieProjectID, doohURL );
 		*/
                   
         scheduleDB.reserve(evt, function(err, result){
@@ -214,7 +214,7 @@ exports.addEvent = function(req, res, next){
         });
         
     }else{
-        console.log("\n List Events....\n");
+        logger.log("\n List Events....\n");
         next();
     }
 };
@@ -225,7 +225,7 @@ exports.censorship = function(req, res){
     
         if(err) throw err;
         eventAdapter(result);
-        console.log("Event Waitling List: " + evtList);
+        logger.log("Event Waitling List: " + evtList);
         
         res.render( "censorship", { 
                                 title: "審查表",
@@ -261,7 +261,7 @@ exports.event = function(req, res, next){
     scheduleDB.listOfReservated(range, function(err, result){
         if(err) throw err;
         if(result){
-            console.log("from " +start.getTime()+ " to " + end.getTime() + " \nevents: " + result);
+            logger.log("from " +start.getTime()+ " to " + end.getTime() + " \nevents: " + result);
             eventAdapter(result);
             next();
         }
@@ -274,7 +274,7 @@ exports.profile = function(req, res, next){
     if(req.session.user){
         videoDB.getVideoListById(req.session.user.userId, function(err, result){
             videoWorks = result;
-            console.log("videoWorks: " + videoWorks);
+            logger.log("videoWorks: " + videoWorks);
             next();
         });
         

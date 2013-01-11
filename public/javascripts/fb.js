@@ -89,13 +89,13 @@ var DEBUG = true,
                             
                     $.post(url, data, function(res){
                         FM_LOG("[SignUp with FB] ");
-                        FM_LOG(res);
+                        logger.info(res);
                                 
                     });
                 }
                 
                 FM_LOG("Facebook auth.statusChang: ");
-                FM_LOG(response);
+                logger.info(response);
             });
             
             FMFB.login();
@@ -202,7 +202,7 @@ FMFB.login = function(){
              * and signed request each expire
              */
             FM_LOG("\nUser connected!");
-            FM_LOG(response);
+            logger.info(response);
             
             //postOn("/1609171038/feed", "http://vimeo.com/44338220", cb);
             //like("1609171038_452124074827971", cb);
@@ -220,7 +220,7 @@ FMFB.login = function(){
                 FM_LOG('Welcome! Fetching your information....');
                     FB.api('/me', function(response){
                         FM_LOG('\nGood to see you, ' + response.name+'.');
-                        FM_LOG(response);
+                        logger.info(response);
                     });
                     
                 } }, {scope: 'read_stream, publish_stream'}
@@ -236,7 +236,7 @@ FMFB.login = function(){
                     FM_LOG('Welcome! Fetching your information....');
                             FB.api('/me', function(response){
                                 FM_LOG('\nGood to see you, '+response.name+'.');
-                                FM_LOG(response);
+                                logger.info(response);
                             });
                 } else {
                     FM_LOG('User cancelled login or did not fully authrize.');
@@ -250,7 +250,7 @@ FMFB.logout = function(){
     fmfb = null;
     FB.logout(function(res){
         FM_LOG("\nFB Logout: ");
-        FM_LOG(res);
+        logger.info(res);
     });
 };
 
@@ -265,7 +265,7 @@ FMFB.post = function(){
     FM_LOG("\nPost Offline: " + JSON.stringify(what) );
     
     FB.api("/"+ userID +"/feed", "post", what, function(res){
-        FM_LOG(res);
+        logger.info(res);
     });
 
 

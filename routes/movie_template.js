@@ -7,7 +7,7 @@ exports.getTemplateList_cb = function(req, res){
 			res.send(files);
 		}
 		else {
-			console.log( 'Fail to read /public/contents/template: '+err );
+			logger.log( 'Fail to read /public/contents/template: '+err );
 			res.send(null);
 		}
 	});
@@ -32,13 +32,13 @@ exports.getTemplateDescription_cb = function(req, res){
 				parser.parseString(data);
 			}
 			else {
-				console.log( 'Fail to read template_description.xml: '+err );
+				logger.log( 'Fail to read template_description.xml: '+err );
 				res.send(null);
 			}
 		});   
 	}
 	else {
-		console.log( 'Fail to templateID in the request ' );
+		logger.log( 'Fail to templateID in the request ' );
 		res.send(null);
 	}
 
@@ -60,13 +60,13 @@ exports.getTemplateCustomizableObjectList_cb = function(req, res){
 				parser.parseString(data);
 			}
 			else {
-				console.log( 'Fail to read template_customizable_object_list.xml: '+err );
+				logger.log( 'Fail to read template_customizable_object_list.xml: '+err );
 				res.send(null);
 			}
 		});   
 	}
 	else {
-		console.log( 'Fail to templateID in the request ' );
+		logger.log( 'Fail to templateID in the request ' );
 		res.send(null);
 	}
 

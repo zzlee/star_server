@@ -11,7 +11,7 @@ var memberDB = require("../member.js"),
 var ObjectID = require('mongodb').ObjectID;
 
 var DEBUG = true,
-    FM_LOG = (DEBUG) ? function(str){ console.log( typeof(str)==='string' ? str : JSON.stringify(str) ); } : function(str){} ;
+    FM_LOG = (DEBUG) ? function(str){ logger.log( typeof(str)==='string' ? str : JSON.stringify(str) ); } : function(str){} ;
     
 var FM = { api: {} };
 
@@ -116,7 +116,7 @@ FM.api._fbExtendToken = function(accessToken, callback){
                     
                 }else{
                     FM_LOG("\nGot longer lived token: ");
-                    FM_LOG(result);
+                    logger.info(result);
                     
                     var longerToken = result.substring( result.indexOf("=")+1, result.indexOf("&expires") );
                     var longerExpiresIn = parseInt(result.substring( result.lastIndexOf("=")+1 ), 10);
@@ -199,7 +199,7 @@ FM.api._fbPostVideoThenAdd = function(vjson){
 					vjsonData.fb_id = fb_id;
 					videoDB.updateOne({"projectId":pid}, vjsonData, {"upsert": true}, function(err, vdoc){
 						if(err)
-							FM_LOG(err);
+							logger.info(err);
 						
 						memberDB.getDeviceTokenById(oid, function(err, result){
 							if(err) throw err;
@@ -279,9 +279,9 @@ FM.api.fbPostCommentReq = function(req, res){
         FM.api._fbPost( path, function(response){
         
             if(response.error){
-                FM_LOG(error);
+                logger.info(error);
             }else{
-                FM_LOG(response.id);
+                logger.info(response.id);
                 res.send({"res":"Succeed"});
             }
         });
@@ -292,7 +292,7 @@ FM.api.fbPostCommentReq = function(req, res){
 FM.api.fbGetCommentReq = function(req, res){
     FM_LOG("[api.fbGetCommentReq]");
     if(req.query && req.query.fb_id && req.query.accessToken){
-        FM_LOG(req.query);
+        logger.info(req.query);
         var fb_id = req.query.fb_id;
             accessToken = req.query.accessToken,
 			projectId = req.query.projectId;
@@ -304,7 +304,7 @@ FM.api.fbGetCommentReq = function(req, res){
             
         FM.api._fbGet(path, function(response){
             if(response.error){
-                FM_LOG(response.error.message);
+                logger.info(response.error.message);
                 res.send(response.error);
             }else{
                 res.send(response); // "comments" and "likes"
@@ -318,7 +318,7 @@ FM.api.fbGetCommentReq = function(req, res){
 FM.api.fbGetThumbnail = function(req, res){
 	FM_LOG("[api.fbGetThumbnail]");
 	if(req.query && req.query.fb_id && req.query.accessToken && req.query.commenter){
-		FM_LOG(req.query);
+		logger.info(req.query);
         var fb_id = req.query.fb_id,
 			commenter = req.query.commenter,
             accessToken = req.query.accessToken;
@@ -330,9 +330,9 @@ FM.api.fbGetThumbnail = function(req, res){
             
         FM.api._fbGet(path, function(response){
 			FM_LOG("[Thumbnail] ");
-			FM_LOG(response);
+			logger.info(response);
             if(response.error){
-                FM_LOG(response.error.message);
+                logger.info(response.error.message);
                 res.send(response.error);
             }else{
 				response.id = fb_id;
@@ -430,7 +430,7 @@ FM.api.deviceToken =  function(req, res){
 	
 	if(req.body && req.body.user){
 		var user = req.body.user;
-		FM_LOG(user);
+		logger.info(user);
 		FM_LOG("\n[Got Device_Token] devicePlatform: " + user.devicePlatform + "; dvc_token: " + user.deviceToken);
 		
 		var oid = ObjectID.createFromHexString(user._id);
@@ -441,8 +441,8 @@ FM.api.deviceToken =  function(req, res){
 		var json = JSON.parse(jsonStr);
 		
 		memberDB.updateMember( oid, json, function(err, result){
-            if(err) FM_LOG(err);
-            if(result) FM_LOG(result);
+            if(err) logger.info(err);
+            if(result) logger.info(result);
 			res.send({"message": "Update Device Token!"});
         });
 	}else{
@@ -460,7 +460,7 @@ FM.api.signupwithFB = function(req, res){
     if(req.body && req.body.authResponse){
     
         FM_LOG("\n[Got FB_Token]: ");
-        FM_LOG(req.body.authResponse);
+        logger.info(req.body.authResponse);
         
         var authRes = req.body.authResponse;
         var userID = authRes.userID,
@@ -515,8 +515,8 @@ FM.api.signupwithFB = function(req, res){
                             newdata.auth = data;
                             
                             memberDB.updateMember( oid, { fb: newdata, deviceToken: deviceToken }, function(err, result){
-                                if(err) FM_LOG(err);
-                                if(result) FM_LOG(result);
+                                if(err) logger.info(err);
+                                if(result) logger.info(result);
                             });
                             
                             res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "expiresIn": data.expiresIn  }, "message":"success"} );
@@ -526,8 +526,8 @@ FM.api.signupwithFB = function(req, res){
                 }else{
 					if(dvc_Token){
 						memberDB.updateMember( oid, { "deviceToken": deviceToken }, function(err, result){
-                            if(err) FM_LOG(err);
-                            if(result) FM_LOG(result);
+                            if(err) logger.info(err);
+                            if(result) logger.info(result);
                         });
 					}
                     //res.send({"message":"success"});
@@ -561,7 +561,7 @@ FM.api.signupwithFB = function(req, res){
                         FM_LOG("with userId " + result["_id"]);
                         if(result){
                             FM_LOG("\n[addMember]:");
-                            FM_LOG(result);
+                            logger.info(result);
                             
                             oid = result["_id"];
                             /* ACK LongPolling from Client
@@ -596,13 +596,13 @@ FM.api.signin = function (req, res) {
     /*
      *  Once member sign-in, we should save profile in session to be used in same session.
      */
-    console.log("Get Sign In Req: " + JSON.stringify(req.body)); 
+    logger.log("Get Sign In Req: " + JSON.stringify(req.body)); 
     if(req.body && req.body.member){
         var member = req.body.member,
             oid = null;
 
         memberDB.isValid(member.memberID, function(err, result){
-            if(err) console.log(memberID + " is invalid " + err);
+            if(err) logger.log(memberID + " is invalid " + err);
             if(result && member.password === result["password"]){
                 oid = result["_id"];
                 req.session.user = {
@@ -610,7 +610,7 @@ FM.api.signin = function (req, res) {
                     pwd: member.password,
                     userId: oid 
                 };             
-                console.log(member.memberID + " Log-In! with userId " + oid.toHexString());
+                logger.log(member.memberID + " Log-In! with userId " + oid.toHexString());
                 
                 FM.api.profile(req, res);
                 
@@ -627,21 +627,21 @@ FM.api.signin = function (req, res) {
 // GET
 FM.api.signout = function (req, res) {
     var username = req.session.user.name;
-    console.log(username + " Log-Out!");
+    logger.log(username + " Log-Out!");
     delete req.session.user;
     res.redirect("/");
 };
 
 // POST
 FM.api.signup = function(req, res){
-    console.log("Get POST SignUp Req: " + JSON.stringify(req.body));
+    logger.log("Get POST SignUp Req: " + JSON.stringify(req.body));
     
     if(req.body && req.body.member){
         var member = req.body.member,
             oid = null;
-        console.log(JSON.stringify(member));
+        logger.log(JSON.stringify(member));
         memberDB.addMember(member, function(err, result){
-            console.log("with userId " + result["_id"]);
+            logger.log("with userId " + result["_id"]);
             if(result){
                 oid = result["_id"];
                 req.session.user = {
@@ -682,7 +682,7 @@ FM.api.signup = function(req, res){
                 
                 
                 res.send("Thanks for registering " + req.body.user);
-                console.log(userStore);
+                logger.log(userStore);
             });
         });
         */
@@ -717,7 +717,7 @@ FM.api.addVideo = function(req, res){
 
 // POST
 FM.api.addEvent = function(req, res){
-    console.log("addEvent Req: " + JSON.stringify(req.body) );
+    logger.log("addEvent Req: " + JSON.stringify(req.body) );
     if(req.body.event){
     
         var event = req.body.event;
@@ -728,10 +728,10 @@ FM.api.addEvent = function(req, res){
             date = parseInt(yearday.substring(8), 10),
             hr = parseInt(time.substring(0, 2), 10),
             min = parseInt(time.substring(2), 10);
-        //console.log("Select " + event.idx);
+        //logger.log("Select " + event.idx);
         var idx = parseInt(event.idx, 10);
             
-        console.log("Year "+year+" Mon "+mon+" Date "+date+" Hr "+hr+ " Min "+min);
+        logger.log("Year "+year+" Mon "+mon+" Date "+date+" Hr "+hr+ " Min "+min);
         var slot = new Date(year, mon-1, date, hr, min);    // month: 0~11
         var start = slot.getTime();
         //slot.setMinutes(min+5);
@@ -749,7 +749,7 @@ FM.api.addEvent = function(req, res){
                     "status": "waiting"
                   };
                   
-        console.log("addEvent: " + start.toLocaleString()+ " to " + end.toLocaleString());*/
+        logger.log("addEvent: " + start.toLocaleString()+ " to " + end.toLocaleString());*/
                  
         scheduleDB.reserve(event, function(err, result){
             if(err){ 
@@ -760,7 +760,7 @@ FM.api.addEvent = function(req, res){
         });
         
     }else{
-        console.log("\n List Events....\n");
+        logger.log("\n List Events....\n");
         
     }
 };
@@ -771,7 +771,7 @@ FM.api.reject = function(req, res){
 
     var evtid = req.body.event.oid;
     
-    console.log("\nReject " + JSON.stringify(evtid) );
+    logger.log("\nReject " + JSON.stringify(evtid) );
     
     scheduleDB.reject(evtid, function(err, result){
     
@@ -787,7 +787,7 @@ FM.api.reject = function(req, res){
 FM.api.prove = function(req, res){
 
     var evtid = req.body.event.oid;
-    console.log("\nProve " + JSON.stringify(evtid) );
+    logger.log("\nProve " + JSON.stringify(evtid) );
     scheduleDB.prove(evtid, function(err, result){
     
         if(err){
@@ -825,7 +825,7 @@ FM.api.eventsOfPeriod = function(req, res){
         scheduleDB.listOfReservated(range, function(err, result){
             if(err) throw err;
             if(result){
-                console.log("from " +start.getTime()+ " to " + end.getTime() + " \nevents: " + result);
+                logger.log("from " +start.getTime()+ " to " + end.getTime() + " \nevents: " + result);
                 res.send(result);
             }
         });
@@ -836,7 +836,7 @@ FM.api.eventsOfPeriod = function(req, res){
 // GET
 FM.api.profile = function(req, res){
     FM_LOG("[api.profile]: ");
-    FM_LOG(req.query);
+    logger.info(req.query);
 	
     if(req.query && req.query.userID){
     
@@ -860,7 +860,7 @@ FM.api.profile = function(req, res){
 //	GET
 FM.api.newVideoList = function(req, res){
 	FM_LOG("[api.newVideoList]: ");
-    FM_LOG(req.query);
+    logger.info(req.query);
 	
     if(req.query && req.query.userID){
     
@@ -945,7 +945,7 @@ FM.api._test = function(){
                     "url": {"youtube":"http://www.youtube.com/embed/oZmtwUAD1ds"},
                     "projectId": "miixcard-50b82149157d80e80d000002-20121206T080743992Z"};
 	videoDB.updateOne({"projectId":"miixcard-50b82149157d80e80d000002-20121206T080743992Z"}, vjson2, function(err, vdoc){
-		FM_LOG(vdoc);
+		logger.info(vdoc);
 	});
 };
 

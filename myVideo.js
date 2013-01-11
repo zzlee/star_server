@@ -14,7 +14,7 @@ module.exports = function(userId){
             for(var i in result){
                 videoDB.getVideoById(result[i], function(err, ));
             }
-            console.log("getVideosByOID: " + result));
+            logger.info("getVideosByOID: " + result));
         }
     });
     

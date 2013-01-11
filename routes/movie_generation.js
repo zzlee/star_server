@@ -15,7 +15,7 @@ exports.uploadUserData_cb = function(req, res) {
 
 	var startGeneratingMovie = function() {
 		//start generating the movie
-		console.log('Start generating the movie!');
+		logger.log('Start generating the movie!');
 		var html = '';
 		if ( req.session.user.userId ) {
 			html += '<p>Start generating the movie! <p/>'; 	
@@ -27,7 +27,7 @@ exports.uploadUserData_cb = function(req, res) {
 		}
 		else {
 			html += '<p>Fail to retrieve userID from session; movie generation halt ! <p/>'; 	
-			console.log( 'Fail to retrieve userID from session; movie generation halt !' );			
+			logger.log( 'Fail to retrieve userID from session; movie generation halt !' );			
 		}
 		html += '<p><a href="/">Go back</a><p/>';
 		res.send(html);
@@ -44,20 +44,20 @@ exports.uploadUserData_cb = function(req, res) {
 				fs.unlink(_tmp_path, function() {
 					if (!err) {
 						resultMsg += 'File uploaded to: ' + _target_path + ' - ' + _size + ' bytes <br/>';
-						console.log( 'Finished uploading to ' + _target_path );
+						logger.log( 'Finished uploading to ' + _target_path );
 						
 						//check if all the user data exist; (if yes, start generating the movie in startGeneratingMovie()
 						//checkUserData(startGeneratingMovie);
 						_moveUploadedFileToUserDataFolder_cb();
 					}
 					else {
-						console.log('Fail to delete temporary uploaded file: '+err);
+						logger.log('Fail to delete temporary uploaded file: '+err);
 						res.send(null);
 					}
 				});
 			}
 			else {
-				console.log('Fail to do util.pump(): '+err);
+				logger.log('Fail to do util.pump(): '+err);
 				res.send(null);
 			}
 		});			
@@ -65,7 +65,7 @@ exports.uploadUserData_cb = function(req, res) {
 	
 	var writeTo_customized_content_xml_cb = function (err) {
 		if (!err) {
-			console.log('customized_content.xml is generated.');
+			logger.log('customized_content.xml is generated.');
 			
 			//check if all the user data exist; (if yes, start generating the movie in startGeneratingMovie()
 			//checkUserData(startGeneratingMovie);
@@ -109,7 +109,7 @@ exports.uploadUserData_cb = function(req, res) {
 			}
 		}
 		else {
-			console.log('Fail to generate customized_content.xml: '+err);
+			logger.log('Fail to generate customized_content.xml: '+err);
 			res.send(null);
 		}
 	};
@@ -148,7 +148,7 @@ exports.uploadUserData_cb = function(req, res) {
 	
 	//finalize customized_content.xml 
 	var xmlString = userDataXml.end({ 'pretty': true, 'indent': '  ', 'newline': '\n' });
-	//console.log(userDataXml);
+	//logger.log(userDataXml);
 	fs.writeFile(userDataDir+'/customized_content.xml', xmlString, writeTo_customized_content_xml_cb );	
 	
 
@@ -162,7 +162,7 @@ exports.uploadUserDataInfo_cb = function(req, res) {
 	
 	var writeTo_customized_content_xml_cb = function (err) {
 		if (!err) {
-			console.log('customized_content.xml is generated.');
+			logger.log('customized_content.xml is generated.');
 			
 			//check if all the user data exist; (if yes, start generating the movie in startGeneratingMovie()
 			var allUserContentExist = true;
@@ -176,12 +176,12 @@ exports.uploadUserDataInfo_cb = function(req, res) {
 			}
 
 			if ( allUserContentExist ) {
-				console.log('Start generating movie %s !', req.body.projectID);
+				logger.log('Start generating movie '+ req.body.projectID +'!');
 				res.send(null);
 				//movieMaker.renderMovie(req.body.projectID, req.body.ownerID);
 				var videoTitle =  "MiixCard movie";
 				//aeServerManager.createMovie(aeServer, req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
-				aeServerManager.createMovie_longPolling("fm_server", req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
+				aeServerManager.createMovie_longPolling("feltmeng_art_PC", req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
 			}
 			else {
 				res.send( {err:"Some or all user contents are missing."} );
@@ -218,7 +218,7 @@ exports.uploadUserDataInfo_cb = function(req, res) {
 	
 	//finalize customized_content.xml 
 	var xmlString = userDataXml.end({ 'pretty': true, 'indent': '  ', 'newline': '\n' });
-	//console.log(userDataXml);
+	//logger.log(userDataXml);
 	if ( fs.existsSync(userDataDir) ) {
 		fs.writeFile(userDataDir+'/customized_content.xml', xmlString, writeTo_customized_content_xml_cb );	
 	}

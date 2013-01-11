@@ -1,7 +1,7 @@
 //  var FM = window.FM || {}; Using in Browser
 
 var DEBUG = true,
-    FM_LOG = (DEBUG) ? function(str){ console.log(str); } : function(str){} ;
+    FM_LOG = (DEBUG) ? function(str){ logger.log(str); } : function(str){} ;
     
 var FM = {};
 
@@ -126,7 +126,7 @@ FM.DB = (function(){
                     mongoose.connect('mongodb://localhost:27017/'+DB);
                     return mongoose.connection;
                 }catch(err){
-                    console.log('Connect DB failed: '+err);
+                    logger.info('Connect DB failed: '+err);
                 }
             };
 
@@ -138,9 +138,9 @@ FM.DB = (function(){
                 var query = Video.find({});
                 query.sort('timestamp', -1).exec(function(err, doc){
                     if(err){
-                        console.log('locationQuery failed: '+err);
+                        logger.info('locationQuery failed: '+err);
                     }else{
-                        console.log('locationQuery '+locationUID+': '+doc);
+                        logger.info('locationQuery '+locationUID+': '+doc);
                     }
                 });
             },
@@ -149,9 +149,9 @@ FM.DB = (function(){
                 var query = Video.find({});
                 query.where('_id', ownerUID).sort('timestamp', -1).exec(function(err, doc){
                     if(err){
-                        console.log('ownerQuery failed: '+err);
+                        logger.info('ownerQuery failed: '+err);
                     }else{
-                        console.log('ownerQuery '+ownerUID.toHexString());
+                        logger.info('ownerQuery '+ownerUID.toHexString());
                     }
                 });
             },
@@ -160,9 +160,9 @@ FM.DB = (function(){
                 var query = Video.find({});
                 query.sort('timestamp', -1),limit(latestNum).exec(function(err, doc){
                     if(err){
-                        console.log('latestQuery failed: '+err);
+                        logger.info('latestQuery failed: '+err);
                     }else{
-                        console.log('latestQuery Latest'+latestNum+': '+doc);
+                        logger.info('latestQuery Latest'+latestNum+': '+doc);
                     }
                 });
             },
@@ -171,9 +171,9 @@ FM.DB = (function(){
                 var query = Video.find({});
                 query.sort('hitRate', -1).limit(topNum).exec(function(err, doc){
                     if(err){
-                        console.log('rankQuery failed: '+err);
+                        logger.info('rankQuery failed: '+err);
                     }else{
-                        console.log('rankQuery TOP'+topNum+': '+doc);
+                        logger.info('rankQuery TOP'+topNum+': '+doc);
                     }
                 });
             },
@@ -212,7 +212,7 @@ FM.DB = (function(){
                 if('undefined' != typeof(ownerId))    
                     doc.ownerId = ownerId;
                 doc.save();
-                console.log("Create a Doc: "+doc);
+                logger.info("Create a Doc: "+doc);
                 
             },
             
@@ -252,7 +252,7 @@ FM.DB = (function(){
             },
 
             updateAdoc: function(docModel, docid, jsonObj, cb){
-                console.log("\n updateAdoc " + " fields: " + JSON.stringify(jsonObj));
+                logger.info("\n updateAdoc " + " fields: " + JSON.stringify(jsonObj));
                 docModel.findByIdAndUpdate(docid, jsonObj, cb);
             },
             
@@ -262,7 +262,7 @@ FM.DB = (function(){
 			},
 			
             deleteAdoc: function(docModel, docid, cb){
-                console.log("Delete a Doc: " + docid);
+                logger.info("Delete a Doc: " + docid);
                 docModel.findByIdAndRemove(docid, cb);
             },
 
@@ -289,11 +289,11 @@ FM.DB = (function(){
                
                 query.exec(function(err, doc){
                     if(err){
-                        console.log('test failed: '+err);
+                        logger.info('test failed: '+err);
                     }else{
                         ownerId1 = doc[0]._id;
                         ownerId2 = doc[1]._id;
-                        console.log('find(): '+ ownerId1.toHexString()+'\n'+ ownerId2.toHexString());
+                        logger.info('find(): '+ ownerId1.toHexString()+'\n'+ ownerId2.toHexString());
                         //var date = new Date( parseInt( json._id.slice(0,8), 16 ) * 1000 );
                         var title;
                         for(i=0; i<100; i++){
@@ -311,7 +311,7 @@ FM.DB = (function(){
             
             test: function(){
                 //var docModel = this.getDocModel2("member");
-                console.log(dbModels["member"]);
+                logger.info(dbModels["member"]);
             }
         };  // End of Return
     }   // End of Constructor
@@ -393,14 +393,14 @@ FM.MEMBER = (function(){
                 FMDB.getValueOf(members, {"memberID":memberID}, field, function(err, result){
                     if(err) throw err;
                     FMDB.deleteAdoc(members, result[field]);
-                    console.log("deleteMember " + memberID + result[field]);
+                    logger.info("deleteMember " + memberID + result[field]);
                 });
             },
             
             isValid: function(memberID, pwd){
                 var field = {"password":1};
                 FMDB.getValueOf(members, {"memberID":memberID}, field, function(err, result){
-                    if(err) console.log("" + err);
+                    if(err) logger.error("" + err);
                     if(pwd === password)
                         return true;
                     return false; 
@@ -449,9 +449,9 @@ FM.VIDEO = (function(){
                 var query = videos.find({});
                 query.sort('timestamp', -1).exec(function(err, doc){
                     if(err){
-                        console.log('locationQuery failed: '+err);
+                       logger.error('locationQuery failed: '+err);
                     }else{
-                        console.log('locationQuery '+locationUID+': '+doc);
+                        logger.info('locationQuery '+locationUID+': '+doc);
                     }
                 });
             },
@@ -491,7 +491,7 @@ function test(){
     var ObjectID = require('mongodb').ObjectID;
     var docid = new ObjectID('5024a2f9242a423018000001');
     FM.DB.getInstance().readAdoc('Member', docid, function cb(err, doc){
-        console.log('Doc: '+doc);
+       logger.info('Doc: '+doc);
     });
      */
      
@@ -503,7 +503,7 @@ function test(){
         if(err)
             throw err;
         
-        (result) ? console.log("TEST: " + result[path]) : console.log("TEST: Not Found!");
+        (result) ? logger.info("TEST: " + result[path]) : logger.info("TEST: Not Found!");
         
     });*/
     
@@ -517,11 +517,11 @@ function test(){
     FM.SCHEDULE.getInstance().reserve(case2);
     FM.SCHEDULE.getInstance().reserve(case3);
     FM.SCHEDULE.getInstance().reserve(case4);
-    console.log("TEST DONE!");
+    logger.info("TEST DONE!");
     */
     var range = {"start":17, "end":20};
     FM.SCHEDULE.getInstance().listOfReservated(range, function(err, result){
-        (err) ? console.log(err) : console.log("LIST: "+result);
+        (err) ? logger.error(err) : logger.info("LIST: "+result);
     });
 }
 

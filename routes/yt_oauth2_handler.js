@@ -17,25 +17,25 @@ var refreshYtToken = function(ytRefreshToken){
 	var client_req = https.request(options, function(client_res) {
 		client_res.setEncoding('utf8');
 		client_res.on('data', function (res_token) {
-			//console.log("res_token= %s", res_token);
+			//logger.log("res_token= %s", res_token);
 			
 			ytToken = JSON.parse(res_token);
 			if ( ytToken.access_token ) {
-				console.log('<%s> Refreshed YouTube token: ', new Date() );
-				console.dir(ytToken);
+				logger.log('<'+ new Date() +'> Refreshed YouTube token: ', ytToken );
+				//console.dir(ytToken);
 				
 				
 				var tokenFile = path.join( workingPath, 'yt_token.json');
 				fs.writeFile(tokenFile, res_token, function(err) {
 					if(!err) {
-						console.log('Successfully save YouTube token ' + ytToken.access_token );
+						logger.log('Successfully save YouTube token ' + ytToken.access_token );
 					} 
 				}); 
 				
 				
 			}
 			else {
-				console.log('Failed to refresh YouTube token: '+res_token);				
+				logger.log('Failed to refresh YouTube token: '+res_token);				
 			}
 			
 		});
@@ -50,7 +50,7 @@ var refreshYtToken = function(ytRefreshToken){
 
 exports.YoutubeOAuth2_cb = function(req, res){
 	if (req.query.code) {
-		console.log('code='+req.query.code);
+		logger.log('code='+req.query.code);
 		
 		
 		
@@ -70,16 +70,16 @@ exports.YoutubeOAuth2_cb = function(req, res){
 				
 				ytToken = JSON.parse(res_token);
 				if ( ytToken.access_token ) {
-					console.log('Got YouTube access_token: ' + ytToken.access_token);
+					logger.log('Got YouTube access_token: ' + ytToken.access_token);
 					res.send('Successfully obtained YouTube token: '+res_token);
 					
 					var tokenFile = path.join( workingPath, 'yt_token.json');
 					fs.writeFile(tokenFile, res_token, function(err) {
 						if(!err) {
-							console.log('Successfully save YouTube token ' + ytToken.access_token );
+							logger.log('Successfully save YouTube token ' + ytToken.access_token );
 						} 
 						else {
-							console.log("Failed to save YouTube access_token");
+							logger.log("Failed to save YouTube access_token");
 						}
 					}); 
 					
@@ -92,15 +92,15 @@ exports.YoutubeOAuth2_cb = function(req, res){
 					var refreshTokenFile = path.join( workingPath, 'yt_refresh_token.json');
 					fs.writeFile(refreshTokenFile, ytToken.refresh_token, function(err) {
 						if(!err) {
-							console.log('Successfully save YouTube refresh_token ' + ytToken.refresh_token );
+							logger.log('Successfully save YouTube refresh_token ' + ytToken.refresh_token );
 						}
 						else {
-							console.log("Failed to save YouTube refresh_token");
+							logger.log("Failed to save YouTube refresh_token");
 						}
 					});
 					
 					setInterval( function( _ytRefreshToken){
-						//console.log("_ytRefreshToken= %s", _ytRefreshToken);
+						//logger.log("_ytRefreshToken= %s", _ytRefreshToken);
 						refreshYtToken(_ytRefreshToken);
 					}, 3500*1000, ytToken.refresh_token);
 				}
@@ -117,7 +117,7 @@ exports.YoutubeOAuth2_cb = function(req, res){
 		
 	}
 	if (req.query.error) {
-		console.log(req.query.error);
+		logger.log(req.query.error);
 		res.send('Accessing YouTube service was denied!');
 	}
 };

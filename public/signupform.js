@@ -12,7 +12,7 @@ $(document).ready(function(){
             
             str += "}";
             pfjson = JSON.parse(str);
-            console.log("pfjson = " + JSON.stringify(pfjson));
+            logger.log("pfjson = " + JSON.stringify(pfjson));
             
             
     });        
