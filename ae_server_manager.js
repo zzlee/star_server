@@ -68,7 +68,7 @@ exports.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, owne
 }
 
 
-exports.createMovie_longPolling = function(starAeServerID, movieProjectID, ownerStdID, ownerFbID, movieTitle) {
+var createMovie_longPolling = function(starAeServerID, movieProjectID, ownerStdID, ownerFbID, movieTitle) {
 
 	youtubeManager.getAccessToken( function(ytAccessToken){
 		if (ytAccessToken) {
@@ -92,3 +92,6 @@ exports.createMovie_longPolling = function(starAeServerID, movieProjectID, owner
 	});
 
 }
+
+exports.createMovie_longPolling = createMovie_longPolling;
+exports.createMiixMovie = createMovie_longPolling;

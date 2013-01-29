@@ -190,7 +190,8 @@ FM.api._fbExtendToken = function(accessToken, callback){
 			 
 			 
 // Inter
-FM.api._fbPostVideoThenAdd = function(vjson){
+// TODO: this function is deprecated; the equivalent codes are moved to miix_content_manager.js
+FM.api._fbPostVideoThenAdd = function(vjson){ 
 	
 	/* Keep for testing in case.
 	var vjson2 = {  "title":"A Awesome World",
