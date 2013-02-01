@@ -87,9 +87,12 @@ app.post('/upload_user_data', routes.uploadUserData_cb );
 app.get('/oauth2callback', routes.YoutubeOAuth2_cb );
 app.post('/upload', routes.upload_cb );
 app.post('/upload_user_data_info',routes.uploadUserDataInfo_cb);
-app.get('/report_rendering_result', routes.reportRenderingResult_cb);
+//app.get('/report_rendering_result', routes.reportRenderingResult_cb);
 app.get('/long_polling_from_ae_server', routes.longPollingFromAeServer_cb);
 app.post('/record_user_action', routes.recordUserAction_cb );
+
+app.get('/internal/ae_server/command', routes.longPollingFromAeServer_cb);
+app.post('/internal/ae_server/command_response', routes.commandResponse_cb);
 
 //GL
 /*

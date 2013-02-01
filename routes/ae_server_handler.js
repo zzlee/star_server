@@ -1,7 +1,11 @@
+var aeServerHandler = {};
+
 var events = require("events");
 var workingPath = process.env.STAR_SERVER_PROJECT;
+var eventEmitter = new events.EventEmitter();
 
-exports.reportRenderingResult_cb = function(req, res) {
+//*****This function is deprecated.*****
+aeServerHandler.reportRenderingResult_cb = function(req, res) {
 
 	if ( req.headers.youtube_video_id ) {
 		var aeServerID = req.headers.ae_server_id;
@@ -16,7 +20,7 @@ exports.reportRenderingResult_cb = function(req, res) {
 		
 		if ( req.headers.err == 'null' || (!req.headers.err) ) {
 			//add to video DB
-			var videoDB = require(workingPath+'/video.js');
+			//var videoDB = require(workingPath+'/video.js');
 			var fmapi= require(workingPath+'/routes/api.js');
 			
 			var url = {"youtube":"http://www.youtube.com/embed/"+youtubeVideoID};
@@ -38,15 +42,28 @@ exports.reportRenderingResult_cb = function(req, res) {
 	
 } 
 
-var eventEmitter = new events.EventEmitter();
+aeServerHandler.commandResponse_cb = function(req, res) {
 
-exports.sendRequestToAeServer = function( targetID, reqToAeServer ) {
+	var commandID = req.headers._command_id;
+	var responseParameters = req.headers
 
-	eventEmitter.emit('COMMAND_'+targetID, reqToAeServer);
-
+	eventEmitter.emit('RESPONSE_'+commandID, responseParameters);
+	logger.info('Got response ' + commandID + 'from AE Server:' );
+	logger.info(JSON.stringify(responseParameters));
+	
+	res.send('');
 }
 
-exports.longPollingFromAeServer_cb = function(req, res) {
+
+aeServerHandler.sendRequestToAeServer = function( targetID, reqToAeServer, cb ) {
+	//TODO: make sure reqToAeServer is not null
+	reqToAeServer._commandID = reqToAeServer.command + '__' + targetID + '__' + (new Date()).getTime().toString();
+	eventEmitter.emit('COMMAND_'+targetID, reqToAeServer);
+	
+	eventEmitter.once('RESPONSE_'+reqToAeServer._commandID, cb);
+}
+
+aeServerHandler.longPollingFromAeServer_cb = function(req, res) {
 	logger.info('['+ new Date() +']Got long-polling HTTP request from AE Server: '+ req.headers.star_ae_server_id )
 	//console.dir(req);
 	
@@ -70,3 +87,5 @@ exports.longPollingFromAeServer_cb = function(req, res) {
 	
 	eventEmitter.once('COMMAND_'+req.headers.star_ae_server_id, callback);	
 }
+
+module.exports = aeServerHandler;
