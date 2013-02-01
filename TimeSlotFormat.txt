@@ -1,0 +1,38 @@
+﻿[day]
+mode		play mode
+day		weekday
+start		start time
+end		end time
+sequence	play sequence
+duration	display time
+
+
+[month]
+mode		play mode
+date		one day in each month
+start		start time
+end		end time
+sequence	play sequence
+duration	display time
+
+
+[period]
+mode		play mode
+start_date	start date (yyyy-mm-dd)
+end_date	end date (yyyy-mm-dd)
+start		start time
+end		end time
+sequence	play sequence
+duration	display time
+
+{
+    mode:
+    day:
+    date:
+    start_date:
+    end_date:
+    start:
+    end:
+    sequence:
+    duration:
+}

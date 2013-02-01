@@ -8,7 +8,6 @@ var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
     videoDB = require("../video.js");
 
-
 var ObjectID = require('mongodb').ObjectID;
 
 var DEBUG = true,
@@ -56,7 +55,7 @@ FM.api._GCM_PushNotification = function( device_token ){
 	 * Parameters: message-literal, registrationIds-array, No. of retries, callback-function
 	 */
 	sender.send(message, registrationIds, 4, function (result) {
-		logger.log(result);
+		FM_LOG(result);
 	});
 };
 
@@ -635,13 +634,13 @@ FM.api.signin = function (req, res) {
     /*
      *  Once member sign-in, we should save profile in session to be used in same session.
      */
-    logger.log("Get Sign In Req: " + JSON.stringify(req.body)); 
+    FM_LOG("Get Sign In Req: " + JSON.stringify(req.body)); 
     if(req.body && req.body.member){
         var member = req.body.member,
             oid = null;
 
         memberDB.isValid(member.memberID, function(err, result){
-            if(err) logger.log(memberID + " is invalid " + err);
+            if(err) FM_LOG(memberID + " is invalid " + err);
             if(result && member.password === result["password"]){
                 oid = result["_id"];
                 req.session.user = {
@@ -649,7 +648,7 @@ FM.api.signin = function (req, res) {
                     pwd: member.password,
                     userId: oid 
                 };             
-                logger.log(member.memberID + " Log-In! with userId " + oid.toHexString());
+                FM_LOG(member.memberID + " Log-In! with userId " + oid.toHexString());
                 
                 FM.api.profile(req, res);
                 
@@ -666,21 +665,21 @@ FM.api.signin = function (req, res) {
 // GET
 FM.api.signout = function (req, res) {
     var username = req.session.user.name;
-    logger.log(username + " Log-Out!");
+    FM_LOG(username + " Log-Out!");
     delete req.session.user;
     res.redirect("/");
 };
 
 // POST
 FM.api.signup = function(req, res){
-    logger.log("Get POST SignUp Req: " + JSON.stringify(req.body));
+    FM_LOG("Get POST SignUp Req: " + JSON.stringify(req.body));
     
     if(req.body && req.body.member){
         var member = req.body.member,
             oid = null;
-        logger.log(JSON.stringify(member));
+        FM_LOG(JSON.stringify(member));
         memberDB.addMember(member, function(err, result){
-            logger.log("with userId " + result["_id"]);
+            FM_LOG("with userId " + result["_id"]);
             if(result){
                 oid = result["_id"];
                 req.session.user = {
@@ -721,7 +720,7 @@ FM.api.signup = function(req, res){
                 
                 
                 res.send("Thanks for registering " + req.body.user);
-                logger.log(userStore);
+                FM_LOG(userStore);
             });
         });
         */
@@ -756,7 +755,7 @@ FM.api.addVideo = function(req, res){
 
 // POST
 FM.api.addEvent = function(req, res){
-    logger.log("addEvent Req: " + JSON.stringify(req.body) );
+    FM_LOG("addEvent Req: " + JSON.stringify(req.body) );
     if(req.body.event){
     
         var event = req.body.event;
@@ -767,10 +766,10 @@ FM.api.addEvent = function(req, res){
             date = parseInt(yearday.substring(8), 10),
             hr = parseInt(time.substring(0, 2), 10),
             min = parseInt(time.substring(2), 10);
-        //logger.log("Select " + event.idx);
+        //FM_LOG("Select " + event.idx);
         var idx = parseInt(event.idx, 10);
             
-        logger.log("Year "+year+" Mon "+mon+" Date "+date+" Hr "+hr+ " Min "+min);
+        FM_LOG("Year "+year+" Mon "+mon+" Date "+date+" Hr "+hr+ " Min "+min);
         var slot = new Date(year, mon-1, date, hr, min);    // month: 0~11
         var start = slot.getTime();
         //slot.setMinutes(min+5);
@@ -788,7 +787,7 @@ FM.api.addEvent = function(req, res){
                     "status": "waiting"
                   };
                   
-        logger.log("addEvent: " + start.toLocaleString()+ " to " + end.toLocaleString());*/
+        FM_LOG("addEvent: " + start.toLocaleString()+ " to " + end.toLocaleString());*/
                  
         scheduleDB.reserve(event, function(err, result){
             if(err){ 
@@ -799,7 +798,7 @@ FM.api.addEvent = function(req, res){
         });
         
     }else{
-        logger.log("\n List Events....\n");
+        FM_LOG("\n List Events....\n");
         
     }
 };
@@ -810,7 +809,7 @@ FM.api.reject = function(req, res){
 
     var evtid = req.body.event.oid;
     
-    logger.log("\nReject " + JSON.stringify(evtid) );
+    FM_LOG("\nReject " + JSON.stringify(evtid) );
     
     scheduleDB.reject(evtid, function(err, result){
     
@@ -826,7 +825,7 @@ FM.api.reject = function(req, res){
 FM.api.prove = function(req, res){
 
     var evtid = req.body.event.oid;
-    logger.log("\nProve " + JSON.stringify(evtid) );
+    FM_LOG("\nProve " + JSON.stringify(evtid) );
     scheduleDB.prove(evtid, function(err, result){
     
         if(err){
@@ -864,7 +863,7 @@ FM.api.eventsOfPeriod = function(req, res){
         scheduleDB.listOfReservated(range, function(err, result){
             if(err) throw err;
             if(result){
-                logger.log("from " +start.getTime()+ " to " + end.getTime() + " \nevents: " + result);
+                FM_LOG("from " +start.getTime()+ " to " + end.getTime() + " \nevents: " + result);
                 res.send(result);
             }
         });

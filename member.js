@@ -64,8 +64,8 @@ FM.MEMBER = (function(){
                 FMDB.getValueOf(members, {"_id":oid}, field, cb);
             },
             
-            listOfMembers: function(cb){
-                members.find(cb);
+            listOfMembers: function(condition, fields, options, cb){
+                members.find(condition, fields, options, cb);
             },
             
             getObjectId: function(memberID, cb){
