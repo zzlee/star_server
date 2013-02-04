@@ -286,7 +286,7 @@ FM.DB = (function(){
             },
 
             updateAdoc: function(docModel, docid, jsonObj, cb){
-                logger.info("\n updateAdoc " + " fields: " + JSON.stringify(jsonObj));
+                //logger.info("\n updateAdoc " + " fields: " + JSON.stringify(jsonObj));
                 docModel.findByIdAndUpdate(docid, jsonObj, cb);
             },
             
