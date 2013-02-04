@@ -138,13 +138,17 @@ http.createServer(app).listen(app.get('port'), function(){
 
 /*
 //test
-var ae_serv_mgr = require('./ae_server_manager.js');
+var aeServerMgr = require('./ae_server_manager.js');
 setTimeout(function(){
 //setInterval(function(){ 
-	//ae_serv_mgr.createMovie('http://192.168.5.101', 'rotate-anonymous-20121115T004014395Z', 'aa', 'aa_fb', 'video to test');
+	//aeServerMgr.createMovie('http://192.168.5.101', 'rotate-anonymous-20121115T004014395Z', 'aa', 'aa_fb', 'video to test');
 	//routes.sendRequestToAeServer( "gance_Feltmeng_pc", { command: "RENDER", movieProjectID: "1234", time: (new Date()).toString()} );
-	ae_serv_mgr.createMovie_longPolling("gance_Feltmeng_pc", "greeting-50c85019e6b209a80f000004-20121213T015823474Z", "ownerStdID", "ownerFbID", "movieTitle")
-}, 30000);
+	//aeServerMgr.createMovie_longPolling("gance_Feltmeng_pc", "greeting-50c85019e6b209a80f000004-20121213T015823474Z", "ownerStdID", "ownerFbID", "movieTitle")
+	aeServerMgr.uploadMovieToMainServer('greeting-50c99d81064d2b841200000a-20130108T054254436Z', function(resParametes){
+		console.log('uploading ended. Response:');
+		console.dir(resParametes);
+	});
+}, 5000);
 */
 
 //test of Jeff

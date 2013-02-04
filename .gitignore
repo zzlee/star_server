@@ -6,3 +6,4 @@ yt_token.json
 yt_refresh_token.json
 routes/api_.js
 log/
+public/contents/miix_movies/

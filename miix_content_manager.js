@@ -2,7 +2,7 @@ var miixContentManager = {};
 
 var workingPath = process.env.STAR_SERVER_PROJECT;
 //var movieMaker = require(workingPath+'/ae_render.js');
-var aeServerManager = require(workingPath+'/ae_server_manager.js');
+var aeServerMgr = require(workingPath+'/ae_server_manager.js');
 var memberDB = require(workingPath+'/member.js');
 var videoDB = require(workingPath+'/video.js');
 var fmapi = require(workingPath+'/routes/api.js')   //TODO:: find a better name
@@ -25,7 +25,7 @@ miixContentManager.generateMiixMoive = function(movieProjectID, ownerStdID, owne
 	//TODO: get starAeServerID.  
 	var starAeServerID = "gance_Feltmeng_pc";
 	
-	aeServerManager.createMiixMovie(starAeServerID, movieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
+	aeServerMgr.createMiixMovie(starAeServerID, movieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
 	
 		if ( responseParameters.youtube_video_id ) {
 			var aeServerID = responseParameters.ae_server_id;
@@ -46,6 +46,11 @@ miixContentManager.generateMiixMoive = function(movieProjectID, ownerStdID, owne
 				fmapi._fbPostVideoThenAdd(vjson); //TODO: split these tasks to different rolls
 				
 				//deliver Miix movie content to DOOH
+				aeServerMgr.uploadMovieToMainServer(movieProjectID, function(resParametes){
+					console.log('uploading to Main Server finished. Result:');
+					console.dir(resParametes);
+				});
+
 								
 				//add Miix movie to the nearest time slot in schedule
 								

@@ -5,6 +5,7 @@ var workingPath = process.env.STAR_SERVER_PROJECT;
 var eventEmitter = new events.EventEmitter();
 
 //*****This function is deprecated.*****
+/*
 aeServerHandler.reportRenderingResult_cb = function(req, res) {
 
 	if ( req.headers.youtube_video_id ) {
@@ -31,16 +32,12 @@ aeServerHandler.reportRenderingResult_cb = function(req, res) {
 						 "projectId":movieProjectID};
 			//logger.info("video " + JSON.stringify(vjson));
 			fmapi._fbPostVideoThenAdd(vjson);
-			/*
-			videoDB.addVideo(vjson, function(err, vdoc){
-				logger.info('Seccessfully add %s to videoDB!', movieProjectID);
-			});
-			*/
 		}
 
 	}
 	
 } 
+*/
 
 aeServerHandler.commandResponse_cb = function(req, res) {
 

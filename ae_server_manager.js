@@ -88,7 +88,7 @@ aeServerManager.createMiixMovie = function(starAeServerID, movieProjectID, owner
 			};
 						
 			aeServerHandler.sendRequestToAeServer( starAeServerID, { command: "RENDER_MOVIE", parameters: commandParameters }, function(responseParameters) {
-				console.dir(responseParameters);
+				//console.dir(responseParameters);
 				if (createMovie_cb )  {
 					createMovie_cb(responseParameters);
 				}
@@ -102,7 +102,7 @@ aeServerManager.createMiixMovie = function(starAeServerID, movieProjectID, owner
 
 }
 
-aeServerManager.uploadMovieToMainServer = function(uploadMovie_cb) {
+aeServerManager.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
 	//TODO:: get corresponding AE Server ID
 	var starAeServerID = 'gance_Feltmeng_pc';
@@ -111,7 +111,12 @@ aeServerManager.uploadMovieToMainServer = function(uploadMovie_cb) {
 		movieProjectID: movieProjectID
 	};
 	
-	aeServerHandler.sendRequestToAeServer( starAeServerID, { command: "UPLOAD_MOVIE_TO_MAIN_SERVER", parameters: commandParameters } );
+	aeServerHandler.sendRequestToAeServer( starAeServerID, { command: "UPLOAD_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+		//console.dir(responseParameters);
+		if (uploadMovie_cb )  {
+			uploadMovie_cb(responseParameters);
+		}
+	});
 	
 
 }
