@@ -5,7 +5,7 @@ var path = require('path');
 var http = require('http');
 var url = require('url');
 var fs = require('fs');
-var aeServerHandler = require('./routes/ae_server_handler.js');
+var connectionHandler = require('./routes/connection_handler.js');
 var youtubeManager = require( './youtube_manager.js' );
 
 //*****This function is deprecated.*****
@@ -87,7 +87,8 @@ aeServerManager.createMiixMovie = function(starAeServerID, movieProjectID, owner
 				ytAccessToken: ytAccessToken 
 			};
 						
-			aeServerHandler.sendRequestToAeServer( starAeServerID, { command: "RENDER_MOVIE", parameters: commandParameters }, function(responseParameters) {
+			//TODO:: get corresponding AE Server ID			
+			connectionHandler.sendRequestToRemote( starAeServerID, { command: "RENDER_MOVIE", parameters: commandParameters }, function(responseParameters) {
 				//console.dir(responseParameters);
 				if (createMovie_cb )  {
 					createMovie_cb(responseParameters);
@@ -111,7 +112,7 @@ aeServerManager.uploadMovieToMainServer = function(movieProjectID, uploadMovie_c
 		movieProjectID: movieProjectID
 	};
 	
-	aeServerHandler.sendRequestToAeServer( starAeServerID, { command: "UPLOAD_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+	connectionHandler.sendRequestToRemote( starAeServerID, { command: "UPLOAD_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
 		//console.dir(responseParameters);
 		if (uploadMovie_cb )  {
 			uploadMovie_cb(responseParameters);

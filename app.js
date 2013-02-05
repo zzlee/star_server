@@ -91,8 +91,8 @@ app.post('/upload_user_data_info',routes.uploadUserDataInfo_cb);
 app.get('/long_polling_from_ae_server', routes.longPollingFromAeServer_cb);
 app.post('/record_user_action', routes.recordUserAction_cb );
 
-app.get('/internal/ae_server/command', routes.longPollingFromAeServer_cb);
-app.post('/internal/ae_server/command_response', routes.commandResponse_cb);
+app.get('/internal/commands', routes.command_get_cb);
+app.post('/internal/command_responses', routes.commandResponse_post_cb);
 
 //GL
 /*
@@ -136,7 +136,7 @@ http.createServer(app).listen(app.get('port'), function(){
   logger.info("Express server listening on port " + app.get('port'));
 });
 
-/*
+/**/
 //test
 var aeServerMgr = require('./ae_server_manager.js');
 setTimeout(function(){
@@ -149,7 +149,7 @@ setTimeout(function(){
 		console.dir(resParametes);
 	});
 }, 5000);
-*/
+
 
 //test of Jeff
 app.get('/test', function(req, res) {
