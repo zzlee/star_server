@@ -139,16 +139,21 @@ http.createServer(app).listen(app.get('port'), function(){
 /**/
 //test
 var aeServerMgr = require('./ae_server_manager.js');
+var doohMgr = require('./dooh_mgr.js');
 setTimeout(function(){
 //setInterval(function(){ 
 	//aeServerMgr.createMovie('http://192.168.5.101', 'rotate-anonymous-20121115T004014395Z', 'aa', 'aa_fb', 'video to test');
 	//routes.sendRequestToAeServer( "gance_Feltmeng_pc", { command: "RENDER", movieProjectID: "1234", time: (new Date()).toString()} );
 	//aeServerMgr.createMovie_longPolling("gance_Feltmeng_pc", "greeting-50c85019e6b209a80f000004-20121213T015823474Z", "ownerStdID", "ownerFbID", "movieTitle")
-	aeServerMgr.uploadMovieToMainServer('greeting-50c99d81064d2b841200000a-20130108T054254436Z', function(resParametes){
-		console.log('uploading ended. Response:');
+	//aeServerMgr.uploadMovieToMainServer('greeting-50c99d81064d2b841200000a-20130108T054254436Z', function(resParametes){
+	//	console.log('uploading ended. Response:');
+	//	console.dir(resParametes);
+	//});
+	doohMgr.downloadMovieFromMainServer('greeting-50c99d81064d2b841200000a-20130108T054254436Z', function(resParametes){
+		console.log('downloading ended. Response:');
 		console.dir(resParametes);
 	});
-}, 5000);
+}, 1000);
 
 
 //test of Jeff

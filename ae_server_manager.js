@@ -1,4 +1,4 @@
-var aeServerManager = {};
+var aeServerMgr = {};
 
 var workingPath = process.env.STAR_SERVER_PROJECT;
 var path = require('path');
@@ -10,7 +10,7 @@ var youtubeManager = require( './youtube_manager.js' );
 
 //*****This function is deprecated.*****
 //use direct HTTP to ask AE Server to create Miix movie
-aeServerManager.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, ownerFbID, movieTitle) {
+aeServerMgr.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, ownerFbID, movieTitle) {
 
 	var userDataFolder = path.join( workingPath, 'public/contents/user_project', movieProjectID, 'user_data');
 	var userFileList = fs.readdirSync(userDataFolder).toString();
@@ -72,7 +72,7 @@ aeServerManager.createMovie = function(starAeServerURL, movieProjectID, ownerStd
 }
 
 //use long polling to ask AE Server to create Miix movie
-aeServerManager.createMiixMovie = function(starAeServerID, movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
+aeServerMgr.createMiixMovie = function(starAeServerID, movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
 
 	youtubeManager.getAccessToken( function(ytAccessToken){
 		if (ytAccessToken) {
@@ -103,7 +103,7 @@ aeServerManager.createMiixMovie = function(starAeServerID, movieProjectID, owner
 
 }
 
-aeServerManager.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
+aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
 	//TODO:: get corresponding AE Server ID
 	var starAeServerID = 'gance_Feltmeng_pc';
@@ -122,4 +122,4 @@ aeServerManager.uploadMovieToMainServer = function(movieProjectID, uploadMovie_c
 
 }
 
-module.exports = aeServerManager;
+module.exports = aeServerMgr;
