@@ -136,7 +136,7 @@ http.createServer(app).listen(app.get('port'), function(){
   logger.info("Express server listening on port " + app.get('port'));
 });
 
-/**/
+/*
 //test
 var aeServerMgr = require('./ae_server_manager.js');
 var doohMgr = require('./dooh_mgr.js');
@@ -154,7 +154,7 @@ setTimeout(function(){
 		console.dir(resParametes);
 	});
 }, 1000);
-
+*/
 
 //test of Jeff
 app.get('/test', function(req, res) {

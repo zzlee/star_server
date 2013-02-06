@@ -1,25 +1,26 @@
-var miixContentManager = {};
+var miixContentMgr = {};
 
 var workingPath = process.env.STAR_SERVER_PROJECT;
 //var movieMaker = require(workingPath+'/ae_render.js');
-var aeServerMgr = require(workingPath+'/ae_server_manager.js');
+var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
+var doohMgr = require(workingPath+'/dooh_mgr.js');
 var memberDB = require(workingPath+'/member.js');
 var videoDB = require(workingPath+'/video.js');
 var fmapi = require(workingPath+'/routes/api.js')   //TODO:: find a better name
 
-miixContentManager.deliverMiixMovieToDooh = function( movieProjectID, downLoadMovie_cb) {
+miixContentMgr.deliverMiixMovieToDooh = function( movieProjectID, downLoadMovie_cb) {
 	var askDoohToDownLoadMovie = function(cb) {
 	
 	}
 	
 }
 
-miixContentManager.submitMiixPlayListToDooh = function(cb) {
+miixContentMgr.submitMiixPlayListToDooh = function(cb) {
 
 }
 
 
-miixContentManager.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbID, movieTitle) {
+miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbID, movieTitle) {
 	
 	//console.log('generateMiixMoive is called.');
 	//TODO: get starAeServerID.  
@@ -45,29 +46,46 @@ miixContentManager.generateMiixMoive = function(movieProjectID, ownerStdID, owne
 							 "projectId":movieProjectID};
 				fmapi._fbPostVideoThenAdd(vjson); //TODO: split these tasks to different rolls
 				
-				//deliver Miix movie content to DOOH
-				aeServerMgr.uploadMovieToMainServer(movieProjectID, function(resParametes){
-					console.log('uploading to Main Server finished. Result:');
-					console.dir(resParametes);
-				});
-
-								
-				//add Miix movie to the nearest time slot in schedule
-								
-				//submit the playlist to DOOH
-				
 			};
+			
+			//for test
+			miixContentMgr.submitMiixMovieToDooh('', movieProjectID);
 		};
 		
 	});
 	
 };
 
+miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
 
-miixContentManager.setMiixPlayList = function(cb) {
+	//deliver Miix movie content to DOOH
+	aeServerMgr.uploadMovieToMainServer(movieProjectID, function(resParametes){
+		console.log('uploading Miix movie from AE Server to Main Server finished. Result:');
+		console.dir(resParametes);
+		
+		//TODO:: check the file size. If not correct, re-upload.
+		
+		if ( (resParametes.err == 'null') || (!resParametes.err) ) {
+			doohMgr.downloadMovieFromMainServer(movieProjectID, function(resParametes){
+				console.log('downloading Miix movie from Main Server to DOOH. Response:');
+				console.dir(resParametes);
+				
+				//TODO:: check the file size. If not correct, re-download.
+			});						
+		}
+	});
+
+					
+	//add Miix movie to the nearest time slot in schedule
+					
+	//submit the playlist to DOOH
+				
+}
+
+miixContentMgr.setMiixPlayList = function(cb) {
 
 }
 
 
 
-module.exports = miixContentManager;
+module.exports = miixContentMgr;

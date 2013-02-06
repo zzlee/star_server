@@ -3,7 +3,7 @@ var path = require('path');
 var workingPath = process.env.STAR_SERVER_PROJECT;
 //var movieMaker = require(workingPath+'/ae_render.js');
 //var aeServerManager = require(workingPath+'/ae_server_manager.js');
-var miixContentManager = require(workingPath+'/miix_content_manager.js');
+var miixContentMgr = require(workingPath+'/miix_content_mgr.js');
 
 //var aeServer = 'http://192.168.5.101';
 //var aeServer = 'http://192.168.5.189';
@@ -25,7 +25,7 @@ exports.uploadUserData_cb = function(req, res) {
 			var videoTitle =  "MiixCard movie of" + req.body.userId.fb_name;
 			//aeServerManager.createMovie(aeServer, req.body.project_ID, req.body.userId._id, req.body.userId.fb_userID, videoTitle);
 			//aeServerManager.createMovie_longPolling("gance_Feltmeng_pc", req.body.project_ID, req.body.userId._id, req.body.userId.fb_userID, videoTitle);
-			miixContentManager.generateMiixMoive(req.body.project_ID, req.body.userId._id, req.body.userId.fb_userID, videoTitle);
+			miixContentMgr.generateMiixMoive(req.body.project_ID, req.body.userId._id, req.body.userId.fb_userID, videoTitle);
 		}
 		else {
 			html += '<p>Fail to retrieve userID from session; movie generation halt ! <p/>'; 	
@@ -184,7 +184,7 @@ exports.uploadUserDataInfo_cb = function(req, res) {
 				var videoTitle =  "MiixCard movie";
 				//aeServerManager.createMovie(aeServer, req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
 				//aeServerManager.createMovie_longPolling("gance_Feltmeng_pc", req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
-				miixContentManager.generateMiixMoive(req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
+				miixContentMgr.generateMiixMoive(req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
 			}
 			else {
 				res.send( {err:"Some or all user contents are missing."} );
