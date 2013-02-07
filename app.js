@@ -138,7 +138,7 @@ http.createServer(app).listen(app.get('port'), function(){
 
 /*
 //test
-var aeServerMgr = require('./ae_server_manager.js');
+var aeServerMgr = require('./ae_server_mgr.js');
 var doohMgr = require('./dooh_mgr.js');
 setTimeout(function(){
 //setInterval(function(){ 
@@ -149,11 +149,11 @@ setTimeout(function(){
 	//	console.log('uploading ended. Response:');
 	//	console.dir(resParametes);
 	//});
-	doohMgr.downloadMovieFromMainServer('greeting-50c99d81064d2b841200000a-20130108T054254436Z', function(resParametes){
+	doohMgr.downloadMovieFromMainServer('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
 		console.log('downloading ended. Response:');
 		console.dir(resParametes);
 	});
-}, 1000);
+}, 5000);
 */
 
 //test of Jeff

@@ -5,6 +5,7 @@ var connectionHandler = require('./routes/connection_handler.js');
 doohMgr.downloadMovieFromMainServer = function(movieProjectID, downloadMovie_cb) {
 
 	//TODO:: get corresponding DOOH ID
+	//var doohID = 'DOOH_gance_winXP_vm';
 	var doohID = 'DOOH_gance_Feltmeng_pc';
 
 	var commandParameters = {
