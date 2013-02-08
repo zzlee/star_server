@@ -23,6 +23,7 @@ FM.DB = (function(){
             occupationList = 'gov student edu industry business service'.split(' ');
             evtStatus = 'waiting proved'.split(' ');
 			videoStatus = 'good soso bad waiting none'.split(' ');
+            videoGenre = 'miix miix_street miix_story'.split(' ');
         
 		/****************** DB Schema ******************/
 		
@@ -43,7 +44,7 @@ FM.DB = (function(){
             memberID: {type: String},
             password: {type: String},
 			deviceToken: {type: Mixed},
-            mPhone: { num: String, proved: {type: Boolean, default: false} },
+            mPhone: { number: String, verified: {type: Boolean, default: false}, code: String },
             email: {type: String, default: 'xyz@feltmeng.com'},
             birthday: {type: Number, min:19110101},
             occupation: {type: String, enum: occupationList},
@@ -75,7 +76,8 @@ FM.DB = (function(){
 			doohTimes: { times: {type: Number, default: 0, min: 0}, event: [ObjectID]},
 			playedTimes: {type: Number, min: 0},
 			review: {type: Number},
-			vip: {type: Boolean, default: false}
+			vip: {type: Boolean, default: false},
+            genre: {type: String, enum: videoGenre}
         }); //  videos collection
 
         var CommentSchema = new Schema({

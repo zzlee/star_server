@@ -59,13 +59,14 @@ FM.VIDEO = (function(){
             },
             
 			getNewVideoListByFB : function(userID, after, cb){
-
+                // Only catch videos which are posted on FB.
                 var query = videos.find();
 				query.where("ownerId.userID", userID).ne("fb_id", null).where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(cb);
-                /*query.where("ownerId.userID", userID).$where(function(after){
-					var createTime = Math.floor(new Date(this._id.getTimestamp()).getTime()/1000);
-					return createTime > after;
-				}).exec(cb);*/  
+            },
+            
+            getNewStreetVideoListByFB : function(userID, after, cb){
+                var query = videos.find();
+				query.where("ownerId.userID", userID).where("genre", "miix_street").ne("fb_id", null).where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(cb);
             },
 			
             update: function(oid, newdata){

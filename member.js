@@ -41,6 +41,11 @@ FM.MEMBER = (function(){
                 FMDB.getValueOf(members, {"memberID":memberID}, field, cb);
             },
             
+            authenticate: function(_id, code, cb){
+                var condition = {'_id': _id, 'mPhone.code': code};
+                FMDB.updateOne(members, condition, {'mPhone.verified': true, 'mPhone.code': null}, {select: 'mPhone.number'}, cb)
+            },
+            
             isFBValid: function(userID, cb){
                 
                 var field = { "_id":1, "fb": 1, "deviceToken":1 };

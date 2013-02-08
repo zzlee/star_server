@@ -368,6 +368,6 @@ FM.SCHEDULE = (function(){
     };
 })();
 
-FM.SCHEDULE.getInstance()._test();
+//FM.SCHEDULE.getInstance()._test();
 
 module.exports = FM.SCHEDULE.getInstance();

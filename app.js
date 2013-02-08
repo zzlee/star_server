@@ -123,8 +123,10 @@ app.get('/api/userProfile', routes.api.userProfile);
 app.get('/api/profile', routes.api.profile);
 app.get('/api/fbStatus', routes.api.fbStatus);
 app.get('/api/fbGetComment', routes.api.fbGetCommentReq);
-app.get('/api/fbGetThumbnail' , routes.api.fbGetThumbnail);
+app.get('/api/fbGetThumbnail', routes.api.fbGetThumbnail);
 app.get('/api/newVideoList', routes.api.newVideoList);
+app.get('/api/newStreetVideoList', routes.api.newStreetVideoList);
+app.get('/api/codeGeneration', routes.api.codeGenerate);
 
 app.post('/api/signin', routes.api.signin);
 
@@ -136,6 +138,7 @@ app.post('/api/prove', routes.api.prove);
 app.post('/api/signupwithFB', routes.api.signupwithFB);
 app.post('/api/deviceToken', routes.api.deviceToken);
 app.post('/api/submitAVideo', routes.api.submitAVideo);
+app.post('/api/codeVerification', routes.api.codeVerify);
 
 app.del('/', routes.api.signout);
 
