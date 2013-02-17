@@ -140,6 +140,8 @@ http.createServer(app).listen(app.get('port'), function(){
 //test
 var aeServerMgr = require('./ae_server_mgr.js');
 var doohMgr = require('./dooh_mgr.js');
+var storyCamControllerMgr = require('./story_cam_controller_mgr.js');
+
 setTimeout(function(){
 //setInterval(function(){ 
 	//aeServerMgr.createMovie('http://192.168.5.101', 'rotate-anonymous-20121115T004014395Z', 'aa', 'aa_fb', 'video to test');
@@ -149,8 +151,13 @@ setTimeout(function(){
 	//	console.log('uploading ended. Response:');
 	//	console.dir(resParametes);
 	//});
-	doohMgr.downloadMovieFromMainServer('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
-		console.log('downloading ended. Response:');
+	//doohMgr.downloadMovieFromMainServer('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
+	//	console.log('downloading ended. Response:');
+	//	console.dir(resParametes);
+	//});
+	console.log('storyCamControllerMgr.startRecording()');
+	storyCamControllerMgr.startRecording('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
+		console.log('started recording. Response:');
 		console.dir(resParametes);
 	});
 }, 5000);
