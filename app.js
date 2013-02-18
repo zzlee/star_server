@@ -136,7 +136,7 @@ http.createServer(app).listen(app.get('port'), function(){
   logger.info("Express server listening on port " + app.get('port'));
 });
 
-/*
+/* 
 //test
 var aeServerMgr = require('./ae_server_mgr.js');
 var doohMgr = require('./dooh_mgr.js');
@@ -155,9 +155,14 @@ setTimeout(function(){
 	//	console.log('downloading ended. Response:');
 	//	console.dir(resParametes);
 	//});
-	console.log('storyCamControllerMgr.startRecording()');
-	storyCamControllerMgr.startRecording('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
-		console.log('started recording. Response:');
+	//console.log('storyCamControllerMgr.startRecording()');
+	//storyCamControllerMgr.startRecording('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
+	//	console.log('started recording. Response:');
+	//	console.dir(resParametes);
+	//});
+	console.log('storyCamControllerMgr.stopRecording()');
+	storyCamControllerMgr.stopRecording( function(resParametes){
+		console.log('stopped recording. Response:');
 		console.dir(resParametes);
 	});
 }, 5000);

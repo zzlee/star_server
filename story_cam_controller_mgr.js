@@ -23,6 +23,18 @@ storyCamControllerMgr.startRecording = function( miixMovieProjectID, startedReco
 
 storyCamControllerMgr.stopRecording = function( stoppedRecording_cb ){
 
+	//TODO:: get corresponding storyCamController ID
+	var storyCamControllerID = 'story_cam_gance_Feltmeng_pc';
+
+	var commandParameters = null;
+	
+	connectionHandler.sendRequestToRemote( storyCamControllerID, { command: "STOP_RECORDING", parameters: commandParameters }, function(responseParameters) {
+		//console.dir(responseParameters);
+		if (stoppedRecording_cb )  {
+			stoppedRecording_cb(responseParameters);
+		}
+	});
+
 }
 
 
