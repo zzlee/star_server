@@ -37,5 +37,11 @@ storyCamControllerMgr.stopRecording = function( stoppedRecording_cb ){
 
 }
 
+storyCamControllerMgr.uploadStoryMovieToMainServer = function(movieProjectID, uploaded_cb) {
+
+
+}
+
+
 
 module.exports = storyCamControllerMgr;

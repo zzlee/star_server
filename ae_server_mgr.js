@@ -122,4 +122,10 @@ aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
 }
 
+aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, downloadMovie_cb) {
+
+
+}
+
+
 module.exports = aeServerMgr;
