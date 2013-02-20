@@ -25,19 +25,21 @@ exports.recordUserAction_cb = analyticsHandler.recordUserAction_cb;
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
     videoDB = require("../video.js"),
-    api = require("./api.js");
+    api = require("./api.js"),
+    admin_handler = require("./admin_handler.js");
     
     //$ = require('jQuery'),
     //jsdom = require('jsdom').jsdom;
     
 exports.api = api;
+exports.admin = admin_handler;
 
 exports.signinFB = function(req, res){
 	logger.log("\n[FM] [signin_fb] ");
     res.render('signinFB', { title: "導向Facebook認證頁！" });
 };
 
-exports.signin = function (req, res, next) {
+exports.signin = function(req, res, next) {
     /*
      *  Once member sign-in, we should save profile in session to be used in same session.
      */
@@ -53,7 +55,7 @@ exports.signin = function (req, res, next) {
                     name: member.memberID,
                     pwd: member.password,
                     userId: oid 
-                };             
+                };
                 logger.log(member.memberID + " Log-In! with userId " + oid.toHexString());
             }
             next();
@@ -324,5 +326,9 @@ exports.index = function (req, res) {
                           videoWorks: videoWorks
                         } );
 };
+
+exports.login = function(req, res){
+	res.render('login');
+}; 
 
 

@@ -8,7 +8,6 @@ var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
     videoDB = require("../video.js");
 
-
 var ObjectID = require('mongodb').ObjectID;
 
 var DEBUG = true,
@@ -56,7 +55,7 @@ FM.api._GCM_PushNotification = function( device_token ){
 	 * Parameters: message-literal, registrationIds-array, No. of retries, callback-function
 	 */
 	sender.send(message, registrationIds, 4, function (result) {
-		logger.log(result);
+		FM_LOG(result);
 	});
 };
 
@@ -636,13 +635,13 @@ FM.api.signin = function (req, res) {
     /*
      *  Once member sign-in, we should save profile in session to be used in same session.
      */
-    logger.log("Get Sign In Req: " + JSON.stringify(req.body)); 
+    FM_LOG("Get Sign In Req: " + JSON.stringify(req.body)); 
     if(req.body && req.body.member){
         var member = req.body.member,
             oid = null;
 
         memberDB.isValid(member.memberID, function(err, result){
-            if(err) logger.log(memberID + " is invalid " + err);
+            if(err) FM_LOG(memberID + " is invalid " + err);
             if(result && member.password === result["password"]){
                 oid = result["_id"];
                 req.session.user = {
@@ -650,7 +649,7 @@ FM.api.signin = function (req, res) {
                     pwd: member.password,
                     userId: oid 
                 };             
-                logger.log(member.memberID + " Log-In! with userId " + oid.toHexString());
+                FM_LOG(member.memberID + " Log-In! with userId " + oid.toHexString());
                 
                 FM.api.profile(req, res);
                 
@@ -667,21 +666,21 @@ FM.api.signin = function (req, res) {
 // GET
 FM.api.signout = function (req, res) {
     var username = req.session.user.name;
-    logger.log(username + " Log-Out!");
+    FM_LOG(username + " Log-Out!");
     delete req.session.user;
     res.redirect("/");
 };
 
 // POST
 FM.api.signup = function(req, res){
-    logger.log("Get POST SignUp Req: " + JSON.stringify(req.body));
+    FM_LOG("Get POST SignUp Req: " + JSON.stringify(req.body));
     
     if(req.body && req.body.member){
         var member = req.body.member,
             oid = null;
-        logger.log(JSON.stringify(member));
+        FM_LOG(JSON.stringify(member));
         memberDB.addMember(member, function(err, result){
-            logger.log("with userId " + result["_id"]);
+            FM_LOG("with userId " + result["_id"]);
             if(result){
                 oid = result["_id"];
                 req.session.user = {
@@ -722,7 +721,7 @@ FM.api.signup = function(req, res){
                 
                 
                 res.send("Thanks for registering " + req.body.user);
-                logger.log(userStore);
+                FM_LOG(userStore);
             });
         });
         */
@@ -757,7 +756,7 @@ FM.api.addVideo = function(req, res){
 
 // POST
 FM.api.addEvent = function(req, res){
-    logger.log("addEvent Req: " + JSON.stringify(req.body) );
+    FM_LOG("addEvent Req: " + JSON.stringify(req.body) );
     if(req.body.event){
     
         var event = req.body.event;
@@ -768,10 +767,10 @@ FM.api.addEvent = function(req, res){
             date = parseInt(yearday.substring(8), 10),
             hr = parseInt(time.substring(0, 2), 10),
             min = parseInt(time.substring(2), 10);
-        //logger.log("Select " + event.idx);
+        //FM_LOG("Select " + event.idx);
         var idx = parseInt(event.idx, 10);
             
-        logger.log("Year "+year+" Mon "+mon+" Date "+date+" Hr "+hr+ " Min "+min);
+        FM_LOG("Year "+year+" Mon "+mon+" Date "+date+" Hr "+hr+ " Min "+min);
         var slot = new Date(year, mon-1, date, hr, min);    // month: 0~11
         var start = slot.getTime();
         //slot.setMinutes(min+5);
@@ -789,7 +788,7 @@ FM.api.addEvent = function(req, res){
                     "status": "waiting"
                   };
                   
-        logger.log("addEvent: " + start.toLocaleString()+ " to " + end.toLocaleString());*/
+        FM_LOG("addEvent: " + start.toLocaleString()+ " to " + end.toLocaleString());*/
                  
         scheduleDB.reserve(event, function(err, result){
             if(err){ 
@@ -800,7 +799,7 @@ FM.api.addEvent = function(req, res){
         });
         
     }else{
-        logger.log("\n List Events....\n");
+        FM_LOG("\n List Events....\n");
         
     }
 };
@@ -811,7 +810,7 @@ FM.api.reject = function(req, res){
 
     var evtid = req.body.event.oid;
     
-    logger.log("\nReject " + JSON.stringify(evtid) );
+    FM_LOG("\nReject " + JSON.stringify(evtid) );
     
     scheduleDB.reject(evtid, function(err, result){
     
@@ -827,7 +826,7 @@ FM.api.reject = function(req, res){
 FM.api.prove = function(req, res){
 
     var evtid = req.body.event.oid;
-    logger.log("\nProve " + JSON.stringify(evtid) );
+    FM_LOG("\nProve " + JSON.stringify(evtid) );
     scheduleDB.prove(evtid, function(err, result){
     
         if(err){
@@ -865,7 +864,7 @@ FM.api.eventsOfPeriod = function(req, res){
         scheduleDB.listOfReservated(range, function(err, result){
             if(err) throw err;
             if(result){
-                logger.log("from " +start.getTime()+ " to " + end.getTime() + " \nevents: " + result);
+                FM_LOG("from " +start.getTime()+ " to " + end.getTime() + " \nevents: " + result);
                 res.send(result);
             }
         });
@@ -906,12 +905,18 @@ FM.api.newVideoList = function(req, res){
     
         var userID = req.query.userID;
 		var after = new Date(parseInt(req.query.after));
-		FM_LOG(">>>>>>>>>>>>>>>[AFTER]: " + after.toISOString());
+		//FM_LOG(">>>>>>>>>>>>>>>[AFTER]: " + after.toISOString());
         
         videoDB.getNewVideoListByFB(userID, after, function(err, result){
         
-            if(err) throw err;
+            if(err){
+                logger.error("[api.newVideoList] error: ", err);
+                res.send({error: "Internal Server Error."});
+                return;
+            }
+            
             FM_LOG("[getNewVideoListByFB] " + JSON.stringify(result));
+            
             var data;
             if(result){
                data = {"videoWorks": result};
@@ -920,14 +925,53 @@ FM.api.newVideoList = function(req, res){
             }
             res.send(data);
         });
+        
+    }else{
+        res.send({error: "Bad Request!"});
     }
 };
+
+//  GET
+FM.api.newStreetVideoList = function(req, res){
+    FM_LOG("[api.newStreetVideoList]: ");
+    
+    if(req.query && req.query.userID){
+    
+        var userID = req.query.userID;
+		var after = new Date(parseInt(req.query.after));
+        
+        videoDB.getNewStreetVideoListByFB( userID, after, function(err, result){
+            if(err){
+                logger.error("[api.newStreetVideoList] error: ", err);
+                res.send({error: "Internal Server Error."});
+                return;
+            }
+            
+            FM_LOG("[getNewVideoListByFB] " + JSON.stringify(result));
+
+            var data;
+            if(result){
+                data = {streetVideos: result};
+            }else{
+                data = {message: "No video"};
+            }
+            res.send(data);
+        });
+        
+    }else{
+        res.send({error: "Bad Request!"});
+    }
+};
+
 
 /*
 var vjson2 = {  "title":"A Awesome World",
                     "ownerId": {"_id": "509ba9395a5ce36006000001", "userID": "100004053532907"},
                     "url": {"youtube":"http://www.youtube.com/embed/oZmtwUAD1ds"},
-                    "projectId": "rotate-anonymous-20121115T004014395Z"};*/
+                    "projectId": "Miix-Street-20121115T004014395Z",
+                    "genre": "miix_street",
+                    "createdOn": 1357010644000,
+             };*/
 
 // POST
 FM.api.submitAVideo = function(req, res){
@@ -952,6 +996,67 @@ FM.api.submitAVideo = function(req, res){
 	}
 };
 
+
+/**
+ *  Authentication of Mobile User. *
+ */
+
+
+// GET
+FM.api.codeGenerate = function(req, res){
+    if(req.query){
+        var code = (Math.floor(Math.random() * 10000)).toString();  // 4 digits
+        var phoneNum = req.query.phoneNum,
+            fb_userID = req.query.fb_userID,
+            _id = ObjectID.createFromHexString(req.query.userID);
+        //console.log(JSON.stringify(req.query));    
+        var metadata = {number: phoneNum, verified: false, code: code};
+        memberDB.updateMember(_id, {mPhone: metadata}, function(err, result){
+            if(err){
+                logger.error("[codeGenerate] updateMember error: ", err);
+                res.send({error: 'Internal Server Error'});
+                return;
+            }
+            
+            FM_LOG("[codeGenerate] Succeed!", result);
+            res.send(200, {message: '手機號碼:「'+ phoneNum +'」，驗證碼：「'+ code +'」。'});
+        });
+        
+    }else{
+        res.send({error: 'Bad Request!'});
+    }
+};
+
+// POST
+FM.api.codeVerify = function(req, res){
+    if(req.body){
+        var code = req.body.code,
+            fb_userID = req.body.fb_userID,
+            _id = ObjectID.createFromHexString(req.body.userID);
+            
+        var metadata = {};
+        memberDB.authenticate(_id, code, function(err, result){
+            if(err){
+                logger.error('[codeVerify] error:', err);
+                res.send({error: 'Internal Server Error'});
+                return;   
+            }
+            if(result){
+                //console.log('[codeVerify] result:' + JSON.stringify(result));
+                var phoneNum = result.mPhone.number;
+                res.send(200, {message: '手機號碼：「'+ phoneNum +'」已通過認證，謝謝您的配合！'});
+                
+            }else{
+                res.send({error: '錯誤的認證碼！'});
+            }
+        });
+        
+    }else{
+        res.send({error: 'Bad Request!'});
+    }
+};
+
+
 // GET
 FM.api.userProfile = function(req, res){
     
@@ -969,21 +1074,21 @@ FM.api.userProfile = function(req, res){
 // Inter
 FM.api._test = function(){
    
-   var oid = ObjectID.createFromHexString("50c9afd0064d2b8412000013");
-   memberDB.getDeviceTokenById(oid, function(err, result){
-							if(err) throw err;
-							if(result.deviceToken){
-								FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
-								for( var devicePlatform in result.deviceToken){
-									if(result.deviceToken[devicePlatform]){
-										if(devicePlatform == 'Android')
-											FM.api._GCM_PushNotification(result.deviceToken[devicePlatform]);
-										else
-											FM.api._pushNotification(result.deviceToken[devicePlatform]);
-									}
-								}
-							}
-						});
+   var _id = ObjectID.createFromHexString("50c9afd0064d2b8412000013");
+   var code = '5376';
+   var phoneNum = '0911988320';
+   //console.log(JSON.stringify(req.query));    
+   var metadata = {number: phoneNum, verified: false, code: code};
+   memberDB.updateMember(_id, {mPhone: metadata}, function(err, result){
+       if(err){
+           logger.error("[codeGenerate] updateMember error: ", err);
+           res.send({error: 'Internal Server Error'});
+           return;
+       }
+       
+       console.log("[codeGenerate] Succeed!" + JSON.stringify(result));
+   });
+   
    //HTC_Desire FM.api._GCM_PushNotification("APA91bFsZZUk2lH_Ud-oOCqSbVsHSOiePVM7NG_Prdw8Q-_ubJXII1F7QewGlK-2GY1MzJYQsf-U3QprSaS8iSaoHKKzODL_vXVguGJg1LisWG5cohC3OMujDvs3kbyJ0QnWOeD951UX");
    //HTC_ONE FM.api._GCM_PushNotification("APA91bH3fugF50nw0sb1zsVQrLx6BDRApdTUHj9-3XiLHc-2fSTqRDVXYJr9cxkkNXtn6X2bb163q_-Sh1yuB7H0BKaMlNZO_BL3qmrPmrDdGEzVqs4L3YIywprv90bBa95k4YaPdZ_t");
 	

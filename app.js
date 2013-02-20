@@ -11,7 +11,7 @@ var http = require('http'),
     Db = require('mongodb').Db,
     dbserver = require('mongodb').Server,
     dbserver_config = new dbserver('localhost', 27017, {auto_reconnect: true, native_parser: true} ),
-    fmdb = new Db('feltmeng', dbserver_config, {})
+    fmdb = new Db('feltmeng', dbserver_config, {}),
     mongoStore = require('connect-mongodb'),
     app = express(),
 	fs = require('fs'),
@@ -94,11 +94,22 @@ app.post('/record_user_action', routes.recordUserAction_cb );
 app.get('/internal/commands', routes.command_get_cb);
 app.post('/internal/command_responses', routes.commandResponse_post_cb);
 
+
 //GL
+/**
+ *  WEB ADMINISTRATION
+ */
+
+app.get('/admin', routes.admin.handler); 
+app.get('/admin/login', routes.admin.login);
+app.get('/admin/memberList', routes.admin.memberList);
+app.get('/admin/playList', routes.admin.playList);
+
 /*
 app.get('/', routes.profile, routes.index);
 app.get('/censorship', routes.censorship);
 app.get('/([a-zA-Z0-9]+)', routes.api.profile);
+app.get('/signin_fb', routes.signinFB);
 
 app.post('/', routes.profile, routes.index);
 app.post('/signin', routes.signin, routes.profile, routes.index);
@@ -107,17 +118,22 @@ app.post('/addEvent', routes.addEvent, routes.event, routes.schedule);
 app.post('/addVideo', routes.addVideo, routes.profile, routes.index );
 
 app.del('/', routes.signout, routes.index);*/
-app.get('/signin_fb', routes.signinFB);
 
-//  FM.API
+
+
+/**
+ * FM.API
+ */
 app.get('/api/eventsOfWaiting', routes.api.eventsOfWaiting);
 app.get('/api/schedule', routes.api.eventsOfPeriod);
 app.get('/api/userProfile', routes.api.userProfile);
 app.get('/api/profile', routes.api.profile);
 app.get('/api/fbStatus', routes.api.fbStatus);
 app.get('/api/fbGetComment', routes.api.fbGetCommentReq);
-app.get('/api/fbGetThumbnail' , routes.api.fbGetThumbnail);
+app.get('/api/fbGetThumbnail', routes.api.fbGetThumbnail);
 app.get('/api/newVideoList', routes.api.newVideoList);
+app.get('/api/newStreetVideoList', routes.api.newStreetVideoList);
+app.get('/api/codeGeneration', routes.api.codeGenerate);
 
 app.post('/api/signin', routes.api.signin);
 
@@ -129,11 +145,12 @@ app.post('/api/prove', routes.api.prove);
 app.post('/api/signupwithFB', routes.api.signupwithFB);
 app.post('/api/deviceToken', routes.api.deviceToken);
 app.post('/api/submitAVideo', routes.api.submitAVideo);
+app.post('/api/codeVerification', routes.api.codeVerify);
 
 app.del('/', routes.api.signout);
 
 http.createServer(app).listen(app.get('port'), function(){
-  logger.info("Express server listening on port " + app.get('port'));
+  console.log("Express server listening on port " + app.get('port'));
 });
 
 

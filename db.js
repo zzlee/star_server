@@ -21,7 +21,9 @@ FM.DB = (function(){
             connection = connectDB(),
             eduLv = 'elem jrHigh srHigh college university master doctor'.split(' '),
             occupationList = 'gov student edu industry business service'.split(' ');
-            evtStatus = 'waiting proved'.split(' ');;
+            evtStatus = 'waiting proved'.split(' ');
+			videoStatus = 'good soso bad waiting none'.split(' ');
+            videoGenre = 'miix miix_street miix_story'.split(' ');
         
 		/****************** DB Schema ******************/
 		
@@ -42,8 +44,8 @@ FM.DB = (function(){
             memberID: {type: String},
             password: {type: String},
 			deviceToken: {type: Mixed},
-            mPhone: { num: String, proved: {type: Boolean, default: false} },
-            email: {type: String},
+            mPhone: { number: String, verified: {type: Boolean, default: false}, code: String },
+            email: {type: String, default: 'xyz@feltmeng.com'},
             birthday: {type: Number, min:19110101},
             occupation: {type: String, enum: occupationList},
             gender: {type: Boolean},    //  0:Male 1:Female
@@ -51,7 +53,10 @@ FM.DB = (function(){
             notification: {type: Boolean, default: true},
             video_ids: {type: [ObjectID]},
             activity_ids: {type: [ObjectID]},
-            thumbnail: {type: String}    //  path/filename
+            video_count: {type: Number, min: 0, default: 0},
+            thumbnail: {type: String},    //  path/to/filename
+			doohTimes: {type: Number, min: 0, default: 0},
+			triedDoohTimes: {type: Number, min: 0, default: 0}
         }); //  members collection
         
         var VideoSchema = new Schema({
@@ -66,8 +71,13 @@ FM.DB = (function(){
             comments: {type: Mixed},    //  "data": []
             vote: {type: Number, min:0},
             likes: {type: Number, min:0},
-            status: {type: String},
-			createdOn: {type: Date, default: Date.now}
+            status: {type: String, enum: videoStatus, default: 'none'},
+			createdOn: {type: Date, default: Date.now},
+			doohTimes: { times: {type: Number, default: 0, min: 0}, event: [ObjectID]},
+			playedTimes: {type: Number, min: 0},
+			review: {type: Number},
+			vip: {type: Boolean, default: false},
+            genre: {type: String, enum: videoGenre}
         }); //  videos collection
 
         var CommentSchema = new Schema({
@@ -78,17 +88,37 @@ FM.DB = (function(){
         
         
         var EventSchema = new Schema({
-            videoId: {type: ObjectID},
-            projectId: {type: String},
-            ownerId: { _id:ObjectID, userID: String },
-            start: {type: Number, min:1325376000001},   // 1325376000001 2012/01/01 08:00:00
-            end: {type: Number, min:1325376000001},
-            videoUrl: {type: String},
-            location: {type: String},    //location: {type: ObjectID},
+            video: { _id: ObjectID,
+                     projectId: String,
+                     url: String
+                   },
+            ownerId: { _id: ObjectID, userID: String },
+            dooh: {client: String, location: String},
+            timeslot: { start: Date, end: Date, sequence: Number, duration: String  },
             status: {type: String, enum: evtStatus}
         }); //  events collection for schedule
         
-		
+        var ProgramSchema = new Schema({
+            dooh: {client: String, location: String},
+            program: [{
+                mode: String,
+                day: Number,
+                date: String,
+                start_date: String,
+                end_date: String,
+                start: String,
+                end: String,
+                sequence: Number,
+                duration: String,
+            }]
+        });
+        
+        var AdminSchema = new Schema({
+            id: {type: String},
+            password: {type: String}
+        });
+        
+        
 		var AnalysisSchema = new Schema({
 			time: {type: Date},
 			user_id: {type: ObjectID},
@@ -105,6 +135,8 @@ FM.DB = (function(){
             Video = connection.model('Video', VideoSchema, 'video'),
             Comment = connection.model('Comment', CommentSchema, 'comment'),
             Event = connection.model('Event', EventSchema, 'event'),
+            Program = connection.model('Program', ProgramSchema, 'program'),
+            Admin = connection.model('Admin', AdminSchema, 'admin'),
 			Analysis = connection.model('Analysis', AnalysisSchema, 'analysis');
             
         var dbModels = [];
@@ -112,6 +144,8 @@ FM.DB = (function(){
         dbModels["video"] = Video;
         dbModels["comment"] = Comment;
         dbModels["event"] = Event;
+        dbModels["program"] = Program;
+        dbModels["admin"] = Admin;
 		dbModels["analysis"] = Analysis;
         
         var dbSchemas = [];
@@ -119,6 +153,8 @@ FM.DB = (function(){
         dbSchemas["video"] = VideoSchema;
         dbSchemas["comment"] = CommentSchema;
         dbSchemas["event"] = EventSchema;
+        dbSchemas['program'] = ProgramSchema;
+        dbSchemas["admin"] = AdminSchema;
 		dbSchemas["analysis"] = AnalysisSchema;
             
         function connectDB(){
@@ -252,7 +288,7 @@ FM.DB = (function(){
             },
 
             updateAdoc: function(docModel, docid, jsonObj, cb){
-                logger.info("\n updateAdoc " + " fields: " + JSON.stringify(jsonObj));
+                //logger.info("\n updateAdoc " + " fields: " + JSON.stringify(jsonObj));
                 docModel.findByIdAndUpdate(docid, jsonObj, cb);
             },
             
@@ -276,7 +312,6 @@ FM.DB = (function(){
             },
             
             getValueOf: function(docModel, condition, field, cb){
-                
                 docModel.findOne(condition, field, cb);
             },
             
