@@ -106,7 +106,7 @@ aeServerMgr.createMiixMovie = function(starAeServerID, movieProjectID, ownerStdI
 aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
 	//TODO:: get corresponding AE Server ID
-	var starAeServerID = 'gance_Feltmeng_pc';
+	var starAeServerID = 'AE_server_gance_Feltmeng_pc';
 
 	var commandParameters = {
 		movieProjectID: movieProjectID
@@ -123,6 +123,20 @@ aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 }
 
 aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, downloadMovie_cb) {
+
+	//TODO:: get corresponding AE Server ID
+	var starAeServerID = 'AE_server_gance_Feltmeng_pc';
+
+	var commandParameters = {
+		movieProjectID: movieProjectID
+	};
+	
+	connectionHandler.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_STORY_MOVIE_FROM_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+		//console.dir(responseParameters);
+		if (downloadMovie_cb )  {
+			downloadMovie_cb(responseParameters);
+		}
+	});
 
 
 }

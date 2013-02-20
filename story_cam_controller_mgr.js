@@ -37,7 +37,21 @@ storyCamControllerMgr.stopRecording = function( stoppedRecording_cb ){
 
 }
 
-storyCamControllerMgr.uploadStoryMovieToMainServer = function(movieProjectID, uploaded_cb) {
+storyCamControllerMgr.uploadStoryMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
+
+	//TODO:: get corresponding storyCamController ID
+	var storyCamControllerID = 'story_cam_gance_Feltmeng_pc';
+
+	var commandParameters = {
+		movieProjectID: movieProjectID
+	};
+	
+	connectionHandler.sendRequestToRemote( storyCamControllerID, { command: "UPLOAD_STORY_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+		//console.dir(responseParameters);
+		if (uploadMovie_cb )  {
+			uploadMovie_cb(responseParameters);
+		}
+	});
 
 
 }

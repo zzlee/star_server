@@ -136,11 +136,15 @@ http.createServer(app).listen(app.get('port'), function(){
   logger.info("Express server listening on port " + app.get('port'));
 });
 
-/* 
-//test
+
+
 var aeServerMgr = require('./ae_server_mgr.js');
 var doohMgr = require('./dooh_mgr.js');
 var storyCamControllerMgr = require('./story_cam_controller_mgr.js');
+
+
+/* 
+//test
 
 setTimeout(function(){
 //setInterval(function(){ 
@@ -155,18 +159,40 @@ setTimeout(function(){
 	//	console.log('downloading ended. Response:');
 	//	console.dir(resParametes);
 	//});
-	//console.log('storyCamControllerMgr.startRecording()');
-	//storyCamControllerMgr.startRecording('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
-	//	console.log('started recording. Response:');
-	//	console.dir(resParametes);
-	//});
+	console.log('storyCamControllerMgr.startRecording()');
+	storyCamControllerMgr.startRecording('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
+		console.log('started recording. Response:');
+		console.dir(resParametes);
+	});
+}, 5000);
+
+setTimeout(function(){
 	console.log('storyCamControllerMgr.stopRecording()');
 	storyCamControllerMgr.stopRecording( function(resParametes){
 		console.log('stopped recording. Response:');
 		console.dir(resParametes);
 	});
+}, 12000);
+
+
+setTimeout(function(){
+	storyCamControllerMgr.uploadStoryMovieToMainServer('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
+		console.log('uploading ended. Response:');
+		console.dir(resParametes);
+	}); 
+
 }, 5000);
-*/
+
+
+setTimeout(function(){
+	aeServerMgr.downloadStoryMovieFromMainServer('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
+		console.log('downloading ended. Response:');
+		console.dir(resParametes);
+	}); 
+
+}, 5000);
+*/	
+
 
 //test of Jeff
 app.get('/test', function(req, res) {
