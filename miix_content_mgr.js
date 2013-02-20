@@ -23,10 +23,8 @@ miixContentMgr.submitMiixPlayListToDooh = function(cb) {
 miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbID, movieTitle) {
 	
 	//console.log('generateMiixMoive is called.');
-	//TODO: get starAeServerID.  
-	var starAeServerID = "gance_Feltmeng_pc";
 	
-	aeServerMgr.createMiixMovie(starAeServerID, movieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
+	aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
 	
 		if ( responseParameters.youtube_video_id ) {
 			var aeServerID = responseParameters.ae_server_id;

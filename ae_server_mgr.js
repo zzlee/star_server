@@ -72,7 +72,9 @@ aeServerMgr.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, 
 }
 
 //use long polling to ask AE Server to create Miix movie
-aeServerMgr.createMiixMovie = function(starAeServerID, movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
+aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
+	//TODO:: get corresponding AE Server ID
+	var starAeServerID = 'AE_server_gance_Feltmeng_pc';
 
 	youtubeManager.getAccessToken( function(ytAccessToken){
 		if (ytAccessToken) {
@@ -102,6 +104,12 @@ aeServerMgr.createMiixMovie = function(starAeServerID, movieProjectID, ownerStdI
 	});
 
 }
+
+//use long polling to ask AE Server to create Story movie
+aeServerMgr.createStoryMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
+
+}
+
 
 aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
