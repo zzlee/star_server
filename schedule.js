@@ -3,6 +3,9 @@ var ObjectID = require('mongodb').ObjectID;
 var parser = require('./asyncTimeSlot.js');
 var FM = {};
 
+var DEBUG = true,
+    FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str) ); } : function(str){} ;
+
 /**
  *  Schema
 	EventSchema = new Schema({
@@ -73,31 +76,31 @@ FM.SCHEDULE = (function(){
                           ] )
                      .sort({'timeslot.start': 1}).exec(function(err, result){
                         if(err) {
-                            console.log("[getTimeSlot] error:" + JSON.stringify(err));
+                            FM_LOG("[getTimeSlot] error:" + JSON.stringify(err));
                             cb(err, null);
                             return;
                         }
                         
                         eventsArray = result;
-                        console.log("[getAllEventsInCache]");
+                        FM_LOG("[getAllEventsInCache]");
                         if( 0 == eventsArray.length){
                             here.generateTimeSlot(condition, cb);
                             
                         }else{
                             here.generateTimeSlotWithoutSaving(condition, function(err, result){
                                 if(err){
-                                    console.log("[getTimeSlot] error:" + JSON.stringify(err));
+                                    FM_LOG("[getTimeSlot] error:" + JSON.stringify(err));
                                     cb(err, null);
                                     return;
                                 }
                                 
                                 timeslotsArray = result;
-                                console.log("[generateTimeSlotWithoutSaving]");
+                                FM_LOG("[generateTimeSlotWithoutSaving]");
                                 if(eventsArray.length == timeslotsArray.length){
                                     here.getAvailableEventsInCache(condition, cb);
-                                    console.log("[All events is in Cache.]");
+                                    FM_LOG("[All events is in Cache.]");
                                 }else{
-                                    console.log("[Part of events are in Cache.]");
+                                    FM_LOG("[Part of events are in Cache.]");
                                     for(var i=0; i < eventsArray.length; i++){
                                         for(var j=0; j < timeslotsArray.length; j++){
                                             if(timeslotsArray[j] && eventsArray[i].timeslot.start == Date(timeslotsArray[j].start)
@@ -110,11 +113,11 @@ FM.SCHEDULE = (function(){
                                     var data = {dooh: dooh, timeslotArray: timeslotsArray}
                                     here.setTimeSlot(data, function(err, result){
                                         if(err){
-                                            console.log("[setTimeSlot] error:" + JSON.stringify(err));
+                                            FM_LOG("[setTimeSlot] error:" + JSON.stringify(err));
                                             cb(err, null);
                                             return;
                                         }
-                                        console.log("[setTimeSlot]");
+                                        FM_LOG("[setTimeSlot]");
                                         here.getAvailableEventsInCache(condition, cb); 
                                     });
                                 }
@@ -158,9 +161,9 @@ FM.SCHEDULE = (function(){
 			},
             
             importPeriodicData : function(data){
-                FMDB.createAdoc(programs, data, function(err, result){
-                    if(err) console.log("[importProgram] error:" + JSON.stringify(err));
-                    console.log("[importProgram] result:" + JSON.stringify(result));
+                FMDB.updateOne(programs, {'dooh.id': data.dooh.id}, data, {upsert: true}, function(err, result){
+                    if(err) FM_LOG("[importProgram] error:" + JSON.stringify(err));
+                    FM_LOG("[importProgram] result:" + JSON.stringify(result));
                 });
             },
             
@@ -171,7 +174,7 @@ FM.SCHEDULE = (function(){
                 
                 this.getProgramData({'dooh.client': dooh.client}, {program:1}, function(err, result){
                     if(err){
-                        console.log("[getProgramData] error:" + JSON.stringify(err));
+                        FM_LOG("[getProgramData] error:" + JSON.stringify(err));
                         cb(err, null);
                         return;
                     }
@@ -195,7 +198,7 @@ FM.SCHEDULE = (function(){
                 
                 this.getProgramData({'dooh.client': dooh.client}, {program:1}, function(err, result){
                     if(err){
-                        console.log("[getProgramData] error:" + JSON.stringify(err));
+                        FM_LOG("[getProgramData] error:" + JSON.stringify(err));
                         cb(err, null);
                         return;
                     }
@@ -237,9 +240,9 @@ FM.SCHEDULE = (function(){
                     }else{
                         FMDB.updateAdoc(events, oid, update, function(err, result){
                             if(err){
-                                console.log('[setPlayList]error:' + JSON.stringify(err));
+                                FM_LOG('[setPlayList]error:' + JSON.stringify(err));
                             }else{
-                                console.log('updateAdoc:' + JSON.stringify(result));
+                                FM_LOG('updateAdoc:' + JSON.stringify(result));
                             }
                         });
                     }
@@ -271,20 +274,20 @@ FM.SCHEDULE = (function(){
                     
                 this.getPlayList(condition, function(err, result){
                     if(err){
-                        console.log("[getPlayList] error:" + JSON.stringify(err));
+                        FM_LOG("[getPlayList] error:" + JSON.stringify(err));
                         return;
                     }
                     if(result)
-                        console.log("[getPlayList] result:" + JSON.stringify(result));
+                        FM_LOG("[getPlayList] result:" + JSON.stringify(result));
                 });
                 /*
                 this.getAvailableEvents(condition, function(err, result){
                     if(err){
-                        console.log("[getAvailableEvents] error:" + JSON.stringify(err));
+                        FM_LOG("[getAvailableEvents] error:" + JSON.stringify(err));
                         return;
                     }
                     if(result)
-                        console.log("[getAvailableEvents] result:" + JSON.stringify(result));
+                        FM_LOG("[getAvailableEvents] result:" + JSON.stringify(result));
                 });*/
                 
                 /* generateTimeSlot
@@ -292,9 +295,9 @@ FM.SCHEDULE = (function(){
                 var condition = {dooh: {client: 'nova_sdome_1', location: 'sdome'}, period: period};
                 
                 this.generateTimeSlot(condition, function(err, result){
-                    if(err) console.log("[generateTimeSlot] error:" + JSON.stringify(err));
+                    if(err) FM_LOG("[generateTimeSlot] error:" + JSON.stringify(err));
                     if(result)
-                        console.log("[generateTimeSlot] result:" + JSON.stringify(result));
+                        FM_LOG("[generateTimeSlot] result:" + JSON.stringify(result));
                     return;
                 });*/
                 
@@ -351,8 +354,8 @@ FM.SCHEDULE = (function(){
                 };
                 
                 this.importPeriodicData(data, function(err, result){
-                    if(err) console.log("[importProgram] error:" + JSON.stringify(err));
-                    console.log("[importProgram] result:" + JSON.stringify(result));
+                    if(err) FM_LOG("[importProgram] error:" + JSON.stringify(err));
+                    FM_LOG("[importProgram] result:" + JSON.stringify(result));
                     return;
                 });*/
             },

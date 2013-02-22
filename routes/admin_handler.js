@@ -12,14 +12,14 @@ var FM = { admin: {} };
 
 
 FM.admin.handler = function(req, res){
-    /* TODO - Using RegularExpress to parse every request, then pass req to corresponding function.
+    /* TODO - Using RegularExpress/Command to parse every request, then pass req to corresponding function.
        switch(req.path){
         case 'api':
             FM.admin.api();
             break;
        }
     */
-    console.log("[admin.handler]");
+    FM_LOG("[admin.handler]");
     res.render('login');
 };
 
@@ -32,7 +32,7 @@ FM.admin.login = function(req, res){
         admin_mgr.isValid(req.query, function(err, result){
             if(err) logger.error("[admin.login] ", err);
             if(result){
-                console.log("[Login Success!]");
+                FM_LOG("[Login Success!]");
                 req.session.user = {
                     oid: result._id,
                     id: req.query.id
@@ -41,7 +41,7 @@ FM.admin.login = function(req, res){
                 member_mgr.listOfMembers( null, 'fb.userName fb.userID email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result){
                     if(err) logger.error('[member_mgr.listOfMemebers]', err);
                     if(result){
-                        //console.log(JSON.stringify(result));
+                        //FM_LOG(JSON.stringify(result));
                         res.render( 'frame', {memberList: result} );
                     }else{
                         // TODO
@@ -62,11 +62,11 @@ FM.admin.login = function(req, res){
 
 FM.admin.memberList = function(req, res){
     
-    console.log("[admin.memberList]");
+    FM_LOG("[admin.memberList]");
     member_mgr.listOfMembers( null, 'fb.userName fb.userID email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result){
         if(err) logger.error('[member_mgr.listOfMemebers]', err);
         if(result){
-            //console.log(JSON.stringify(result));
+            //FM_LOG(JSON.stringify(result));
             res.render( 'form_member', {memberList: result} );
         }
     });
@@ -75,7 +75,7 @@ FM.admin.memberList = function(req, res){
 
 FM.admin.playList = function(req, res){
     
-    console.log("[admin.playList]");
+    FM_LOG("[admin.playList]");
     var result = [{
             asset: "../images/shopping/pic.jpg",
             videoId: "2711",

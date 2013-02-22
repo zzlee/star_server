@@ -21,6 +21,11 @@ exports.command_get_cb = connectionHandler.command_get_cb;
 var analyticsHandler = require('./analytics_handler.js');
 exports.recordUserAction_cb = analyticsHandler.recordUserAction_cb;
 
+//JF
+var dooh_handler = require('./dooh_handler.js');
+exports.dooh_handler = dooh_handler;
+
+
 //GL
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
@@ -331,6 +336,4 @@ exports.login = function(req, res){
 	res.render('login');
 }; 
 
-//JF
-var dataProcess = require('./dooh_handler.js');
-exports.timeDataGet = dataProcess.getTimeData;
+
