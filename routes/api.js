@@ -1002,6 +1002,7 @@ FM.api.submitAVideo = function(req, res){
 	}
 };
 
+var miixContentMgr = require('../miix_content_mgr.js')(
 
 FM.api.submitDooh = function(req, res){
     FM_LOG("[api.submitDooh]");
@@ -1021,6 +1022,8 @@ FM.api.submitDooh = function(req, res){
             }else{
                 FM_LOG(JSON.stringify(result));
                 res.send(200, {message: "已收到您申請影片登上大螢幕。"});
+				
+				miixContentMgr.submitMiixMovieToDooh('', movieProjectID);
             }
         });
         

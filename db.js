@@ -78,7 +78,8 @@ FM.DB = (function(){
 			review: {type: Number},
 			vip: {type: Boolean, default: false},
             genre: {type: String, enum: videoGenre, default: 'miix'},
-            no: {type: Number}
+            no: {type: Number},
+			aeId: {type: String}
         }); //  videos collection
 
         var CommentSchema = new Schema({
