@@ -331,4 +331,6 @@ exports.login = function(req, res){
 	res.render('login');
 }; 
 
-
+//JF
+var dataProcess = require('./dooh_handler.js');
+exports.timeDataGet = dataProcess.getTimeData;

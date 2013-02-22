@@ -37,7 +37,7 @@ global.logger = logger;
   
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 80);
+  app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
@@ -208,6 +208,9 @@ setTimeout(function(){
 	}); 
 
 }, 5000);
+
+//JF
+app.post('/internal/dooh_timeslot_rawdata', routes.timeDataGet);
 
 
 setTimeout(function(){
