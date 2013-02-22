@@ -1,10 +1,13 @@
 storyCamControllerMgr = {};
 var connectionHandler = require('./routes/connection_handler.js');
 
+var correspondingStoryCamController = 'story_cam_jeff_Feltmeng_pc';
+//var correspondingStoryCamController = 'story_cam_gance_Feltmeng_pc';
+
 storyCamControllerMgr.startRecording = function( miixMovieProjectID, startedRecording_cb ){
 
 	//TODO:: get corresponding storyCamController ID
-	var storyCamControllerID = 'story_cam_gance_Feltmeng_pc';
+	var storyCamControllerID = correspondingStoryCamController;
 
 	var commandParameters = {
 		movieProjectID: miixMovieProjectID
@@ -24,7 +27,7 @@ storyCamControllerMgr.startRecording = function( miixMovieProjectID, startedReco
 storyCamControllerMgr.stopRecording = function( stoppedRecording_cb ){
 
 	//TODO:: get corresponding storyCamController ID
-	var storyCamControllerID = 'story_cam_gance_Feltmeng_pc';
+	var storyCamControllerID = correspondingStoryCamController;
 
 	var commandParameters = null;
 	
@@ -40,7 +43,7 @@ storyCamControllerMgr.stopRecording = function( stoppedRecording_cb ){
 storyCamControllerMgr.uploadStoryMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
 	//TODO:: get corresponding storyCamController ID
-	var storyCamControllerID = 'story_cam_gance_Feltmeng_pc';
+	var storyCamControllerID = correspondingStoryCamController;
 
 	var commandParameters = {
 		movieProjectID: movieProjectID

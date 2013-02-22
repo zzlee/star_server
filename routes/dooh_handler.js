@@ -1,6 +1,9 @@
+var doohHandler = {};
+
+var storyCamControllerMgr = require('../story_cam_controller_mgr.js');
 
 
-exports.getTimeData = function(req, res) {
+doohHandler.getTimeData = function(req, res) {
 	//get message.
 	user = req.headers.rawdata;
 	res.writeHead(200, { "Content-Type": "text/plain" });
@@ -20,3 +23,30 @@ exports.getTimeData = function(req, res) {
 	req.on('data', function(chunk) { result += chunk; }).on('end', function() { console.log(JSON.parse(result)); });
 	res.end();
 };
+
+doohHandler.doohMoviePlayingState_post_cb = function(req, res) {
+	if ( req.headers.miix_movie_project_id ) {
+		if ( req.headers.state == 'playing' ){
+			console.log('dooh starts playing movie');
+			storyCamControllerMgr.startRecording( req.headers.miix_movie_project_id, function(resParametes){
+				console.log('started recording. Response:');
+				console.dir(resParametes);
+				res.send(null);
+			});
+			
+		}
+		else if ( req.headers.state == 'stopped' ){
+			console.log('dooh stopped playing movie');
+			storyCamControllerMgr.stopRecording( function(resParametes){
+				console.log('stopped recording. Response:');
+				console.dir(resParametes);
+				res.send(null);
+			});
+		}	
+	}
+	else {
+		res.send("No movie project id avaialable");
+	}
+}
+
+module.exports = doohHandler;
