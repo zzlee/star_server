@@ -58,10 +58,10 @@ FM.VIDEO = (function(){
                 videos.find({"ownerId.userID":userID}, cb );
             },
             
-			getNewVideoListByFB : function(userID, after, cb){
+			getNewVideoListByFB : function(userID, genre, after, cb){
                 // Only catch videos which are posted on FB.
                 var query = videos.find();
-				query.where("ownerId.userID", userID).ne("fb_id", null).where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(cb);
+				query.where("ownerId.userID", userID).where("genre", genre).ne("fb_id", null).where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(cb);
             },
             
             getNewStreetVideoListByFB : function(userID, after, cb){
@@ -83,10 +83,30 @@ FM.VIDEO = (function(){
             /*  ownerId must be included in vjson. [callback]  */
             addVideo: function(vjson, cb){
                 if(vjson.ownerId){
-                    FMDB.createAdoc(videos, vjson, cb);
+                    videos.count({}, function(err, count){
+                        vjson.no = parseInt(count)+1;
+                        FMDB.createAdoc(videos, vjson, cb);
+                    });
+                    
                 }else{
-                    throw new Error("Video_doc must include 'ownerId'!");
+                    var err = {error: "ownerId is MUST-HAVE!"};
+                    cb(err, null);
                 }
+            },
+            
+            /*  For TEST. */
+            _test: function(){
+                var ObjectID = require('mongodb').ObjectID;
+                var vjson = {  "title":"A Awesome World",
+                    "ownerId": {"_id": ObjectID.createFromHexString("509ba9395a5ce36006000001"), "userID": "100004053532907"},
+                    "url": {"youtube":"http://www.youtube.com/embed/oZmtwUAD1ds"},
+                    "projectId": "Miix-Street-20121115T004014395Z",
+                    "genre": "miix_street",
+                    "createdOn": 1357010644000
+                };
+                this.addVideo(vjson, function(err, doc){
+                    console.log(JSON.stringify(doc));
+                });
             }
         };
     }
@@ -100,5 +120,8 @@ FM.VIDEO = (function(){
         }
     };  // End of Return uInstance
 })(); // End of FM.VIDEO;
+
+/*  For TEST. */
+//FM.VIDEO.getInstance()._test();
 
 module.exports = FM.VIDEO.getInstance();

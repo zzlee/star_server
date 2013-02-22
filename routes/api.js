@@ -11,7 +11,7 @@ var memberDB = require("../member.js"),
 var ObjectID = require('mongodb').ObjectID;
 
 var DEBUG = true,
-    FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str) ); } : function(str){} ;
+    FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str)); } : function(str){} ;
     
 var FM = { api: {} };
 
@@ -903,10 +903,11 @@ FM.api.newVideoList = function(req, res){
     if(req.query && req.query.userID){
     
         var userID = req.query.userID;
+        var genre = req.query.genre;
 		var after = new Date(parseInt(req.query.after));
 		//FM_LOG(">>>>>>>>>>>>>>>[AFTER]: " + after.toISOString());
         
-        videoDB.getNewVideoListByFB(userID, after, function(err, result){
+        videoDB.getNewVideoListByFB(userID, genre, after, function(err, result){
         
             if(err){
                 logger.error("[api.newVideoList] error: ", err);
@@ -946,7 +947,7 @@ FM.api.newStreetVideoList = function(req, res){
                 return;
             }
             
-            FM_LOG("[getNewVideoListByFB] " + JSON.stringify(result));
+            FM_LOG("[getNewStreetVideoListByFB] " + JSON.stringify(result));
 
             var data;
             if(result){
@@ -980,10 +981,15 @@ FM.api.submitAVideo = function(req, res){
 		var _id = ObjectID.createFromHexString(req.body._id);
 		var userID = req.body.userID;
 		var pid = req.body.pid;
-		FM_LOG("User[" + userID + "] submit a VideoMaking[" + pid +"]");
-		var vjson = {"ownerId": {"_id": _id, "userID": userID},
-                    "projectId": pid};
-					
+        var genre = (req.body.genre) ? req.body.genre : 'miix';
+        
+		FM_LOG("User[" + userID + "] submit a Video[" + pid +"]");
+		var vjson = {
+                "ownerId": {"_id": _id, "userID": userID},
+                "projectId": pid,
+                "genre": genre
+            };
+
 		videoDB.addVideo(vjson, function(err, result){
 			if(err) throw err;
 			if(result)
@@ -996,6 +1002,33 @@ FM.api.submitAVideo = function(req, res){
 };
 
 
+FM.api.submitDooh = function(req, res){
+    FM_LOG("[api.submitDooh]");
+    
+    if(req.body && req.body.userID && req.body.pid && req.body._id){
+        var _id = ObjectID.createFromHexString(req.body._id),
+            userID = req.body.userID,
+            pid = req.body.pid;
+        var condition = {projectId: pid};
+        var update = {status: 'waiting'};
+        
+        videoDB.updateOne(condition, update, null, function(err, result){
+            if(err){
+                logger.error("[submitDooh]videoDB.updateOne", err);
+                res.send({error: "Internal Server Error!"});
+                
+            }else{
+                FM_LOG(JSON.stringify(result));
+                res.send(200, {message: "已收到您申請影片登上大螢幕。"});
+            }
+        });
+        
+    }else{
+        res.send("Bad Request.");
+    }
+};
+
+
 /**
  *  Authentication of Mobile User. *
  */
@@ -1003,8 +1036,12 @@ FM.api.submitAVideo = function(req, res){
 
 // GET
 FM.api.codeGenerate = function(req, res){
+    FM_LOG("[api.codeGenerate]");
     if(req.query){
-        var code = (Math.floor(Math.random() * 10000)).toString();  // 4 digits
+        var code = '';
+        for( var i=0; i < 4; i++){
+            code += (Math.floor(Math.random() * 10)%10).toString();  // 4 digits
+        }
         var phoneNum = req.query.phoneNum,
             fb_userID = req.query.fb_userID,
             _id = ObjectID.createFromHexString(req.query.userID);
@@ -1017,7 +1054,7 @@ FM.api.codeGenerate = function(req, res){
                 return;
             }
             
-            FM_LOG("[codeGenerate] Succeed!", result);
+            FM_LOG("[codeGenerate] Succeed!" + JSON.stringify(result));
             res.send(200, {message: '手機號碼:「'+ phoneNum +'」，驗證碼：「'+ code +'」。'});
         });
         
@@ -1028,12 +1065,12 @@ FM.api.codeGenerate = function(req, res){
 
 // POST
 FM.api.codeVerify = function(req, res){
+    FM_LOG("[api.codeVerify]");
     if(req.body){
         var code = req.body.code,
             fb_userID = req.body.fb_userID,
             _id = ObjectID.createFromHexString(req.body.userID);
             
-        var metadata = {};
         memberDB.authenticate(_id, code, function(err, result){
             if(err){
                 logger.error('[codeVerify] error:', err);
@@ -1076,7 +1113,7 @@ FM.api._test = function(){
    var _id = ObjectID.createFromHexString("50c9afd0064d2b8412000013");
    var code = '5376';
    var phoneNum = '0911988320';
-   //console.log(JSON.stringify(req.query));    
+   
    var metadata = {number: phoneNum, verified: false, code: code};
    memberDB.updateMember(_id, {mPhone: metadata}, function(err, result){
        if(err){
@@ -1088,9 +1125,9 @@ FM.api._test = function(){
        console.log("[codeGenerate] Succeed!" + JSON.stringify(result));
    });
    
+   
    //HTC_Desire FM.api._GCM_PushNotification("APA91bFsZZUk2lH_Ud-oOCqSbVsHSOiePVM7NG_Prdw8Q-_ubJXII1F7QewGlK-2GY1MzJYQsf-U3QprSaS8iSaoHKKzODL_vXVguGJg1LisWG5cohC3OMujDvs3kbyJ0QnWOeD951UX");
    //HTC_ONE FM.api._GCM_PushNotification("APA91bH3fugF50nw0sb1zsVQrLx6BDRApdTUHj9-3XiLHc-2fSTqRDVXYJr9cxkkNXtn6X2bb163q_-Sh1yuB7H0BKaMlNZO_BL3qmrPmrDdGEzVqs4L3YIywprv90bBa95k4YaPdZ_t");
-	
 };
 
 //FM.api._test();
