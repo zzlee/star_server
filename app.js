@@ -145,6 +145,7 @@ app.post('/api/prove', routes.api.prove);
 app.post('/api/signupwithFB', routes.api.signupwithFB);
 app.post('/api/deviceToken', routes.api.deviceToken);
 app.post('/api/submitAVideo', routes.api.submitAVideo);
+app.post('/api/submitDooh', routes.api.submitDooh);
 app.post('/api/codeVerification', routes.api.codeVerify);
 
 app.del('/', routes.api.signout);

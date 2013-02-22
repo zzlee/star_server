@@ -225,16 +225,16 @@ FM.SCHEDULE = (function(){
             
             setPlayList : function( playList, cb){
                 /* Set Events with video-related data.
-                 * [{_id: XXX, update: {}}, {}]
+                 * [{_id: XXX, update: {}}, ]
                  */
                  
                 for(var i in playList){
                     var oid = ObjectID.createFromHexString(playList[i]._id),
                         update = playList[i].update;
                         
-                    if( i == playList.length-1)
+                    if( i == playList.length-1){
                         FMDB.updateAdoc(events, oid, update, cb);
-                    else
+                    }else{
                         FMDB.updateAdoc(events, oid, update, function(err, result){
                             if(err){
                                 console.log('[setPlayList]error:' + JSON.stringify(err));
@@ -242,6 +242,7 @@ FM.SCHEDULE = (function(){
                                 console.log('updateAdoc:' + JSON.stringify(result));
                             }
                         });
+                    }
                 }
             },
             
