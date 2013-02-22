@@ -87,13 +87,19 @@ app.post('/upload_user_data', routes.uploadUserData_cb );
 app.get('/oauth2callback', routes.YoutubeOAuth2_cb );
 app.post('/upload', routes.upload_cb );
 app.post('/upload_user_data_info',routes.uploadUserDataInfo_cb);
-app.get('/report_rendering_result', routes.reportRenderingResult_cb);
+//app.get('/report_rendering_result', routes.reportRenderingResult_cb);
 app.get('/long_polling_from_ae_server', routes.longPollingFromAeServer_cb);
 app.post('/record_user_action', routes.recordUserAction_cb );
 
+app.get('/internal/commands', routes.command_get_cb);
+app.post('/internal/command_responses', routes.commandResponse_post_cb);
+
+
+//GL
 /**
  *  WEB ADMINISTRATION
  */
+
 app.get('/admin', routes.admin.handler); 
 app.get('/admin/login', routes.admin.login);
 app.get('/admin/memberList', routes.admin.memberList);
@@ -112,6 +118,7 @@ app.post('/addEvent', routes.addEvent, routes.event, routes.schedule);
 app.post('/addVideo', routes.addVideo, routes.profile, routes.index );
 
 app.del('/', routes.signout, routes.index);*/
+
 
 
 /**
@@ -147,13 +154,79 @@ http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
 
-/*
+
+
+var aeServerMgr = require('./ae_server_mgr.js');
+var doohMgr = require('./dooh_mgr.js');
+var storyCamControllerMgr = require('./story_cam_controller_mgr.js');
+
+
+/* 
 //test
-var ae_serv_mgr = require('./ae_server_manager.js');
+
 setTimeout(function(){
 //setInterval(function(){ 
-	//ae_serv_mgr.createMovie('http://192.168.5.101', 'rotate-anonymous-20121115T004014395Z', 'aa', 'aa_fb', 'video to test');
+	//aeServerMgr.createMovie('http://192.168.5.101', 'rotate-anonymous-20121115T004014395Z', 'aa', 'aa_fb', 'video to test');
 	//routes.sendRequestToAeServer( "gance_Feltmeng_pc", { command: "RENDER", movieProjectID: "1234", time: (new Date()).toString()} );
-	ae_serv_mgr.createMovie_longPolling("gance_Feltmeng_pc", "greeting-50c85019e6b209a80f000004-20121213T015823474Z", "ownerStdID", "ownerFbID", "movieTitle")
-}, 30000);
-*/
+	//aeServerMgr.createMovie_longPolling("gance_Feltmeng_pc", "greeting-50c85019e6b209a80f000004-20121213T015823474Z", "ownerStdID", "ownerFbID", "movieTitle")
+	//aeServerMgr.uploadMovieToMainServer('greeting-50c99d81064d2b841200000a-20130108T054254436Z', function(resParametes){
+	//	console.log('uploading ended. Response:');
+	//	console.dir(resParametes);
+	//});
+	//doohMgr.downloadMovieFromMainServer('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
+	//	console.log('downloading ended. Response:');
+	//	console.dir(resParametes);
+	//});
+	console.log('storyCamControllerMgr.startRecording()');
+	storyCamControllerMgr.startRecording('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
+		console.log('started recording. Response:');
+		console.dir(resParametes);
+	});
+}, 5000);
+
+setTimeout(function(){
+	console.log('storyCamControllerMgr.stopRecording()');
+	storyCamControllerMgr.stopRecording( function(resParametes){
+		console.log('stopped recording. Response:');
+		console.dir(resParametes);
+	});
+}, 12000);
+
+
+setTimeout(function(){
+	storyCamControllerMgr.uploadStoryMovieToMainServer('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
+		console.log('uploading ended. Response:');
+		console.dir(resParametes);
+	}); 
+
+}, 5000);
+
+
+setTimeout(function(){
+	aeServerMgr.downloadStoryMovieFromMainServer('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
+		console.log('downloading ended. Response:');
+		console.dir(resParametes);
+	}); 
+
+}, 5000);
+*/	
+
+//JF
+app.post('/internal/dooh_timeslot_rawdata', routes.timeDataGet);
+
+
+//test of Jeff
+app.get('/test', function(req, res) {
+	//get message.
+	user = req.headers.message;
+	res.writeHead(200, { "Content-Type": "text/plain" });
+	if(user) {
+		logger.info('Client message: ' + user);
+		//send to client.
+		res.write('Hello.');
+	} else {
+		logger.info(user);
+		logger.info('No data.');
+	}
+	res.end();
+});

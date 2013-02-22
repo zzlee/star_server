@@ -1,12 +1,16 @@
+var aeServerMgr = {};
+
 var workingPath = process.env.STAR_SERVER_PROJECT;
 var path = require('path');
 var http = require('http');
 var url = require('url');
 var fs = require('fs');
-var routes = require('./routes');
+var connectionHandler = require('./routes/connection_handler.js');
 var youtubeManager = require( './youtube_manager.js' );
 
-exports.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, ownerFbID, movieTitle) {
+//*****This function is deprecated.*****
+//use direct HTTP to ask AE Server to create Miix movie
+aeServerMgr.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, ownerFbID, movieTitle) {
 
 	var userDataFolder = path.join( workingPath, 'public/contents/user_project', movieProjectID, 'user_data');
 	var userFileList = fs.readdirSync(userDataFolder).toString();
@@ -67,8 +71,10 @@ exports.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, owne
 
 }
 
-
-exports.createMovie_longPolling = function(starAeServerID, movieProjectID, ownerStdID, ownerFbID, movieTitle) {
+//use long polling to ask AE Server to create Miix movie
+aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
+	//TODO:: get corresponding AE Server ID
+	var starAeServerID = 'AE_server_gance_Feltmeng_pc';
 
 	youtubeManager.getAccessToken( function(ytAccessToken){
 		if (ytAccessToken) {
@@ -82,8 +88,14 @@ exports.createMovie_longPolling = function(starAeServerID, movieProjectID, owner
 				movieTitle: movieTitle,
 				ytAccessToken: ytAccessToken 
 			};
-			
-			routes.sendRequestToAeServer( starAeServerID, { command: "RENDER_MOVIE", parameters: commandParameters } );
+						
+			//TODO:: get corresponding AE Server ID			
+			connectionHandler.sendRequestToRemote( starAeServerID, { command: "RENDER_MOVIE", parameters: commandParameters }, function(responseParameters) {
+				//console.dir(responseParameters);
+				if (createMovie_cb )  {
+					createMovie_cb(responseParameters);
+				}
+			});
 		}
 		else {
 			logger.info('[%s] Cannot get Youtube access token!', movieProjectID);
@@ -92,3 +104,50 @@ exports.createMovie_longPolling = function(starAeServerID, movieProjectID, owner
 	});
 
 }
+
+//use long polling to ask AE Server to create Story movie
+aeServerMgr.createStoryMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
+
+}
+
+
+aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
+
+	//TODO:: get corresponding AE Server ID
+	var starAeServerID = 'AE_server_gance_Feltmeng_pc';
+
+	var commandParameters = {
+		movieProjectID: movieProjectID
+	};
+	
+	connectionHandler.sendRequestToRemote( starAeServerID, { command: "UPLOAD_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+		//console.dir(responseParameters);
+		if (uploadMovie_cb )  {
+			uploadMovie_cb(responseParameters);
+		}
+	});
+	
+
+}
+
+aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, downloadMovie_cb) {
+
+	//TODO:: get corresponding AE Server ID
+	var starAeServerID = 'AE_server_gance_Feltmeng_pc';
+
+	var commandParameters = {
+		movieProjectID: movieProjectID
+	};
+	
+	connectionHandler.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_STORY_MOVIE_FROM_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+		//console.dir(responseParameters);
+		if (downloadMovie_cb )  {
+			downloadMovie_cb(responseParameters);
+		}
+	});
+
+
+}
+
+
+module.exports = aeServerMgr;

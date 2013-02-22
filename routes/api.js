@@ -189,7 +189,8 @@ FM.api._fbExtendToken = function(accessToken, callback){
 			 
 			 
 // Inter
-FM.api._fbPostVideoThenAdd = function(vjson){
+// TODO: it is suggested that these codes are handled by different roles (such as SocialNetworkMgr, VideoDB, PushMgr)
+FM.api._fbPostVideoThenAdd = function(vjson){ 
 	
 	/* Keep for testing in case.
 	var vjson2 = {  "title":"A Awesome World",
