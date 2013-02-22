@@ -208,8 +208,17 @@ setTimeout(function(){
 	}); 
 
 }, 5000);
-*/	
 
+
+setTimeout(function(){
+	console.log('aeServerMgr.createStoryMovie()');
+	aeServerMgr.createStoryMovie('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', 'myStdID', 'myFbID', 'My Story Movie', function(resParametes){
+		console.log('createStoryMovie ended. Response:');
+		console.dir(resParametes);
+	}); 
+
+}, 5000);
+*/	
 
 //test of Jeff
 app.get('/test', function(req, res) {
