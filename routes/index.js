@@ -24,7 +24,7 @@ exports.recordUserAction_cb = analyticsHandler.recordUserAction_cb;
 //JF
 var dooh_handler = require('./dooh_handler.js');
 exports.dooh_handler = dooh_handler;
-
+exports.doohMoviePlayingState_post_cb = dooh_handler.doohMoviePlayingState_post_cb; //GZ
 
 //GL
 var memberDB = require("../member.js"),

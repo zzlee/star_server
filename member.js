@@ -88,8 +88,23 @@ FM.MEMBER = (function(){
             },
             
             getUserName: function(user_id, cb){
-                var oid = ObjectID.createFromHexString(user_id);
-                member.findById(oid, "fb.userName", cb);
+                //var oid = ObjectID.createFromHexString(user_id);
+				var oid = null;
+				if('string' === typeof(user_id))
+					oid = ObjectID.createFromHexString(user_id);
+				else
+					oid = user_id;
+					
+                members.findById(oid, "fb.userName", function(err, result){
+					if(err){
+						logger.error("[members.findById]", err);
+						cb(err, null);
+					}else if(result){
+						cb(err, result.fb.userName);
+					}else{
+						cb(err, result);
+					}
+				});
             },
             
             getVideosOf: function(memberID, cb){

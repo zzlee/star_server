@@ -209,7 +209,8 @@ setTimeout(function(){
 
 
 setTimeout(function(){
-	storyCamControllerMgr.uploadStoryMovieToMainServer('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
+	console.log('storyCamControllerMgr.uploadStoryMovieToMainServer()');
+	storyCamControllerMgr.uploadStoryMovieToMainServer('greeting-50ee77e2fc4d981408000014-20130222T023238273Z', function(resParametes){
 		console.log('uploading ended. Response:');
 		console.dir(resParametes);
 	}); 
@@ -244,6 +245,9 @@ setTimeout(function(){
 }, 5000);
 
 */
+
+
+
 //test of Jeff
 app.get('/test', function(req, res) {
 	//get message.

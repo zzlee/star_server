@@ -44,40 +44,78 @@ var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID
 }
 
 storyContentMgr.generateStoryMV = function(movieProjectID) {
+	var ownerStdID = "my_stdID"; //TODO: call Gabriel's api
+	var ownerFbID = "my_fbID"; //TODO: call Gabriel's api
+	var movieTitle = ownerFbID+"'s Miix story movie";
+	
+	var getUserIdAndName = function( finish_cb ){
+		videoDB.getOwnerIdByPid( movieProjectID, function( err, _ownerStdID) {
+			if (!err) {
+				ownerStdID = _ownerStdID;
+				memberDB.getUserName( ownerStdID, function(err2, result){
+					if (!err2) {
+						ownerFbID = result;
+						if (finish_cb){
+							finish_cb(null);
+						}					
+					}
+				});
+			}
+			else{
+				if (finish_cb){
+					finish_cb(err);
+				}
+			}
+		});
+	
+	}
+	
 	
 	downloadStoryMovieFromStoryCamControllerToAeServer( movieProjectID, function(err){
-		var ownerStdID = "my_stdID"; //TODO: call Gabriel's api
-		var ownerFbID = "my_fbID"; //TODO: call Gabriel's api
-		var movieTitle = ownerFbID+"'s Miix story movie";
 		
-		aeServerMgr.createStoryMV( movieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
+		if (!err){
+			getUserIdAndName(function(err2){
+				if (!err2){
+					aeServerMgr.createStoryMV( movieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
+					
+						if ( responseParameters.youtube_video_id ) {
+							var aeServerID = responseParameters.ae_server_id;
+							var youtubeVideoID = responseParameters.youtube_video_id;
+							
+							
+							console.log('generated Story MV. Response:');
+							console.dir(responseParameters);
+							
+							if ( responseParameters.err == 'null' || (!responseParameters.err) ) {
+							
+								//TODO: call the same api of Gabriel?
+								//post to FB; update video DB; push notification to mobile client 
+								
+								var url = {"youtube":"http://www.youtube.com/embed/"+youtubeVideoID};			
+								var vjson = {"title": movieTitle,
+											 "ownerId": {"_id": ownerStdID, "userID": ownerFbID},
+											 "url": url,
+											 "genre":"miix_story",
+											 "projectId":movieProjectID};
+								fmapi._fbPostVideoThenAdd(vjson); //TODO: split these tasks to different rolls
+								
+								
+							};
+							
+						};
+						
+					});
+				}
+				else{
+					console.log('fail to user ID and name');
+				}
+			});
+		}
+		else {
+			console.log('fail to download Story Movie from Cam Controller to AE Server');
+		}
 		
-			if ( responseParameters.youtube_video_id ) {
-				var aeServerID = responseParameters.ae_server_id;
-				var youtubeVideoID = responseParameters.youtube_video_id;
-				
-				
-				if ( responseParameters.err == 'null' || (!responseParameters.err) ) {
-				
-					//TODO: call the same api of Gabriel?
-					//post to FB; update video DB; push notification to mobile client 
-					
-					var url = {"youtube":"http://www.youtube.com/embed/"+youtubeVideoID};			
-					var vjson = {"title": movieTitle,
-								 "ownerId": {"_id": ownerStdID, "userID": ownerFbID},
-								 "url": url,
-								 "genre":"miix_story",
-								 "projectId":movieProjectID};
-					fmapi._fbPostVideoThenAdd(vjson); //TODO: split these tasks to different rolls
-					
-					console.log('generated Story MV. Response:');
-					console.dir(responseParameters);
-					
-				};
-				
-			};
-			
-		});
+		
 	});
 };
 
