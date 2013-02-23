@@ -23,32 +23,32 @@ form#mainform(action='')
           th.table-header-repeat.line-left(width='100')
             a(href='') 已做影片
 
+        if(playList)
+            each play, i in playList
+                if i%2
+                    tr
+                      td #{i+1}
+                      td
+                        img(src="../images/shopping/pic.jpg", alt='', width='208')
+                      td #{play.no}
+                      td None
+                      td None
+                      td None
+                      td #{play.ownerId.userID}
+                      td None
+                      td None
+                      td None
 
-        each play, i in playList
-            if i%2
-                tr
-                  td #{i+1}
-                  td
-                    img(src="#{play.asset}", alt='', width='208')
-                  td #{play.videoId}
-                  td #{play.timeslot}
-                  td #{play.like}
-                  td #{play.comment}
-                  td #{play.user.userName}
-                  td #{play.user.triedDoohTimes}
-                  td #{play.user.doohTimes}
-                  td #{play.user.video_count}
-
-            else
-                tr.alternate-row
-                  td #{i+1}
-                  td
-                    img(src="../images/shopping/pic.jpg", alt='', width='208')
-                  td #{play.videoId}
-                  td #{play.timeslot}
-                  td #{play.like}
-                  td #{play.comment}
-                  td #{play.user.userName}
-                  td #{play.user.triedDoohTimes}
-                  td #{play.user.doohTimes}
-                  td #{play.user.video_count}
+                else
+                    tr.alternate-row
+                      td #{i+1}
+                      td None
+                        img(src="../images/shopping/pic.jpg", alt='', width='208')
+                      td #{play.no}
+                      td None
+                      td None
+                      td None
+                      td #{play.ownerId.userID}
+                      td None
+                      td None
+                      td None

@@ -87,9 +87,18 @@ FM.MEMBER = (function(){
                 FMDB.readAdocById(members, oid, cb);
             },
             
-            getUserName: function(user_id, cb){
+            getUserNameById: function(user_id, cb){
                 var oid = ObjectID.createFromHexString(user_id);
-                member.findById(oid, "fb.userName", cb);
+                member.findById(oid, "fb.userName", function(err, result){
+                    if(err){
+                        logger.err("[getUserName] error ", err);
+                        cb(err, null);
+                    }else if(result){
+                        cb(null, result.fb.userName);
+                    }else{
+                        cb(null, result);
+                    }
+                });
             },
             
             getVideosOf: function(memberID, cb){
