@@ -110,7 +110,7 @@ FM.VIDEO = (function(){
             
             // Only for v1.2 - GL
             getPlayList: function(cb){
-                var query = videos.findOneAndUpdate();
+                var query = videos.find();
                 query.ne("doohTimes.submited_time", null).sort({"doohTimes.submited_time": 1}).exec(cb);
             },
             
@@ -123,7 +123,7 @@ FM.VIDEO = (function(){
             _test: function(){
                 var ObjectID = require('mongodb').ObjectID;
                 
-                this.getOwnerIdByPid( "greeting-50c99656064d2b8412000005-20130107T091109720Z", function(err, doc){
+                this.nextDoohVideo( function(err, doc){
                     if(err) console.log(JSON.stringify(err));
                     else console.log(JSON.stringify(doc));
                 });

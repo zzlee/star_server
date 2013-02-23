@@ -16,25 +16,26 @@ form#mainform(action='')
             a(href='') 上傳影片數量
           th.table-header-repeat.line-left(width='168')
             a(href='') DOOH播放影片數量
-            
-        each member, i in memberList
-            if i%2
-                tr
-                  td #{i+1}
-                  td #{member.fb.userName}
-                  td #{member.fb.userID}
-                  td 
-                    a(href='') xyz@feltmeng.com
-                  td 0912345678
-                  td #{member.video_count}
-                  td #{member.doohTimes}
-            else
-                tr.alternate-row
-                  td #{i+1}
-                  td #{member.fb.userName}
-                  td #{member.fb.userID}
-                  td 
-                    a(href='') xyz@feltmeng.com
-                  td 0912345678
-                  td #{member.video_count}
-                  td #{member.doohTimes}
+        
+        if(memberList)
+            each member, i in memberList
+                if i%2
+                    tr
+                      td #{i+1}
+                      td #{member.fb.userName}
+                      td #{member.fb.userID}
+                      td 
+                        a(href='') xyz@feltmeng.com
+                      td 0912345678
+                      td #{member.video_count}
+                      td #{member.doohTimes}
+                else
+                    tr.alternate-row
+                      td #{i+1}
+                      td #{member.fb.userName}
+                      td #{member.fb.userID}
+                      td 
+                        a(href='') xyz@feltmeng.com
+                      td 0912345678
+                      td #{member.video_count}
+                      td #{member.doohTimes}

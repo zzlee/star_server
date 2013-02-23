@@ -45,7 +45,7 @@ FM.admin.login = function(req, res){
                         res.render( 'frame', {memberList: result} );
                     }else{
                         // TODO
-                        //res.render( 'frame', {memberList: result} );
+                        res.render( 'frame', {memberList: result} );
                     }
                 });
                 
@@ -103,8 +103,16 @@ FM.admin.playList = function(req, res){
             }
         }];
     */
-    
-    res.render('form_play', {playList: result});
+    video_mgr.getPlayList(function(err, result){
+        if(err){
+            logger.error("[video_mgr.getPlayList]error ", err);
+            res.render('form_play', {playList: null});
+            
+        }else{
+            FM_LOG("playlist:" + JSON.stringify(result));
+            res.render('form_play', {playList: result});
+        }
+    });
 };
 
 
