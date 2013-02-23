@@ -44,9 +44,9 @@ var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID
 }
 
 storyContentMgr.generateStoryMV = function(movieProjectID) {
-	var ownerStdID = "my_stdID"; //TODO: call Gabriel's api
-	var ownerFbID = "my_fbID"; //TODO: call Gabriel's api
-	var movieTitle = ownerFbID+"'s Miix story movie";
+	var ownerStdID;
+	var ownerFbID;
+	var movieTitle;
 	
 	var getUserIdAndName = function( finish_cb ){
 		videoDB.getOwnerIdByPid( movieProjectID, function( err, _ownerStdID) {
@@ -55,6 +55,7 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
 				memberDB.getUserName( ownerStdID, function(err2, result){
 					if (!err2) {
 						ownerFbID = result;
+                        movieTitle = ownerFbID+"'s Miix story movie";
 						if (finish_cb){
 							finish_cb(null);
 						}					

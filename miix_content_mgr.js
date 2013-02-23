@@ -68,15 +68,15 @@ miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
 					
 	//submit the playlist to DOOH
 				
-}
+};
 
 miixContentMgr.setMiixPlayList = function(cb) {
 
-}
+};
 
 miixContentMgr.submitMiixPlayListToDooh = function(cb) {
 
-}
+};
 
 
 
