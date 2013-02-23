@@ -76,6 +76,7 @@ FM.admin.memberList = function(req, res){
 FM.admin.playList = function(req, res){
     
     FM_LOG("[admin.playList]");
+    /*
     var result = [{
             asset: "../images/shopping/pic.jpg",
             videoId: "2711",
@@ -101,6 +102,7 @@ FM.admin.playList = function(req, res){
                 video_count: 10
             }
         }];
+    */
     
     res.render('form_play', {playList: result});
 };

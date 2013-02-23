@@ -45,6 +45,19 @@ FM.VIDEO = (function(){
                 FMDB.getValueOf(videos, {"_id":oid}, fields, cb);
             },
             
+            getOwnerIdByPid: function(pid, cb){
+                videos.findOne({projectId: pid}, 'ownerId._id', function(err, result){
+                    if(err){
+                        logger.error("[getOwnerIdByPid]", err);
+                        cb(err, null);
+                    }else if(result){
+                        cb(null, result.ownerId._id);
+                    }else{
+                        cb(null, result);
+                    }
+                });
+            },
+            
             getValueByProject: function(projectId, fields, cb){
                 
                 FMDB.getValueOf(videos, {"projectId":projectId}, fields, cb);
@@ -105,7 +118,7 @@ FM.VIDEO = (function(){
             _test: function(){
                 var ObjectID = require('mongodb').ObjectID;
                 
-                this.nextDoohVideo(function(err, doc){
+                this.getOwnerIdByPid( "greeting-50c99656064d2b8412000005-20130107T091109720Z", function(err, doc){
                     if(err) console.log(JSON.stringify(err));
                     else console.log(JSON.stringify(doc));
                 });

@@ -970,7 +970,7 @@ var vjson2 = {  "title":"A Awesome World",
                     "ownerId": {"_id": "509ba9395a5ce36006000001", "userID": "100004053532907"},
                     "url": {"youtube":"http://www.youtube.com/embed/oZmtwUAD1ds"},
                     "projectId": "Miix-Street-20121115T004014395Z",
-                    "genre": "miix_street",
+                    "genre": "miix_story",
                     "createdOn": 1357010644000,
              };*/
 
