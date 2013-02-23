@@ -119,6 +119,13 @@ app.post('/addVideo', routes.addVideo, routes.profile, routes.index );
 
 app.del('/', routes.signout, routes.index);*/
 
+/**
+ *  Internal
+ */
+//JF, modified by Gabriel
+app.post('/internal/dooh_periodic_data', routes.dooh_handler.importPeriodicData);
+
+app.get('/internal/dooh_current_video', routes.dooh_handler.dooh_current_video);
 
 
 /**
@@ -228,7 +235,6 @@ setTimeout(function(){
 
 }, 5000);
 */	
-
 
 
 

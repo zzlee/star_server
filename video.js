@@ -45,6 +45,19 @@ FM.VIDEO = (function(){
                 FMDB.getValueOf(videos, {"_id":oid}, fields, cb);
             },
             
+            getOwnerIdByPid: function(pid, cb){
+                videos.findOne({projectId: pid}, 'ownerId._id', function(err, result){
+                    if(err){
+                        logger.error("[getOwnerIdByPid]", err);
+                        cb(err, null);
+                    }else if(result){
+                        cb(null, result.ownerId._id);
+                    }else{
+                        cb(null, result);
+                    }
+                });
+            },
+            
             getValueByProject: function(projectId, fields, cb){
                 
                 FMDB.getValueOf(videos, {"projectId":projectId}, fields, cb);
@@ -95,17 +108,19 @@ FM.VIDEO = (function(){
             },
             
             /*  For TEST. */
+            
+            // Only for v1.2 - GL
+            nextDoohVideo: function(cb){
+                var query = videos.findOneAndUpdate(null, {$unset:{"doohTimes.submited_time": 1}}, {select:{projectId:1}} );
+                query.ne("doohTimes.submited_time", null).sort({"doohTimes.submited_time": 1}).limit(1).exec(cb);
+            },
+            
             _test: function(){
                 var ObjectID = require('mongodb').ObjectID;
-                var vjson = {  "title":"A Awesome World",
-                    "ownerId": {"_id": ObjectID.createFromHexString("509ba9395a5ce36006000001"), "userID": "100004053532907"},
-                    "url": {"youtube":"http://www.youtube.com/embed/oZmtwUAD1ds"},
-                    "projectId": "Miix-Street-20121115T004014395Z",
-                    "genre": "miix_street",
-                    "createdOn": 1357010644000
-                };
-                this.addVideo(vjson, function(err, doc){
-                    console.log(JSON.stringify(doc));
+                
+                this.getOwnerIdByPid( "greeting-50c99656064d2b8412000005-20130107T091109720Z", function(err, doc){
+                    if(err) console.log(JSON.stringify(err));
+                    else console.log(JSON.stringify(doc));
                 });
             }
         };

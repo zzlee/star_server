@@ -970,7 +970,7 @@ var vjson2 = {  "title":"A Awesome World",
                     "ownerId": {"_id": "509ba9395a5ce36006000001", "userID": "100004053532907"},
                     "url": {"youtube":"http://www.youtube.com/embed/oZmtwUAD1ds"},
                     "projectId": "Miix-Street-20121115T004014395Z",
-                    "genre": "miix_street",
+                    "genre": "miix_story",
                     "createdOn": 1357010644000,
              };*/
 
@@ -1002,7 +1002,7 @@ FM.api.submitAVideo = function(req, res){
 	}
 };
 
-var miixContentMgr = require('../miix_content_mgr.js')(
+var miixContentMgr = require('../miix_content_mgr.js');
 
 FM.api.submitDooh = function(req, res){
     FM_LOG("[api.submitDooh]");
@@ -1012,7 +1012,7 @@ FM.api.submitDooh = function(req, res){
             userID = req.body.userID,
             pid = req.body.pid;
         var condition = {projectId: pid};
-        var update = {status: 'waiting'};
+        var update = {status: 'waiting', "doohTimes.submited_time": Date.now()};
         
         videoDB.updateOne(condition, update, null, function(err, result){
             if(err){

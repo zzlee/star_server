@@ -69,17 +69,17 @@ FM.DB = (function(){
             projectId: {type: String},  //  AE project ID
             hitRate: {type: Number, min:0},
             comments: {type: Mixed},    //  "data": []
-            vote: {type: Number, min:0},
-            likes: {type: Number, min:0},
+            vote: {type: Number, default: 0, min:0},
+            likes: {type: Number, default: 0, min:0},
             status: {type: String, enum: videoStatus, default: 'none'},
 			createdOn: {type: Date, default: Date.now},
-			doohTimes: { times: {type: Number, default: 0, min: 0}, event: [ObjectID]},
+			doohTimes: { times: {type: Number, default: 0, min: 0}, event: [ObjectID], submited_time: Date},
 			playedTimes: {type: Number, min: 0},
 			review: {type: Number},
 			vip: {type: Boolean, default: false},
             genre: {type: String, enum: videoGenre, default: 'miix'},
             no: {type: Number},
-			aeId: {type: String}
+            aeId: {type: String}
         }); //  videos collection
 
         var CommentSchema = new Schema({
@@ -101,7 +101,7 @@ FM.DB = (function(){
         }); //  events collection for schedule
         
         var ProgramSchema = new Schema({
-            dooh: {client: String, location: String},
+            dooh: {id: String, location: String},
             program: [{
                 mode: String,
                 day: Number,
