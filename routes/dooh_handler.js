@@ -82,4 +82,29 @@ FM.dooh_handler.dooh_current_video = function(req, res){
 };
 
 
+FM.dooh_handler.doohMoviePlayingState_post_cb = function(req, res) {
+	if ( req.headers.miix_movie_project_id ) {
+		if ( req.headers.state == 'playing' ){
+			console.log('dooh starts playing movie');
+			storyCamControllerMgr.startRecording( req.headers.miix_movie_project_id, function(resParametes){
+				console.log('started recording. Response:');
+				console.dir(resParametes);
+				res.send(null);
+			});
+			
+		}
+		else if ( req.headers.state == 'stopped' ){
+			console.log('dooh stopped playing movie');
+			storyCamControllerMgr.stopRecording( function(resParametes){
+				console.log('stopped recording. Response:');
+				console.dir(resParametes);
+				res.send(null);
+			});
+		}	
+	}
+	else {
+		res.send("No movie project id avaialable");
+	}
+}
+
 module.exports = FM.dooh_handler;

@@ -93,7 +93,7 @@ app.post('/record_user_action', routes.recordUserAction_cb );
 
 app.get('/internal/commands', routes.command_get_cb);
 app.post('/internal/command_responses', routes.commandResponse_post_cb);
-
+app.post('/internal/dooh/movie_playing_state', routes.doohMoviePlayingState_post_cb);
 
 //GL
 /**
@@ -157,6 +157,10 @@ app.post('/api/codeVerification', routes.api.codeVerify);
 
 app.del('/', routes.api.signout);
 
+//JF
+app.post('/internal/dooh_timeslot_rawdata', routes.timeDataGet);
+
+
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
@@ -184,6 +188,9 @@ setTimeout(function(){
 	//	console.log('downloading ended. Response:');
 	//	console.dir(resParametes);
 	//});
+}, 5000);
+
+setTimeout(function(){
 	console.log('storyCamControllerMgr.startRecording()');
 	storyCamControllerMgr.startRecording('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
 		console.log('started recording. Response:');
@@ -212,6 +219,17 @@ setTimeout(function(){
 setTimeout(function(){
 	aeServerMgr.downloadStoryMovieFromMainServer('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', function(resParametes){
 		console.log('downloading ended. Response:');
+		console.dir(resParametes);
+	}); 
+
+}, 5000);
+
+
+
+setTimeout(function(){
+	console.log('aeServerMgr.createStoryMovie()');
+	aeServerMgr.createStoryMovie('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', 'myStdID', 'myFbID', 'My Story Movie', function(resParametes){
+		console.log('createStoryMovie ended. Response:');
 		console.dir(resParametes);
 	}); 
 

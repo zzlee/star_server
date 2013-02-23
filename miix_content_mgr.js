@@ -41,13 +41,14 @@ miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbI
 				var vjson = {"title": movieTitle,
 							 "ownerId": {"_id": ownerStdID, "userID": ownerFbID},
 							 "url": url,
+							 "aeId": "AE_server_gance_Feltmeng_pc",
 							 "projectId":movieProjectID};
 				fmapi._fbPostVideoThenAdd(vjson); //TODO: split these tasks to different rolls
 				
 			};
 			
 			//for test
-			miixContentMgr.submitMiixMovieToDooh('', movieProjectID);
+			//miixContentMgr.submitMiixMovieToDooh('', movieProjectID);
 		};
 		
 	});
