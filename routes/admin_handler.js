@@ -45,7 +45,7 @@ FM.admin.login = function(req, res){
                         res.render( 'frame', {memberList: result} );
                     }else{
                         // TODO
-                        //res.render( 'frame', {memberList: result} );
+                        res.render( 'frame', {memberList: result} );
                     }
                 });
                 
@@ -109,7 +109,7 @@ FM.admin.playList = function(req, res){
             res.render('form_play', {playList: null});
             
         }else{
-            console.log("playlist:" + JSON.stringify(result));
+            FM_LOG("playlist:" + JSON.stringify(result));
             res.render('form_play', {playList: result});
         }
     });

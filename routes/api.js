@@ -1023,7 +1023,7 @@ FM.api.submitDooh = function(req, res){
                 FM_LOG(JSON.stringify(result));
                 res.send(200, {message: "已收到您申請影片登上大螢幕。"});
 				
-				miixContentMgr.submitMiixMovieToDooh('', movieProjectID);
+				miixContentMgr.submitMiixMovieToDooh('', pid);
             }
         });
         

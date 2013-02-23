@@ -2,8 +2,8 @@
  * FeltMeng.com
  */
  
-var DOMAIN = "http://localhost:3000/admin/",
-     SDOMAIN = "https://lcoalhost:3000/admin/";
+var DOMAIN = "http://www.feltmeng.idv.tw/admin/",
+     SDOMAIN = "https://www.feltmeng.idv.tw/admin/";
 
 var FM = {};     
  
