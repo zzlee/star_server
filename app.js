@@ -162,6 +162,7 @@ http.createServer(app).listen(app.get('port'), function(){
 var aeServerMgr = require('./ae_server_mgr.js');
 var doohMgr = require('./dooh_mgr.js');
 var storyCamControllerMgr = require('./story_cam_controller_mgr.js');
+var storyContentMgr = require('./story_content_mgr.js');
 
 
 /* 
@@ -219,17 +220,22 @@ setTimeout(function(){
 
 
 setTimeout(function(){
-	console.log('aeServerMgr.createStoryMovie()');
+	console.log('aeServerMgr.createStoryMV()');
 	aeServerMgr.createStoryMovie('greeting-50ee77e2fc4d981408000014-20130207T014253670Z', 'myStdID', 'myFbID', 'My Story Movie', function(resParametes){
 		console.log('createStoryMovie ended. Response:');
 		console.dir(resParametes);
 	}); 
 
 }, 5000);
-*/	
+	
 
+setTimeout(function(){
+	console.log('storyContentMgr.generateStoryMV()');
+	storyContentMgr.generateStoryMV('greeting-50ee77e2fc4d981408000014-20130222T023238273Z'); 
 
+}, 5000);
 
+*/
 
 //test of Jeff
 app.get('/test', function(req, res) {

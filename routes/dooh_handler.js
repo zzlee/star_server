@@ -1,7 +1,7 @@
 var doohHandler = {};
 
 var storyCamControllerMgr = require('../story_cam_controller_mgr.js');
-
+var storyContentMgr = require('../story_content_mgr.js');
 
 doohHandler.getTimeData = function(req, res) {
 	//get message.
@@ -29,7 +29,7 @@ doohHandler.doohMoviePlayingState_post_cb = function(req, res) {
 		if ( req.headers.state == 'playing' ){
 			console.log('dooh starts playing movie');
 			storyCamControllerMgr.startRecording( req.headers.miix_movie_project_id, function(resParametes){
-				console.log('started recording. Response:');
+				console.log('story cam started recording. Response:');
 				console.dir(resParametes);
 				res.send(null);
 			});
@@ -38,9 +38,12 @@ doohHandler.doohMoviePlayingState_post_cb = function(req, res) {
 		else if ( req.headers.state == 'stopped' ){
 			console.log('dooh stopped playing movie');
 			storyCamControllerMgr.stopRecording( function(resParametes){
-				console.log('stopped recording. Response:');
+				console.log('story cam stopped recording. Response:');
 				console.dir(resParametes);
 				res.send(null);
+				if ( resParametes.err == 'null' || (!resParametes.err) ) {
+					storyContentMgr.generateStoryMV( req.headers.miix_movie_project_id );
+				}
 			});
 		}	
 	}
