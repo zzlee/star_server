@@ -7,3 +7,10 @@ yt_refresh_token.json
 routes/api_.js
 routes/api_.js
 log/winston.log
+npm-debug.log
+*.gitignore
+*.log
+log/winston.log.orig
+log/winston.log
+.gitignore
+.gitignore
