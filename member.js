@@ -1,5 +1,6 @@
 var FMDB = require('./db.js'),
-    videoDB = require('./video.js');
+    videoDB = require('./video.js'),
+    ObjectID = require('mongodb').ObjectID;
     
 var FM = {};
 var DEBUG = true,
@@ -84,6 +85,20 @@ FM.MEMBER = (function(){
             
             getProfileById: function(oid, cb){
                 FMDB.readAdocById(members, oid, cb);
+            },
+            
+            getUserNameById: function(user_id, cb){
+                var oid = ObjectID.createFromHexString(user_id);
+                member.findById(oid, "fb.userName", function(err, result){
+                    if(err){
+                        logger.err("[getUserName] error ", err);
+                        cb(err, null);
+                    }else if(result){
+                        cb(null, result.fb.userName);
+                    }else{
+                        cb(null, result);
+                    }
+                });
             },
             
             getVideosOf: function(memberID, cb){

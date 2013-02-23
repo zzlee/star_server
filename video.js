@@ -59,7 +59,6 @@ FM.VIDEO = (function(){
             },
             
             getValueByProject: function(projectId, fields, cb){
-                
                 FMDB.getValueOf(videos, {"projectId":projectId}, fields, cb);
             },
             
@@ -110,6 +109,12 @@ FM.VIDEO = (function(){
             /*  For TEST. */
             
             // Only for v1.2 - GL
+            getPlayList: function(cb){
+                var query = videos.find();
+                query.ne("doohTimes.submited_time", null).sort({"doohTimes.submited_time": 1}).exec(cb);
+            },
+            
+            
             nextDoohVideo: function(cb){
                 var query = videos.findOneAndUpdate(null, {$unset:{"doohTimes.submited_time": 1}}, {select:{projectId:1}} );
                 query.ne("doohTimes.submited_time", null).sort({"doohTimes.submited_time": 1}).limit(1).exec(cb);
@@ -118,7 +123,7 @@ FM.VIDEO = (function(){
             _test: function(){
                 var ObjectID = require('mongodb').ObjectID;
                 
-                this.getOwnerIdByPid( "greeting-50c99656064d2b8412000005-20130107T091109720Z", function(err, doc){
+                this.nextDoohVideo( function(err, doc){
                     if(err) console.log(JSON.stringify(err));
                     else console.log(JSON.stringify(doc));
                 });
