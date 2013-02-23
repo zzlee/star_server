@@ -1,23 +1,11 @@
 var miixContentMgr = {};
 
 var workingPath = process.env.STAR_SERVER_PROJECT;
-//var movieMaker = require(workingPath+'/ae_render.js');
 var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var memberDB = require(workingPath+'/member.js');
 var videoDB = require(workingPath+'/video.js');
-var fmapi = require(workingPath+'/routes/api.js')   //TODO:: find a better name
-
-miixContentMgr.deliverMiixMovieToDooh = function( movieProjectID, downLoadMovie_cb) {
-	var askDoohToDownLoadMovie = function(cb) {
-	
-	}
-	
-}
-
-miixContentMgr.submitMiixPlayListToDooh = function(cb) {
-
-}
+var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
 
 
 miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbID, movieTitle) {
@@ -41,6 +29,7 @@ miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbI
 				var vjson = {"title": movieTitle,
 							 "ownerId": {"_id": ownerStdID, "userID": ownerFbID},
 							 "url": url,
+							 "genre":"miix",
 							 "aeId": "AE_server_gance_Feltmeng_pc",
 							 "projectId":movieProjectID};
 				fmapi._fbPostVideoThenAdd(vjson); //TODO: split these tasks to different rolls
@@ -82,6 +71,10 @@ miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
 }
 
 miixContentMgr.setMiixPlayList = function(cb) {
+
+}
+
+miixContentMgr.submitMiixPlayListToDooh = function(cb) {
 
 }
 

@@ -105,7 +105,7 @@ aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, mo
 }
 
 //use long polling to ask AE Server to create Story movie
-aeServerMgr.createStoryMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
+aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
 	//TODO:: get corresponding AE Server ID
 	var starAeServerID = 'AE_server_gance_Feltmeng_pc';
 
