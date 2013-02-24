@@ -11,17 +11,19 @@ var fmapi = require(workingPath+'/routes/api.js');
 var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID, downloaded_cb){
 
 	storyCamControllerMgr.uploadStoryMovieToMainServer(movieProjectID, function(resParametes){
-		console.log('uploading story movie from Story Cam Controller to Main Server finished. err='+resParametes.err);
+		logger.info('uploading story movie from Story Cam Controller to Main Server finished. ');
+		logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
 		
 		//TODO:: check the file size. If not correct, re-upload.
 		
 		if ( (resParametes.err == 'null') || (!resParametes.err) ) {
 			aeServerMgr.downloadStoryMovieFromMainServer(movieProjectID, function(resParameter2){
-				console.log('downloading story movie from Main Server to AE Server. err='+resParameter2.err);
+				logger.info('downloading story movie from Main Server to AE Server.');
+				logger.info('res: _command_id='+resParameter2._command_id+' err='+resParameter2.err);
 				
 				//TODO:: check the file size. If not correct, re-download.
 				
-				if ( (resParametes.err == 'null') || (!resParametes.err) ) {
+				if ( (resParameter2.err == 'null') || (!resParameter2.err) ) {
 					if (downloaded_cb){
 						downloaded_cb(null)
 					}
@@ -79,13 +81,14 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
 				if (!err2){
 					aeServerMgr.createStoryMV( movieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
 					
+						logger.info('generating Story MV finished. ');
+						logger.info('res: _command_id='+responseParameters._command_id+' err='+responseParameters.err+' youtube_video_id='+responseParameters.youtube_video_id);
+						
 						if ( responseParameters.youtube_video_id ) {
 							var aeServerID = responseParameters.ae_server_id;
 							var youtubeVideoID = responseParameters.youtube_video_id;
 							
 							
-							console.log('generated Story MV. Response:');
-							console.dir(responseParameters);
 							
 							if ( responseParameters.err == 'null' || (!responseParameters.err) ) {
 							
@@ -108,12 +111,12 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
 					});
 				}
 				else{
-					console.log('fail to user ID and name');
+					logger.info('fail to get user ID and name');
 				}
 			});
 		}
 		else {
-			console.log('fail to download Story Movie from Cam Controller to AE Server');
+			logger.info('fail to download Story Movie from Cam Controller to AE Server');
 		}
 		
 		

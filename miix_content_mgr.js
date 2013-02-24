@@ -48,15 +48,15 @@ miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
 
 	//deliver Miix movie content to DOOH
 	aeServerMgr.uploadMovieToMainServer(movieProjectID, function(resParametes){
-		console.log('uploading Miix movie from AE Server to Main Server finished. Result:');
-		console.dir(resParametes);
+		logger.info('uploading Miix movie from AE Server to Main Server finished.');
+		logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
 		
 		//TODO:: check the file size. If not correct, re-upload.
 		
 		if ( (resParametes.err == 'null') || (!resParametes.err) ) {
 			doohMgr.downloadMovieFromMainServer(movieProjectID, function(resParametes){
-				console.log('downloading Miix movie from Main Server to DOOH. Response:');
-				console.dir(resParametes);
+				logger.info('downloading Miix movie from Main Server to DOOH. ');
+				logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
 				
 				//TODO:: check the file size. If not correct, re-download.
 			});						
