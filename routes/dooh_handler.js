@@ -9,6 +9,9 @@ var schedule_handler = require("../schedule.js"),
 var DEBUG = true,
     FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str)); } : function(str){} ;
 
+    
+FM.dooh_handler.lastMoviePlayed = null;
+FM.dooh_handler.lastMovieStopped = null;
 
 /* ------ Handler API ------ */    
     
@@ -81,33 +84,36 @@ FM.dooh_handler.dooh_current_video = function(req, res){
     });*/
 };
 
-var storyContentMgr = require('../story_content_mgr.js');
+
 
 FM.dooh_handler.doohMoviePlayingState_post_cb = function(req, res) {
 	if ( req.headers.miix_movie_project_id ) {
-		if ( req.headers.state == 'playing' ){
+		if ( (req.headers.state == 'playing')&&(req.headers.miix_movie_project_id != FM.dooh_handler.lastMoviePlayed) ){
 			console.log('dooh starts playing movie');
+            FM.dooh_handler.lastMoviePlayed = req.headers.miix_movie_project_id;
 			storyCamControllerMgr.startRecording( req.headers.miix_movie_project_id, function(resParametes){
-				console.log('story cam started recording. Response:');
-				console.dir(resParametes);
-				res.send(null);
+				logger.info('story cam started recording.');
+				logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+				res.send(200);
 			});
 			
 		}
-		else if ( req.headers.state == 'stopped' ){
+		else if ( (req.headers.state == 'stopped')&&(req.headers.miix_movie_project_id != FM.dooh_handler.lastMovieStopped) ){
 			console.log('dooh stopped playing movie');
+            FM.dooh_handler.lastMovieStopped = req.headers.miix_movie_project_id;
 			storyCamControllerMgr.stopRecording( function(resParametes){
-				console.log('story cam stopped recording. Response:');
-				console.dir(resParametes);
-				res.send(null);
-				if ( resParametes.err == 'null' || (!resParametes.err) ) {
-					storyContentMgr.generateStoryMV( req.headers.miix_movie_project_id );
-				}
+				logger.info('story cam stopped recording.');
+				logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+				res.send(200);
 			});
-		}	
+		}
+        //
+        setTimeout(function(){
+            res.send(500, {error: "Remote story camera does not respond in 8 sec."});;  
+        }, 8000);        
 	}
 	else {
-		res.send("No movie project id avaialable");
+		res.send(400, {error: "Bad Request!"} );
 	}
 }
 

@@ -93,7 +93,8 @@ app.post('/record_user_action', routes.recordUserAction_cb );
 
 app.get('/internal/commands', routes.command_get_cb);
 app.post('/internal/command_responses', routes.commandResponse_post_cb);
-app.post('/internal/dooh/movie_playing_state', routes.doohMoviePlayingState_post_cb);
+app.post('/internal/dooh/movie_playing_state', routes.dooh_handler.doohMoviePlayingState_post_cb);
+app.post('/internal/story_cam_controller/available_story_movie', routes.storyCamControllerHandler.availableStoryMovie_post_cb);
 
 //GL
 /**
@@ -244,9 +245,14 @@ setTimeout(function(){
 
 }, 5000);
 
+
+
+setTimeout(function(){
+	console.log('storyContentMgr.generateStoryMV()');
+	storyContentMgr.generateStoryMV('greeting-50c99d81064d2b841200000a-20130223T113921895Z'); 
+
+}, 20000);
 */
-
-
 
 //test of Jeff
 app.get('/test', function(req, res) {

@@ -21,10 +21,12 @@ exports.command_get_cb = connectionHandler.command_get_cb;
 var analyticsHandler = require('./analytics_handler.js');
 exports.recordUserAction_cb = analyticsHandler.recordUserAction_cb;
 
+var storyCamControllerHandler = require('./story_cam_controller_handler.js');
+exports.storyCamControllerHandler = storyCamControllerHandler;
+
 //JF
 var dooh_handler = require('./dooh_handler.js');
 exports.dooh_handler = dooh_handler;
-exports.doohMoviePlayingState_post_cb = dooh_handler.doohMoviePlayingState_post_cb; //GZ
 
 //GL
 var memberDB = require("../member.js"),
