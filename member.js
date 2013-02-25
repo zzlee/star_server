@@ -49,7 +49,7 @@ FM.MEMBER = (function(){
             
             isFBValid: function(userID, cb){
                 
-                var field = { "_id":1, "fb": 1, "deviceToken":1 };
+                var field = { "_id":1, "fb": 1, "deviceToken":1, "mPhone":1 };
                 FMDB.getValueOf(members, {"fb.userID":userID}, field, cb);
             },
             
@@ -87,7 +87,7 @@ FM.MEMBER = (function(){
                 FMDB.readAdocById(members, oid, cb);
             },
             
-            getUserName: function(user_id, cb){
+            getUserNameAndID: function(user_id, cb){
                 //var oid = ObjectID.createFromHexString(user_id);
 				var oid = null;
 				if('string' === typeof(user_id))
@@ -95,12 +95,10 @@ FM.MEMBER = (function(){
 				else
 					oid = user_id;
 					
-                members.findById(oid, "fb.userName", function(err, result){
+                members.findById(oid, "fb.userName fb.userID", function(err, result){
 					if(err){
 						logger.error("[members.findById]", err);
 						cb(err, null);
-					}else if(result){
-						cb(err, result.fb.userName);
 					}else{
 						cb(err, result);
 					}

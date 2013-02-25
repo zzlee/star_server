@@ -48,16 +48,18 @@ var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID
 storyContentMgr.generateStoryMV = function(movieProjectID) {
 	var ownerStdID;
 	var ownerFbID;
+    var ownerFbName;
 	var movieTitle;
 	
 	var getUserIdAndName = function( finish_cb ){
 		videoDB.getOwnerIdByPid( movieProjectID, function( err, _ownerStdID) {
 			if (!err) {
 				ownerStdID = _ownerStdID;
-				memberDB.getUserName( ownerStdID, function(err2, result){
+				memberDB.getUserNameAndID( ownerStdID, function(err2, result){
 					if (!err2) {
-						ownerFbID = result;
-                        movieTitle = ownerFbID+"'s Miix story movie";
+						ownerFbID = result.fb.userID;
+                        ownerFbName = result.fb.userName;
+                        movieTitle = ownerFbName+"'s Miix story movie";
 						if (finish_cb){
 							finish_cb(null);
 						}					
@@ -86,7 +88,8 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
 						
 						if ( responseParameters.youtube_video_id ) {
 							var aeServerID = responseParameters.ae_server_id;
-							var youtubeVideoID = responseParameters.youtube_video_id;
+							//var youtubeVideoID = responseParameters.youtube_video_id;
+							var youtubeVideoID = "VNrn-jhmLBE"; //GZ temporarily hard code for test
 							
 							
 							

@@ -73,7 +73,7 @@ FM.VIDEO = (function(){
 			getNewVideoListByFB : function(userID, genre, after, cb){
                 // Only catch videos which are posted on FB.
                 var query = videos.find();
-				query.where("ownerId.userID", userID).where("genre", genre).ne("fb_id", null).where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(cb);
+				query.where("ownerId.userID", userID).where("genre", genre).where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(cb);
             },
             
             getNewStreetVideoListByFB : function(userID, after, cb){
@@ -120,10 +120,20 @@ FM.VIDEO = (function(){
                 query.ne("doohTimes.submited_time", null).sort({"doohTimes.submited_time": 1}).limit(1).exec(cb);
             },
             
+            _updateCounter: function(cb){
+                var query = videos.find({});
+                query.sort({createdOn:1}).exec(function(err, result){
+                    if(err) return;
+                    for(var i in result){
+                        videos.findByIdAndUpdate(result[i]._id, {no:parseInt(i)+1}, {select:{no:1}}, cb);
+                    }
+                });
+            },
+            
             _test: function(){
                 var ObjectID = require('mongodb').ObjectID;
                 
-                this.nextDoohVideo( function(err, doc){
+                this._updateCounter( function(err, doc){
                     if(err) console.log(JSON.stringify(err));
                     else console.log(JSON.stringify(doc));
                 });

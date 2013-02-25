@@ -65,13 +65,13 @@ FM.api._GCM_PushNotification = function( device_token ){
 FM.api._pushNotification = function( device_token ){
 	var apns = require('apn');
 	var options = {
-			cert: './apns-prod/apns-prod-cert.pem',  			/* Certificate file path */
+			cert: './apns/apns-dev-cert.pem',  			/* Certificate file path */ /*./apns-prod/apns-prod-cert.pem*/ /*./apns/apns-dev-cert.pem*/
 			certData: null,                   			/* String or Buffer containing certificate data, if supplied uses this instead of cert file path */
-			key:  './apns-prod/apns-prod-key-noenc.pem',		/* Key file path */
+			key:  './apns/apns-dev-key-noenc.pem',/* Key file path */ /*./apns-prod/apns-prod-key-noenc.pem*/ /*./apns/apns-dev-key-noenc.pem*/
 			keyData: null,                    			/* String or Buffer containing key data, as certData */
 			passphrase: null,                 			/* A passphrase for the Key file */
 			ca: null,                         			/* String or Buffer of CA data to use for the TLS connection */
-			gateway: 'gateway.push.apple.com',	/* gateway address 'Sand-box' - gateway.sandbox.push.apple.com */
+			gateway: 'gateway.sandbox.push.apple.com',	/* gateway address 'Sand-box' - gateway.sandbox.push.apple.com */ /* Product- gateway.push.apple.com */
 			port: 2195,                   				/* gateway port */
 			enhanced: true,               				/* enable enhanced format */
 			errorCallback: FM.api._pushErrorCallback,	/* Callback when error occurs function(err,notification) */
@@ -532,6 +532,8 @@ FM.api.signupwithFB = function(req, res){
                 
                 var oid = result._id;
 				var deviceToken;
+                var mPhone_verified = result.mPhone.verified;
+                
 				if(dvc_Token){
 					if(result.deviceToken){
 						deviceToken = result.deviceToken;
@@ -560,7 +562,7 @@ FM.api.signupwithFB = function(req, res){
                                 if(result) logger.info(result);
                             });
                             
-                            res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "expiresIn": data.expiresIn  }, "message":"success"} );
+                            res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "expiresIn": data.expiresIn, "verified": mPhone_verified  }, "message":"success"} );
                         }
                     });
                     
@@ -572,7 +574,7 @@ FM.api.signupwithFB = function(req, res){
                         });
 					}
                     //res.send({"message":"success"});
-					res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn}, 
+					res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn, "verified": mPhone_verified}, 
 								"message":"success"} );
                 }
                 
@@ -908,7 +910,7 @@ FM.api.newVideoList = function(req, res){
         var userID = req.query.userID;
         var genre = req.query.genre;
 		var after = new Date(parseInt(req.query.after));
-		//FM_LOG(">>>>>>>>>>>>>>>[AFTER]: " + after.toISOString());
+		FM_LOG(genre +" [AFTER]: " + after.toISOString());
         
         videoDB.getNewVideoListByFB(userID, genre, after, function(err, result){
         
@@ -918,7 +920,7 @@ FM.api.newVideoList = function(req, res){
                 return;
             }
             
-            FM_LOG("[getNewVideoListByFB] " + JSON.stringify(result));
+            FM_LOG("[getNewVideoListByFB] "+ genre + ": " + JSON.stringify(result));
             
             var data;
             if(result){

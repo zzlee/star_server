@@ -71,10 +71,13 @@ aeServerMgr.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, 
 
 }
 
+var defaultAeServer = 'feltmeng_art_PC';
+//var defaultAeServer = 'AE_server_gance_Feltmeng_pc';
+
 //use long polling to ask AE Server to create Miix movie
 aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
 	//TODO:: get corresponding AE Server ID
-	var starAeServerID = 'AE_server_gance_Feltmeng_pc';
+	var starAeServerID = defaultAeServer;
 
 	youtubeTokenMgr.getAccessToken( function(ytAccessToken){
 		if (ytAccessToken) {
@@ -107,7 +110,7 @@ aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, mo
 //use long polling to ask AE Server to create Story movie
 aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
 	//TODO:: get corresponding AE Server ID
-	var starAeServerID = 'AE_server_gance_Feltmeng_pc';
+	var starAeServerID = defaultAeServer;
 
 	youtubeTokenMgr.getAccessToken( function(ytAccessToken){
 		if (ytAccessToken) {
@@ -141,7 +144,7 @@ aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movi
 aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
 	//TODO:: get corresponding AE Server ID
-	var starAeServerID = 'AE_server_gance_Feltmeng_pc';
+	var starAeServerID = defaultAeServer;
 
 	var commandParameters = {
 		movieProjectID: movieProjectID
@@ -160,7 +163,7 @@ aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, downloadMovie_cb) {
 
 	//TODO:: get corresponding AE Server ID
-	var starAeServerID = 'AE_server_gance_Feltmeng_pc';
+	var starAeServerID = defaultAeServer;
 
 	var commandParameters = {
 		movieProjectID: movieProjectID
