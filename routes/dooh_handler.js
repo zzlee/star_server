@@ -87,29 +87,34 @@ FM.dooh_handler.dooh_current_video = function(req, res){
 
 
 FM.dooh_handler.doohMoviePlayingState_post_cb = function(req, res) {
+    var resIsSent = false;
 	if ( req.headers.miix_movie_project_id ) {
 		if ( (req.headers.state == 'playing')&&(req.headers.miix_movie_project_id != FM.dooh_handler.lastMoviePlayed) ){
-			console.log('dooh starts playing movie');
+			logger.info('dooh starts playing movie');
             FM.dooh_handler.lastMoviePlayed = req.headers.miix_movie_project_id;
 			storyCamControllerMgr.startRecording( req.headers.miix_movie_project_id, function(resParametes){
 				logger.info('story cam started recording.');
 				logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
 				res.send(200);
+                resIsSent = true;
 			});
 			
 		}
 		else if ( (req.headers.state == 'stopped')&&(req.headers.miix_movie_project_id != FM.dooh_handler.lastMovieStopped) ){
-			console.log('dooh stopped playing movie');
+			logger.info('dooh stopped playing movie');
             FM.dooh_handler.lastMovieStopped = req.headers.miix_movie_project_id;
 			storyCamControllerMgr.stopRecording( function(resParametes){
 				logger.info('story cam stopped recording.');
 				logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
 				res.send(200);
+                resIsSent = true;
 			});
 		}
         //
         setTimeout(function(){
-            res.send(500, {error: "Remote story camera does not respond in 8 sec."});;  
+            if (!resIsSent ){
+                res.send(500, {error: "Remote story camera does not respond in 8 sec."});
+            }
         }, 8000);        
 	}
 	else {

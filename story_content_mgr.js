@@ -92,8 +92,6 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
 							
 							if ( responseParameters.err == 'null' || (!responseParameters.err) ) {
 							
-								//TODO: call the same api of Gabriel?
-								//post to FB; update video DB; push notification to mobile client 
 								
 								var url = {"youtube":"http://www.youtube.com/embed/"+youtubeVideoID};			
 								var vjson = {"title": movieTitle,
@@ -101,9 +99,9 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
 											 "url": url,
 											 "genre":"miix_story",
 											 "projectId":movieProjectID};
-								fmapi._fbPostVideoThenAdd(vjson); //TODO: split these tasks to different rolls
-								
-								
+								fmapi._fbPostVideoThenAdd(vjson); 
+                                logger.info('fmapi._fbPostVideoThenAdd(vjson) called. vjson=');
+                                logger.info(JSON.stringify(vjson));
 							};
 							
 						};

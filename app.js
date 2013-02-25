@@ -254,6 +254,64 @@ setTimeout(function(){
 }, 20000);
 */
 
+/*
+//test for fmapi._fbPostVideoThenAdd()
+var fmapi = require('./routes/api.js'); 
+var memberDB = require('./member.js');
+var videoDB = require('./video.js');
+
+setTimeout(function(){
+
+    var movieProjectID = 'greeting-50c99d81064d2b841200000a-20130224T152058176Z';
+
+	var ownerStdID;
+	var ownerFbID;
+	var movieTitle;
+	
+	var getUserIdAndName = function( finish_cb ){
+		videoDB.getOwnerIdByPid( movieProjectID, function( err, _ownerStdID) {
+			if (!err) {
+				ownerStdID = _ownerStdID;
+				memberDB.getUserName( ownerStdID, function(err2, result){
+					if (!err2) {
+						ownerFbID = result;
+                        movieTitle = ownerFbID+"'s Miix story movie";
+						if (finish_cb){
+							finish_cb(null);
+						}					
+					}
+				});
+			}
+			else{
+				if (finish_cb){
+					finish_cb(err);
+				}
+			}
+		});
+	
+	}
+
+
+    var youtubeVideoID = 'WZ7Tp-ieReY';
+    var url = {"youtube":"http://www.youtube.com/embed/"+youtubeVideoID};			
+    var vjson = {"title": movieTitle,
+                 "ownerId": {"_id": ownerStdID, "userID": ownerFbID},
+                 "url": url,
+                 "genre":"miix_story",
+                 "projectId":movieProjectID};
+    getUserIdAndName(function(err2){
+        if (!err2){
+            fmapi._fbPostVideoThenAdd(vjson); //TODO: split these tasks to different rolls
+            console.log('fmapi._fbPostVideoThenAdd(vjson) called. vjson=');
+            console.dir(vjson);
+            console.log(JSON.stringify(vjson));
+        }
+    });
+	 
+
+}, 3000);
+*/
+
 //test of Jeff
 app.get('/test', function(req, res) {
 	//get message.
