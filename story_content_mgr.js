@@ -88,8 +88,8 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
 						
 						if ( responseParameters.youtube_video_id ) {
 							var aeServerID = responseParameters.ae_server_id;
-							//var youtubeVideoID = responseParameters.youtube_video_id;
-							var youtubeVideoID = "VNrn-jhmLBE"; //GZ temporarily hard code for test
+							var youtubeVideoID = responseParameters.youtube_video_id;
+							//var youtubeVideoID = "VNrn-jhmLBE"; //GZ temporarily hard code for test
 							
 							
 							
