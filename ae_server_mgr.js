@@ -71,7 +71,7 @@ aeServerMgr.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, 
 
 }
 
-var defaultAeServer = 'feltmeng_art_PC';
+var defaultAeServer = 'AE_Server_feltmeng_art_PC';
 //var defaultAeServer = 'AE_server_gance_Feltmeng_pc';
 
 //use long polling to ask AE Server to create Miix movie
