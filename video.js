@@ -70,6 +70,16 @@ FM.VIDEO = (function(){
                 videos.find({"ownerId.userID":userID}, cb );
             },
             
+            getVideoListOnFB: function(userID, genre, cb){
+                var query = videos.find(null, 'fb_id url.youtube');
+                if('function' === typeof (genre)){
+                    cb = genre;
+                    query.where("ownerId.userID", userID).ne("fb_id", null).sort({createdOn: -1}).exec(cb);
+                }else{
+                    query.where("ownerId.userID", userID).where("genre", genre).ne("fb_id", null).sort({createdOn: -1}).exec(cb);
+                }
+            },
+            
 			getNewVideoListByFB : function(userID, genre, after, cb){
                 // Only catch videos which are posted on FB.
                 var query = videos.find();
@@ -131,11 +141,12 @@ FM.VIDEO = (function(){
             },
             
             _test: function(){
-                var ObjectID = require('mongodb').ObjectID;
-                
-                this._updateCounter( function(err, doc){
-                    if(err) console.log(JSON.stringify(err));
-                    else console.log(JSON.stringify(doc));
+                this.getVideoListOnFB( '100004712734912', function(err, result){
+                    if(err){
+                        console.log("err: " + JSON.stringify(err));
+                    }else{
+                        console.log("result: " + JSON.stringify(result));
+                    }
                 });
             }
         };

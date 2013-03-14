@@ -119,7 +119,149 @@ FM.MEMBER = (function(){
                         vUrls.push(vdoc.url.youtube);
                     });
                 });*/
-            }
+            },
+            
+            getTotalCommentsLikesSharesOnFB: function(userID, cb){
+                var that = this;
+                var likes_count = 0,
+                    comments_count = 0,
+                    shares_count = 0;
+                    
+                videoDB.getVideoListOnFB(userID, function(err, videos){
+                    if(err){
+                         cb(err, null);
+                         logger.error("[videoDB.getVideoListOnFB] ", err);
+                         
+                    }else if(videos && videos.length > 0){
+                        var async = require("async");
+                        
+                        that.getFBAccessTokenByFBId(userID, function(err, fb_auth){
+                            if(err){
+                                logger.error("[getTotalLikesOnFB] ", err);
+                                cb(err, null);
+                                
+                            }else if(fb_auth){
+                                var access_token = fb_auth.fb.auth.accessToken;
+                                
+                                var async = require("async");
+                                
+                                
+                                async.parallel([
+                                    function(callback){
+                                        var batch = [];
+                                        
+                                        for(var idx in videos){
+                                            var relative_url = videos[idx].fb_id + "?fields=comments,likes";
+                                            batch.push( {"method": "GET", "relative_url": relative_url} );
+                                        }
+                                        
+                                        that.batchRequestToFB(access_token, null, batch, function(err, result){
+                                            if(err){
+                                                logger.error("[batchRequestToFB] " + err);
+                                                callback(err, null);
+                                                
+                                            }else{
+                                                for(var i in result){
+                                                    //console.log(result[i]);
+                                                    comments_count += result[i].comments.count;
+                                                    
+                                                    // when count=0, there is no likes object.
+                                                    likes_count += (result[i].likes) ? result[i].likes.count : 0;
+                                                }
+                                            }
+                                            
+                                            callback(null, {totalLikes: likes_count, totalComments: comments_count} );
+                                        });
+                                    },
+                                    function(callback){
+                                        var batch = [];
+                                        
+                                        for(var idx in videos){
+                                            var relative_url = videos[idx].url.youtube;
+                                            batch.push( {"method": "GET", "relative_url": relative_url} );
+                                        }
+                                        
+                                        that.batchRequestToFB(access_token, null, batch, function(err, result){
+                                            if(err){
+                                                logger.error("[batchRequestToFB] " + err);
+                                                callback(err, null);
+                                            }else{
+                                                for(var i in result){
+                                                    shares_count += (result[i].shares) ? result[i].shares: 0;
+                                                }
+                                            }
+                                            
+                                            callback(null, {totalShares: shares_count} );
+                                        });
+                                    }
+                                ]
+                                , function(err, result){
+                                    if(err){
+                                        cb(err, null);
+                                    }else{
+                                        cb(null, result);
+                                    }
+                                });
+                            }
+                        });
+                        
+                        
+                    }else{
+                        cb(null, {count: 0});
+                    }
+                });
+            },
+            
+            
+            batchRequestToFB: function( token, path, data, cb){
+                var request = require("request");
+                var qs;
+                
+                if(token)
+                    qs = {'access_token':token, 'batch':JSON.stringify(data) };
+                else
+                    qs = {'batch':JSON.stringify(data) };
+                    
+                request({
+                    method: 'POST',
+                    uri: 'https://graph.facebook.com' + ((path)? path: ''),
+                    qs: qs,
+                    json: true,
+                    //body: {'batch': JSON.stringify(data),},
+                    
+                }, function(error, response, body){
+                    
+                    if(error){
+                        console.logger("[postOnFB] ", error);
+                        cb(error, null);
+                        
+                    }else{
+                        var result = [];
+                        //console.log("BODY: " + JSON.stringify(body));
+                        for(var i in body){
+                            if(body[i]){
+                                if(typeof(body[i].body) === 'string')
+                                    result.push(JSON.parse(body[i].body));
+                                else
+                                    result.push(body[i].body);
+                            }
+                        }
+                        
+                        cb(null, result);
+                    }
+                });
+            },
+            
+            
+            
+            _test: function(){
+                this.getTotalCommentsLikesSharesOnFB( '100004712734912', function(err, result){
+                    if(err)
+                        console.log("Err: " + JSON.stringify(err));
+                    else
+                        console.log("Result: " + JSON.stringify(result));
+                });
+            },
         };
     } //    End of Constructor.
     
@@ -132,5 +274,8 @@ FM.MEMBER = (function(){
         }
     }; //   End of Return uInstance.
 })(); // End of FM.MEMBER
+
+/*  For TEST. */
+//FM.MEMBER.getInstance()._test();
 
 module.exports = FM.MEMBER.getInstance();
