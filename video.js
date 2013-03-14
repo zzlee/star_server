@@ -116,6 +116,88 @@ FM.VIDEO = (function(){
                 }
             },
             
+            getCommentsLikesSharesOnFB: function( v_id, owner_id, fb_id, youtube_url, cb){
+                var access_token;
+                var async = require("async");
+                var likes_count = 0,
+                    comments_count = 0,
+                    shares_count = 0;
+                
+                memberDB.getFBAccessTokenById(owner_id, function(err, fb_auth){
+                    if(err){
+                        logger.error("[memberDB.getFBAccessTokenById] ", err);
+                        cb(err, null);
+                        
+                    }else{
+                        access_token = fb_auth.fb.auth.accessToken;
+                        
+                        async.parallel([
+                            function(callback){
+                                var request = require("request");
+                                var qs = {'access_token': access_token, 'fields':'comments,likes'};
+                    
+                                request({
+                                    method: 'GET',
+                                    uri: 'https://graph.facebook.com/' + fb_id,
+                                    qs: qs,
+                                    json: true,
+                                    //body: {'batch': JSON.stringify(data),},
+                                    
+                                }, function(error, response, body){
+                                    
+                                    if(error){
+                                        logger.error("[ReqCommentsLikesToFB] ", error);
+                                        callback(error, null);
+                                        
+                                    }else{
+                                        //console.log("comments " + body);
+                                        comments_count = body.comments.count;
+                                        likes_count = (body.likes) ? body.likes.count : 0;
+                                        
+                                        callback(null, {comments: comments_count, likes: likes_count} );
+                                    }
+                                });
+                            }
+                            , function(callback){
+                                var request = require("request");
+                                //var qs = {'access_token':token, 'fields':'comments,likes'};
+                    
+                                request({
+                                    method: 'GET',
+                                    uri: 'https://graph.facebook.com/' + youtube_url,
+                                    //qs: qs,
+                                    json: true,
+                                    //body: {'batch': JSON.stringify(data),},
+                                    
+                                }, function(error, response, body){
+                                    
+                                    if(error){
+                                        logger.error("[ReqCommentsLikesToFB] ", error);
+                                        callback(error, null);
+                                        
+                                    }else{
+                                        //console.log("shares" + body);
+                                        shares_count = (body.shares) ? body.shares : 0;
+                                        
+                                        callback(null, {shares: shares_count} );
+                                    }
+                                });
+                            }
+                        ]
+                        
+                        , function(err, result){
+                            if(err){
+                                logger.err("[getCommentsLikesSharesOnFB] ", err);
+                                cb(err, null);
+                                
+                            }else{
+                                cb(null, result);
+                            }
+                        });
+                    }
+                });
+            },
+            
             /*  For TEST. */
             
             // Only for v1.2 - GL
@@ -141,7 +223,13 @@ FM.VIDEO = (function(){
             },
             
             _test: function(){
-                this.getVideoListOnFB( '100004712734912', function(err, result){
+                var ObjectID = require('mongodb').ObjectID;
+                var v_id = ObjectID.createFromHexString("51302b836b8e0e580f000004");
+                var owner_id =  ObjectID.createFromHexString("512d849345483ac80d000003");
+                var fb_id = "100004712734912_604889539525089";
+                var youtube_url = "http://www.youtube.com/embed/CJuffmPIMJ0";
+                
+                this.getCommentsLikesSharesOnFB( v_id, owner_id, fb_id, youtube_url, function(err, result){
                     if(err){
                         console.log("err: " + JSON.stringify(err));
                     }else{

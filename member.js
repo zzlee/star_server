@@ -217,10 +217,12 @@ FM.MEMBER = (function(){
                 var request = require("request");
                 var qs;
                 
-                if(token)
-                    qs = {'access_token':token, 'batch':JSON.stringify(data) };
-                else
-                    qs = {'batch':JSON.stringify(data) };
+                if(!token){
+                    cb( {error: "access_token is necessary."}, null);
+                    return;
+                }
+                    
+                qs = {'access_token':token, 'batch':JSON.stringify(data) };
                     
                 request({
                     method: 'POST',
