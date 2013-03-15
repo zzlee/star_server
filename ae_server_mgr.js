@@ -6,7 +6,7 @@ var http = require('http');
 var url = require('url');
 var fs = require('fs');
 var connectionHandler = require('./routes/connection_handler.js');
-var youtubeTokenMgr = require( './youtube_token_mgr.js' );
+var youtubeTokenMgr = require( './youtube_mgr.js' );
 
 //*****This function is deprecated.*****
 //use direct HTTP to ask AE Server to create Miix movie
