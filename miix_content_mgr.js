@@ -1,4 +1,4 @@
-var miixContentMgr = {};
+var FM = { miixContentMgr: {} };
 
 var workingPath = process.env.STAR_SERVER_PROJECT;
 var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
@@ -7,8 +7,11 @@ var memberDB = require(workingPath+'/member.js');
 var videoDB = require(workingPath+'/video.js');
 var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
 
+var fs = require('fs');
+var path = require('path');
+var xml2js = require('xml2js');
 
-miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbID, movieTitle) {
+FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbID, movieTitle) {
 	
 	//console.log('generateMiixMoive is called.');
 	
@@ -44,7 +47,7 @@ miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbI
 	
 };
 
-miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
+FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
 
 	//deliver Miix movie content to DOOH
 	aeServerMgr.uploadMovieToMainServer(movieProjectID, function(resParametes){
@@ -70,14 +73,62 @@ miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
 				
 };
 
-miixContentMgr.setMiixPlayList = function(cb) {
+FM.miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUrls_cb) {
+	var userUploadedImageUrls = new Array();
+	var anUserUploadedImageUrl;
+	var userContentXmlFile = path.join( workingPath, 'public/contents/user_project', miixMovieProjectID, 'user_data/customized_content.xml')
+	var parser = new xml2js.Parser({explicitArray: false});
+	fs.readFile( userContentXmlFile, function(err, data) {
+		if (!err){
+			parser.parseString(data, function (err2, result) {
+				if (!err2){
+					var customizable_objects = result.customized_content.customizable_object_list.customizable_object;
+					
+					if( Object.prototype.toString.call( customizable_objects ) === '[object Array]' ){
+						for (var i=0;i<customizable_objects.length;i++) {
+							anUserUploadedImageUrl = '/contents/user_project/'+miixMovieProjectID+'/user_data/'+customizable_objects[i].content;
+							userUploadedImageUrls.push( anUserUploadedImageUrl );
+						}
+					}
+					else{
+						anUserUploadedImageUrl = '/contents/user_project/'+miixMovieProjectID+'/user_data/'+customizable_objects.content;
+						userUploadedImageUrls.push( anUserUploadedImageUrl );
+					}
+					if (gotUrls_cb) {
+						gotUrls_cb(userUploadedImageUrls, null);
+					}
+				}
+				else{
+					if (gotUrls_cb) {
+						gotUrls_cb(null, err2);
+					}
+				}
+			});
+		}
+		else {
+			if (gotUrls_cb) {
+				gotUrls_cb(null, err);
+			}		
+		}
+	});
+}
+
+FM.miixContentMgr.setMiixPlayList = function(cb) {
 
 };
 
-miixContentMgr.submitMiixPlayListToDooh = function(cb) {
+FM.miixContentMgr.submitMiixPlayListToDooh = function(cb) {
 
 };
 
 
 
-module.exports = miixContentMgr;
+module.exports = FM.miixContentMgr;
+
+/*
+//test
+FM.miixContentMgr.getUserUploadedImageUrls('greeting-50c99d81064d2b841200000a-20130129T072747490Z', function(userUploadedImageUrls, err){
+	console.log('userUploadedImageUrls=');
+	console.dir(userUploadedImageUrls);
+});
+*/
