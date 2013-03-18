@@ -29,7 +29,7 @@ var dooh_handler = require('./dooh_handler.js');
 exports.dooh_handler = dooh_handler;
 
 //GL
-var memberDB = require("../member.js"),
+var member_handler = require("../member.js"),
     scheduleDB = require("../schedule.js"),
     videoDB = require("../video.js"),
     api = require("./api.js"),
@@ -40,6 +40,7 @@ var memberDB = require("../member.js"),
     
 exports.api = api;
 exports.admin = admin_handler;
+exports.member = member_handler;
 
 exports.signinFB = function(req, res){
 	logger.log("\n[FM] [signin_fb] ");
@@ -54,7 +55,7 @@ exports.signin = function(req, res, next) {
         var member = req.body.member,
             oid = null;
 
-        memberDB.isValid(member.memberID, function(err, result){
+        member_handler.isValid(member.memberID, function(err, result){
             if(err) logger.log(memberID+" is invalid " + err);
             if(result && member.password === result["password"]){
                 oid = result["_id"];
@@ -87,7 +88,7 @@ exports.signup = function(req, res, next){
         var member = req.body.member,
             oid = null;
         logger.log(JSON.stringify(member));
-        memberDB.addMember(member, function(err, result){
+        member_handler.addMember(member, function(err, result){
             logger.log("with userId " + result["_id"]);
             if(result){
                 oid = result["_id"];

@@ -1,5 +1,6 @@
 var FMDB = require('./db.js'),
     videoDB = require('./video.js'),
+    fb_handler = require('./fb_handler.js'),
     ObjectID = require('mongodb').ObjectID;
     
 var FM = {};
@@ -60,7 +61,7 @@ FM.MEMBER = (function(){
 			
             getFBAccessTokenByFBId: function(userID, cb){
             
-                var field = {"fb.auth": 1};
+                var field = {"fb.auth": 1, "fb.userName":1 };
                 FMDB.getValueOf(members, {"fb.userID":userID}, field, cb);
             },
             
@@ -155,9 +156,8 @@ FM.MEMBER = (function(){
                                             batch.push( {"method": "GET", "relative_url": relative_url} );
                                         }
                                         
-                                        that.batchRequestToFB(access_token, null, batch, function(err, result){
+                                        fb_handler.batchRequestToFB(access_token, null, batch, function(err, result){
                                             if(err){
-                                                logger.error("[batchRequestToFB] " + err);
                                                 callback(err, null);
                                                 
                                             }else{
@@ -181,9 +181,8 @@ FM.MEMBER = (function(){
                                             batch.push( {"method": "GET", "relative_url": relative_url} );
                                         }
                                         
-                                        that.batchRequestToFB(access_token, null, batch, function(err, result){
+                                        fb_handler.batchRequestToFB(access_token, null, batch, function(err, result){
                                             if(err){
-                                                logger.error("[batchRequestToFB] " + err);
                                                 callback(err, null);
                                             }else{
                                                 for(var i in result){
@@ -213,49 +212,37 @@ FM.MEMBER = (function(){
             },
             
             
-            batchRequestToFB: function( token, path, data, cb){
-                var request = require("request");
-                var qs;
-                
-                if(!token){
-                    cb( {error: "access_token is necessary."}, null);
+            isFBTokenValid: function( req, res){
+                if(!req.fb_id){
+                    res.send({error: "Bad Request"});
                     return;
                 }
-                    
-                qs = {'access_token':token, 'batch':JSON.stringify(data) };
-                    
-                request({
-                    method: 'POST',
-                    uri: 'https://graph.facebook.com' + ((path)? path: ''),
-                    qs: qs,
-                    json: true,
-                    //body: {'batch': JSON.stringify(data),},
-                    
-                }, function(error, response, body){
-                    
-                    if(error){
-                        console.logger("[postOnFB] ", error);
-                        cb(error, null);
+                
+                var fb_id = req.fb_id;
+                var user_token = null;
+                
+                this.getFBAccessTokenByFBId( fb_id, function(err, result){
+                    if(err){
+                        res.send({error: "Internal Server Error"});
                         
                     }else{
-                        var result = [];
-                        //console.log("BODY: " + JSON.stringify(body));
-                        for(var i in body){
-                            if(body[i]){
-                                if(typeof(body[i].body) === 'string')
-                                    result.push(JSON.parse(body[i].body));
-                                else
-                                    result.push(body[i].body);
+                        user_token = result.fb.auth.accessToken;
+                        fb_handler.isTokenValid(user_token, function(err, result){
+                            if(err){
+                                res.send({error: "Internal Server Error"});
+                                
+                            }else{
+                                res.send({message: result});
                             }
-                        }
-                        
-                        cb(null, result);
+                        });
                     }
                 });
             },
             
             
             
+            
+            /*    TEST    */
             _test: function(){
                 this.getTotalCommentsLikesSharesOnFB( '100004712734912', function(err, result){
                     if(err)

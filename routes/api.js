@@ -6,7 +6,8 @@
 
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
-    videoDB = require("../video.js");
+    videoDB = require("../video.js"),
+    fb_handler = require("../fb_handler.js");
     
 
 
@@ -29,7 +30,7 @@ FM.api._pushErrorCallback = function(err, notification){
 };
 
 /**
- * Google Cloud Messaging, a.k.a, GCM.
+ * Google Cloud Messaging, a.k.a., GCM.
  * GCM sender_ID: 701982981612
  * API Key: AIzaSyDn_H-0W251CKUjDCl-EkBLV0GunnWwpZ4
  */
@@ -151,7 +152,7 @@ FM.api._fbExtendToken = function(accessToken, callback){
                     
                 }else{
                     FM_LOG("\nGot longer lived token: ");
-                    logger.info(result);
+                    FM_LOG(result);
                     
                     var longerToken = result.substring( result.indexOf("=")+1, result.indexOf("&expires") );
                     var longerExpiresIn = parseInt(result.substring( result.lastIndexOf("=")+1 ), 10);
@@ -533,6 +534,8 @@ FM.api.signupwithFB = function(req, res){
                 var oid = result._id;
 				var deviceToken;
                 var mPhone_verified = result.mPhone.verified;
+                var fb = result.fb;
+                var existed_access_token = fb.auth.accessToken;
                 
 				if(dvc_Token){
 					if(result.deviceToken){
@@ -544,6 +547,13 @@ FM.api.signupwithFB = function(req, res){
 					member.deviceToken = deviceToken;
 					
 				}
+                
+                fb_handler.isTokenValid(userID, function(err, result){
+                    
+                    if(!result){
+                        
+                    }
+                });
 				
                 // if expire within 20days.
                 if( parseInt(expiresIn) - Date.now() < 20*24*60*60*1000 ){
