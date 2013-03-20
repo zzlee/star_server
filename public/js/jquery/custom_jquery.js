@@ -44,11 +44,12 @@ $(document).ready(function(){
 
 
 $(document).ready(function(){
+
     $('#memberListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#memberList').attr("class", "current");
         
-        FM.memberList(0, 20, function(res){
+        FM.memberList(1, 18, function(res){
             if(res.message){
                 console.log("[Response of memberList] message:" + res.message);
             }else{
@@ -84,22 +85,23 @@ $(document).ready(function(){
         });
     });
     
+    $('#memberListBtn').click();
 });
 
 
-FM.memberList = function(page, row, cb){
-    var url = DOMAIN + "memberList";
-    $.get(url, {page: page, row: row}, cb);
+FM.memberList = function(pageToGo, rowsPerPage, cb){
+    var url = DOMAIN + "member_list";
+    $.get(url, {skip: (pageToGo-1)*rowsPerPage, limit: rowsPerPage}, cb);
 };
 
-FM.miixPlayList = function(page, row, cb){
-    var url = DOMAIN + "playList";
-    $.get(url, {page: page, row: row}, cb);
+FM.miixPlayList = function(pageToGo, rowsPerPage, cb){
+    var url = DOMAIN + "miix_play_list";
+    $.get(url, {skip: (pageToGo-1)*rowsPerPage, limit: rowsPerPage}, cb);
 };
 
-FM.storyPlayList = function(page, row, cb){
-    var url = DOMAIN + "playList";
-    $.get(url, {page: page, row: row}, cb);
+FM.storyPlayList = function(pageToGo, rowsPerPage, cb){
+    var url = DOMAIN + "story_play_list";
+    $.get(url, {skip: (pageToGo-1)*rowsPerPage, limit: rowsPerPage}, cb);
 };
 
 
