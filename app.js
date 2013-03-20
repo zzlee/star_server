@@ -101,10 +101,12 @@ app.post('/internal/story_cam_controller/available_story_movie', routes.storyCam
  *  WEB ADMINISTRATION
  */
 
-app.get('/admin', routes.admin.handler); 
-app.get('/admin/login', routes.admin.login);
-app.get('/admin/memberList', routes.admin.memberList);
-app.get('/admin/playList', routes.admin.playList);
+app.get('/admin', routes.admin.get_cb); 
+app.get('/admin/login', routes.admin.login_get_cb);
+app.get('/admin/logout', routes.admin.logout_get_cb);
+app.get('/admin/member_list', routes.admin.memberList_get_cb);
+app.get('/admin/miix_play_list', routes.admin.miixPlayList_get_cb);
+app.get('/admin/story_play_list', routes.admin.storyPlayList_get_cb);
 
 /*
 app.get('/', routes.profile, routes.index);

@@ -1,8 +1,13 @@
+var fs = require('fs');
+var path = require('path');
+var workingPath = process.env.STAR_SERVER_PROJECT;
+
 var admin_mgr = require("../admin.js"),
     member_mgr = require("../member.js"),
     schedule_mgr = require("../schedule.js"),
     video_mgr = require("../video.js");
 
+    
 var ObjectID = require('mongodb').ObjectID;
 
 var DEBUG = true,
@@ -11,7 +16,7 @@ var DEBUG = true,
 var FM = { admin: {} };
 
 
-FM.admin.handler = function(req, res){
+FM.admin.get_cb = function(req, res){
     /* TODO - Using RegularExpress/Command to parse every request, then pass req to corresponding function.
        switch(req.path){
         case 'api':
@@ -19,35 +24,49 @@ FM.admin.handler = function(req, res){
             break;
        }
     */
-    FM_LOG("[admin.handler]");
-    res.render('login');
+    FM_LOG("[admin.get_cb]");
+    //res.render('login');
+    var loginHtml = path.join(workingPath, 'public/admin_login.html');
+    var mainAdminPageHtml = path.join(workingPath, 'public/admin_frame.html');
+    
+    if (!req.session.admin_user) {
+        res.sendfile(loginHtml);
+    }
+    else{
+        res.sendfile(mainAdminPageHtml);
+    }
 };
 
 
-FM.admin.login = function(req, res){
+FM.admin.login_get_cb = function(req, res){
     
     //FM_LOG("[admin.login] " + JSON.stringify(req.query));
     if(req.query.id && req.query.password){
     
         admin_mgr.isValid(req.query, function(err, result){
-            if(err) logger.error("[admin.login] ", err);
+            if(err) logger.error("[admin.login_get_cb] ", err);
             if(result){
                 FM_LOG("[Login Success!]");
-                req.session.user = {
+                req.session.admin_user = {
                     oid: result._id,
                     id: req.query.id
                 };
                 
-                member_mgr.listOfMembers( null, 'fb.userName fb.userID email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result){
+                res.send(200);
+                
+                /*
+                member_mgr.listOfMembers( null, 'fb.userName fb.userID email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result2){
                     if(err) logger.error('[member_mgr.listOfMemebers]', err);
-                    if(result){
+                    if(result2){
                         //FM_LOG(JSON.stringify(result));
-                        res.render( 'frame', {memberList: result} );
+                        //res.render( 'frame', {memberList: result} );
+                        next();
                     }else{
                         // TODO
-                        res.render( 'frame', {memberList: result} );
+                        //res.render( 'frame', {memberList: result} );
                     }
                 });
+                */
                 
             }else{
                 res.send({message: "Wrong ID/PASSWORD Match!"});
@@ -59,23 +78,36 @@ FM.admin.login = function(req, res){
     }
 };
 
+FM.admin.logout_get_cb = function(req, res){
+    delete req.session.admin_user;
+    res.send(200);
+};
 
-FM.admin.memberList = function(req, res){
+FM.admin.memberList_get_cb = function(req, res){
+
+    //TODO: need to implement
     
-    FM_LOG("[admin.memberList]");
-    member_mgr.listOfMembers( null, 'fb.userName fb.userID email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result){
-        if(err) logger.error('[member_mgr.listOfMemebers]', err);
-        if(result){
-            //FM_LOG(JSON.stringify(result));
-            res.render( 'form_member', {memberList: result} );
-        }
-    });
+    if ( req.query.limit && req.query.skip ) {
+        FM_LOG("[admin.memberList_get_cb]");
+        var cursor = member_mgr.listOfMembers( null, 'fb.userName fb.userID email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName',limit: req.query.limit, skip: req.query.skip}, function(err, result){
+            if(err) logger.error('[member_mgr.listOfMemebers]', err);
+            if(result){
+                //FM_LOG(JSON.stringify(result));
+                res.render( 'form_member', {memberList: result} );
+            }
+        });
+    }
+    else{
+        res.send(400, {error: "Parameters are correct"});
+    }
 };
 
 
-FM.admin.playList = function(req, res){
+FM.admin.miixPlayList_get_cb = function(req, res){
     
-    FM_LOG("[admin.playList]");
+    //TODO: need to implement
+    
+    FM_LOG("[admin.miixPlayList_get_cb]");
     /*
     var result = [{
             asset: "../images/shopping/pic.jpg",
@@ -115,6 +147,10 @@ FM.admin.playList = function(req, res){
     });
 };
 
+FM.admin.storyPlayList_get_cb = function(req, res){
+    //TODO: need to implement
+    res.send(200);
+};
 
 /** Internal API */
 
