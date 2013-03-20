@@ -203,13 +203,11 @@ $(document).pngFix( );
 
 		<!-- start nav-right -->
 		<div id="nav-right">
-		
+		<!--
 			<div class="nav-divider">&nbsp;</div>
-			<div class="showhide-account"><img src="images/shared/nav/nav_myaccount.gif" width="93" height="14" alt="" /></div>
-			<div class="nav-divider">&nbsp;</div>
-			<a href="" id="logout-btn"><img src="images/shared/nav/nav_logout.gif" width="64" height="14" alt="" /></a>
+                <div id="logout-btn"><img src="images/shared/nav/nav_logout.gif" width="64" height="14" alt="" /></div>
 			<div class="clear">&nbsp;</div>
-		
+		-->
 			<!--  start account-content -->	
 			<div class="account-content">
 			<div class="account-drop-inner">
@@ -238,7 +236,7 @@ $(document).pngFix( );
 		<div class="nav">
 		<div id="main_menu" class="table">
 		
-		<ul id="memberList" class="current"><li><a href="#memberList"><b>會員資料</b><!--[if IE 7]><!--></a><!--<![endif]-->
+		<ul id="memberList" class="current"><li><a id="memberListBtn"><b>會員資料</b><!--[if IE 7]><!--></a><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->
 		<div class="select_sub">
 			<ul class="sub">
@@ -250,7 +248,7 @@ $(document).pngFix( );
 		
 		<div class="nav-divider">&nbsp;</div>
 		                    
-		<ul id="miixPlayList" class="select"><li><a href="#miixPlayList"><b>《我的影片》資料</b><!--[if IE 7]><!--></a><!--<![endif]-->
+		<ul id="miixPlayList" class="select"><li><a id="miixPlayListBtn"><b>《我的影片》資料</b><!--[if IE 7]><!--></a><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->
 		<div class="select_sub show">
 			<ul class="sub">
@@ -262,7 +260,7 @@ $(document).pngFix( );
 		
 		<div class="nav-divider">&nbsp;</div>
 		
-		<ul id="storyPlayList" class="select"><li><a href="#storyPlayList"><b>《我的影像故事》資料</b><!--[if IE 7]><!--></a><!--<![endif]-->
+		<ul id="storyPlayList" class="select"><li><a id="storyPlayListBtn"><b>《我的影像故事》資料</b><!--[if IE 7]><!--></a><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->
 		<div class="select_sub">
 			<ul class="sub">
@@ -272,6 +270,20 @@ $(document).pngFix( );
 		<!--[if lte IE 6]></td></tr></table></a><![endif]-->
 		</li>
 		</ul>
+		
+		<div class="nav-divider">&nbsp;</div>
+		
+		<ul id="logout" class="select"><li><a id="logoutBtn"><b>登出</b><!--[if IE 7]><!--></a><!--<![endif]-->
+		<!--[if lte IE 6]><table><tr><td><![endif]-->
+		<div class="select_sub">
+			<ul class="sub">
+			
+			</ul>
+		</div>
+		<!--[if lte IE 6]></td></tr></table></a><![endif]-->
+		</li>
+		</ul>
+        
 		<ul class="select">
 		  <li><!--<![endif]-->
 		<!--[if lte IE 6]><table><tr><td><![endif]-->

@@ -33,11 +33,9 @@ $(document).ready(function(){
         
     });
 
-    $("#logout-btn").click(function(){
+    $("#logoutBtn").click(function(){
         $.get(DOMAIN + "logout", function(res){
-            if ('OK'){
-                location.reload();
-            }
+            location.reload();
         });
     });
     
@@ -46,7 +44,7 @@ $(document).ready(function(){
 
 
 $(document).ready(function(){
-    $('#main_menu a[href="#memberList"]').click(function(){
+    $('#memberListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#memberList').attr("class", "current");
         
@@ -60,7 +58,7 @@ $(document).ready(function(){
     });
     
     
-    $('#main_menu a[href="#miixPlayList"]').click(function(){
+    $('#miixPlayListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#miixPlayList').attr("class", "current");
         
@@ -73,7 +71,7 @@ $(document).ready(function(){
         });
     });
 
-    $('#main_menu a[href="#storyPlayList"]').click(function(){
+    $('#storyPlayListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#storyPlayList').attr("class", "current");
         
