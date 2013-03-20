@@ -2,8 +2,10 @@
  * FeltMeng.com
  */
  
-var DOMAIN = "http://www.feltmeng.idv.tw/admin/",
-     SDOMAIN = "https://www.feltmeng.idv.tw/admin/";
+//var DOMAIN = "http://www.feltmeng.idv.tw/admin/",
+//     SDOMAIN = "https://www.feltmeng.idv.tw/admin/";
+var DOMAIN = serverURL+"/admin/",
+     SDOMAIN = serverURL+"/admin/";
 
 var FM = {};     
  
@@ -22,20 +24,32 @@ $(document).ready(function(){
                 if(res.message)
                     console.log("[Response of Login] message:" + res.message);
                 else
-                    $('html').html(res);
+                    //$('html').html(res);
+                    //$('html').replaceWith(res);
+                    //$('html').load('/frame.html');
+                    location.reload();
             });
         }        
         
     });
+
+    $("#logoutBtn").click(function(){
+        $.get(DOMAIN + "logout", function(res){
+            location.reload();
+        });
+    });
+    
+    
 });
 
 
 $(document).ready(function(){
-    $('#main_menu a[href="#memberList"]').click(function(){
+
+    $('#memberListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#memberList').attr("class", "current");
         
-        FM.memberList(0, 20, function(res){
+        FM.memberList(1, 18, function(res){
             if(res.message){
                 console.log("[Response of memberList] message:" + res.message);
             }else{
@@ -45,11 +59,11 @@ $(document).ready(function(){
     });
     
     
-    $('#main_menu a[href="#playList"]').click(function(){
+    $('#miixPlayListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
-        $('#playList').attr("class", "current");
+        $('#miixPlayList').attr("class", "current");
         
-        FM.playList(0, 20, function(res){
+        FM.miixPlayList(0, 20, function(res){
             if(res.message){
                 console.log("[Response of playList] message:" + res.message);
             }else{
@@ -57,17 +71,37 @@ $(document).ready(function(){
             }
         });
     });
+
+    $('#storyPlayListBtn').click(function(){
+        $('#main_menu ul[class="current"]').attr("class", "select");
+        $('#storyPlayList').attr("class", "current");
+        
+        FM.storyPlayList(0, 20, function(res){
+            if(res.message){
+                console.log("[Response of playList] message:" + res.message);
+            }else{
+                $('#table-content').html(res);
+            }
+        });
+    });
+    
+    $('#memberListBtn').click();
 });
 
 
-FM.memberList = function(page, row, cb){
-    var url = DOMAIN + "memberList";
-    $.get(url, {page: page, row: row}, cb);
+FM.memberList = function(pageToGo, rowsPerPage, cb){
+    var url = DOMAIN + "member_list";
+    $.get(url, {skip: (pageToGo-1)*rowsPerPage, limit: rowsPerPage}, cb);
 };
 
-FM.playList = function(page, row, cb){
-    var url = DOMAIN + "playList";
-    $.get(url, {page: page, row: row}, cb);
+FM.miixPlayList = function(pageToGo, rowsPerPage, cb){
+    var url = DOMAIN + "miix_play_list";
+    $.get(url, {skip: (pageToGo-1)*rowsPerPage, limit: rowsPerPage}, cb);
+};
+
+FM.storyPlayList = function(pageToGo, rowsPerPage, cb){
+    var url = DOMAIN + "story_play_list";
+    $.get(url, {skip: (pageToGo-1)*rowsPerPage, limit: rowsPerPage}, cb);
 };
 
 
