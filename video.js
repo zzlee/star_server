@@ -1,5 +1,6 @@
 var FMDB = require('./db.js'),
-    memberDB = require('./member.js');
+    memberDB = require('./member.js'),
+	youtubeInfo = require('./youtube_mgr.js');
     
 var FM = {};
 var DEBUG = true,
@@ -236,7 +237,30 @@ FM.VIDEO = (function(){
                         console.log("result: " + JSON.stringify(result));
                     }
                 });
-            }
+            },
+			
+			//JF
+			getViewCount: function(youtube_url, viewCount_cb){
+				var youtube_path = youtube_url.slice(youtube_url.lastIndexOf("/")+1);
+				youtubeInfo.getVideoViewCount(youtube_path, function(viewCount, err){
+					if(err) viewCount_cb(null, 0);
+					else viewCount_cb(null, viewCount);
+				});
+			},
+			
+			getVideoCount: function(_id, videoType, cb){
+				var condition = { 'ownerId._id': _id, 'genre': videoType };
+				videos.count(condition, cb);
+			},
+			
+			_JF_test: function(){
+				var ObjectID = require('mongodb').ObjectID;
+                var v_id = ObjectID.createFromHexString("50c99348064d2b8412000001");
+                var youtube_url = "http://www.youtube.com/embed/zvI1iNW7LD0";
+				this.getViewCount(youtube_url, function(err, res) {
+					console.log(res);
+				});
+			}
         };
     }
     
@@ -252,5 +276,6 @@ FM.VIDEO = (function(){
 
 /*  For TEST. */
 //FM.VIDEO.getInstance()._test();
+//FM.VIDEO.getInstance()._JF_test();
 
 module.exports = FM.VIDEO.getInstance();
