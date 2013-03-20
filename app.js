@@ -103,6 +103,7 @@ app.post('/internal/story_cam_controller/available_story_movie', routes.storyCam
 
 app.get('/admin', routes.admin.handler); 
 app.get('/admin/login', routes.admin.login);
+app.get('/admin/logout', routes.admin.logout);
 app.get('/admin/memberList', routes.admin.memberList);
 app.get('/admin/playList', routes.admin.playList);
 

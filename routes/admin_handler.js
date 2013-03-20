@@ -1,8 +1,13 @@
+var fs = require('fs');
+var path = require('path');
+var workingPath = process.env.STAR_SERVER_PROJECT;
+
 var admin_mgr = require("../admin.js"),
     member_mgr = require("../member.js"),
     schedule_mgr = require("../schedule.js"),
     video_mgr = require("../video.js");
 
+    
 var ObjectID = require('mongodb').ObjectID;
 
 var DEBUG = true,
@@ -20,7 +25,16 @@ FM.admin.handler = function(req, res){
        }
     */
     FM_LOG("[admin.handler]");
-    res.render('login');
+    //res.render('login');
+    var loginHtml = path.join(workingPath, 'public/admin_login.html');
+    var mainAdminPageHtml = path.join(workingPath, 'public/admin_frame.html');
+    
+    if (!req.session.admin_user) {
+        res.sendfile(loginHtml);
+    }
+    else{
+        res.sendfile(mainAdminPageHtml);
+    }
 };
 
 
@@ -33,21 +47,26 @@ FM.admin.login = function(req, res){
             if(err) logger.error("[admin.login] ", err);
             if(result){
                 FM_LOG("[Login Success!]");
-                req.session.user = {
+                req.session.admin_user = {
                     oid: result._id,
                     id: req.query.id
                 };
                 
-                member_mgr.listOfMembers( null, 'fb.userName fb.userID email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result){
+                res.send(200);
+                
+                /*
+                member_mgr.listOfMembers( null, 'fb.userName fb.userID email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result2){
                     if(err) logger.error('[member_mgr.listOfMemebers]', err);
-                    if(result){
+                    if(result2){
                         //FM_LOG(JSON.stringify(result));
-                        res.render( 'frame', {memberList: result} );
+                        //res.render( 'frame', {memberList: result} );
+                        next();
                     }else{
                         // TODO
-                        res.render( 'frame', {memberList: result} );
+                        //res.render( 'frame', {memberList: result} );
                     }
                 });
+                */
                 
             }else{
                 res.send({message: "Wrong ID/PASSWORD Match!"});
@@ -59,6 +78,10 @@ FM.admin.login = function(req, res){
     }
 };
 
+FM.admin.logout = function(req, res){
+    delete req.session.admin_user;
+    res.send(200);
+};
 
 FM.admin.memberList = function(req, res){
     

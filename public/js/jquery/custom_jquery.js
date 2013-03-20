@@ -2,8 +2,10 @@
  * FeltMeng.com
  */
  
-var DOMAIN = "http://www.feltmeng.idv.tw/admin/",
-     SDOMAIN = "https://www.feltmeng.idv.tw/admin/";
+//var DOMAIN = "http://www.feltmeng.idv.tw/admin/",
+//     SDOMAIN = "https://www.feltmeng.idv.tw/admin/";
+var DOMAIN = serverURL+"/admin/",
+     SDOMAIN = serverURL+"/admin/";
 
 var FM = {};     
  
@@ -22,11 +24,24 @@ $(document).ready(function(){
                 if(res.message)
                     console.log("[Response of Login] message:" + res.message);
                 else
-                    $('html').html(res);
+                    //$('html').html(res);
+                    //$('html').replaceWith(res);
+                    //$('html').load('/frame.html');
+                    location.reload();
             });
         }        
         
     });
+
+    $("#logout-btn").click(function(){
+        $.get(DOMAIN + "logout", function(res){
+            if ('OK'){
+                location.reload();
+            }
+        });
+    });
+    
+    
 });
 
 
@@ -45,11 +60,11 @@ $(document).ready(function(){
     });
     
     
-    $('#main_menu a[href="#playList"]').click(function(){
+    $('#main_menu a[href="#miixPlayList"]').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
-        $('#playList').attr("class", "current");
+        $('#miixPlayList').attr("class", "current");
         
-        FM.playList(0, 20, function(res){
+        FM.miixPlayList(0, 20, function(res){
             if(res.message){
                 console.log("[Response of playList] message:" + res.message);
             }else{
@@ -57,6 +72,20 @@ $(document).ready(function(){
             }
         });
     });
+
+    $('#main_menu a[href="#storyPlayList"]').click(function(){
+        $('#main_menu ul[class="current"]').attr("class", "select");
+        $('#storyPlayList').attr("class", "current");
+        
+        FM.storyPlayList(0, 20, function(res){
+            if(res.message){
+                console.log("[Response of playList] message:" + res.message);
+            }else{
+                $('#table-content').html(res);
+            }
+        });
+    });
+    
 });
 
 
@@ -65,7 +94,12 @@ FM.memberList = function(page, row, cb){
     $.get(url, {page: page, row: row}, cb);
 };
 
-FM.playList = function(page, row, cb){
+FM.miixPlayList = function(page, row, cb){
+    var url = DOMAIN + "playList";
+    $.get(url, {page: page, row: row}, cb);
+};
+
+FM.storyPlayList = function(page, row, cb){
     var url = DOMAIN + "playList";
     $.get(url, {page: page, row: row}, cb);
 };
