@@ -98,6 +98,7 @@ FM.FB_HANDLER = (function(){
                         cb(error, null);
                         
                     }else{
+                        FM_LOG("[isTokenValid] " + body.data);
                         cb(null, { is_valid: body.data.is_valid, expires_at: body.data.expires_at });
                     }
                 });

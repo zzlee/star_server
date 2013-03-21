@@ -507,6 +507,7 @@ FM.api.signupwithFB = function(req, res){
         var authRes = req.body.authResponse;
         var userID = authRes.userID,
 			userName = authRes.userName,
+            email = null,
             accessToken = authRes.accessToken,
             expiresIn = authRes.expiresIn,
 			device = authRes.device,
@@ -520,6 +521,11 @@ FM.api.signupwithFB = function(req, res){
                       "auth": auth
             },
             member = {"fb": meta};
+        
+        if(authRes.email){
+            email = authRes.email;
+            member.email = email;
+        }
             
 			
         
@@ -560,10 +566,13 @@ FM.api.signupwithFB = function(req, res){
                                 
                                 member.fb.auth = response.data;
                                 var data = response.data;
-                                
                                 newdata.auth = data;
                                 
-                                memberDB.updateMember( oid, { fb: newdata, deviceToken: deviceToken }, function(err, result){
+                                var update = { fb: newdata, deviceToken: deviceToken };
+                                if(email)
+                                    update.email = email;
+                                
+                                memberDB.updateMember( oid, update, function(err, result){
                                     if(err) logger.info(err);
                                     if(result) logger.info(result);
                                 });
@@ -586,7 +595,11 @@ FM.api.signupwithFB = function(req, res){
                                     var data = response.data;
                                     newdata.auth = data;
                                     
-                                    memberDB.updateMember( oid, { fb: newdata, deviceToken: deviceToken }, function(err, result){
+                                    var update = { fb: newdata, deviceToken: deviceToken };
+                                    if(email)
+                                        update.email = email;
+                                    
+                                    memberDB.updateMember( oid, update, function(err, result){
                                         if(err) logger.info(err);
                                         if(result) logger.info(result);
                                     });
@@ -595,12 +608,19 @@ FM.api.signupwithFB = function(req, res){
                                 }
                             });
                         }else{
-                            if(dvc_Token){
-                                memberDB.updateMember( oid, { "deviceToken": deviceToken }, function(err, result){
+                            var update = {};
+                            if(dvc_Token)
+                                update.deviceToken = deviceToken;
+                            if(email)
+                                update.email = email;
+                                
+                            if(update.deviceToken || update.email){
+                                memberDB.updateMember( oid, update, function(err, result){
                                     if(err) logger.info(err);
                                     if(result) logger.info(result);
                                 });
                             }
+                            
                             
                             res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn, "verified": mPhone_verified}, 
                                         "message":"success"} );
