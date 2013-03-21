@@ -1,4 +1,4 @@
-var fs = require('fs');
+﻿var fs = require('fs');
 var path = require('path');
 var workingPath = process.env.STAR_SERVER_PROJECT;
 
@@ -93,7 +93,42 @@ FM.admin.memberList_get_cb = function(req, res){
             if(err) logger.error('[member_mgr.listOfMemebers]', err);
             if(result){
                 //FM_LOG(JSON.stringify(result));
-                res.render( 'form_member', {memberList: result} );
+                //console.dir(result);
+                //res.render( 'form_member', {memberList: result} );
+                var testArray =
+                [ { fb: { userID: '100001295751468', userName: 'AA Yang' },
+                    _id: '50d59511524130fc09000005',
+                    email: 'xyz@feltmeng.com', //Email
+                    mobilePhoneNumber: '0928234303', //手機
+                    miixMovieCount: 5, //已製作影片數
+                    doohPlayCount: 20, //DOOH刊登次數
+                    movieViewedCount: 200, //影片觀看總次數
+                    fbLikeCount: 235, //FB讚總數
+                    fbCommentCount: 203, //FB留言總數
+                    fbShareCount: 34  }, //FB分享總數
+                  { fb: { userID: '100001295751468', userName: 'BB Zhu' },
+                    _id: '50d59511524130fc09000005',
+                    email: 'abc@feltmeng.com', //Email
+                    mobilePhoneNumber: '0928234111', //手機
+                    miixMovieCount: 5, //已製作影片數
+                    doohPlayCount: 20, //DOOH刊登次數
+                    movieViewedCount: 200, //影片觀看總次數
+                    fbLikeCount: 235, //FB讚總數
+                    fbCommentCount: 203, //FB留言總數
+                    fbShareCount: 34  }, //FB分享總數
+                  { fb: { userID: '100001295751468', userName: 'CC Zhu' },
+                    _id: '50d595115241302349000005',
+                    email: 'ccd@feltmeng.com', //Email
+                    mobilePhoneNumber: '09282340003', //手機
+                    miixMovieCount: 5, //已製作影片數
+                    doohPlayCount: 20, //DOOH刊登次數
+                    movieViewedCount: 200, //影片觀看總次數
+                    fbLikeCount: 235, //FB讚總數
+                    fbCommentCount: 203, //FB留言總數
+                    fbShareCount: 35  } //FB分享總數  
+                    ];
+                    
+                res.render( 'table_member', {memberList: testArray} );
             }
         });
     }
