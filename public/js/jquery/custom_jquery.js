@@ -4,8 +4,8 @@
  
 //var DOMAIN = "http://www.feltmeng.idv.tw/admin/",
 //     SDOMAIN = "https://www.feltmeng.idv.tw/admin/";
-var DOMAIN = serverURL+"/admin/",
-     SDOMAIN = serverURL+"/admin/";
+var DOMAIN = "/admin/",
+     SDOMAIN = "/admin/";
 
 var FM = {};     
  
