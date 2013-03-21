@@ -10,10 +10,12 @@ var DEBUG = true,
 FM.MEMBER = (function(){
     var uInstance = null;
     
+    
     function constructor(){
         var members = FMDB.getDocModel("member");
         
         return {
+        
         /*
          *  Public Members
          */
@@ -143,7 +145,6 @@ FM.MEMBER = (function(){
                                 
                             }else if(fb_auth){
                                 var access_token = fb_auth.fb.auth.accessToken;
-                                
                                 var async = require("async");
                                 
                                 
@@ -212,27 +213,58 @@ FM.MEMBER = (function(){
             },
             
             
-            isFBTokenValid: function( req, res){
-                if(!req.fb_id){
+            isFBTokenValid: function( req, res ){
+                FM_LOG("[isFBTokenValid]");
+                if(!req.query && !req.query.fb_id){
                     res.send({error: "Bad Request"});
                     return;
                 }
                 
-                var fb_id = req.fb_id;
+                var oid = ObjectID.createFromHexString(req.query._id);
+                var fb_id = req.query.fb_id;
                 var user_token = null;
+                var expiresIn = 0;
                 
-                this.getFBAccessTokenByFBId( fb_id, function(err, result){
+                // Do not use "this" here, it's in differenct closure since "async callback".
+                FM.MEMBER.getInstance().getFBAccessTokenByFBId( fb_id, function(err, result){
                     if(err){
                         res.send({error: "Internal Server Error"});
                         
                     }else{
                         user_token = result.fb.auth.accessToken;
+                        var is_valid = null;
+                        //console.log("getFBAccessTokenByFBId" + JSON.stringify(result));
+                        
                         fb_handler.isTokenValid(user_token, function(err, result){
                             if(err){
-                                res.send({error: "Internal Server Error"});
+                                res.send({error: err});
+                                
+                            }else if(result){
+                                expiresIn = result.expires_at;
+                                is_valid = result.is_valid;
+                                
+                                if(expiresIn*1000 - Date.now() < 15*864000*1000){
+                                
+                                    fb_handler.extendToken(user_token, function(err, result){
+                                        if(err){
+                                            res.send({message: is_valid, });
+                                        }else{
+                                            FM.MEMBER.getInstance().updateMember(oid, {"fb.auth": result.data}, function(err, result){
+                                                if(err)
+                                                    logger.error("[updateMember] ", err);
+                                                else
+                                                    FM_LOG("[updateMember]", result);
+                                            });
+                                            
+                                            res.send({message: is_valid, access_token: result.data.accessToken});
+                                        }
+                                    });
+                                }else{
+                                    res.send({message: is_valid});
+                                }
                                 
                             }else{
-                                res.send({message: result});
+                                res.send({message: result.is_valid});
                             }
                         });
                     }
@@ -244,7 +276,11 @@ FM.MEMBER = (function(){
             
             /*    TEST    */
             _test: function(){
-                this.getTotalCommentsLikesSharesOnFB( '100004712734912', function(err, result){
+                var oid = ObjectID.createFromHexString("512d8df5989cfc2403000002");
+                this.updateMember( oid, {"fb.userName": "Felt Meng", "fb.userID":"100004840958721"
+                , "fb.auth.accessToken":"AAABqPdYntP0BADKwGxVqhtQCaWm3dIJtuzPtWZA2KMRVbuzWqP0TmMQlxZAOwYscjwyv4131iWE0CM9UjIO8E6ZAkvMNmblXj18rLi4EAZDZD"
+                , "fb.auth.expiresIn":"0"
+                }, function(err, result){
                     if(err)
                         console.log("Err: " + JSON.stringify(err));
                     else
