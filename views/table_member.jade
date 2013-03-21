@@ -2,8 +2,6 @@
 form#mainform(action='')
     table#product-table(border='0', width='99%', cellpadding='0', cellspacing='0')
         tr
-          th.table-header-repeat.line-left.minwidth-1(width='10')
-            序號
           th.table-header-repeat.line-left.minwidth-1(width='58')
             a(href='') FB名稱
           th.table-header-repeat.line-left(width='192')
@@ -27,7 +25,6 @@ form#mainform(action='')
             each member, i in memberList
                 if i%2
                     tr
-                      td #{i+1}
                       td #{member.fb.userName}
                       td #{member.email}
                       td #{member.mobilePhoneNumber}
@@ -39,7 +36,6 @@ form#mainform(action='')
                       td #{member.fbShareCount}
                 else
                     tr.alternate-row
-                      td #{i+1}
                       td #{member.fb.userName}
                       td #{member.email}
                       td #{member.mobilePhoneNumber}

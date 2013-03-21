@@ -97,7 +97,6 @@ FM.admin.memberList_get_cb = function(req, res){
                 //res.render( 'form_member', {memberList: result} );
                 var testArray =
                 [ { fb: { userID: '100001295751468', userName: 'AA Yang' },
-                    _id: '50d59511524130fc09000005',
                     email: 'xyz@feltmeng.com', //Email
                     mobilePhoneNumber: '0928234303', //手機
                     miixMovieCount: 5, //已製作影片數
@@ -107,7 +106,6 @@ FM.admin.memberList_get_cb = function(req, res){
                     fbCommentCount: 203, //FB留言總數
                     fbShareCount: 34  }, //FB分享總數
                   { fb: { userID: '100001295751468', userName: 'BB Zhu' },
-                    _id: '50d59511524130fc09000005',
                     email: 'abc@feltmeng.com', //Email
                     mobilePhoneNumber: '0928234111', //手機
                     miixMovieCount: 5, //已製作影片數
@@ -117,7 +115,6 @@ FM.admin.memberList_get_cb = function(req, res){
                     fbCommentCount: 203, //FB留言總數
                     fbShareCount: 34  }, //FB分享總數
                   { fb: { userID: '100001295751468', userName: 'CC Zhu' },
-                    _id: '50d595115241302349000005',
                     email: 'ccd@feltmeng.com', //Email
                     mobilePhoneNumber: '09282340003', //手機
                     miixMovieCount: 5, //已製作影片數
@@ -177,7 +174,31 @@ FM.admin.miixPlayList_get_cb = function(req, res){
             
         }else{
             FM_LOG("playlist:" + JSON.stringify(result));
-            res.render('form_play', {playList: result});
+            //res.render('form_play', {playList: result});
+            
+            var testArray =
+                [ { userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T025333669Z/user_data/_cdv_photo_011.jpg', //素材照片
+                    movieNo: '035', //影片編號
+                    movieViewedCount: 200, //觀看次數
+                    fbLikeCount: 235, //FB讚次數
+                    fbCommentCount: 203, //FB留言數
+                    fbShareCount: 34, //FB分享次數
+                    movieMaker: 'abc AA', //會員名稱
+                    applyDoohPlayCount: 5, //投稿次數
+                    doohPlayCount: 20, //DOOH刊登次數
+                    timesOfPlaying: ['2013/2/3 15:14', '2013/2/5 16:14', '2013/4/3 15:08'] }, //播放時間
+                  { userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //素材照片
+                    movieNo: '035', //影片編號
+                    movieViewedCount: 200, //觀看次數
+                    fbLikeCount: 235, //FB讚次數
+                    fbCommentCount: 203, //FB留言數
+                    fbShareCount: 34, //FB分享次數
+                    movieMaker: 'cda BB', //會員名稱
+                    applyDoohPlayCount: 5, //投稿次數
+                    doohPlayCount: 20, //DOOH刊登次數
+                    timesOfPlaying: ['2013/5/3 15:14', '2013/6/5 16:14', '2013/8/3 15:08'] } //播放時間
+                    ];
+            res.render('table_miix_movie', {miixMovieList: testArray});
         }
     });
 };
