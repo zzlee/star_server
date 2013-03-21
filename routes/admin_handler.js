@@ -86,6 +86,41 @@ FM.admin.logout_get_cb = function(req, res){
 FM.admin.memberList_get_cb = function(req, res){
 
     //TODO: need to implement
+	
+	var videoInfo = function(data, cb){
+		var async = require('async');
+		var i = 0, next = 0;
+		
+		var async_cb = function(err, result){
+			if(err) feedback(err, null);
+			else if(req.query.limit > next) {
+				i++;
+				next++;
+				async_toDo(data[i]);
+			}
+			else feedback(null, 'OK');
+		}
+		
+		var async_toDo = function(data[i]){
+			async.parallel([
+				function(callback){
+					for(var i=0; i<data.length; i++){
+						member_mgr.getVideoCount(data._id, 'miix', function(err, result){
+							data.video_count = result;
+						});
+					}
+				},
+				
+				function(callback){
+					for(var i=0; i<data.length; i++){
+						member_mgr.getVideoCount(data._id, 'story', function(err, result){
+							data.doohTimes = result;
+						});
+					}
+				}
+			], async_cb);
+		}
+	}
     
     if ( req.query.limit && req.query.skip ) {
         FM_LOG("[admin.memberList_get_cb]");
@@ -93,6 +128,7 @@ FM.admin.memberList_get_cb = function(req, res){
             if(err) logger.error('[member_mgr.listOfMemebers]', err);
             if(result){
                 //FM_LOG(JSON.stringify(result));
+				
                 res.render( 'form_member', {memberList: result} );
             }
         });
