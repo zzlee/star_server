@@ -205,7 +205,29 @@ FM.admin.miixPlayList_get_cb = function(req, res){
 
 FM.admin.storyPlayList_get_cb = function(req, res){
     //TODO: need to implement
-    res.send(200);
+    //res.send(200);
+    var testArray =
+        [ { movieNo: '035', //影片編號
+            movieViewedCount: 200, //觀看次數
+            fbLikeCount: 235, //FB讚次數
+            fbCommentCount: 203, //FB留言數
+            fbShareCount: 34, //FB分享次數
+            movieMaker: 'abc AA'}, //會員名稱
+          { movieNo: '055', //影片編號
+            movieViewedCount: 200, //觀看次數
+            fbLikeCount: 235, //FB讚次數
+            fbCommentCount: 203, //FB留言數
+            fbShareCount: 34, //FB分享次數
+            movieMaker: 'abc BB'}, //會員名稱
+          { movieNo: '075', //影片編號
+            movieViewedCount: 200, //觀看次數
+            fbLikeCount: 235, //FB讚次數
+            fbCommentCount: 203, //FB留言數
+            fbShareCount: 34, //FB分享次數
+            movieMaker: 'abc CC'} //會員名稱
+            ];
+    res.render('table_story_movie', {storyMovieList: testArray});
+    
 };
 
 /** Internal API */
