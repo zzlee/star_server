@@ -94,7 +94,8 @@ FM.admin.memberList_get_cb = function(req, res){
             if(result){
                 //FM_LOG(JSON.stringify(result));
                 //console.dir(result);
-                //res.render( 'form_member', {memberList: result} );
+                res.render( 'form_member', {memberList: result} );
+                
                 var testArray =
                 [ { fb: { userID: '100001295751468', userName: 'AA Yang' },
                     email: 'xyz@feltmeng.com', //Email
@@ -125,7 +126,7 @@ FM.admin.memberList_get_cb = function(req, res){
                     fbShareCount: 35  } //FB分享總數  
                     ];
                     
-                res.render( 'table_member', {memberList: testArray} );
+                //res.render( 'table_member', {memberList: testArray} );
             }
         });
     }
