@@ -113,7 +113,8 @@ body	{
 #table-content	{
 	line-height: 16px;
 	margin: 0 10px 10px 10px;
-	min-height: 500px;
+	height:400px;
+	overflow:scroll;
 	}
 	
 .topleft {

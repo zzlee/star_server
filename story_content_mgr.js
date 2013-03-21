@@ -59,7 +59,7 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
 					if (!err2) {
 						ownerFbID = result.fb.userID;
                         ownerFbName = result.fb.userName;
-                        movieTitle = ownerFbName+"'s Miix story movie";
+                        movieTitle = "Miix movie playing on a DOOH";
 						if (finish_cb){
 							finish_cb(null);
 						}					
