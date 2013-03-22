@@ -18,11 +18,14 @@ function PageList( rowsPerPage, urlToGetListContent, urlToGetListSize){
 }; 
 
 PageList.prototype.showPageContent = function(Page){
+    var _this = this;
     $.get(this.urlToGetListContent, {skip: (Page-1)*this.rowsPerPage, limit: this.rowsPerPage}, function(res){
         if(res.message){
             console.log("[Response] message:" + res.message);
         }else{
+            _this.currentPage = Page;
             $('#table-content').html(res);
+            $('#pageNoInput').attr('value',_this.currentPage);
         }
     });
 };
@@ -98,8 +101,8 @@ $(document).ready(function(){
 $(document).ready(function(){
 
     FM.memberList = new PageList( 8, '/admin/member_list', '');
-    FM.miixPlayList = new PageList( 3, '/admin/miix_play_list', '');
-    FM.storyPlayList = new PageList( 3, '/admin/story_play_list', '');
+    FM.miixPlayList = new PageList( 5, '/admin/miix_play_list', '');
+    FM.storyPlayList = new PageList( 8, '/admin/story_play_list', '');
     
     FM.currentContent = FM.memberList;
 
@@ -128,6 +131,9 @@ $(document).ready(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#miixPlayList').attr("class", "current");
         
+        FM.currentContent = FM.miixPlayList;
+        FM.currentContent.showCurrentPageContent();
+        /*
         FM.miixPlayList(0, 20, function(res){
             if(res.message){
                 console.log("[Response of playList] message:" + res.message);
@@ -136,12 +142,16 @@ $(document).ready(function(){
                 $('#table-content').html(res);
             }
         });
+        */
     });
 
     $('#storyPlayListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#storyPlayList').attr("class", "current");
         
+        FM.currentContent = FM.storyPlayList;
+        FM.currentContent.showCurrentPageContent();
+        /*
         FM.storyPlayList(0, 20, function(res){
             if(res.message){
                 console.log("[Response of playList] message:" + res.message);
@@ -150,6 +160,7 @@ $(document).ready(function(){
                 $('#table-content').html(res);
             }
         });
+        */
     });
 
     
@@ -169,7 +180,31 @@ $(document).ready(function(){
         FM.currentContent.showLastPageContent();
     });
     
+    $('#pageNoInput').keyup(function(event){
+        if(event.keyCode == 13){ //return key
+            var pageNo = parseInt($("#pageNoInput").attr('value'));
+            if (pageNo){
+                if ( pageNo < 1) {
+                    pageNo = 1;
+                }
+                else if ( pageNo > FM.currentContent.totalPageNumber ){
+                    pageNo = FM.currentContent.totalPageNumber;
+                }
+                FM.currentContent.showPageContent(pageNo);
+            }
+            else{
+                $("#pageNoInput").attr('value', FM.currentContent.currentPage);
+            }
+        }
+    });
+    
+    $('#rowsPerPageSelect').change(function(){
+        alert('select changed!');
+    });
+    
     $('#memberListBtn').click();
+    $('#totalPage').html(FM.currentContent.totalPageNumber);
+    
 });
 
 /*

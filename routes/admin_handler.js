@@ -175,7 +175,7 @@ FM.admin.miixPlayList_get_cb = function(req, res){
             
         }else{
             FM_LOG("playlist:" + JSON.stringify(result));
-            //res.render('form_play', {playList: result});
+            res.render('form_play', {playList: result});
             
             var testArray =
                 [ { userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T025333669Z/user_data/_cdv_photo_011.jpg', //素材照片
@@ -199,7 +199,7 @@ FM.admin.miixPlayList_get_cb = function(req, res){
                     doohPlayCount: 20, //DOOH刊登次數
                     timesOfPlaying: ['2013/5/3 15:14', '2013/6/5 16:14', '2013/8/3 15:08'] } //播放時間
                     ];
-            res.render('table_miix_movie', {miixMovieList: testArray});
+            //res.render('table_miix_movie', {miixMovieList: testArray});
         }
     });
 };
