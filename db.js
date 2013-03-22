@@ -55,8 +55,7 @@ FM.DB = (function(){
             activity_ids: {type: [ObjectID]},
             video_count: {type: Number, min: 0, default: 0},
             thumbnail: {type: String},    //  path/to/filename
-			doohTimes: {type: Number, min: 0, default: 0},
-			triedDoohTimes: {type: Number, min: 0, default: 0}
+			doohTimes: {type: Number, min: 0, default: 0}
         }); //  members collection
         
         var VideoSchema = new Schema({
@@ -79,7 +78,10 @@ FM.DB = (function(){
 			vip: {type: Boolean, default: false},
             genre: {type: String, enum: videoGenre, default: 'miix'},
             no: {type: Number},
-            aeId: {type: String}
+            aeId: {type: String},
+			triedDoohTimes: {type: Number, min: 0, default: 0},	//JF
+			doohPlayedTimes: {type: Number},	//JF
+			playedTimes: {type: Number}		//JF
         }); //  videos collection
 
         var CommentSchema = new Schema({

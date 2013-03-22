@@ -1,6 +1,7 @@
 var FMDB = require('./db.js'),
     videoDB = require('./video.js'),
-    ObjectID = require('mongodb').ObjectID;
+    ObjectID = require('mongodb').ObjectID,
+	youtubeInfo = require('./youtube_mgr.js');
     
 var FM = {};
 var DEBUG = true,
@@ -264,6 +265,55 @@ FM.MEMBER = (function(){
                         console.log("Result: " + JSON.stringify(result));
                 });
             },
+			
+			//JF
+			updateVideoCount: function(_id, cb){
+				videoDB.getVideoCount(_id, "miix", function(err, result){
+					var condition = {'_id': _id};
+					FMDB.updateOne(members, condition, {'video_count': result}, null, cb);
+				});
+			},
+			
+			updateDoohTimes: function(_id, cb){
+				videoDB.getVideoCount(_id, "story", function(err, result){
+					var condition = {'_id': _id};
+					FMDB.updateOne(members, condition, {'doohTimes': result}, null, cb);
+				});
+			},
+			
+			getTotalView: function(_id, totalView_cb){
+				var videos = FMDB.getDocModel("video"),
+					async = require('async');
+				var condition = {'ownerId._id': _id};
+				videos.find(condition, {}, function(err, result){
+					var count = [];
+					var asyncStart = function() {
+						async.parallel(count , function(err, result) {
+							if(err) totalView_cb(err, null);
+							else {
+								var total = 0;
+								for(var i=0; i<result.length; i++) total += result[i];
+								totalView_cb(null, total);
+							}
+						});
+					}
+					for(var i=0;i<result.length;i++){
+						count.push(
+							function(callback){
+								videoDB.getViewCount(result[i].url.youtube, callback);
+							}
+						);
+						if(i == result.length-1) asyncStart();
+					}
+				});
+			},
+			
+			_JF_test: function(){
+				var v_id = ObjectID.createFromHexString("50c99348064d2b8412000001");
+				this.getTotalView(v_id, function(err, res) {
+					console.log(res);
+				});
+			},
         };
     } //    End of Constructor.
     
@@ -279,5 +329,6 @@ FM.MEMBER = (function(){
 
 /*  For TEST. */
 //FM.MEMBER.getInstance()._test();
+//FM.MEMBER.getInstance()._JF_test();
 
 module.exports = FM.MEMBER.getInstance();
