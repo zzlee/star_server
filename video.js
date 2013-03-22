@@ -240,14 +240,14 @@ FM.VIDEO = (function(){
             },
             
             //GZ
-			getVideoCount: function(videoType, cb){
-				var condition = { 'genre': videoType };
+			getVideoCountWithGenre: function(videoGenre, cb){
+				var condition = { 'genre': videoGenre };
 				videos.count(condition, cb);
 			},
             
             _GZ_test: function(){
             
-                this.getVideoCount('miix_story', function(err, count) {
+                this.getVideoCountWithGenre('miix_story', function(err, count) {
                     console.log('count= '+count);
                 });
             },

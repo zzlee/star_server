@@ -240,12 +240,12 @@ FM.admin.listSize_get_cb = function(req, res){
         });
     }
     else if (req.query.listType == 'miixMovieList'){
-        video_mgr.getVideoCount('miix_story', function(err, count) {
+        video_mgr.getVideoCountWithGenre('miix', function(err, count) {
             res.send({err: err, size: count});
         });
     }
     else if (req.query.listType == 'storyMovieList'){
-        video_mgr.getVideoCount('miix_story', function(err, count) {
+        video_mgr.getVideoCountWithGenre('miix_story', function(err, count) {
             res.send({err: err, size: count});
         });
     }
