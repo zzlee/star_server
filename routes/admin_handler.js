@@ -86,36 +86,82 @@ FM.admin.logout_get_cb = function(req, res){
 FM.admin.memberList_get_cb = function(req, res){
 
     //TODO: need to implement
-    
+	
+	var memberList = [];
+	
+	var memberListInfo = function(fb_id, fb_name, email, mp_number, miix_movie, dooh_play, movie_view, fb_like, fb_comment, fb_share, arr) {
+		arr.push({ 
+			fb: { userID: fb_id, userName: fb_name },
+			//_id: _id,
+			email: email, //Email
+			mobilePhoneNumber: mp_number, //手機
+			miixMovieCount: miix_movie, //已製作影片數
+			doohPlayCount: dooh_play, //DOOH刊登次數
+			movieViewedCount: movie_view, //影片觀看總次數
+			fbLikeCount: fb_like, //FB讚總數
+			fbCommentCount: fb_comment, //FB留言總數
+			fbShareCount: fb_share
+		});
+	}
+
+	var async = require('async');
+	var next = 0;
+	
+	var setMemberList = function(data, set_cb){
+		var toDo = function(err, result){
+			console.log(result);
+			if(next == req.query.limit-1) {
+				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], " ", " ", " ", " ", memberList);
+				set_cb(null, 'OK');
+			}
+			else {
+				//memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], result[2], " ", " ", " ", memberList);
+				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], " ", " ", " ", " ", memberList);
+				next += 1;
+				setMemberList(data, set_cb);
+			}
+		}
+		
+		async.parallel([
+			function(callback){
+				video_mgr.getVideoCount(data[next]._id, 'miix', function(err, result){
+					if(err) callback(err, null);
+					else callback(null, result);
+				});
+			},
+			function(callback){
+				video_mgr.getVideoCount(data[next]._id, 'story', function(err, result){
+					if(err) callback(err, null);
+					else callback(null, result);
+				});
+			},/*
+			function(callback){
+				member_mgr.getTotalView(data[next]._id, function(err, result){
+					if(err) callback(err, null);
+					else callback(null, result);
+				});
+			},
+			function(callback){
+				member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
+					if(err) callback(err, null);
+					else callback(null, result);
+				});
+			},*/
+		], toDo);
+	}	
+	
     if ( req.query.limit && req.query.skip ) {
         FM_LOG("[admin.memberList_get_cb]");
-        var cursor = member_mgr.listOfMembers( null, 'fb.userName fb.userID email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName',limit: req.query.limit, skip: req.query.skip}, function(err, result){
+        var cursor = member_mgr.listOfMembers( null, 'fb.userName fb.userID _id email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName',limit: req.query.limit, skip: req.query.skip}, function(err, result){
             if(err) logger.error('[member_mgr.listOfMemebers]', err);
             if(result){
                 //FM_LOG(JSON.stringify(result));
-                //console.dir(result);
-                res.render( 'form_member', {memberList: result} );
+				
+                //res.render( 'form_member', {memberList: result} );
+
                 
                 var testArray =
-                [ { fb: { userID: '100001295751468', userName: 'AA Yang' },
-                    email: 'xyz@feltmeng.com', //Email
-                    mobilePhoneNumber: '0928234303', //手機
-                    miixMovieCount: 5, //已製作影片數
-                    doohPlayCount: 20, //DOOH刊登次數
-                    movieViewedCount: 200, //影片觀看總次數
-                    fbLikeCount: 235, //FB讚總數
-                    fbCommentCount: 203, //FB留言總數
-                    fbShareCount: 34  }, //FB分享總數
-                  { fb: { userID: '100001295751468', userName: 'BB Zhu' },
-                    email: 'abc@feltmeng.com', //Email
-                    mobilePhoneNumber: '0928234111', //手機
-                    miixMovieCount: 5, //已製作影片數
-                    doohPlayCount: 20, //DOOH刊登次數
-                    movieViewedCount: 200, //影片觀看總次數
-                    fbLikeCount: 235, //FB讚總數
-                    fbCommentCount: 203, //FB留言總數
-                    fbShareCount: 34  }, //FB分享總數
-                  { fb: { userID: '100001295751468', userName: 'CC Zhu' },
+                [ { fb: { userID: '100001295751468', userName: 'CC Zhu' },
                     email: 'ccd@feltmeng.com', //Email
                     mobilePhoneNumber: '09282340003', //手機
                     miixMovieCount: 5, //已製作影片數
@@ -126,7 +172,13 @@ FM.admin.memberList_get_cb = function(req, res){
                     fbShareCount: 35  } //FB分享總數  
                     ];
                     
-                //res.render( 'table_member', {memberList: testArray} );
+                //res.render( 'table_member', {'memberList': testArray} );
+				
+				setMemberList(result, function(err, docs){
+					if(err) console.log(err);
+					else res.render( 'table_member', {'memberList': memberList} );
+				});
+
             }
         });
     }
