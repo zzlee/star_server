@@ -109,14 +109,15 @@ FM.admin.memberList_get_cb = function(req, res){
 	
 	var setMemberList = function(data, set_cb){
 		var toDo = function(err, result){
-			console.log(result);
+			//console.log(result);
 			if(next == req.query.limit-1) {
-				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], " ", " ", " ", " ", memberList);
+				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], result[2], " ", " ", " ", memberList);
+				//memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], " ", " ", " ", " ", memberList);
 				set_cb(null, 'OK');
 			}
 			else {
-				//memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], result[2], " ", " ", " ", memberList);
-				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], " ", " ", " ", " ", memberList);
+				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], result[2], " ", " ", " ", memberList);
+				//memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], " ", " ", " ", " ", memberList);
 				next += 1;
 				setMemberList(data, set_cb);
 			}
@@ -134,13 +135,13 @@ FM.admin.memberList_get_cb = function(req, res){
 					if(err) callback(err, null);
 					else callback(null, result);
 				});
-			},/*
+			},
 			function(callback){
 				member_mgr.getTotalView(data[next]._id, function(err, result){
 					if(err) callback(err, null);
 					else callback(null, result);
 				});
-			},
+			},/*
 			function(callback){
 				member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
 					if(err) callback(err, null);
@@ -177,6 +178,10 @@ FM.admin.memberList_get_cb = function(req, res){
                 //res.render( 'table_member', {'memberList': testArray} );
 				
 				setMemberList(result, function(err, docs){
+					member_mgr.getTotalCommentsLikesSharesOnFB(result[0].fb.userID, function(err, test){
+						if(err) console.log(err, null);
+						else console.log(null, test);
+					});
 					if(err) console.log(err);
 					else res.render( 'table_member', {'memberList': memberList} );
 				});
