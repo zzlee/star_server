@@ -89,6 +89,7 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
 						if ( responseParameters.youtube_video_id ) {
 							var aeServerID = responseParameters.ae_server_id;
 							var youtubeVideoID = responseParameters.youtube_video_id;
+                            var storyMovieProjectID = responseParameters.movie_project_id;
 							//var youtubeVideoID = "VNrn-jhmLBE"; //GZ temporarily hard code for test
 							
 							
@@ -101,7 +102,7 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
 											 "ownerId": {"_id": ownerStdID, "userID": ownerFbID},
 											 "url": url,
 											 "genre":"miix_story",
-											 "projectId":movieProjectID};
+											 "projectId":storyMovieProjectID};
 								fmapi._fbPostVideoThenAdd(vjson); 
                                 logger.info('fmapi._fbPostVideoThenAdd(vjson) called. vjson=');
                                 logger.info(JSON.stringify(vjson));
