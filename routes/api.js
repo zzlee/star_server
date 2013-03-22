@@ -202,7 +202,6 @@ FM.api._fbPostVideoThenAdd = function(vjson){
                     "projectId": "rotate-anonymous-20121115T004014395Z"}; */
 					
 	var vjsonData = vjson;				
-    var can_msg = "參加MiixCard活動初體驗！";
 	var link = vjsonData.url.youtube;
 	var oid = vjsonData.ownerId._id;
 	var pid = vjsonData.projectId;
@@ -213,10 +212,10 @@ FM.api._fbPostVideoThenAdd = function(vjson){
         if(result){
             var userID = result.fb.userID;
 			var userName = result.fb.userName;
-            var accessToken = result.fb.auth.accessToken;
-                path = "/" + userID + "/feed",
+            var can_msg = (vjsonData.genre === 'miix_story') ? ("不要懷疑！【"+ userName +"】登上大螢幕和你說聲嗨！") : (userName + "MiixCard活動初體驗！");
+            var path = "/" + userID + "/feed",
                 query = "?" + "access_token=" + accessToken
-                + "&message=" + userName + can_msg
+                + "&message=" + can_msg
                 + "&link=" + link;
             path += query.replace(/\s/g, "+");
             
