@@ -309,8 +309,7 @@ FM.MEMBER = (function(){
 			},
 			
 			_JF_test: function(){
-				var v_id = ObjectID.createFromHexString("50c99348064d2b8412000001");
-				this.getTotalView(v_id, function(err, res) {
+				this.getTotalView('50d188389e5dc9080a000001', function(err, res) {
 					console.log(res);
 				});
 			},
