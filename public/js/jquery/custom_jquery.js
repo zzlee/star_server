@@ -10,11 +10,20 @@ var DOMAIN = "/admin/",
 var FM = {};    
 
 // PageList object implementation
-function PageList( rowsPerPage, urlToGetListContent, urlToGetListSize){
+function PageList( listType, rowsPerPage, urlToGetListContent){
+    var _this = this;
     this.currentPage = 1;
     this.rowsPerPage = rowsPerPage;
     this.urlToGetListContent = urlToGetListContent;
-    this.totalPageNumber = 3; //TODO: calculate this from list size
+    this.totalPageNumber = 1;
+    this.listType = listType;
+    $.get('/admin/list_size', {listType: listType}, function(res){
+        if (!res.err){
+            var listSize = res.size;
+            _this.totalPageNumber = Math.ceil(res.size/_this.rowsPerPage); 
+            $('#totalPage').html(FM.currentContent.totalPageNumber);
+        }
+    });
 }; 
 
 PageList.prototype.showPageContent = function(Page){
@@ -26,6 +35,14 @@ PageList.prototype.showPageContent = function(Page){
             _this.currentPage = Page;
             $('#table-content').html(res);
             $('#pageNoInput').attr('value',_this.currentPage);
+        }
+    });
+    
+    $.get('/admin/list_size', {listType: this.listType}, function(res){
+        if (!res.err){
+            var listSize = res.size;
+            _this.totalPageNumber = Math.ceil(res.size/_this.rowsPerPage); 
+            $('#totalPage').html(FM.currentContent.totalPageNumber);
         }
     });
 };
@@ -100,9 +117,9 @@ $(document).ready(function(){
 // Main Page 
 $(document).ready(function(){
 
-    FM.memberList = new PageList( 8, '/admin/member_list', '');
-    FM.miixPlayList = new PageList( 5, '/admin/miix_play_list', '');
-    FM.storyPlayList = new PageList( 8, '/admin/story_play_list', '');
+    FM.memberList = new PageList( 'memberList', 8, '/admin/member_list');
+    FM.miixPlayList = new PageList( 'miixMovieList', 5, '/admin/miix_play_list');
+    FM.storyPlayList = new PageList( 'storyMovieList', 8, '/admin/story_play_list');
     
     FM.currentContent = FM.memberList;
 
@@ -203,7 +220,7 @@ $(document).ready(function(){
     });
     
     $('#memberListBtn').click();
-    $('#totalPage').html(FM.currentContent.totalPageNumber);
+    
     
 });
 

@@ -265,6 +265,18 @@ FM.MEMBER = (function(){
                         console.log("Result: " + JSON.stringify(result));
                 });
             },
+            
+            //GZ
+			getMemberCount: function( cb){
+				members.count(cb);
+			},
+            
+            _GZ_test: function(){
+            
+                this.getMemberCount(function(err, count) {
+                    console.log('count= '+count);
+                });
+            },
 			
 			//JF
 			updateVideoCount: function(_id, cb){
@@ -330,5 +342,6 @@ FM.MEMBER = (function(){
 /*  For TEST. */
 //FM.MEMBER.getInstance()._test();
 //FM.MEMBER.getInstance()._JF_test();
+//FM.MEMBER.getInstance()._GZ_test();
 
 module.exports = FM.MEMBER.getInstance();

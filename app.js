@@ -107,6 +107,7 @@ app.get('/admin/logout', routes.admin.logout_get_cb);
 app.get('/admin/member_list', routes.admin.memberList_get_cb);
 app.get('/admin/miix_play_list', routes.admin.miixPlayList_get_cb);
 app.get('/admin/story_play_list', routes.admin.storyPlayList_get_cb);
+app.get('/admin/list_size', routes.admin.listSize_get_cb);
 
 /*
 app.get('/', routes.profile, routes.index);

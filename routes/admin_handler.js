@@ -131,7 +131,7 @@ FM.admin.memberList_get_cb = function(req, res){
         });
     }
     else{
-        res.send(400, {error: "Parameters are correct"});
+        res.send(400, {error: "Parameters are not correct"});
     }
 };
 
@@ -231,9 +231,29 @@ FM.admin.storyPlayList_get_cb = function(req, res){
     
 };
 
+//GZ
+FM.admin.listSize_get_cb = function(req, res){
+
+    if (req.query.listType == 'memberList'){
+        member_mgr.getMemberCount(function(err, count) {
+            res.send({err: err, size: count});
+        });
+    }
+    else if (req.query.listType == 'miixMovieList'){
+        video_mgr.getVideoCount('miix_story', function(err, count) {
+            res.send({err: err, size: count});
+        });
+    }
+    else if (req.query.listType == 'storyMovieList'){
+        video_mgr.getVideoCount('miix_story', function(err, count) {
+            res.send({err: err, size: count});
+        });
+    }
+    else {
+        res.send(400, {error: "Parameters are not correct"});
+    }
+}
+
 /** Internal API */
-
-
-
 
 module.exports = FM.admin;
