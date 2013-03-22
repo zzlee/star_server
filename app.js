@@ -107,6 +107,7 @@ app.get('/admin/logout', routes.admin.logout_get_cb);
 app.get('/admin/member_list', routes.admin.memberList_get_cb);
 app.get('/admin/miix_play_list', routes.admin.miixPlayList_get_cb);
 app.get('/admin/story_play_list', routes.admin.storyPlayList_get_cb);
+app.get('/admin/list_size', routes.admin.listSize_get_cb);
 
 /*
 app.get('/', routes.profile, routes.index);
@@ -144,6 +145,15 @@ app.get('/api/fbGetThumbnail', routes.api.fbGetThumbnail);
 app.get('/api/newVideoList', routes.api.newVideoList);
 app.get('/api/newStreetVideoList', routes.api.newStreetVideoList);
 app.get('/api/codeGeneration', routes.api.codeGenerate);
+
+
+
+/*
+ *  member.js
+ */
+app.get('/api/member.isFBTokenValid', routes.member.isFBTokenValid);
+
+
 
 app.post('/api/signin', routes.api.signin);
 

@@ -160,11 +160,9 @@ FM.admin.memberList_get_cb = function(req, res){
 				
                 //res.render( 'form_member', {memberList: result} );
 
-                //console.dir(result);
-                //res.render( 'form_member', {memberList: result} );
+                
                 var testArray =
                 [ { fb: { userID: '100001295751468', userName: 'CC Zhu' },
-                    //_id: '50d595115241302349000005',
                     email: 'ccd@feltmeng.com', //Email
                     mobilePhoneNumber: '09282340003', //手機
                     miixMovieCount: 5, //已製作影片數
@@ -190,7 +188,7 @@ FM.admin.memberList_get_cb = function(req, res){
         });
     }
     else{
-        res.send(400, {error: "Parameters are correct"});
+        res.send(400, {error: "Parameters are not correct"});
     }
 };
 
@@ -235,18 +233,84 @@ FM.admin.miixPlayList_get_cb = function(req, res){
         }else{
             FM_LOG("playlist:" + JSON.stringify(result));
             res.render('form_play', {playList: result});
+            
+            var testArray =
+                [ { userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T025333669Z/user_data/_cdv_photo_011.jpg', //素材照片
+                    movieNo: '035', //影片編號
+                    movieViewedCount: 200, //觀看次數
+                    fbLikeCount: 235, //FB讚次數
+                    fbCommentCount: 203, //FB留言數
+                    fbShareCount: 34, //FB分享次數
+                    movieMaker: 'abc AA', //會員名稱
+                    applyDoohPlayCount: 5, //投稿次數
+                    doohPlayCount: 20, //DOOH刊登次數
+                    timesOfPlaying: ['2013/2/3 15:14', '2013/2/5 16:14', '2013/4/3 15:08'] }, //播放時間
+                  { userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //素材照片
+                    movieNo: '035', //影片編號
+                    movieViewedCount: 200, //觀看次數
+                    fbLikeCount: 235, //FB讚次數
+                    fbCommentCount: 203, //FB留言數
+                    fbShareCount: 34, //FB分享次數
+                    movieMaker: 'cda BB', //會員名稱
+                    applyDoohPlayCount: 5, //投稿次數
+                    doohPlayCount: 20, //DOOH刊登次數
+                    timesOfPlaying: ['2013/5/3 15:14', '2013/6/5 16:14', '2013/8/3 15:08'] } //播放時間
+                    ];
+            //res.render('table_miix_movie', {miixMovieList: testArray});
         }
     });
 };
 
 FM.admin.storyPlayList_get_cb = function(req, res){
     //TODO: need to implement
-    res.send(200);
+    //res.send(200);
+    var testArray =
+        [ { movieNo: '035', //影片編號
+            movieViewedCount: 200, //觀看次數
+            fbLikeCount: 235, //FB讚次數
+            fbCommentCount: 203, //FB留言數
+            fbShareCount: 34, //FB分享次數
+            movieMaker: 'abc AA'}, //會員名稱
+          { movieNo: '055', //影片編號
+            movieViewedCount: 200, //觀看次數
+            fbLikeCount: 235, //FB讚次數
+            fbCommentCount: 203, //FB留言數
+            fbShareCount: 34, //FB分享次數
+            movieMaker: 'abc BB'}, //會員名稱
+          { movieNo: '075', //影片編號
+            movieViewedCount: 200, //觀看次數
+            fbLikeCount: 235, //FB讚次數
+            fbCommentCount: 203, //FB留言數
+            fbShareCount: 34, //FB分享次數
+            movieMaker: 'abc CC'} //會員名稱
+            ];
+    res.render('table_story_movie', {storyMovieList: testArray});
+    
 };
 
+//GZ
+FM.admin.listSize_get_cb = function(req, res){
+
+    if (req.query.listType == 'memberList'){
+        member_mgr.getMemberCount(function(err, count) {
+            res.send({err: err, size: count});
+        });
+    }
+    else if (req.query.listType == 'miixMovieList'){
+        video_mgr.getVideoCountWithGenre('miix', function(err, count) {
+            res.send({err: err, size: count});
+        });
+    }
+    else if (req.query.listType == 'storyMovieList'){
+        video_mgr.getVideoCountWithGenre('miix_story', function(err, count) {
+            res.send({err: err, size: count});
+        });
+    }
+    else {
+        res.send(400, {error: "Parameters are not correct"});
+    }
+}
+
 /** Internal API */
-
-
-
 
 module.exports = FM.admin;

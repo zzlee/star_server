@@ -223,6 +223,22 @@ FM.VIDEO = (function(){
                 });
             },
 			
+            
+            //GZ
+			getVideoCountWithGenre: function(videoGenre, cb){
+				var condition = { 'genre': videoGenre };
+				videos.count(condition, cb);
+			},
+            
+            _GZ_test: function(){
+            
+                this.getVideoCountWithGenre('miix_story', function(err, count) {
+                    console.log('count= '+count);
+                });
+            },
+            
+            
+			
 			//JF
 			getViewCount: function(youtube_url, viewCount_cb){
 				var youtube_path = youtube_url.slice(youtube_url.lastIndexOf("/")+1);
@@ -272,5 +288,6 @@ FM.VIDEO = (function(){
 
 /*  For TEST. */
 //FM.VIDEO.getInstance()._test();
+//FM.VIDEO.getInstance()._GZ_test();
 
 module.exports = FM.VIDEO.getInstance();
