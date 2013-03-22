@@ -222,22 +222,7 @@ FM.VIDEO = (function(){
                     }
                 });
             },
-            
-            _test: function(){
-                var ObjectID = require('mongodb').ObjectID;
-                var v_id = ObjectID.createFromHexString("51302b836b8e0e580f000004");
-                var owner_id =  ObjectID.createFromHexString("512d849345483ac80d000003");
-                var fb_id = "100004712734912_604889539525089";
-                var youtube_url = "http://www.youtube.com/embed/CJuffmPIMJ0";
-                
-                this.getCommentsLikesSharesOnFB( v_id, owner_id, fb_id, youtube_url, function(err, result){
-                    if(err){
-                        console.log("err: " + JSON.stringify(err));
-                    }else{
-                        console.log("result: " + JSON.stringify(result));
-                    }
-                });
-            },
+			
             
             //GZ
 			getVideoCountWithGenre: function(videoGenre, cb){
@@ -268,14 +253,21 @@ FM.VIDEO = (function(){
 				videos.count(condition, cb);
 			},
 			
-			_JF_test: function(){
-				var ObjectID = require('mongodb').ObjectID;
-                var v_id = ObjectID.createFromHexString("50c99348064d2b8412000001");
-                var youtube_url = "http://www.youtube.com/embed/zvI1iNW7LD0";
-				this.getViewCount(youtube_url, function(err, res) {
-					console.log(res);
-				});
-			}
+			_test: function(){
+                var ObjectID = require('mongodb').ObjectID;
+                var v_id = ObjectID.createFromHexString("51302b836b8e0e580f000004");
+                var owner_id =  ObjectID.createFromHexString("512d849345483ac80d000003");
+                var fb_id = "100004712734912_604889539525089";
+                var youtube_url = "http://www.youtube.com/embed/CJuffmPIMJ0";
+                
+                this.getCommentsLikesSharesOnFB( v_id, owner_id, fb_id, youtube_url, function(err, result){
+                    if(err){
+                        console.log("err: " + JSON.stringify(err));
+                    }else{
+                        console.log("result: " + JSON.stringify(result));
+                    }
+                });
+            },
         };
     }
     
@@ -291,7 +283,6 @@ FM.VIDEO = (function(){
 
 /*  For TEST. */
 //FM.VIDEO.getInstance()._test();
-//FM.VIDEO.getInstance()._JF_test();
 //FM.VIDEO.getInstance()._GZ_test();
 
 module.exports = FM.VIDEO.getInstance();
