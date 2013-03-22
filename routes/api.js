@@ -6,7 +6,8 @@
 
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
-    videoDB = require("../video.js");
+    videoDB = require("../video.js"),
+    fb_handler = require("../fb_handler.js");
     
 
 
@@ -29,7 +30,7 @@ FM.api._pushErrorCallback = function(err, notification){
 };
 
 /**
- * Google Cloud Messaging, a.k.a, GCM.
+ * Google Cloud Messaging, a.k.a., GCM.
  * GCM sender_ID: 701982981612
  * API Key: AIzaSyDn_H-0W251CKUjDCl-EkBLV0GunnWwpZ4
  */
@@ -151,7 +152,7 @@ FM.api._fbExtendToken = function(accessToken, callback){
                     
                 }else{
                     FM_LOG("\nGot longer lived token: ");
-                    logger.info(result);
+                    FM_LOG(result);
                     
                     var longerToken = result.substring( result.indexOf("=")+1, result.indexOf("&expires") );
                     var longerExpiresIn = parseInt(result.substring( result.lastIndexOf("=")+1 ), 10);
@@ -201,7 +202,6 @@ FM.api._fbPostVideoThenAdd = function(vjson){
                     "projectId": "rotate-anonymous-20121115T004014395Z"}; */
 					
 	var vjsonData = vjson;				
-    var can_msg = "參加MiixCard活動初體驗！";
 	var link = vjsonData.url.youtube;
 	var oid = vjsonData.ownerId._id;
 	var pid = vjsonData.projectId;
@@ -212,10 +212,10 @@ FM.api._fbPostVideoThenAdd = function(vjson){
         if(result){
             var userID = result.fb.userID;
 			var userName = result.fb.userName;
-            var accessToken = result.fb.auth.accessToken;
-                path = "/" + userID + "/feed",
+            var can_msg = (vjsonData.genre === 'miix_story') ? ("不要懷疑！【"+ userName +"】登上大螢幕和你說聲嗨！") : (userName + "MiixCard活動初體驗！");
+            var path = "/" + userID + "/feed",
                 query = "?" + "access_token=" + accessToken
-                + "&message=" + userName + can_msg
+                + "&message=" + can_msg
                 + "&link=" + link;
             path += query.replace(/\s/g, "+");
             
@@ -506,6 +506,7 @@ FM.api.signupwithFB = function(req, res){
         var authRes = req.body.authResponse;
         var userID = authRes.userID,
 			userName = authRes.userName,
+            email = null,
             accessToken = authRes.accessToken,
             expiresIn = authRes.expiresIn,
 			device = authRes.device,
@@ -519,6 +520,11 @@ FM.api.signupwithFB = function(req, res){
                       "auth": auth
             },
             member = {"fb": meta};
+        
+        if(authRes.email){
+            email = authRes.email;
+            member.email = email;
+        }
             
 			
         
@@ -533,6 +539,9 @@ FM.api.signupwithFB = function(req, res){
                 var oid = result._id;
 				var deviceToken;
                 var mPhone_verified = result.mPhone.verified;
+                var fb = result.fb;
+                var existed_access_token = fb.auth.accessToken;
+                var newdata = result.fb;
                 
 				if(dvc_Token){
 					if(result.deviceToken){
@@ -544,45 +553,80 @@ FM.api.signupwithFB = function(req, res){
 					member.deviceToken = deviceToken;
 					
 				}
-				
-                // if expire within 20days.
-                if( parseInt(expiresIn) - Date.now() < 20*24*60*60*1000 ){
+                
+                fb_handler.isTokenValid(userID, function(err, result){
                     
-                    FM.api._fbExtendToken(authRes.accessToken, function(response){
-                    
-                        if(response.data){
-                            
-                            member.fb.auth = response.data;
-                            var data = response.data;
-                            var newdata = result.fb;
-                            newdata.auth = data;
-                            
-                            memberDB.updateMember( oid, { fb: newdata, deviceToken: deviceToken }, function(err, result){
-                                if(err) logger.info(err);
-                                if(result) logger.info(result);
-                            });
-                            
-                            res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "expiresIn": data.expiresIn, "verified": mPhone_verified  }, "message":"success"} );
-                        }
-                    });
-                    
-                }else{
-					if(dvc_Token){
-						memberDB.updateMember( oid, { "deviceToken": deviceToken }, function(err, result){
-                            if(err) logger.info(err);
-                            if(result) logger.info(result);
+                    // Extending new/short access_token replaces invalid existed access_token.
+                    if(!result){
+                        fb_handler.extendToken(accessToken, function(err, response){
+                            if(err){
+                                res.send( {"data":{"_id": oid.toHexString(), "accessToken": accessToken, "expiresIn": expiresIn, "verified": mPhone_verified  }, "message":"success"} );
+                            }else{
+                                
+                                member.fb.auth = response.data;
+                                var data = response.data;
+                                newdata.auth = data;
+                                
+                                var update = { fb: newdata, deviceToken: deviceToken };
+                                if(email)
+                                    update.email = email;
+                                
+                                memberDB.updateMember( oid, update, function(err, result){
+                                    if(err) logger.info(err);
+                                    if(result) logger.info(result);
+                                });
+                                
+                                res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "verified": mPhone_verified  }, "message":"success"} );
+                            }
                         });
-					}
-                    //res.send({"message":"success"});
-					res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn, "verified": mPhone_verified}, 
-								"message":"success"} );
-                }
-                
-                /* ACK LongPolling from Client
-                var ack = { "data":{"sessionID": sid, "accessToken": accessToken, "userID": userID, "_id": oid} };
-                FM.api._fbStatusAck(ack);
-                */
-                
+                        
+                    }else{
+                        // existed access_token is valid. Check if expire within 20days, then renew it.
+                        if( parseInt(fb.auth.expiresIn) - Date.now() < 20*86400*1000 ){
+                    
+                            fb_handler.extendToken(authRes.accessToken, function(err, response){
+                                if(err){
+                                    res.send( {"data":{"_id": oid.toHexString(), "accessToken": existed_access_token, "verified": mPhone_verified  }, "message":"success"} );
+                                    
+                                }else{
+                                    
+                                    member.fb.auth = response.data;
+                                    var data = response.data;
+                                    newdata.auth = data;
+                                    
+                                    var update = { fb: newdata, deviceToken: deviceToken };
+                                    if(email)
+                                        update.email = email;
+                                    
+                                    memberDB.updateMember( oid, update, function(err, result){
+                                        if(err) logger.info(err);
+                                        if(result) logger.info(result);
+                                    });
+                                    
+                                    res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "expiresIn": data.expiresIn, "verified": mPhone_verified  }, "message":"success"} );
+                                }
+                            });
+                        }else{
+                            var update = {};
+                            if(dvc_Token)
+                                update.deviceToken = deviceToken;
+                            if(email)
+                                update.email = email;
+                                
+                            if(update.deviceToken || update.email){
+                                memberDB.updateMember( oid, update, function(err, result){
+                                    if(err) logger.info(err);
+                                    if(result) logger.info(result);
+                                });
+                            }
+                            
+                            
+                            res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn, "verified": mPhone_verified}, 
+                                        "message":"success"} );
+                        }
+                    }
+                });
+				
                 
             }else{  //  New fb user signup.
                 FM_LOG("[signupwithFB:] NEW FB User[" + userID + "] Signup!");

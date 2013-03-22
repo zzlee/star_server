@@ -146,6 +146,15 @@ app.get('/api/newVideoList', routes.api.newVideoList);
 app.get('/api/newStreetVideoList', routes.api.newStreetVideoList);
 app.get('/api/codeGeneration', routes.api.codeGenerate);
 
+
+
+/*
+ *  member.js
+ */
+app.get('/api/member.isFBTokenValid', routes.member.isFBTokenValid);
+
+
+
 app.post('/api/signin', routes.api.signin);
 
 //app.post('/', routes.profile, routes.index);
