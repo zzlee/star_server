@@ -444,17 +444,21 @@ $(document).pngFix( );
 			<td>
 				<a id="goToFirstPage" class="page-far-left"></a>
 				<a id="goToPreviousPage" class="page-left"></a>
-				<div id="page-info">Page <strong><input id="pageNoInput" value="1" style="width:20px" autofocus="autofocus"></strong> / <span id="totalPage">15</span></div>
+				<div id="page-info">Page <strong><input id="pageNoInput" value="1" style="width:20px"></strong> / <span id="totalPage">15</span></div>
 				<a id="goToNextPage" class="page-right"></a>
 				<a id="goToLastPage" class="page-far-right"></a>
 			</td>
 			<td>
-			<select id="rowsPerPageSelect" class="styledselect_pages">
-				<option value="">Number of rows</option>
-				<option value="">1</option>
-				<option value="">2</option>
-				<option value="">3</option>
-			</select>
+                Number of rows
+                <input id="rowsPerPage" value="1" style="width:35px" type="number">
+                <!--
+                <select id="rowsPerPageSelect" class="styledselect_pages">
+                    <option value="default" selected="selected">Number of rows</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                </select>
+                -->
 			</td>
 			</tr>
 			</table>

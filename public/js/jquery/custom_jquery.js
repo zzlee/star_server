@@ -35,6 +35,7 @@ PageList.prototype.showPageContent = function(Page){
             _this.currentPage = Page;
             $('#table-content').html(res);
             $('#pageNoInput').attr('value',_this.currentPage);
+            $('input#rowsPerPage').attr('value', _this.rowsPerPage);
         }
     });
     
@@ -76,7 +77,10 @@ PageList.prototype.showLastPageContent = function(){
 };
 
 PageList.prototype.setRowsPerPage = function(newRowsPerPage ){
-
+    var keyRow = this.rowsPerPage*(this.currentPage-1)+1;
+    var newPage = Math.ceil(keyRow/newRowsPerPage); 
+    this.rowsPerPage = newRowsPerPage;
+    this.showPageContent(newPage);
 };
 
 
@@ -197,27 +201,37 @@ $(document).ready(function(){
         FM.currentContent.showLastPageContent();
     });
     
-    $('#pageNoInput').keyup(function(event){
-        if(event.keyCode == 13){ //return key
-            var pageNo = parseInt($("#pageNoInput").attr('value'));
-            if (pageNo){
-                if ( pageNo < 1) {
-                    pageNo = 1;
-                }
-                else if ( pageNo > FM.currentContent.totalPageNumber ){
-                    pageNo = FM.currentContent.totalPageNumber;
-                }
-                FM.currentContent.showPageContent(pageNo);
+    $('#pageNoInput').change(function(){
+        var pageNo = parseInt($("#pageNoInput").attr('value'));
+        if (pageNo){
+            if ( pageNo < 1) {
+                pageNo = 1;
             }
-            else{
-                $("#pageNoInput").attr('value', FM.currentContent.currentPage);
+            else if ( pageNo > FM.currentContent.totalPageNumber ){
+                pageNo = FM.currentContent.totalPageNumber;
             }
+            FM.currentContent.showPageContent(pageNo);
+        }
+        else{
+            $("#pageNoInput").attr('value', FM.currentContent.currentPage);
         }
     });
     
-    $('#rowsPerPageSelect').change(function(){
-        alert('select changed!');
+    
+    
+    $('input#rowsPerPage').change(function(){
+        var rowsPerPage = parseInt($('input#rowsPerPage').attr('value'));
+        if (rowsPerPage){
+            if ( rowsPerPage < 1) {
+                rowsPerPage = 1;
+            }
+            FM.currentContent.setRowsPerPage(rowsPerPage);
+        }
+        else{
+            $('input#rowsPerPage').attr('value', FM.currentContent.rowsPerPage);
+        }
     });
+    
     
     $('#memberListBtn').click();
     
