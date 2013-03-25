@@ -81,7 +81,7 @@ FM.DB = (function(){
             aeId: {type: String},
 			triedDoohTimes: {type: Number, min: 0, default: 0},	//JF
 			doohPlayedTimes: {type: Number},	//JF
-			playedTimes: {type: Number}		//JF
+			timesOfPlaying: {type: Number}		//JF
         }); //  videos collection
 
         var CommentSchema = new Schema({

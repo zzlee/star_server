@@ -310,7 +310,7 @@ FM.MEMBER = (function(){
 			},
 			
 			updateDoohTimes: function(_id, cb){
-				videoDB.getVideoCount(_id, "story", function(err, result){
+				videoDB.getVideoCount(_id, "miix_story", function(err, result){
 					var condition = {'_id': _id};
 					FMDB.updateOne(members, condition, {'doohTimes': result}, null, cb);
 				});
@@ -321,30 +321,35 @@ FM.MEMBER = (function(){
 					async = require('async');
 				var condition = {'ownerId._id': _id};
 				videos.find(condition, {}, function(err, result){
-					var count = [];
-					var asyncStart = function() {
-						async.parallel(count , function(err, result) {
-							if(err) totalView_cb(err, null);
-							else {
-								var total = 0;
-								for(var i=0; i<result.length; i++) total += result[i];
-								totalView_cb(null, total);
-							}
-						});
-					}
-					for(var i=0;i<result.length;i++){
-						count.push(
-							function(callback){
-								videoDB.getViewCount(result[i].url.youtube, callback);
-							}
-						);
-						if(i == result.length-1) asyncStart();
+					if(result.length == 0) totalView_cb(null, 0);
+					else {
+						var count = [];
+						var asyncStart = function() {
+							async.parallel(count , function(err, result) {
+								if(err) totalView_cb(err, null);
+								else {
+									var total = 0;
+									for(var i=0; i<result.length; i++) total += result[i];
+									totalView_cb(null, total);
+								}
+							});
+						}
+						for(var i=0;i<result.length;i++){
+							count.push(
+								function(callback){
+									//console.log(typeof(result[i].url.youtube) + ", " + result[i].url.youtube);
+									if((typeof(result[i].url.youtube) != null)&&(typeof(result[i].url.youtube) != 'undefined')) videoDB.getViewCount(result[i].url.youtube, callback);
+									else callback(null, 0);
+								}
+							);
+							if(i == result.length-1) asyncStart();
+						}
 					}
 				});
 			},
 			
 			_JF_test: function(){
-				this.getTotalView('50d188389e5dc9080a000001', function(err, res) {
+				this.getTotalView('50e00d33f04c60040b000006', function(err, res) {
 					console.log(res);
 				});
 			},

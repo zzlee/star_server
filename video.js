@@ -255,6 +255,7 @@ FM.VIDEO = (function(){
 				var youtube_path = youtube_url.slice(youtube_url.lastIndexOf("/")+1);
 				youtubeInfo.getVideoViewCount(youtube_path, function(viewCount, err){
 					if(err) viewCount_cb(null, 0);
+					else if(viewCount == null) viewCount_cb(null, 0);
 					else viewCount_cb(null, viewCount);
 				});
 			},
@@ -278,6 +279,10 @@ FM.VIDEO = (function(){
                         console.log("result: " + JSON.stringify(result));
                     }
                 });
+				
+				this.getViewCount('http://www.youtube.com/embed/Y1DdQmx8os0', function(res, err){
+					if(res == null) console.log('0');
+				});
             },
         };
     }
