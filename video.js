@@ -231,9 +231,20 @@ FM.VIDEO = (function(){
 			},
             
             _GZ_test: function(){
-            
+                /*
                 this.getVideoCountWithGenre('miix_story', function(err, count) {
                     console.log('count= '+count);
+                });
+                */
+                var after = new Date(parseInt('1363950956281'));
+                var query = videos.find();
+				query.exec(function(err, result){
+				//query.where("ownerId.userID", '100004619173955').sort({createdOn: -1}).limit(20).exec(function(err, result){
+				//query.where("ownerId.userID", '100004619173955').where("genre", 'miix_story').where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(function(err, result){
+                //this.getNewVideoListByFB('100004619173955', 'miix_story', after, function(err, result){
+                    console.dir(result);
+                    fs=require('fs');
+                    fs.writeFile('result2.txt', result);
                 });
             },
             

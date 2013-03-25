@@ -22,11 +22,11 @@ FM.api.reply = [];  // Queue Res callback according to sessionID.
 
 
 FM.api._pushErrorCallback = function(err, notification){
-	FM_LOG("[_pushErrorCallback] ");
-	if(err)
-		FM_LOG("[error] " + JSON.stringify(err) );
-	if(notification)
-		FM_LOG("[notification] "+ JSON.stringify(notification) );
+    FM_LOG("[_pushErrorCallback] ");
+    if(err)
+        FM_LOG("[error] " + JSON.stringify(err) );
+    if(notification)
+        FM_LOG("[notification] "+ JSON.stringify(notification) );
 };
 
 /**
@@ -36,62 +36,62 @@ FM.api._pushErrorCallback = function(err, notification){
  */
 FM.api._GCM_PushNotification = function( device_token ){
 
-	var gcm = require('node-gcm');
+    var gcm = require('node-gcm');
 
-	var message = new gcm.Message();
-	var sender = new gcm.Sender('AIzaSyDn_H-0W251CKUjDCl-EkBLV0GunnWwpZ4');
-	var registrationIds = [];
+    var message = new gcm.Message();
+    var sender = new gcm.Sender('AIzaSyDn_H-0W251CKUjDCl-EkBLV0GunnWwpZ4');
+    var registrationIds = [];
 
-	// Optional
-	message.addData('title', 'MiixCard');
-	message.addData('message','Hello Android');
-	message.addData('msgcnt','1');
-	message.collapseKey = 'MiixCard';
-	message.delayWhileIdle = true;
-	message.timeToLive = 3;
+    // Optional
+    message.addData('title', 'MiixCard');
+    message.addData('message','Hello Android');
+    message.addData('msgcnt','1');
+    message.collapseKey = 'MiixCard';
+    message.delayWhileIdle = true;
+    message.timeToLive = 3;
 
-	// At least one required
-	registrationIds.push(device_token);
-	//registrationIds.push('regId2'); 
+    // At least one required
+    registrationIds.push(device_token);
+    //registrationIds.push('regId2'); 
 
-	/**
-	 * Parameters: message-literal, registrationIds-array, No. of retries, callback-function
-	 */
-	sender.send(message, registrationIds, 4, function (result) {
-		FM_LOG(result);
-	});
+    /**
+     * Parameters: message-literal, registrationIds-array, No. of retries, callback-function
+     */
+    sender.send(message, registrationIds, 4, function (result) {
+        FM_LOG(result);
+    });
 };
 
 // Apple Push Notification Service.	
 FM.api._pushNotification = function( device_token ){
-	var apns = require('apn');
-	var options = {
-			cert: './apns/apns-dev-cert.pem',  			/* Certificate file path */ /*./apns-prod/apns-prod-cert.pem*/ /*./apns/apns-dev-cert.pem*/
-			certData: null,                   			/* String or Buffer containing certificate data, if supplied uses this instead of cert file path */
-			key:  './apns/apns-dev-key-noenc.pem',/* Key file path */ /*./apns-prod/apns-prod-key-noenc.pem*/ /*./apns/apns-dev-key-noenc.pem*/
-			keyData: null,                    			/* String or Buffer containing key data, as certData */
-			passphrase: null,                 			/* A passphrase for the Key file */
-			ca: null,                         			/* String or Buffer of CA data to use for the TLS connection */
-			gateway: 'gateway.sandbox.push.apple.com',	/* gateway address 'Sand-box' - gateway.sandbox.push.apple.com */ /* Product- gateway.push.apple.com */
-			port: 2195,                   				/* gateway port */
-			enhanced: true,               				/* enable enhanced format */
-			errorCallback: FM.api._pushErrorCallback,	/* Callback when error occurs function(err,notification) */
-			cacheLength: 100              				/* Number of notifications to cache for error purposes */
-	};
+    var apns = require('apn');
+    var options = {
+            cert: './apns/apns-dev-cert.pem',  			/* Certificate file path */ /*./apns-prod/apns-prod-cert.pem*/ /*./apns/apns-dev-cert.pem*/
+            certData: null,                   			/* String or Buffer containing certificate data, if supplied uses this instead of cert file path */
+            key:  './apns/apns-dev-key-noenc.pem',/* Key file path */ /*./apns-prod/apns-prod-key-noenc.pem*/ /*./apns/apns-dev-key-noenc.pem*/
+            keyData: null,                    			/* String or Buffer containing key data, as certData */
+            passphrase: null,                 			/* A passphrase for the Key file */
+            ca: null,                         			/* String or Buffer of CA data to use for the TLS connection */
+            gateway: 'gateway.sandbox.push.apple.com',	/* gateway address 'Sand-box' - gateway.sandbox.push.apple.com */ /* Product- gateway.push.apple.com */
+            port: 2195,                   				/* gateway port */
+            enhanced: true,               				/* enable enhanced format */
+            errorCallback: FM.api._pushErrorCallback,	/* Callback when error occurs function(err,notification) */
+            cacheLength: 100              				/* Number of notifications to cache for error purposes */
+    };
 
-	
-	var apnsConnection = new apns.Connection(options);
-	var device = new apns.Device(device_token);
-	var note = new apns.Notification();
-	note.expiry = Math.floor(Date.now() / 1000) + 3600*24; // Expires 1 day from now.
-	note.badge = 1;
-	note.sound = "ping.aiff";
-	note.alert = "You have a new video!";
-	note.payload = {'messageFrom': 'Miix.tv'};
-	note.device = device;
-	
-	FM_LOG("PUSH to Device[" + device_token +"]");
-	apnsConnection.sendNotification(note);
+    
+    var apnsConnection = new apns.Connection(options);
+    var device = new apns.Device(device_token);
+    var note = new apns.Notification();
+    note.expiry = Math.floor(Date.now() / 1000) + 3600*24; // Expires 1 day from now.
+    note.badge = 1;
+    note.sound = "ping.aiff";
+    note.alert = "You have a new video!";
+    note.payload = {'messageFrom': 'Miix.tv'};
+    note.device = device;
+    
+    FM_LOG("PUSH to Device[" + device_token +"]");
+    apnsConnection.sendNotification(note);
 
 };
 
@@ -189,29 +189,29 @@ FM.api._fbExtendToken = function(accessToken, callback){
              *         "tags": "" };
              */
 
-			 
-			 
+             
+             
 // Inter
 // TODO: it is suggested that these codes are handled by different roles (such as SocialNetworkMgr, VideoDB, PushMgr)
 FM.api._fbPostVideoThenAdd = function(vjson){ 
-	
-	/* Keep for testing in case.
-	var vjson2 = {  "title":"A Awesome World",
+    
+    /* Keep for testing in case.
+    var vjson2 = {  "title":"A Awesome World",
                     "ownerId": {"_id": "509ba9395a5ce36006000001", "userID": "100004053532907"},
                     "url": {"youtube":"http://www.youtube.com/embed/oZmtwUAD1ds"},
                     "projectId": "rotate-anonymous-20121115T004014395Z"}; */
-					
-	var vjsonData = vjson;				
-	var link = vjsonData.url.youtube;
-	var oid = vjsonData.ownerId._id;
-	var pid = vjsonData.projectId;
-	
-	memberDB.getFBAccessTokenById(oid, function(err, result){
+                    
+    var vjsonData = vjson;				
+    var link = vjsonData.url.youtube;
+    var oid = vjsonData.ownerId._id;
+    var pid = vjsonData.projectId;
+    
+    memberDB.getFBAccessTokenById(oid, function(err, result){
     
         if(err) throw err;
         if(result){
             var userID = result.fb.userID;
-			var userName = result.fb.userName;
+            var userName = result.fb.userName;
             var can_msg = (vjsonData.genre === 'miix_story') ? ("不要懷疑！【"+ userName +"】登上大螢幕和你說聲嗨！") : (userName + "MiixCard活動初體驗！");
             var path = "/" + userID + "/feed",
                 query = "?" + "access_token=" + accessToken
@@ -232,28 +232,28 @@ FM.api._fbPostVideoThenAdd = function(vjson){
                     FM_LOG("\n[Response after POST on FB:]\n" + JSON.stringify(response) ); 
                     //var fb_id = full_id.substring(full_id.lastIndexOf("_")+1);
                    
-					vjsonData.fb_id = fb_id;
-					
+                    vjsonData.fb_id = fb_id;
+                    
                 }
-				videoDB.updateOne({"projectId":pid}, vjsonData, {"upsert": true}, function(err, vdoc){
-					if(err)
-						logger.info(err);
-					
-					memberDB.getDeviceTokenById(oid, function(err, result){
-						if(err) throw err;
-						if(result.deviceToken){
-							FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
-							for( var devicePlatform in result.deviceToken){
-								if(result.deviceToken[devicePlatform] != 'undefined'){
-									if(devicePlatform == 'Android')
-										FM.api._GCM_PushNotification(result.deviceToken[devicePlatform]);
-									else
-										FM.api._pushNotification(result.deviceToken[devicePlatform]);
-								}
-							}
-						}
-					});
-				});
+                videoDB.updateOne({"projectId":pid}, vjsonData, {"upsert": true}, function(err, vdoc){
+                    if(err)
+                        logger.info(err);
+                    
+                    memberDB.getDeviceTokenById(oid, function(err, result){
+                        if(err) throw err;
+                        if(result.deviceToken){
+                            FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
+                            for( var devicePlatform in result.deviceToken){
+                                if(result.deviceToken[devicePlatform] != 'undefined'){
+                                    if(devicePlatform == 'Android')
+                                        FM.api._GCM_PushNotification(result.deviceToken[devicePlatform]);
+                                    else
+                                        FM.api._pushNotification(result.deviceToken[devicePlatform]);
+                                }
+                            }
+                        }
+                    });
+                });
             });
         }
     });
@@ -336,7 +336,7 @@ FM.api.fbGetCommentReq = function(req, res){
         logger.info(req.query);
         var fb_id = req.query.fb_id;
             accessToken = req.query.accessToken,
-			projectId = req.query.projectId;
+            projectId = req.query.projectId;
             
         var fields = "comments,likes";
         var path = "/" + fb_id 
@@ -357,30 +357,30 @@ FM.api.fbGetCommentReq = function(req, res){
 };
 
 FM.api.fbGetThumbnail = function(req, res){
-	FM_LOG("[api.fbGetThumbnail]");
-	if(req.query && req.query.fb_id && req.query.accessToken && req.query.commenter){
-		logger.info(req.query);
+    FM_LOG("[api.fbGetThumbnail]");
+    if(req.query && req.query.fb_id && req.query.accessToken && req.query.commenter){
+        logger.info(req.query);
         var fb_id = req.query.fb_id,
-			commenter = req.query.commenter,
+            commenter = req.query.commenter,
             accessToken = req.query.accessToken;
-			
+            
         var fields = "picture";    
         var path = "/" + commenter 
             + "?access_token=" + accessToken
-			+ "&fields=" + fields; 
+            + "&fields=" + fields; 
             
         FM.api._fbGet(path, function(response){
-			FM_LOG("[Thumbnail] ");
-			logger.info(response);
+            FM_LOG("[Thumbnail] ");
+            logger.info(response);
             if(response.error){
                 logger.info(response.error.message);
                 res.send(response.error);
             }else{
-				response.id = fb_id;
+                response.id = fb_id;
                 res.send(response); // "thumbnail of commenter"
             }
         });
-	}else{
+    }else{
         res.send({error: "fb_id, token and commenter are MUST-Have."});
     }
 }
@@ -425,7 +425,7 @@ FM.api._fbGet = function( path, cb){
     var req = https.request(urlOpts, function(res){
             res.setEncoding('utf8');
             res.on('data', function(chunk){
-				FM_LOG("[fbGet] \n" + chunk);
+                FM_LOG("[fbGet] \n" + chunk);
                 cb(JSON.parse(chunk));
             });                  
         });
@@ -452,7 +452,7 @@ FM.api._fbGetHttp = function( path, cb){
     var req = http.request(urlOpts, function(res){
             res.setEncoding('utf8');
             res.on('data', function(chunk){
-				FM_LOG("[fbGet] \n" + chunk);
+                FM_LOG("[fbGet] \n" + chunk);
                 cb(JSON.parse(chunk));
             });                  
         });
@@ -467,28 +467,28 @@ FM.api._fbGetHttp = function( path, cb){
 
 // POST
 FM.api.deviceToken =  function(req, res){
-	FM_LOG("[Receive deviceToken POST] ");
-	
-	if(req.body && req.body.user){
-		var user = req.body.user;
-		logger.info(user);
-		FM_LOG("\n[Got Device_Token] devicePlatform: " + user.devicePlatform + "; dvc_token: " + user.deviceToken);
-		
-		var oid = ObjectID.createFromHexString(user._id);
-		var deviceToken = {};
-		deviceToken[user.devicePlatform] = user.deviceToken;
-		
-		var jsonStr = '{"deviceToken.' + user.devicePlatform +'":"'+ user.deviceToken + '"}';
-		var json = JSON.parse(jsonStr);
-		
-		memberDB.updateMember( oid, json, function(err, result){
+    FM_LOG("[Receive deviceToken POST] ");
+    
+    if(req.body && req.body.user){
+        var user = req.body.user;
+        logger.info(user);
+        FM_LOG("\n[Got Device_Token] devicePlatform: " + user.devicePlatform + "; dvc_token: " + user.deviceToken);
+        
+        var oid = ObjectID.createFromHexString(user._id);
+        var deviceToken = {};
+        deviceToken[user.devicePlatform] = user.deviceToken;
+        
+        var jsonStr = '{"deviceToken.' + user.devicePlatform +'":"'+ user.deviceToken + '"}';
+        var json = JSON.parse(jsonStr);
+        
+        memberDB.updateMember( oid, json, function(err, result){
             if(err) logger.info(err);
             if(result) logger.info(result);
-			res.send({"message": "Update Device Token!"});
+            res.send({"message": "Update Device Token!"});
         });
-	}else{
-		res.send({"message": "Failed!"});
-	}
+    }else{
+        res.send({"message": "Failed!"});
+    }
 };
 
 
@@ -505,18 +505,18 @@ FM.api.signupwithFB = function(req, res){
         
         var authRes = req.body.authResponse;
         var userID = authRes.userID,
-			userName = authRes.userName,
+            userName = authRes.userName,
             email = null,
             accessToken = authRes.accessToken,
             expiresIn = authRes.expiresIn,
-			device = authRes.device,
-			devicePlatform = authRes.devicePlatform,
-			dvc_Token = authRes.deviceToken,
+            device = authRes.device,
+            devicePlatform = authRes.devicePlatform,
+            dvc_Token = authRes.deviceToken,
             auth = {"accessToken": accessToken,
                     "expiresIn": expiresIn,
             },
             meta = {"userID": userID,
-					"userName": userName,
+                    "userName": userName,
                       "auth": auth
             },
             member = {"fb": meta};
@@ -526,7 +526,7 @@ FM.api.signupwithFB = function(req, res){
             member.email = email;
         }
             
-			
+            
         
         /* New FB User or Exsited User */
         memberDB.isFBValid( userID, function(err, result){
@@ -537,22 +537,22 @@ FM.api.signupwithFB = function(req, res){
                 FM_LOG("[signupwithFB] FB user[" + userID + "] Existed!");
                 
                 var oid = result._id;
-				var deviceToken;
+                var deviceToken;
                 var mPhone_verified = result.mPhone.verified;
                 var fb = result.fb;
                 var existed_access_token = fb.auth.accessToken;
                 var newdata = result.fb;
                 
-				if(dvc_Token){
-					if(result.deviceToken){
-						deviceToken = result.deviceToken;
-					}else{
-						deviceToken = {};
-					}
-					deviceToken[devicePlatform] = dvc_Token;
-					member.deviceToken = deviceToken;
-					
-				}
+                if(dvc_Token){
+                    if(result.deviceToken){
+                        deviceToken = result.deviceToken;
+                    }else{
+                        deviceToken = {};
+                    }
+                    deviceToken[devicePlatform] = dvc_Token;
+                    member.deviceToken = deviceToken;
+                    
+                }
                 
                 fb_handler.isTokenValid(userID, function(err, result){
                     
@@ -626,17 +626,17 @@ FM.api.signupwithFB = function(req, res){
                         }
                     }
                 });
-				
+                
                 
             }else{  //  New fb user signup.
                 FM_LOG("[signupwithFB:] NEW FB User[" + userID + "] Signup!");
                 
-				if(dvc_Token){
-					var deviceToken = {};
-					deviceToken[devicePlatform] = dvc_Token;
-					member.deviceToken= deviceToken;
-				}
-				
+                if(dvc_Token){
+                    var deviceToken = {};
+                    deviceToken[devicePlatform] = dvc_Token;
+                    member.deviceToken= deviceToken;
+                }
+                
                 FM.api._fbExtendToken(authRes.accessToken, function(response){
                     
                     if(response.data){
@@ -663,7 +663,7 @@ FM.api.signupwithFB = function(req, res){
                             };
                             
                             res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn}, 
-								"message":"success"} );
+                                "message":"success"} );
                         } //else{}
                     });
                 });
@@ -924,7 +924,7 @@ FM.api.eventsOfPeriod = function(req, res){
 FM.api.profile = function(req, res){
     FM_LOG("[api.profile]: ");
     logger.info(req.query);
-	
+    
     if(req.query && req.query.userID){
     
         var userID = req.query.userID;
@@ -946,15 +946,15 @@ FM.api.profile = function(req, res){
 
 //	GET
 FM.api.newVideoList = function(req, res){
-	FM_LOG("[api.newVideoList]: ");
+    FM_LOG("[api.newVideoList]: ");
     logger.info(req.query);
-	
+    
     if(req.query && req.query.userID){
     
         var userID = req.query.userID;
         var genre = req.query.genre;
-		var after = new Date(parseInt(req.query.after));
-		FM_LOG(genre +" [AFTER]: " + after.toISOString());
+        var after = new Date(parseInt(req.query.after));
+        FM_LOG(genre +" [AFTER]: " + after.toISOString());
         
         videoDB.getNewVideoListByFB(userID, genre, after, function(err, result){
         
@@ -987,7 +987,7 @@ FM.api.newStreetVideoList = function(req, res){
     if(req.query && req.query.userID){
     
         var userID = req.query.userID;
-		var after = new Date(parseInt(req.query.after));
+        var after = new Date(parseInt(req.query.after));
         
         videoDB.getNewStreetVideoListByFB( userID, after, function(err, result){
             if(err){
@@ -1024,30 +1024,30 @@ var vjson2 = {  "title":"A Awesome World",
 
 // POST
 FM.api.submitAVideo = function(req, res){
-	FM_LOG("[api.submitAVideo]");
-	
-	if(req.body && req.body.userID && req.body.pid && req.body._id){
-		var _id = ObjectID.createFromHexString(req.body._id);
-		var userID = req.body.userID;
-		var pid = req.body.pid;
+    FM_LOG("[api.submitAVideo]");
+    
+    if(req.body && req.body.userID && req.body.pid && req.body._id){
+        var _id = ObjectID.createFromHexString(req.body._id);
+        var userID = req.body.userID;
+        var pid = req.body.pid;
         var genre = (req.body.genre) ? req.body.genre : 'miix';
         
-		FM_LOG("User[" + userID + "] submit a Video[" + pid +"]");
-		var vjson = {
+        FM_LOG("User[" + userID + "] submit a Video[" + pid +"]");
+        var vjson = {
                 "ownerId": {"_id": _id, "userID": userID},
                 "projectId": pid,
                 "genre": genre
             };
 
-		videoDB.addVideo(vjson, function(err, result){
-			if(err) throw err;
-			if(result)
-				res.send(result);
-		});
-		
-	}else{
-		res.send({"message": "_id, userID, pid MUST HAVE!"});
-	}
+        videoDB.addVideo(vjson, function(err, result){
+            if(err) throw err;
+            if(result)
+                res.send(result);
+        });
+        
+    }else{
+        res.send({"message": "_id, userID, pid MUST HAVE!"});
+    }
 };
 
 
@@ -1061,7 +1061,7 @@ FM.api.submitDooh = function(req, res){
             pid = req.body.pid;
         var condition = {projectId: pid};
         var update = {status: 'waiting', "doohTimes.submited_time": Date.now(), $inc: { "triedDoohTimes": 1 }};
-		//JF: add $inc: { "triedDoohTimes": 1 }
+        //JF: add $inc: { "triedDoohTimes": 1 }
         
         videoDB.updateOne(condition, update, null, function(err, result){
             if(err){
@@ -1071,9 +1071,9 @@ FM.api.submitDooh = function(req, res){
             }else{
                 FM_LOG(JSON.stringify(result));
                 res.send(200, {message: "已收到您申請影片登上大螢幕。"});
-				
+                
                 var miixContentMgr = require('../miix_content_mgr.js');
-				miixContentMgr.submitMiixMovieToDooh('', pid);
+                miixContentMgr.submitMiixMovieToDooh('', pid);
             }
         });
         
