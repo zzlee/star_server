@@ -7,8 +7,10 @@ var admin_mgr = require("../admin.js"),
     schedule_mgr = require("../schedule.js"),
     video_mgr = require("../video.js");
 
-    
-var ObjectID = require('mongodb').ObjectID;
+var FMDB = require('../db.js'),
+	videos = FMDB.getDocModel("video"),
+	members = FMDB.getDocModel("member")
+	miix_content_mgr = require('../miix_content_mgr.js');
 
 var DEBUG = true,
     FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str) ); } : function(str){} ;
@@ -111,12 +113,12 @@ FM.admin.memberList_get_cb = function(req, res){
 		var toDo = function(err, result){
 			//console.log(result);
 			if(next == req.query.limit-1) {
-				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], result[2], " ", " ", " ", memberList);
+				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, result[0], result[1], result[2], " ", " ", " ", memberList);
 				//memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], " ", " ", " ", " ", memberList);
 				set_cb(null, 'OK');
 			}
 			else {
-				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], result[2], " ", " ", " ", memberList);
+				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, result[0], result[1], result[2], " ", " ", " ", memberList);
 				//memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], " ", " ", " ", " ", memberList);
 				next += 1;
 				setMemberList(data, set_cb);
@@ -131,7 +133,7 @@ FM.admin.memberList_get_cb = function(req, res){
 				});
 			},
 			function(callback){
-				video_mgr.getVideoCount(data[next]._id, 'story', function(err, result){
+				video_mgr.getVideoCount(data[next]._id, 'miix_story', function(err, result){
 					if(err) callback(err, null);
 					else callback(null, result);
 				});
@@ -176,10 +178,10 @@ FM.admin.memberList_get_cb = function(req, res){
                 //res.render( 'table_member', {'memberList': testArray} );
 				
 				setMemberList(result, function(err, docs){
-					member_mgr.getTotalCommentsLikesSharesOnFB(result[0].fb.userID, function(err, test){
+					/*member_mgr.getTotalCommentsLikesSharesOnFB(result[0].fb.userID, function(err, test){
 						if(err) console.log(err, null);
 						else console.log(null, test);
-					});
+					});*/
 					if(err) console.log(err);
 					else res.render( 'table_member', {'memberList': memberList} );
 				});
@@ -196,6 +198,91 @@ FM.admin.memberList_get_cb = function(req, res){
 FM.admin.miixPlayList_get_cb = function(req, res){
     
     //TODO: need to implement
+	
+	var miixPlayList = [];
+	
+	var miixPlayListInfo = function(photo_url, miix_no, miix_view, fb_like, fb_comment, fb_share, user_name, dooh_apply, dooh_play, played_time, arr) {
+		arr.push({ 
+			//userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T025333669Z/user_data/_cdv_photo_011.jpg', //素材照片
+			userPhotoUrl: photo_url, //素材照片
+			movieNo: miix_no, //影片編號
+			movieViewedCount: miix_view, //觀看次數
+			fbLikeCount: fb_like, //FB讚次數
+			fbCommentCount: fb_comment, //FB留言數
+			fbShareCount: fb_share, //FB分享次數
+			movieMaker: user_name, //會員名稱
+			applyDoohPlayCount: dooh_apply, //投稿次數
+			doohPlayCount: dooh_play, //DOOH刊登次數
+			timesOfPlaying: played_time 
+		});
+	}
+	
+	var async = require('async');
+	var next = 0;
+	
+	var setMiixPlayList = function(data, set_cb){
+		var toDo = function(err, result){
+			//console.log(result);
+			//console.log(data[next]._id, data[next].ownerId._id, data[next].ownerId.userID, data[next].url.youtube);
+			//if(typeof(data[next].url.youtube) === 'undefined') console.log('ture');
+			if(next == req.query.limit-1) {
+				miixPlayListInfo(result[0], data[next].no, result[1], " ", " ", " ", result[2], data[next].triedDoohTimes, data[next].doohPlayedTimes, 0, miixPlayList);
+				//miixPlayListInfo(" ", data[next].no, " ", " ", " ", " ", " ", " ", " ", 0, miixPlayList);
+				set_cb(null, 'OK');
+			}
+			else {
+				miixPlayListInfo(result[0], data[next].no, result[1], " ", " ", " ", result[2], data[next].triedDoohTimes, data[next].doohPlayedTimes, 0, miixPlayList);
+				//miixPlayListInfo(" ", data[next].no, " ", " ", " ", " ", " ", " ", " ", 0, miixPlayList);
+				next += 1;
+				setMiixPlayList(data, set_cb);
+			}
+		}
+		//miix_content_mgr
+		async.parallel([
+			function(callback){
+				miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
+					if(err) callback(err, null);
+					else callback(null, result);
+				});
+			},
+			function(callback){
+				video_mgr.getVideoCount(data[next]._id, 'miix', function(err, result){
+					if(err) callback(err, null);
+					else callback(null, result);
+				});
+			},
+			function(callback){
+				member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
+					if(err) callback(err, null);
+					else if(result == null) callback(null, 'No User');
+					else callback(null, result.fb.userName);
+				});
+			},/*
+			function(callback){
+				//console.log(data[next].ownerId.userID);
+				if((typeof(data[next].ownerId._id) == null) || (typeof(data[next].ownerId._id) === 'undefined') ||
+				   (typeof(data[next].ownerId.userID) == null) || (typeof(data[next].ownerId.userID) === 'undefined') ||
+				   (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, ['No data', 'No data', 'No data']);
+				else { //getCommentsLikesSharesOnFB: function( v_id, owner_id, fb_id, youtube_url, cb)
+					video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].ownerId.userID, data[next].url.youtube, function(err, result){
+						console.log(result);
+						if(err) callback(err, null);
+						else callback(null, 'OK');
+					});
+				}
+			},*/
+		], toDo);
+	}
+	
+	var query = videos.find({'genre': 'miix'});
+    query.sort({'no': 1}).limit(req.query.limit).exec(function(err, docs){
+		//console.dir(docs);
+		setMiixPlayList(docs, function(err, result){
+			if(err) console.log(err);
+			else //console.log(result);
+			res.render('table_miix_movie', {miixMovieList: miixPlayList});
+		});
+	});
     
     FM_LOG("[admin.miixPlayList_get_cb]");
     /*
@@ -225,27 +312,18 @@ FM.admin.miixPlayList_get_cb = function(req, res){
             }
         }];
     */
+	
     video_mgr.getPlayList(function(err, result){
         if(err){
-            logger.error("[video_mgr.getPlayList]error ", err);
-            res.render('form_play', {playList: null});
+            //logger.error("[video_mgr.getPlayList]error ", err);
+            //res.render('form_play', {playList: null});
             
         }else{
-            FM_LOG("playlist:" + JSON.stringify(result));
-            res.render('form_play', {playList: result});
+            //FM_LOG("playlist:" + JSON.stringify(result));
+            //res.render('form_play', {playList: result});
             
             var testArray =
-                [ { userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T025333669Z/user_data/_cdv_photo_011.jpg', //素材照片
-                    movieNo: '035', //影片編號
-                    movieViewedCount: 200, //觀看次數
-                    fbLikeCount: 235, //FB讚次數
-                    fbCommentCount: 203, //FB留言數
-                    fbShareCount: 34, //FB分享次數
-                    movieMaker: 'abc AA', //會員名稱
-                    applyDoohPlayCount: 5, //投稿次數
-                    doohPlayCount: 20, //DOOH刊登次數
-                    timesOfPlaying: ['2013/2/3 15:14', '2013/2/5 16:14', '2013/4/3 15:08'] }, //播放時間
-                  { userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //素材照片
+                [ { userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //素材照片
                     movieNo: '035', //影片編號
                     movieViewedCount: 200, //觀看次數
                     fbLikeCount: 235, //FB讚次數
@@ -263,28 +341,78 @@ FM.admin.miixPlayList_get_cb = function(req, res){
 
 FM.admin.storyPlayList_get_cb = function(req, res){
     //TODO: need to implement
+	
+	var storyPlayList = [];
+	
+	var storyPlayListInfo = function(story_no, story_view, fb_like, fb_comment, fb_share, user_name, arr) {
+		arr.push({ 
+			movieNo: story_no, //影片編號
+            movieViewedCount: story_view, //觀看次數
+            fbLikeCount: fb_like, //FB讚次數
+            fbCommentCount: fb_comment, //FB留言數
+            fbShareCount: fb_share, //FB分享次數
+            movieMaker: user_name //會員名稱
+		});
+	}
+	
+	var async = require('async');
+	var next = 0;
+	
+	var setStoryPlayList = function(data, set_cb){
+		var toDo = function(err, result){
+			if(next == req.query.limit-1) {
+				storyPlayListInfo(data[next].no, result[1], " ", " ", " ", result[0], storyPlayList);
+				set_cb(null, 'OK');
+			}
+			else {
+				storyPlayListInfo(data[next].no, result[1], " ", " ", " ", result[0], storyPlayList);
+				next += 1;
+				setStoryPlayList(data, set_cb);
+			}
+		}
+		
+		async.parallel([
+			function(callback){
+				member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
+					if(err) callback(err, null);
+					else callback(null, result.fb.userName);
+				});
+			},
+			function(callback){
+				video_mgr.getVideoCount(data[next]._id, 'miix_story', function(err, result){
+					if(err) callback(err, null);
+					else callback(null, result);
+				});
+			},/*
+			function(callback){
+				video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId.userID, data[next].fb_id, data[next].url.youtube, function(err, result){
+					if(err) callback(err, null);
+					else callback(null, result);
+				});
+			},*/
+		], toDo);
+	}
+
+	var query = videos.find({'genre': 'miix_story'});
+    query.sort({'no': 1}).limit(req.query.limit).exec(function(err, docs){
+		//console.dir(docs);
+		setStoryPlayList(docs, function(err, result){
+			if(err) console.log(err);
+			else //console.log(result);
+			res.render('table_story_movie', {storyMovieList: storyPlayList});
+		});
+	});
+	
     //res.send(200);
     var testArray =
-        [ { movieNo: '035', //影片編號
-            movieViewedCount: 200, //觀看次數
-            fbLikeCount: 235, //FB讚次數
-            fbCommentCount: 203, //FB留言數
-            fbShareCount: 34, //FB分享次數
-            movieMaker: 'abc AA'}, //會員名稱
-          { movieNo: '055', //影片編號
-            movieViewedCount: 200, //觀看次數
-            fbLikeCount: 235, //FB讚次數
-            fbCommentCount: 203, //FB留言數
-            fbShareCount: 34, //FB分享次數
-            movieMaker: 'abc BB'}, //會員名稱
-          { movieNo: '075', //影片編號
+        [ { movieNo: '075', //影片編號
             movieViewedCount: 200, //觀看次數
             fbLikeCount: 235, //FB讚次數
             fbCommentCount: 203, //FB留言數
             fbShareCount: 34, //FB分享次數
             movieMaker: 'abc CC'} //會員名稱
             ];
-    res.render('table_story_movie', {storyMovieList: testArray});
+    //res.render('table_story_movie', {storyMovieList: testArray});
     
 };
 

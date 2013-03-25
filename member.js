@@ -310,7 +310,7 @@ FM.MEMBER = (function(){
 			},
 			
 			updateDoohTimes: function(_id, cb){
-				videoDB.getVideoCount(_id, "story", function(err, result){
+				videoDB.getVideoCount(_id, "miix_story", function(err, result){
 					var condition = {'_id': _id};
 					FMDB.updateOne(members, condition, {'doohTimes': result}, null, cb);
 				});
