@@ -80,7 +80,7 @@ FM.DB = (function(){
             no: {type: Number},
             aeId: {type: String},
 			triedDoohTimes: {type: Number, min: 0, default: 0},	//JF
-			doohPlayedTimes: {type: Number},	//JF
+			doohPlayedTimes: {type: Number, min: 0, default: 0},	//JF
 			timesOfPlaying: {type: Number}		//JF
         }); //  videos collection
 
@@ -519,57 +519,10 @@ FM.VIDEO = (function(){
 
 
 module.exports = FM.DB.getInstance();
-//module.exports = FM.SCHEDULE.getInstance();
-//module.exports = FM.MEMBER.getInstance();
-//module.exports = FM.VIDEO.getInstance();
 
 
-function test(){
-    /*
-    var jsonObj = {"first_name":"Bang"};   
-    var ObjectID = require('mongodb').ObjectID;
-    var docid = new ObjectID('5024a2f9242a423018000001');
-    FM.DB.getInstance().readAdoc('Member', docid, function cb(err, doc){
-       logger.info('Doc: '+doc);
-    });
-     */
-     
-    /* 
-    var path = "last_name";
-    var field = JSON.parse('{"'+path+'":'+1+'}');
-    
-    FM.DB.getInstance().getValueOf("member", {"first_name":"Gabriels"}, field, function(err, result){
-        if(err)
-            throw err;
-        
-        (result) ? logger.info("TEST: " + result[path]) : logger.info("TEST: Not Found!");
-        
-    });*/
-    
-    /*
-    var case1 = {"name":"case1", "start":19, "end":20},
-        case2 = {"name":"case2", "start":16, "end":18},
-        case3 = {"name":"case3", "start":22, "end":24},
-        case4 = {"name":"case4", "start":17, "end":23};
-        
-    FM.SCHEDULE.getInstance().reserve(case1);
-    FM.SCHEDULE.getInstance().reserve(case2);
-    FM.SCHEDULE.getInstance().reserve(case3);
-    FM.SCHEDULE.getInstance().reserve(case4);
-    logger.info("TEST DONE!");
-    */
-    var range = {"start":17, "end":20};
-    FM.SCHEDULE.getInstance().listOfReservated(range, function(err, result){
-        (err) ? logger.error(err) : logger.info("LIST: "+result);
-    });
-}
 
-/*
-function main(){
-    test();
-}
-main();
-*/
+
 
 
 /* User Token

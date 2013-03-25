@@ -38,7 +38,8 @@ FM.FB_HANDLER = (function(){
                     cb( {error: "access_token is necessary."}, null);
                     return;
                 }
-                    
+                
+				//console.log("data"+ JSON.stringify(data));
                 qs = {'access_token':token, 'batch':JSON.stringify(data) };
                     
                 request({
@@ -54,15 +55,23 @@ FM.FB_HANDLER = (function(){
                         console.logger("[postOnFB] ", error);
                         cb(error, null);
                         
-                    }else{
+                    }else if(body.error){
+						cb(body.error, null);
+					}else{
                         var result = [];
                         //console.log("BODY: " + JSON.stringify(body));
                         for(var i in body){
                             if(body[i]){
-                                if(typeof(body[i].body) === 'string')
-                                    result.push(JSON.parse(body[i].body));
-                                else
-                                    result.push(body[i].body);
+                                if(typeof(body[i].body) === 'string'){
+									var sub_body = JSON.parse(body[i].body);
+									//console.log("sub_body" + sub_body.error);
+									if(!sub_body.error)
+										result.push(sub_body);
+                                }else{
+
+									if(!body[i].error)
+										result.push(body[i].body);
+								}
                             }
                         }
                         

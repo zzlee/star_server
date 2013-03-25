@@ -9,7 +9,7 @@ var admin_mgr = require("../admin.js"),
 
 var FMDB = require('../db.js'),
 	videos = FMDB.getDocModel("video"),
-	members = FMDB.getDocModel("member")
+	members = FMDB.getDocModel("member"),
 	miix_content_mgr = require('../miix_content_mgr.js');
 
 var DEBUG = true,
@@ -107,19 +107,19 @@ FM.admin.memberList_get_cb = function(req, res){
 	}
 
 	var async = require('async');
-	var next = 0;
+	var next = 0,
+		limit;
 	
 	var setMemberList = function(data, set_cb){
 		var toDo = function(err, result){
-			//console.log(result);
-			if(next == req.query.limit-1) {
-				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, result[0], result[1], result[2], " ", " ", " ", memberList);
-				//memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], " ", " ", " ", " ", memberList);
+			//console.dir(result);
+			if(next == limit-1) {
+				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, result[0], result[1], result[2], result[3][0].totalLikes, result[3][0].totalComments, result[3][1].totalShares, memberList);
+				next = 0;
 				set_cb(null, 'OK');
 			}
 			else {
-				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, result[0], result[1], result[2], " ", " ", " ", memberList);
-				//memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, " ", result[0], result[1], " ", " ", " ", " ", memberList);
+				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, result[0], result[1], result[2], result[3][0].totalLikes, result[3][0].totalComments, result[3][1].totalShares, memberList);
 				next += 1;
 				setMemberList(data, set_cb);
 			}
@@ -143,13 +143,13 @@ FM.admin.memberList_get_cb = function(req, res){
 					if(err) callback(err, null);
 					else callback(null, result);
 				});
-			},/*
+			},
 			function(callback){
 				member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
 					if(err) callback(err, null);
 					else callback(null, result);
 				});
-			},*/
+			},
 		], toDo);
 	}	
 	
@@ -161,7 +161,6 @@ FM.admin.memberList_get_cb = function(req, res){
                 //FM_LOG(JSON.stringify(result));
 				
                 //res.render( 'form_member', {memberList: result} );
-
                 
                 var testArray =
                 [ { fb: { userID: '100001295751468', userName: 'CC Zhu' },
@@ -177,13 +176,16 @@ FM.admin.memberList_get_cb = function(req, res){
                     
                 //res.render( 'table_member', {'memberList': testArray} );
 				
+				if(req.query.skip < result.length)
+					limit = req.query.limit;
+				else 
+					limit = result.length;
+				
 				setMemberList(result, function(err, docs){
-					/*member_mgr.getTotalCommentsLikesSharesOnFB(result[0].fb.userID, function(err, test){
-						if(err) console.log(err, null);
-						else console.log(null, test);
-					});*/
 					if(err) console.log(err);
-					else res.render( 'table_member', {'memberList': memberList} );
+					else {
+						res.render( 'table_member', {'memberList': memberList} );
+					}
 				});
 
             }
@@ -218,26 +220,24 @@ FM.admin.miixPlayList_get_cb = function(req, res){
 	}
 	
 	var async = require('async');
-	var next = 0;
+	var next = 0,
+		limit;
 	
 	var setMiixPlayList = function(data, set_cb){
 		var toDo = function(err, result){
 			//console.log(result);
-			//console.log(data[next]._id, data[next].ownerId._id, data[next].ownerId.userID, data[next].url.youtube);
-			//if(typeof(data[next].url.youtube) === 'undefined') console.log('ture');
-			if(next == req.query.limit-1) {
-				miixPlayListInfo(result[0], data[next].no, result[1], " ", " ", " ", result[2], data[next].triedDoohTimes, data[next].doohPlayedTimes, 0, miixPlayList);
-				//miixPlayListInfo(" ", data[next].no, " ", " ", " ", " ", " ", " ", " ", 0, miixPlayList);
+			if(next == limit-1) {
+				miixPlayListInfo(result[0], data[next].no, result[1], result[3][0].likes, result[3][0].comments, result[3][1].shares, result[2], data[next].triedDoohTimes, data[next].doohPlayedTimes, 0, miixPlayList);
+				next = 0;
 				set_cb(null, 'OK');
 			}
 			else {
-				miixPlayListInfo(result[0], data[next].no, result[1], " ", " ", " ", result[2], data[next].triedDoohTimes, data[next].doohPlayedTimes, 0, miixPlayList);
-				//miixPlayListInfo(" ", data[next].no, " ", " ", " ", " ", " ", " ", " ", 0, miixPlayList);
+				miixPlayListInfo(result[0], data[next].no, result[1], result[3][0].likes, result[3][0].comments, result[3][1].shares, result[2], data[next].triedDoohTimes, data[next].doohPlayedTimes, 0, miixPlayList);
 				next += 1;
 				setMiixPlayList(data, set_cb);
 			}
 		}
-		//miix_content_mgr
+
 		async.parallel([
 			function(callback){
 				miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
@@ -257,27 +257,32 @@ FM.admin.miixPlayList_get_cb = function(req, res){
 					else if(result == null) callback(null, 'No User');
 					else callback(null, result.fb.userName);
 				});
-			},/*
+			},
 			function(callback){
-				//console.log(data[next].ownerId.userID);
-				if((typeof(data[next].ownerId._id) == null) || (typeof(data[next].ownerId._id) === 'undefined') ||
-				   (typeof(data[next].ownerId.userID) == null) || (typeof(data[next].ownerId.userID) === 'undefined') ||
-				   (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, ['No data', 'No data', 'No data']);
-				else { //getCommentsLikesSharesOnFB: function( v_id, owner_id, fb_id, youtube_url, cb)
-					video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].ownerId.userID, data[next].url.youtube, function(err, result){
-						console.log(result);
+				if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
+				   (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
+				else {
+					video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
 						if(err) callback(err, null);
-						else callback(null, 'OK');
+						else callback(null, result);
 					});
 				}
-			},*/
+			},
 		], toDo);
 	}
 	
 	var query = videos.find({'genre': 'miix'});
-    query.sort({'no': 1}).limit(req.query.limit).exec(function(err, docs){
-		//console.dir(docs);
-		setMiixPlayList(docs, function(err, result){
+    query.sort({'no': 1}).limit(req.query.limit).skip(req.query.skip).exec(function(err, result){
+		//console.dir(result);
+		
+		if(req.query.skip < result.length)
+			limit = req.query.limit;
+		else 
+			limit = result.length;
+		
+		//console.log(req.query.limit + "," + req.query.skip + "," + result.length + "," + limit);
+		
+		setMiixPlayList(result, function(err, result){
 			if(err) console.log(err);
 			else //console.log(result);
 			res.render('table_miix_movie', {miixMovieList: miixPlayList});
@@ -356,16 +361,19 @@ FM.admin.storyPlayList_get_cb = function(req, res){
 	}
 	
 	var async = require('async');
-	var next = 0;
+	var next = 0,
+		limit;
 	
 	var setStoryPlayList = function(data, set_cb){
 		var toDo = function(err, result){
-			if(next == req.query.limit-1) {
-				storyPlayListInfo(data[next].no, result[1], " ", " ", " ", result[0], storyPlayList);
+			//console.log(result);
+			if(next == limit-1) {
+				storyPlayListInfo(data[next].no, result[1], result[2][0].likes, result[2][0].comments, result[2][1].shares, result[0], storyPlayList);
+				next = 0;
 				set_cb(null, 'OK');
 			}
 			else {
-				storyPlayListInfo(data[next].no, result[1], " ", " ", " ", result[0], storyPlayList);
+				storyPlayListInfo(data[next].no, result[1], result[2][0].likes, result[2][0].comments, result[2][1].shares, result[0], storyPlayList);
 				next += 1;
 				setStoryPlayList(data, set_cb);
 			}
@@ -383,20 +391,32 @@ FM.admin.storyPlayList_get_cb = function(req, res){
 					if(err) callback(err, null);
 					else callback(null, result);
 				});
-			},/*
+			},
 			function(callback){
-				video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId.userID, data[next].fb_id, data[next].url.youtube, function(err, result){
-					if(err) callback(err, null);
-					else callback(null, result);
-				});
-			},*/
+				if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
+				   (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
+				else {
+					video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
+						if(err) callback(err, null);
+						else callback(null, result);
+					});
+				}
+			},
 		], toDo);
 	}
 
 	var query = videos.find({'genre': 'miix_story'});
-    query.sort({'no': 1}).limit(req.query.limit).exec(function(err, docs){
-		//console.dir(docs);
-		setStoryPlayList(docs, function(err, result){
+    query.sort({'no': 1}).limit(req.query.limit).skip(req.query.skip).exec(function(err, result){
+		//console.dir(result);
+		
+		if(req.query.skip < result.length)
+			limit = req.query.limit;
+		else 
+			limit = result.length;
+			
+		//console.log(req.query.limit + "," + req.query.skip + "," + result.length + "," + limit);
+		
+		setStoryPlayList(result, function(err, result){
 			if(err) console.log(err);
 			else //console.log(result);
 			res.render('table_story_movie', {storyMovieList: storyPlayList});
@@ -440,5 +460,21 @@ FM.admin.listSize_get_cb = function(req, res){
 }
 
 /** Internal API */
-
+/*
+var _test = (function(){
+	var ObjectID = require('mongodb').ObjectID;
+	var v_id = ObjectID.createFromHexString("51302b836b8e0e580f000004");
+	var owner_id =  ObjectID.createFromHexString("512d849345483ac80d000003");
+	var fb_id = "100004712734912_604889539525089";
+	var youtube_url = "http://www.youtube.com/embed/CJuffmPIMJ0";
+	if((typeof(fb_id) == null) || (typeof(fb_id) === 'undefined') ||
+	   (typeof(youtube_url) == null) || (typeof(youtube_url) === 'undefined')) callback(null, ['No data', 'No data', 'No data']);
+	else {
+		video_mgr.getCommentsLikesSharesOnFB(v_id, owner_id, fb_id, youtube_url, function(err, result){
+			if(err) console.log(err, null);
+			else console.log(null, result);
+		});
+	}
+})();
+*/
 module.exports = FM.admin;

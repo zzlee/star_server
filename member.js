@@ -126,7 +126,6 @@ FM.MEMBER = (function(){
             },
             
             getTotalCommentsLikesSharesOnFB: function(userID, cb){
-                var that = this;
                 var likes_count = 0,
                     comments_count = 0,
                     shares_count = 0;
@@ -139,7 +138,7 @@ FM.MEMBER = (function(){
                     }else if(videos && videos.length > 0){
                         var async = require("async");
                         
-                        that.getFBAccessTokenByFBId(userID, function(err, fb_auth){
+                        FM.MEMBER.getInstance().getFBAccessTokenByFBId(userID, function(err, fb_auth){
                             if(err){
                                 logger.error("[getTotalLikesOnFB] ", err);
                                 cb(err, null);
@@ -160,9 +159,10 @@ FM.MEMBER = (function(){
                                         
                                         fb_handler.batchRequestToFB(access_token, null, batch, function(err, result){
                                             if(err){
-                                                callback(err, null);
+                                                callback(null, {totalLikes: likes_count, totalComments: comments_count});
                                                 
                                             }else{
+												//console.log(JSON.stringify(result));
                                                 for(var i in result){
                                                     //console.log(result[i]);
                                                     comments_count += result[i].comments.count;
@@ -170,9 +170,8 @@ FM.MEMBER = (function(){
                                                     // when count=0, there is no likes object.
                                                     likes_count += (result[i].likes) ? result[i].likes.count : 0;
                                                 }
+												callback(null, {totalLikes: likes_count, totalComments: comments_count} );
                                             }
-                                            
-                                            callback(null, {totalLikes: likes_count, totalComments: comments_count} );
                                         });
                                     },
                                     function(callback){
@@ -185,14 +184,14 @@ FM.MEMBER = (function(){
                                         
                                         fb_handler.batchRequestToFB(access_token, null, batch, function(err, result){
                                             if(err){
-                                                callback(err, null);
+                                                //callback(err, null);
+												callback(null, {totalShares: shares_count} );
                                             }else{
                                                 for(var i in result){
                                                     shares_count += (result[i].shares) ? result[i].shares: 0;
                                                 }
+												callback(null, {totalShares: shares_count} );
                                             }
-                                            
-                                            callback(null, {totalShares: shares_count} );
                                         });
                                     }
                                 ]
@@ -208,7 +207,7 @@ FM.MEMBER = (function(){
                         
                         
                     }else{
-                        cb(null, {count: 0});
+                        cb(null, [{totalLikes: likes_count, totalComments: comments_count}, {totalShares: shares_count}]);
                     }
                 });
             },
@@ -278,10 +277,7 @@ FM.MEMBER = (function(){
             /*    TEST    */
             _test: function(){
                 var oid = ObjectID.createFromHexString("512d8df5989cfc2403000002");
-                this.updateMember( oid, {"fb.userName": "Felt Meng", "fb.userID":"100004840958721"
-                , "fb.auth.accessToken":"AAABqPdYntP0BADKwGxVqhtQCaWm3dIJtuzPtWZA2KMRVbuzWqP0TmMQlxZAOwYscjwyv4131iWE0CM9UjIO8E6ZAkvMNmblXj18rLi4EAZDZD"
-                , "fb.auth.expiresIn":"0"
-                }, function(err, result){
+                this.getTotalCommentsLikesSharesOnFB( '100000886748741', function(err, result){
                     if(err)
                         console.log("Err: " + JSON.stringify(err));
                     else
