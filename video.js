@@ -1,6 +1,4 @@
-var FMDB = require('./db.js'),
-    memberDB = require('./member.js'),
-	youtubeInfo = require('./youtube_mgr.js');
+
     
 var FM = {};
 var DEBUG = true,
@@ -8,9 +6,13 @@ var DEBUG = true,
 
 FM.VIDEO = (function(){
     var uInstance;
+	
     
     function constructor(){
-        var videos = FMDB.getDocModel("video");
+		var FMDB = require('./db.js'),
+			memberDB = require('./member.js'),
+			youtubeInfo = require('./youtube_mgr.js'),
+			videos = FMDB.getDocModel("video");
         
         return {
         /*
@@ -122,9 +124,11 @@ FM.VIDEO = (function(){
                 var async = require("async");
                 var likes_count = 0,
                     comments_count = 0,
-                    shares_count = 0;
-                
-                memberDB.getFBAccessTokenById(owner_id, function(err, fb_auth){
+                    shares_count = 0;	
+				var memberDB_fb = require('./member.js');
+				
+                memberDB_fb.getFBAccessTokenById(owner_id, function(err, fb_auth){
+					//console.log(fb_auth);
                     if(err){
                         logger.error("[memberDB.getFBAccessTokenById] ", err);
                         cb(err, null);
@@ -145,17 +149,20 @@ FM.VIDEO = (function(){
                                     //body: {'batch': JSON.stringify(data),},
                                     
                                 }, function(error, response, body){
-                                    
                                     if(error){
                                         logger.error("[ReqCommentsLikesToFB] ", error);
                                         callback(error, null);
                                         
                                     }else{
                                         //console.log("comments " + body);
-                                        comments_count = body.comments.count;
-                                        likes_count = (body.likes) ? body.likes.count : 0;
-                                        
-                                        callback(null, {comments: comments_count, likes: likes_count} );
+										if(body.error) 
+											callback(null, {comments: comments_count, likes: likes_count} );
+										else {
+											comments_count = body.comments.count;
+											likes_count = (body.likes) ? body.likes.count : 0;
+											
+											callback(null, {comments: comments_count, likes: likes_count} );
+										}
                                     }
                                 });
                             }
@@ -171,11 +178,9 @@ FM.VIDEO = (function(){
                                     //body: {'batch': JSON.stringify(data),},
                                     
                                 }, function(error, response, body){
-                                    
                                     if(error){
                                         logger.error("[ReqCommentsLikesToFB] ", error);
                                         callback(error, null);
-                                        
                                     }else{
                                         //console.log("shares" + body);
                                         shares_count = (body.shares) ? body.shares : 0;
@@ -193,6 +198,7 @@ FM.VIDEO = (function(){
                                 
                             }else{
                                 cb(null, result);
+								//cb(null, [{comments: comments_count, likes: likes_count}, {shares: shares_count}]);
                             }
                         });
                     }
@@ -279,10 +285,11 @@ FM.VIDEO = (function(){
                         console.log("result: " + JSON.stringify(result));
                     }
                 });
-				
+				/*
 				this.getViewCount('http://www.youtube.com/embed/Y1DdQmx8os0', function(res, err){
 					if(res == null) console.log('0');
 				});
+				*/
             },
         };
     }
