@@ -557,7 +557,7 @@ FM.api.signupwithFB = function(req, res){
                 fb_handler.isTokenValid(userID, function(err, result){
                     
                     // Extending new/short access_token replaces invalid existed access_token.
-                    if(!result){
+                    if(!result.is_valid){
                         fb_handler.extendToken(accessToken, function(err, response){
                             if(err){
                                 res.send( {"data":{"_id": oid.toHexString(), "accessToken": accessToken, "expiresIn": expiresIn, "verified": mPhone_verified  }, "message":"success"} );
