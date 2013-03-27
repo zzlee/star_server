@@ -950,7 +950,7 @@ FM.api.newVideoList = function(req, res){
     FM_LOG("[api.newVideoList]: ");
     logger.info(req.query);
     
-    if(req.query && req.query.userID){
+    if(req.query && req.query.userID && req.query.after){
     
         var userID = req.query.userID;
         var genre = req.query.genre;

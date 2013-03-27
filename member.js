@@ -215,7 +215,7 @@ FM.MEMBER = (function(){
             
             isFBTokenValid: function( req, res ){
                 FM_LOG("[isFBTokenValid]");
-                if(!req.query && !req.query.fb_id){
+                if(!req.query && !req.query.fb_id && !req.query._id){
                     res.send({error: "Bad Request"});
                     return;
                 }
