@@ -213,6 +213,7 @@ FM.api._fbPostVideoThenAdd = function(vjson){
             var userID = result.fb.userID;
             var userName = result.fb.userName;
             var can_msg = (vjsonData.genre === 'miix_story') ? ("不要懷疑！【"+ userName +"】登上大螢幕和你說聲嗨！") : (userName + "MiixCard活動初體驗！");
+            var accessToken = result.fb.auth.accessToken;
             var path = "/" + userID + "/feed",
                 query = "?" + "access_token=" + accessToken
                 + "&message=" + can_msg
