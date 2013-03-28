@@ -293,12 +293,12 @@ FM.DB = (function(){
 
             updateAdoc: function(docModel, docid, jsonObj, cb){
                 //logger.info("\n updateAdoc " + " fields: " + JSON.stringify(jsonObj));
-                docModel.findByIdAndUpdate(docid, {$atomic: jsonObj}, cb);
+                docModel.findByIdAndUpdate(docid, {$set: jsonObj}, cb);
             },
             
 			updateOne: function(docModel, condition, jsonObj, options, cb){
 				FM_LOG("\n[updateOne]");
-				docModel.findOneAndUpdate(condition, {$atomic: jsonObj}, options, cb);
+				docModel.findOneAndUpdate(condition, {$set: jsonObj}, options, cb);
 			},
 			
             deleteAdoc: function(docModel, docid, cb){
