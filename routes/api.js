@@ -238,7 +238,12 @@ FM.api._fbPostVideoThenAdd = function(vjson){
                 }
                 videoDB.updateOne({"projectId":pid}, vjsonData, {"upsert": true}, function(err, vdoc){
                     if(err)
-                        logger.info(err);
+                        logger.error(err);
+                    
+                    //debug
+                    videoDB.getNewVideoListByFB(vjsonData.ownerId.userID, 'miix', 0, function(err, result){
+                        logger.info('[result of adding one new miix video into db]: '+JSON.stringify(result));
+                    });
                     
                     memberDB.getDeviceTokenById(oid, function(err, result){
                         if(err) throw err;
