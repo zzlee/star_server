@@ -96,7 +96,7 @@ FM.api._pushNotification = function( device_token ){
 };
 
 
-// GET
+//DEPRECATED
 FM.api.fbStatus = function(req, res){
     
     var sid = req.sessionID;
@@ -111,7 +111,7 @@ FM.api.fbStatus = function(req, res){
     FM.api.reply[sid] = res;
 };
 
-// Inter
+//DEPRECATED
 FM.api._fbStatusAck = function(response){
     FM_LOG("\n[fbStatusAck]:");
     
@@ -258,8 +258,10 @@ FM.api._fbPostVideoThenAdd = function(vjson){
             });
         }
     });
-}
-// Inter
+};
+
+
+//DEPRECATED
 FM.api._fbPostVideo = function(projectID, content){
         
     videoDB.getValueByProject(projectID, "ownerId _id url.youtube", function(err, result){    
@@ -384,7 +386,7 @@ FM.api.fbGetThumbnail = function(req, res){
     }else{
         res.send({error: "fb_id, token and commenter are MUST-Have."});
     }
-}
+};
 
 // Inter
 FM.api._fbPost = function( path, cb){
@@ -439,6 +441,7 @@ FM.api._fbGet = function( path, cb){
 
 };
 
+//DEPRECATED
 FM.api._fbGetHttp = function( path, cb){
 
     var host = "graph.facebook.com",
@@ -854,7 +857,7 @@ FM.api.addEvent = function(req, res){
 };
 
 
-// POST
+ //DEPRECATED
 FM.api.reject = function(req, res){
 
     var evtid = req.body.event.oid;
@@ -871,7 +874,7 @@ FM.api.reject = function(req, res){
     });
 };
 
-// POST
+ //DEPRECATED
 FM.api.prove = function(req, res){
 
     var evtid = req.body.event.oid;
