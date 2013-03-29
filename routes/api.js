@@ -1069,7 +1069,7 @@ FM.api.submitDooh = function(req, res){
             userID = req.body.userID,
             pid = req.body.pid;
         var condition = {projectId: pid};
-        var update = {status: 'waiting', "doohTimes.submited_time": Date.now(), $inc: { "triedDoohTimes": 1 }};
+        var update = {status: 'waiting', "doohTimes.submited_time": Date.now(), inc: { "triedDoohTimes": 1 }};
         //JF: add $inc: { "triedDoohTimes": 1 }
         
         videoDB.updateOne(condition, update, null, function(err, result){
