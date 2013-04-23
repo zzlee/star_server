@@ -18,9 +18,6 @@ var connectionHandler = require('./connection_handler.js');
 exports.commandResponse_post_cb = connectionHandler.commandResponse_post_cb;
 exports.command_get_cb = connectionHandler.command_get_cb;
 
-var analyticsHandler = require('./analytics_handler.js');
-exports.recordUserAction_cb = analyticsHandler.recordUserAction_cb;
-
 var storyCamControllerHandler = require('./story_cam_controller_handler.js');
 exports.storyCamControllerHandler = storyCamControllerHandler;
 
