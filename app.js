@@ -323,6 +323,7 @@ setTimeout(function(){
 }, 3000);
 */
 
+/*
 //test of Jeff
 app.get('/test', function(req, res) {
 	//get message.
@@ -338,3 +339,4 @@ app.get('/test', function(req, res) {
 	}
 	res.end();
 });
+*/
