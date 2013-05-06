@@ -11,8 +11,8 @@ exports.getTemplateCustomizableObjectList_cb = movieTemplate.getTemplateCustomiz
 var youtube = require('./yt_oauth2_handler.js');
 exports.YoutubeOAuth2_cb = youtube.YoutubeOAuth2_cb;
 
-var upload = require('./upload.js');
-exports.upload_cb = upload.upload_cb;
+var uploadHandler = require('./upload_handler.js');
+exports.upload_photo_cb = uploadHandler.upload_photo_cb;
 
 var connectionHandler = require('./connection_handler.js');
 exports.commandResponse_post_cb = connectionHandler.commandResponse_post_cb;

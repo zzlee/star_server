@@ -91,7 +91,7 @@ app.post('/members/device_tokens', routes.api.deviceToken);
 /**
  *  Miix client 
  */
-app.post('/miix/videos/user_content_files', routes.upload_cb );
+app.post('/miix/videos/user_content_files', routes.upload_photo_cb );
 app.post('/miix/videos/user_content_description',routes.uploadUserDataInfo_cb);
 app.get('/miix/videos/new_videos', routes.api.newVideoList);
 
