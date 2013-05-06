@@ -77,29 +77,68 @@ app.configure('production', function(){
 
 app.get('/users', user.list);
 
+/**
+ *  generic 
+ */
+app.get('/fb/comment', routes.api.fbGetCommentReq); 
+app.get('/fb/thumbnail', routes.api.fbGetThumbnail);
+app.get('/members/authentication_code', routes.api.codeGenerate);
+app.post('/members/authentication_code_validity', routes.api.codeVerify);  //TODO: better use GET
+app.get('/members/fb_token_validity', routes.member.isFBTokenValid);
+app.post('/members/fb_info', routes.api.signupwithFB);
+app.post('/members/device_tokens', routes.api.deviceToken);
 
-//GZ 
-app.get('/get_template_list', routes.getTemplateList_cb );
-app.get('/get_template_raw_data', routes.getTemplateRawData_cb );
-app.get('/get_template_description', routes.getTemplateDescription_cb );
-app.get('/get_template_customizable_object_list', routes.getTemplateCustomizableObjectList_cb );
-app.post('/upload_user_data', routes.uploadUserData_cb );
-app.get('/oauth2callback', routes.YoutubeOAuth2_cb );
-app.post('/upload', routes.upload_cb );
-app.post('/upload_user_data_info',routes.uploadUserDataInfo_cb);
-//app.get('/report_rendering_result', routes.reportRenderingResult_cb);
-app.get('/long_polling_from_ae_server', routes.longPollingFromAeServer_cb);
+/**
+ *  Miix client 
+ */
+app.post('/miix/videos/user_content_files', routes.upload_cb );
+app.post('/miix/videos/user_content_description',routes.uploadUserDataInfo_cb);
+app.get('/miix/videos/new_videos', routes.api.newVideoList);
 
+app.post('/miix/videos/miix_videos', routes.api.submitAVideo);
+app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh);
+
+
+/**
+ *  Miix admin
+ */
+app.get('/miix_admin', routes.admin.get_cb); 
+app.get('/miix_admin/login', routes.admin.login_get_cb); //TODO: change to a better resource name of RESTful style
+app.get('/miix_admin/logout', routes.admin.logout_get_cb); //TODO: change to a better resource name of RESTful style
+app.get('/miix_admin/members', routes.admin.memberList_get_cb);
+app.get('/miix_admin/miix_movies', routes.admin.miixPlayList_get_cb); 
+app.get('/miix_admin/story_movies', routes.admin.storyPlayList_get_cb);
+app.get('/miix_admin/list_size', routes.admin.listSize_get_cb);
+
+
+/**
+ *  Internal
+ */
+app.get('/internal/oauth2callback', routes.YoutubeOAuth2_cb );
 app.get('/internal/commands', routes.command_get_cb);
-app.post('/internal/command_responses', routes.commandResponse_post_cb);
+app.post('/internal/command_responses', routes.commandResponse_post_cb); 
+
 app.post('/internal/dooh/movie_playing_state', routes.dooh_handler.doohMoviePlayingState_post_cb);
+app.post('/internal/dooh/dooh_periodic_data', routes.dooh_handler.importPeriodicData);
+app.get('/internal/dooh/dooh_current_video', routes.dooh_handler.dooh_current_video);
+
 app.post('/internal/story_cam_controller/available_story_movie', routes.storyCamControllerHandler.availableStoryMovie_post_cb);
 
-//GL
-/**
- *  WEB ADMINISTRATION
- */
 
+// == DEPRECATED ==, but used by MiixCard v1.2 or earlier versions
+//movie gen
+app.get('/get_template_list', routes.getTemplateList_cb ); //not used in MiixCard v1.2
+app.get('/get_template_raw_data', routes.getTemplateRawData_cb ); //not used in MiixCard v1.2
+app.get('/get_template_description', routes.getTemplateDescription_cb ); //not used in MiixCard v1.2
+app.get('/get_template_customizable_object_list', routes.getTemplateCustomizableObjectList_cb ); //not used in MiixCard v1.2
+app.post('/upload_user_data', routes.uploadUserData_cb ); //not used in MiixCard v1.2
+
+app.get('/oauth2callback', routes.YoutubeOAuth2_cb );
+
+app.post('/upload', routes.upload_cb );
+app.post('/upload_user_data_info',routes.uploadUserDataInfo_cb);
+
+//admin
 app.get('/admin', routes.admin.get_cb); 
 app.get('/admin/login', routes.admin.login_get_cb);
 app.get('/admin/logout', routes.admin.logout_get_cb);
@@ -108,68 +147,39 @@ app.get('/admin/miix_play_list', routes.admin.miixPlayList_get_cb);
 app.get('/admin/story_play_list', routes.admin.storyPlayList_get_cb);
 app.get('/admin/list_size', routes.admin.listSize_get_cb);
 
-/*
-app.get('/', routes.profile, routes.index);
-app.get('/censorship', routes.censorship);
-app.get('/([a-zA-Z0-9]+)', routes.api.profile);
-app.get('/signin_fb', routes.signinFB);
-
-app.post('/', routes.profile, routes.index);
-app.post('/signin', routes.signin, routes.profile, routes.index);
-app.post('/signup', routes.signup, routes.profile, routes.index);
-app.post('/addEvent', routes.addEvent, routes.event, routes.schedule);
-app.post('/addVideo', routes.addVideo, routes.profile, routes.index );
-
-app.del('/', routes.signout, routes.index);*/
-
-/**
- *  Internal
- */
-//JF, modified by Gabriel
+//internal
 app.post('/internal/dooh_periodic_data', routes.dooh_handler.importPeriodicData);
-
 app.get('/internal/dooh_current_video', routes.dooh_handler.dooh_current_video);
+app.post('/internal/dooh_timeslot_rawdata', routes.timeDataGet);
 
 
-/**
- * FM.API
- */
-app.get('/api/eventsOfWaiting', routes.api.eventsOfWaiting);
-app.get('/api/schedule', routes.api.eventsOfPeriod);
-app.get('/api/userProfile', routes.api.userProfile);
-app.get('/api/profile', routes.api.profile);
-//app.get('/api/fbStatus', routes.api.fbStatus); //DEPRECATED 
-app.get('/api/fbGetComment', routes.api.fbGetCommentReq);
+//FM.API
+app.get('/api/eventsOfWaiting', routes.api.eventsOfWaiting); //not used in MiixCard v1.0 or later
+app.get('/api/schedule', routes.api.eventsOfPeriod); //not used in MiixCard v1.0 or later
+app.get('/api/userProfile', routes.api.userProfile); //not used in MiixCard v1.0 or later
+app.get('/api/profile', routes.api.profile); //not used in MiixCard v1.0 or later
+app.get('/api/fbGetComment', routes.api.fbGetCommentReq); 
 app.get('/api/fbGetThumbnail', routes.api.fbGetThumbnail);
 app.get('/api/newVideoList', routes.api.newVideoList);
-app.get('/api/newStreetVideoList', routes.api.newStreetVideoList);
+app.get('/api/newStreetVideoList', routes.api.newStreetVideoList); //not used in MiixCard v1.2
 app.get('/api/codeGeneration', routes.api.codeGenerate);
 
-
-
-/*
- *  member.js
- */
+//member.js
 app.get('/api/member.isFBTokenValid', routes.member.isFBTokenValid);
 
-
-
-app.post('/api/signin', routes.api.signin);  //DEPRECATED
-
-app.post('/api/signup', routes.api.signup);  //DEPRECATED
-app.post('/api/addEvent', routes.api.addEvent);
-app.post('/api/reject', routes.api.reject); //DEPRECATED
-app.post('/api/prove', routes.api.prove); //DEPRECATED
+app.post('/api/signin', routes.api.signin);  //not used in MiixCard v1.0 or later, but worse to be kept for Miix web client
+app.post('/api/signup', routes.api.signup);  //not used in MiixCard v1.0 or later, but worse to be kept for Miix web client
+app.post('/api/addEvent', routes.api.addEvent); //not used in MiixCard v1.0 or later
+app.post('/api/reject', routes.api.reject); //not used in MiixCard v1.0 or later
+app.post('/api/prove', routes.api.prove); //not used in MiixCard v1.0 or later
 app.post('/api/signupwithFB', routes.api.signupwithFB);
 app.post('/api/deviceToken', routes.api.deviceToken);
 app.post('/api/submitAVideo', routes.api.submitAVideo);
 app.post('/api/submitDooh', routes.api.submitDooh);
 app.post('/api/codeVerification', routes.api.codeVerify);
 
-app.del('/', routes.api.signout);
+app.del('/', routes.api.signout); //not used in MiixCard v1.0 or later, but worse to be kept for Miix web client
 
-//JF
-app.post('/internal/dooh_timeslot_rawdata', routes.timeDataGet);
 
 
 http.createServer(app).listen(app.get('port'), function(){
