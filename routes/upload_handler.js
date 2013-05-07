@@ -161,7 +161,6 @@ uploadHandler.upload_photo_cb = function(req, res){
     
     logger.log('req.body.fileObjectID= '+ req.body.fileObjectID);
     
-    var areaToCrop, resizeTo;
     
     if ( req.body.projectID ) {
         var projectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectID);
@@ -174,20 +173,30 @@ uploadHandler.upload_photo_cb = function(req, res){
         }
         target_path = path.join( userDataDir, req.files['file'].name);
         
-        
-        
-        areaToCrop = { 	x: req.body.croppedArea_x,
-                        y: req.body.croppedArea_y,
-                        width: req.body.croppedArea_width,
-                        height: req.body.croppedArea_height };
-                            
-        resizeTo = { width: req.body.obj_OriginalWidth, height: req.body.obj_OriginalHeight};
-        
-        moveFile( tmp_path, target_path, function() { 
-            processFile( userDataDir, req.files['file'].name, areaToCrop, resizeTo, req.body.osVersion, function() {
-                res.send(null);
+        if (req.body.format == "video"){
+            moveFile( tmp_path, target_path, function() { 
+                var newPath = path.join( userDataDir, "_"+req.files['file'].name );
+                fs.rename(target_path, newPath, function(){
+                    res.send(200, {message: "User content file is succesfully uploaded."});
+                });
             });
-        });
+        }
+        else {  //req.body.format == "image"
+        
+            var areaToCrop, resizeTo;        
+            areaToCrop = { 	x: req.body.croppedArea_x,
+                            y: req.body.croppedArea_y,
+                            width: req.body.croppedArea_width,
+                            height: req.body.croppedArea_height };
+                                
+            resizeTo = { width: req.body.obj_OriginalWidth, height: req.body.obj_OriginalHeight};
+            
+            moveFile( tmp_path, target_path, function() { 
+                processFile( userDataDir, req.files['file'].name, areaToCrop, resizeTo, req.body.osVersion, function() {
+                    res.send(200, {message: "User content file is succesfully uploaded."});;
+                });
+            });
+        }
         
     }
     else {
