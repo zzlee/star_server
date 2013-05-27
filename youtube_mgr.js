@@ -1,6 +1,6 @@
 ﻿var fs = require('fs');
 var path = require('path');
-var workingPath = process.env.STAR_SERVER_PROJECT;
+var workingPath = process.cwd();
 var ytToken = null;
 var yt_feed = require('youtube-feeds');
 

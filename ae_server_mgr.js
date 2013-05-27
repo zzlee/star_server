@@ -1,6 +1,6 @@
 var aeServerMgr = {};
 
-var workingPath = process.env.STAR_SERVER_PROJECT;
+var workingPath = process.cwd();
 var path = require('path');
 var http = require('http');
 var url = require('url');

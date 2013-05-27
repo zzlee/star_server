@@ -1,6 +1,6 @@
 var FM = { miixContentMgr: {} };
 
-var workingPath = process.env.STAR_SERVER_PROJECT;
+var workingPath = process.cwd();
 var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var memberDB = require(workingPath+'/member.js');

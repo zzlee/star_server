@@ -1,6 +1,6 @@
 var storyContentMgr = {};
 
-var workingPath = process.env.STAR_SERVER_PROJECT;
+var workingPath = process.cwd();
 var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var storyCamControllerMgr = require(workingPath+'/story_cam_controller_mgr.js');

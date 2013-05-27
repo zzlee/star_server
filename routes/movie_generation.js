@@ -1,6 +1,6 @@
 ﻿var fs = require('fs');
 var path = require('path');
-var workingPath = process.env.STAR_SERVER_PROJECT;
+var workingPath = process.cwd();
 //var movieMaker = require(workingPath+'/ae_render.js');
 //var aeServerManager = require(workingPath+'/ae_server_manager.js');
 var miixContentMgr = require(workingPath+'/miix_content_mgr.js');
