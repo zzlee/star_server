@@ -1,5 +1,5 @@
 ﻿//GZ  
-var movieGeneration = require('./movie_generation.js'); 
+var movieGeneration = require('./movie_generation.js');   //TODO: move to userContentHandler
 exports.uploadUserData_cb = movieGeneration.uploadUserData_cb;
 exports.uploadUserDataInfo_cb = movieGeneration.uploadUserDataInfo_cb;
 
@@ -11,8 +11,8 @@ exports.getTemplateCustomizableObjectList_cb = movieTemplate.getTemplateCustomiz
 var youtube = require('./yt_oauth2_handler.js');
 exports.YoutubeOAuth2_cb = youtube.YoutubeOAuth2_cb;
 
-var uploadHandler = require('./upload_handler.js');
-exports.upload_photo_cb = uploadHandler.upload_photo_cb;
+var userContentHandler = require('./user_content_handler.js');
+exports.upload_photo_cb = userContentHandler.upload_photo_cb;
 
 var connectionHandler = require('./connection_handler.js');
 exports.commandResponse_post_cb = connectionHandler.commandResponse_post_cb;

@@ -156,7 +156,7 @@ exports.uploadUserData_cb = function(req, res) {
 
 };
 
-
+//POST /miix/videos/user_content_description
 exports.uploadUserDataInfo_cb = function(req, res) {
 
 	var movieProjectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectID);

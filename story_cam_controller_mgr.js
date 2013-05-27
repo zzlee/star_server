@@ -24,7 +24,7 @@ storyCamControllerMgr.startRecording = function( miixMovieProjectID, startedReco
 
 
 
-}
+};
 
 storyCamControllerMgr.stopRecording = function( stoppedRecording_cb ){
 
@@ -40,7 +40,7 @@ storyCamControllerMgr.stopRecording = function( stoppedRecording_cb ){
 		}
 	});
 
-}
+};
 
 storyCamControllerMgr.uploadStoryMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
@@ -59,7 +59,7 @@ storyCamControllerMgr.uploadStoryMovieToMainServer = function(movieProjectID, up
 	});
 
 
-}
+};
 
 
 

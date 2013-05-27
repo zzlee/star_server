@@ -3,7 +3,7 @@ var connectionHandler = {};
 var events = require("events");
 var eventEmitter = new events.EventEmitter();
 
-
+//POST /internal/command_responses
 connectionHandler.commandResponse_post_cb = function(req, res) {
 
 	var commandID = req.headers._command_id;
@@ -25,6 +25,7 @@ connectionHandler.sendRequestToRemote = function( targetID, reqToRemote, cb ) {
 	eventEmitter.once('RESPONSE_'+reqToRemote._commandID, cb);
 }
 
+//GET /internal/commands
 connectionHandler.command_get_cb = function(req, res) {
 	logger.info('['+ new Date() +']Got long-polling from remot: '+ req.headers.remote_id )
 	//console.log('['+ new Date() +']Got long-polling HTTP request from remot: '+ req.headers.remote_id )

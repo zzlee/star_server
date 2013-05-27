@@ -111,14 +111,6 @@ FM.miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUr
             }		
         }
     });
-}
-
-FM.miixContentMgr.setMiixPlayList = function(cb) {
-
-};
-
-FM.miixContentMgr.submitMiixPlayListToDooh = function(cb) {
-
 };
 
 

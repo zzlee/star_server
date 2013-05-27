@@ -1,4 +1,4 @@
-var uploadHandler = {};
+var userContentHandler = {};
 
 var fs = require('fs');
 var path = require('path');
@@ -8,7 +8,8 @@ var workingPath = process.env.AE_PROJECT;
  * handle file upload
  */
 
-uploadHandler.upload_photo_cb = function(req, res){
+//POST /miix/videos/user_content_files
+userContentHandler.upload_photo_cb = function(req, res){
 
     var processFile = function( _userDataDir, _imageFileToProcess, _areaToCrop, _resizeTo, _osVersion, _callback1 ) {
         //var fileNameBody = _imageFileToProcess.substring(0, _imageFileToProcess.lastIndexOf(".") )
@@ -211,4 +212,4 @@ uploadHandler.upload_photo_cb = function(req, res){
 
 
 
-module.exports = uploadHandler;
+module.exports = userContentHandler;

@@ -69,7 +69,7 @@ aeServerMgr.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, 
 		}
 	});
 
-}
+};
 
 var defaultAeServer = 'AE_Server_feltmeng_art_PC';
 //var defaultAeServer = 'AE_server_gance_Feltmeng_pc';
@@ -105,7 +105,7 @@ aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, mo
 	
 	});
 
-}
+};
 
 //use long polling to ask AE Server to create Story movie
 aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
@@ -138,7 +138,7 @@ aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movi
 	
 	});
 
-}
+};
 
 
 aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
@@ -158,7 +158,7 @@ aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 	});
 	
 
-}
+};
 
 aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, downloadMovie_cb) {
 
@@ -177,7 +177,7 @@ aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, download
 	});
 
 
-}
+};
 
 
 module.exports = aeServerMgr;
