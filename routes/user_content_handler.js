@@ -2,7 +2,7 @@ var userContentHandler = {};
 
 var fs = require('fs');
 var path = require('path');
-var workingPath = process.env.AE_PROJECT;
+var workingPath = process.cwd();
 
 /*
  * handle file upload
