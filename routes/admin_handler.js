@@ -5,7 +5,9 @@ var workingPath = process.env.STAR_SERVER_PROJECT;
 var admin_mgr = require("../admin.js"),
     member_mgr = require("../member.js"),
     schedule_mgr = require("../schedule.js"),
-    video_mgr = require("../video.js");
+    video_mgr = require("../video.js"),
+    admincache_mgr = require("../admin_cache.js");
+
 
 var FMDB = require('../db.js'),
 	videos = FMDB.getDocModel("video"),
@@ -16,7 +18,7 @@ var DEBUG = true,
     FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str) ); } : function(str){} ;
     
 var FM = { admin: {} };
-
+var	timeoutcnl = 0;
 
 FM.admin.get_cb = function(req, res){
     /* TODO - Using RegularExpress/Command to parse every request, then pass req to corresponding function.
@@ -88,6 +90,11 @@ FM.admin.logout_get_cb = function(req, res){
 FM.admin.memberList_get_cb = function(req, res){
 
     //TODO: need to implement
+	//kaiser test
+	console.log("admin_handler_kaiser_start");
+	admincache_mgr.getMemberListInfo(req, res);
+	//
+	
 	
 	var memberList = [];
 	
@@ -109,10 +116,16 @@ FM.admin.memberList_get_cb = function(req, res){
 	var async = require('async');
 	var next = 0,
 		limit;
-	
+			  //      setInterval(timeoutcnl = 1,6000);
+		      //      setInterval(setMemberList,6000);
 	var setMemberList = function(data, set_cb){
 		var toDo = function(err, result){
+
 			//console.dir(result);
+//					console.log(timeoutcnl);
+//					timeoutcnl = 1;
+//			if(timeoutcnl == 1){
+			//	timeoutcnl = 0;			
 			if(next == limit-1) {
 				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, result[0], result[1], result[2], result[3][0].totalLikes, result[3][0].totalComments, result[3][1].totalShares, memberList);
 				next = 0;
@@ -123,7 +136,10 @@ FM.admin.memberList_get_cb = function(req, res){
 				next += 1;
 				setMemberList(data, set_cb);
 			}
+//			}
+
 		}
+					
 		
 		async.parallel([
 			function(callback){
@@ -184,7 +200,8 @@ FM.admin.memberList_get_cb = function(req, res){
 				setMemberList(result, function(err, docs){
 					if(err) console.log(err);
 					else {
-						res.render( 'table_member', {'memberList': memberList} );
+
+					//	res.render( 'table_member', {'memberList': memberList} );
 					}
 				});
 
