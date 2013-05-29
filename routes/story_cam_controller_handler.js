@@ -8,6 +8,7 @@ var DEBUG = true,
 
 var storyContentMgr = require('../story_content_mgr.js');  
     
+//POST /internal/story_cam_controller/available_story_movie
 FM.storyCamControllerHandler.availableStoryMovie_post_cb = function(req, res) {
 
     if ( req.headers.miix_movie_project_id ) {

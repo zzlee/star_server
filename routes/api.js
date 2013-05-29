@@ -954,6 +954,7 @@ FM.api.profile = function(req, res){
 };
 
 //	GET
+//GET /miix/videos/new_videos
 FM.api.newVideoList = function(req, res){
     FM_LOG("[api.newVideoList]: ");
     logger.info(req.query);
@@ -1032,6 +1033,7 @@ var vjson2 = {  "title":"A Awesome World",
              };*/
 
 // POST
+//POST /miix/videos/miix_videos
 FM.api.submitAVideo = function(req, res){
     FM_LOG("[api.submitAVideo]");
     
@@ -1054,13 +1056,16 @@ FM.api.submitAVideo = function(req, res){
                 res.send(result);
         });
         
+        
+        //TODO: have aeServerMgr generate Miix movie here
+        
     }else{
         res.send({"message": "_id, userID, pid MUST HAVE!"});
     }
 };
 
 
-
+//POST /miix/videos/videos_on_dooh
 FM.api.submitDooh = function(req, res){
     FM_LOG("[api.submitDooh]");
     

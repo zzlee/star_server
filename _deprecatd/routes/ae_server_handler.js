@@ -1,7 +1,7 @@
 var aeServerHandler = {};
 
 var events = require("events");
-var workingPath = process.env.STAR_SERVER_PROJECT;
+var workingPath = process.cwd();
 var eventEmitter = new events.EventEmitter();
 
 //*****This function is deprecated.*****

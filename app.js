@@ -92,7 +92,7 @@ app.post('/members/device_tokens', routes.api.deviceToken);
  *  Miix client 
  */
 app.post('/miix/videos/user_content_files', routes.upload_photo_cb );
-app.post('/miix/videos/user_content_description',routes.uploadUserDataInfo_cb);
+app.post('/miix/videos/user_content_description',routes.uploadUserDataInfo_cb);  //TODO: /miix/videos/user_content_descriptions is better
 app.get('/miix/videos/new_videos', routes.api.newVideoList);
 
 app.post('/miix/videos/miix_videos', routes.api.submitAVideo);
@@ -118,9 +118,9 @@ app.get('/internal/oauth2callback', routes.YoutubeOAuth2_cb );
 app.get('/internal/commands', routes.command_get_cb);
 app.post('/internal/command_responses', routes.commandResponse_post_cb); 
 
-app.post('/internal/dooh/movie_playing_state', routes.dooh_handler.doohMoviePlayingState_post_cb);
-app.post('/internal/dooh/dooh_periodic_data', routes.dooh_handler.importPeriodicData);
-app.get('/internal/dooh/dooh_current_video', routes.dooh_handler.dooh_current_video);
+app.post('/internal/dooh/movie_playing_state', routes.dooh_handler.doohMoviePlayingState_post_cb);  //TODO: PUT /internal/dooh/movie_playing_state is better
+app.post('/internal/dooh/dooh_periodic_data', routes.dooh_handler.importPeriodicData);  //TODO: POST /internal/adapter/schedule_periodic_data is better
+app.get('/internal/dooh/dooh_current_video', routes.dooh_handler.dooh_current_video);  
 
 app.post('/internal/story_cam_controller/available_story_movie', routes.storyCamControllerHandler.availableStoryMovie_post_cb);
 

@@ -9,12 +9,15 @@ var schedule_handler = require("../schedule.js"),
 var DEBUG = true,
     FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str)); } : function(str){} ;
 
+var storyCamControllerMgr = require("../story_cam_controller_mgr.js");
     
 FM.dooh_handler.lastMoviePlayed = null;
 FM.dooh_handler.lastMovieStopped = null;
 
 /* ------ Handler API ------ */    
-    
+
+//DEPRECATED: not used in current v1_2 
+//POST /internal/dooh/dooh_periodic_data
 FM.dooh_handler.importPeriodicData = function(req, res) {
     FM_LOG("[dooh_handler.importPeridoicData]");
 
@@ -34,6 +37,8 @@ FM.dooh_handler.importPeriodicData = function(req, res) {
 };
 
 
+//DEPRECATED: not used in current v1_2 
+//GET /internal/dooh/dooh_current_video
 FM.dooh_handler.dooh_current_video = function(req, res){
     FM_LOG("[dooh_handler.dooh_current_video]");
     if(req.query.id){
@@ -85,7 +90,7 @@ FM.dooh_handler.dooh_current_video = function(req, res){
 };
 
 
-
+//POST /internal/dooh/movie_playing_state
 FM.dooh_handler.doohMoviePlayingState_post_cb = function(req, res) {
     var resIsSent = false;
 	if ( req.headers.miix_movie_project_id ) {

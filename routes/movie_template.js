@@ -1,5 +1,5 @@
 var fs = require('fs');
-var workingPath = process.env.STAR_SERVER_PROJECT;
+var workingPath = process.cwd();
 
 exports.getTemplateList_cb = function(req, res){
 	fs.readdir(workingPath+'/public/contents/template', function(err, files) {
