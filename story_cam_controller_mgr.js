@@ -1,5 +1,5 @@
 storyCamControllerMgr = {};
-var connectionHandler = require('./routes/connection_handler.js');
+var globalConnectionMgr = require('./global_connection_mgr.js');
 
 var correspondingStoryCamController = 'story_cam_server';
 //var correspondingStoryCamController = 'story_cam_jeff_Feltmeng_pc';
@@ -15,7 +15,7 @@ storyCamControllerMgr.startRecording = function( miixMovieProjectID, startedReco
 		movieProjectID: miixMovieProjectID
 	};
 	
-	connectionHandler.sendRequestToRemote( storyCamControllerID, { command: "START_RECORDING", parameters: commandParameters }, function(responseParameters) {
+	globalConnectionMgr.sendRequestToRemote( storyCamControllerID, { command: "START_RECORDING", parameters: commandParameters }, function(responseParameters) {
 		//console.dir(responseParameters);
 		if (startedRecording_cb )  {
 			startedRecording_cb(responseParameters);
@@ -33,7 +33,7 @@ storyCamControllerMgr.stopRecording = function( stoppedRecording_cb ){
 
 	var commandParameters = null;
 	
-	connectionHandler.sendRequestToRemote( storyCamControllerID, { command: "STOP_RECORDING", parameters: commandParameters }, function(responseParameters) {
+	globalConnectionMgr.sendRequestToRemote( storyCamControllerID, { command: "STOP_RECORDING", parameters: commandParameters }, function(responseParameters) {
 		//console.dir(responseParameters);
 		if (stoppedRecording_cb )  {
 			stoppedRecording_cb(responseParameters);
@@ -51,7 +51,7 @@ storyCamControllerMgr.uploadStoryMovieToMainServer = function(movieProjectID, up
 		movieProjectID: movieProjectID
 	};
 	
-	connectionHandler.sendRequestToRemote( storyCamControllerID, { command: "UPLOAD_STORY_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+	globalConnectionMgr.sendRequestToRemote( storyCamControllerID, { command: "UPLOAD_STORY_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
 		//console.dir(responseParameters);
 		if (uploadMovie_cb )  {
 			uploadMovie_cb(responseParameters);

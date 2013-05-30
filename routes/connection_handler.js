@@ -2,10 +2,10 @@ var connectionHandler = {};
 
 var events = require("events");
 var eventEmitter = new events.EventEmitter();
-var globalConnectionManager;
+var globalConnectionMgr;
 
 connectionHandler.init = function( _globalConnectionManager ){
-    globalConnectionManager = _globalConnectionManager;
+    globalConnectionMgr = _globalConnectionManager;
 };
 
 connectionHandler.sendRequestToRemote = function( targetID, reqToRemote, cb ) {
@@ -44,15 +44,17 @@ connectionHandler.command_get_cb = function(req, res) {
 		messageToRemote.type = "COMMAND";
 		messageToRemote.body = reqToRemote;
 		res.send(messageToRemote);
+		globalConnectionMgr.removeConnection(req.headers.remote_id);
 	};
 	
-	globalConnectionMgr.addConnection(req.headers.remote_id);
+	globalConnectionMgr.addConnection(req.headers.remote_id, req.headers.remote_type);
 
 	var timer = setTimeout(function(){ 
 		eventEmitter.removeListener('COMMAND_'+req.headers.remote_id, callback);
 		messageToRemote.type = "LONG_POLLING_TIMEOUT";
 		messageToRemote.body = null;
 		res.send(messageToRemote);
+		globalConnectionMgr.removeConnection(req.headers.remote_id);
 	}, 60000);	
 	//}, 5000);	
 	
