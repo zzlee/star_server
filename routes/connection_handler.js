@@ -45,6 +45,8 @@ connectionHandler.command_get_cb = function(req, res) {
 		messageToRemote.body = reqToRemote;
 		res.send(messageToRemote);
 	};
+	
+	globalConnectionMgr.addConnection(req.headers.remote_id);
 
 	var timer = setTimeout(function(){ 
 		eventEmitter.removeListener('COMMAND_'+req.headers.remote_id, callback);
