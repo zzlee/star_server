@@ -8,6 +8,7 @@ var fs = require('fs');
 var async = require('async');
 var globalConnectionMgr = require('./global_connection_mgr.js');
 var youtubeTokenMgr = require( './youtube_mgr.js' );
+var videoDB = require('./video.js');
 
 //*****This function is deprecated.*****
 //use direct HTTP to ask AE Server to create Miix movie
@@ -198,18 +199,27 @@ aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movi
 
 aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
-	//TODO:: get corresponding AE Server ID
-	var starAeServerID = defaultAeServer;
-
-	var commandParameters = {
-		movieProjectID: movieProjectID
-	};
+    var starAeServerID;
+    videoDB.getAeIdByPid(movieProjectID,function(err, _aeID){
+        
+        if (!err){
+            starAeServerID = _aeID;
+        }
+        else{
+            starAeServerID = defaultAeServer;
+        }
+    
+    	var commandParameters = {
+    		movieProjectID: movieProjectID
+    	};
+    	
+    	globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "UPLOAD_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+    		//console.dir(responseParameters);
+    		if (uploadMovie_cb )  {
+    			uploadMovie_cb(responseParameters);
+    		}
+    	});
 	
-	globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "UPLOAD_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
-		//console.dir(responseParameters);
-		if (uploadMovie_cb )  {
-			uploadMovie_cb(responseParameters);
-		}
 	});
 	
 
@@ -217,18 +227,28 @@ aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
 aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, downloadMovie_cb) {
 
-	//TODO:: get corresponding AE Server ID
-	var starAeServerID = defaultAeServer;
 
-	var commandParameters = {
-		movieProjectID: movieProjectID
-	};
+	var starAeServerID;
+	videoDB.getAeIdByPid(movieProjectID,function(err, _aeID){
+        
+        if (!err){
+            starAeServerID = _aeID;
+        }
+        else{
+            starAeServerID = defaultAeServer;
+        }
+
+    	var commandParameters = {
+    		movieProjectID: movieProjectID
+    	};
+    	
+    	globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_STORY_MOVIE_FROM_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+    		//console.dir(responseParameters);
+    		if (downloadMovie_cb )  {
+    			downloadMovie_cb(responseParameters);
+    		}
+    	});
 	
-	globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_STORY_MOVIE_FROM_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
-		//console.dir(responseParameters);
-		if (downloadMovie_cb )  {
-			downloadMovie_cb(responseParameters);
-		}
 	});
 
 

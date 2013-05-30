@@ -61,6 +61,19 @@ FM.VIDEO = (function(){
                 });
             },
             
+            getAeIdByPid: function(pid, cb){
+                videos.findOne({projectId: pid}, 'aeId', function(err, result){
+                    if(err){
+                        logger.error("[getAeIdByPid]", err);
+                        cb(err, null);
+                    }else if(result){
+                        cb(null, result.aeId);
+                    }else{
+                        cb(null, result);
+                    }
+                });
+            },
+            
             getValueByProject: function(projectId, fields, cb){
                 FMDB.getValueOf(videos, {"projectId":projectId}, fields, cb);
             },
@@ -242,6 +255,7 @@ FM.VIDEO = (function(){
                     console.log('count= '+count);
                 });
                 */
+                /*
                 var after = new Date(parseInt('1363950956281'));
                 var query = videos.find();
 				query.exec(function(err, result){
@@ -251,6 +265,10 @@ FM.VIDEO = (function(){
                     console.dir(result);
                     fs=require('fs');
                     fs.writeFile('result2.txt', result);
+                });
+                */
+                this.getAeIdByPid('greeting-5192f1cac6e16fa00d000006-20130530T082537316Z',function(err, _aeID){
+                    console.log('_aeID=%s', _aeID);
                 });
             },
             
