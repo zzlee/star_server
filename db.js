@@ -132,6 +132,43 @@ FM.DB = (function(){
 			platform: {type: String},
 			os_version: {type: String}
 		}); 
+
+        //kaiser start **************
+        var MemberListInfoSchema = new Schema({
+            fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
+            email: {type: String, default: 'xyz@feltmeng.com'},
+            mPhone: { number: String, verified: {type: Boolean, default: false}, code: String },
+            miixMovieVideo_count: {type: Number, min: 0, default: 0},                            //籹紇计
+            doohPlay_count: {type: Number, min: 0, default: 0},                                  //DOOH祅Ω计
+            movieViewed_count: {type: Number, min: 0, default: 0},                               //紇芠羆Ω计
+            fbLike_count: {type: Number, min: 0, default: 0},                                    //FB苂羆计
+            fbComment_count: {type: Number, min: 0, default: 0},                                 //FB痙ē羆计
+            fbShare_count: {type: Number, min: 0, default: 0}                                    //FBだㄉΩ计
+            
+        }); //  memberListInfo collection
+        
+        var MiixPlayListInfoSchema = new Schema({
+            fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
+            movieViewed_count: {type: Number, min: 0, default: 0},   //芠Ω计
+            fbLike_count: {type: Number, min: 0, default: 0},        //FB苂Ω计
+            fbComment_count: {type: Number, min: 0, default: 0},     //FB痙ē计
+            fbShare_count: {type: Number, min: 0, default: 0},       //FBだㄉΩ计
+            applyDoohPlay_count: {type: Number, min: 0, default: 0}, //щ絑Ω计
+            doohPlay_count: {type: Number, min: 0, default: 0}       //DOOH祅Ω计
+            
+        }); //  miixPlayListInfo collection
+        
+        var StoryPlayListInfoSchema = new Schema({
+            fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}       
+            movieViewed_count: {type: Number, min: 0, default: 0},   //芠Ω计
+            fbLike_count: {type: Number, min: 0, default: 0},        //FB苂Ω计
+            fbComment_count: {type: Number, min: 0, default: 0},     //FB痙ē计
+            fbShare_count: {type: Number, min: 0, default: 0}        //FBだㄉΩ计
+            
+        }); //  storyPlayListInfo collection
+        
+         //kaiser end ***************		
+		
 		
         /****************** End of DB Schema ******************/
 		
@@ -141,7 +178,11 @@ FM.DB = (function(){
             Event = connection.model('Event', EventSchema, 'event'),
             Program = connection.model('Program', ProgramSchema, 'program'),
             Admin = connection.model('Admin', AdminSchema, 'admin'),
-			Analysis = connection.model('Analysis', AnalysisSchema, 'analysis');
+			Analysis = connection.model('Analysis', AnalysisSchema, 'analysis'),
+            MemberListInfo = connection.model('MemberListInfo', MemberListInfoSchema, 'memberListInfo'),//kaiser
+            MiixPlayListInfo = connection.model('MiixPlayListInfo', MiixPlayListInfoSchema, 'miixPlayListInfo'),
+            StoryPlayListInfo = connection.model('StoryPlayListInfo', StoryPlayListInfoSchema, 'storyPlayListInfo');
+           
             
         var dbModels = [];
         dbModels["member"] = Member;
@@ -151,6 +192,9 @@ FM.DB = (function(){
         dbModels["program"] = Program;
         dbModels["admin"] = Admin;
 		dbModels["analysis"] = Analysis;
+        dbModels["memberListInfo"] = MemberListInfo;//kaiser
+        dbModels["miixPlayListInfo"] = MiixPlayListInfo;
+        dbModels["storyPlayListInfo"] = StoryPlayListInfo;  
         
         var dbSchemas = [];
         dbSchemas["member"] = MemberSchema;
@@ -160,6 +204,9 @@ FM.DB = (function(){
         dbSchemas['program'] = ProgramSchema;
         dbSchemas["admin"] = AdminSchema;
 		dbSchemas["analysis"] = AnalysisSchema;
+        dbSchemas['memberListInfo'] = MemberListInfoSchema;//kaiser
+        dbSchemas["miixPlayListInfo"] = MiixPlayListInfoSchema;
+        dbSchemas["storyPlayListInfo"] = StoryPlayListInfoSchema;
             
         function connectDB(){
                 try{
@@ -233,6 +280,9 @@ FM.DB = (function(){
                     case 'event':
                         return Event;
                         break;
+                    case 'memberListInfo':
+                        return MemberListInfo;
+                        break;
                     default:
                         throw new error('DB Cannot find this Collection: ' + collection);
                         break;
@@ -305,7 +355,30 @@ FM.DB = (function(){
                 logger.info("Delete a Doc: " + docid);
                 docModel.findByIdAndRemove(docid, cb);
             },
-
+            //kaiser
+            updateModify: function(docModel, condition, jsonObj, options, cb){
+                FM_LOG("\n[updateModify]");
+                docModel.findOneAndUpdate(condition, {$set: jsonObj}, options,cb);
+                getValueOf
+//                docModel.findOneAndUpdate(condition, {$set: jsonObj}, options, function(err, result){
+//                    if(err)
+//                        createAdoc(docModel ,jsonObj, null); 
+//                    else{
+//                        return result;
+//                    }
+//                });
+                
+            },
+            
+            deleteAdoc2: function(docModel, cb){
+                logger.info("Delete all Doc: ");
+                docModel.remove(docModel, cb);
+            },
+            
+            listOfdocModels: function(docModel,condition, fields, options, cb){
+                docModel.find(condition, fields, options, cb);
+            },
+            //kaiser end
             getValueOfById: function(docModel, docid, path, cb){
                 var doc = this.readAdocById(docModel, docid, function(err, result){
                     if(err)

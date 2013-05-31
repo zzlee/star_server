@@ -12,6 +12,7 @@ var admin_mgr = require("../admin.js"),
 var FMDB = require('../db.js'),
 	videos = FMDB.getDocModel("video"),
 	members = FMDB.getDocModel("member"),
+    memberListInfos = FMDB.getDocModel("memberListInfo"),
 	miix_content_mgr = require('../miix_content_mgr.js');
 
 var DEBUG = true,
@@ -92,86 +93,100 @@ FM.admin.memberList_get_cb = function(req, res){
     //TODO: need to implement
 	//kaiser test
 	console.log("admin_handler_kaiser_start");
-	admincache_mgr.getMemberListInfo(req, res);
+////    setInterval(admincachemgr,6000);
+////    setInterval(console.log("timer Exec"),6000);
+//    
+////	var admincachemgr = admincache_mgr.getMemberListInfo(req, res);
+//	admincache_mgr.getMemberListInfo(req, res);
+	
+//	admincache_mgr.getMemberListInfo(page, itemNumInPage, function(err, result){
+//	    result
+//	    
+//	    
+//	    
+//	});
+//	 admincache_mgr.getMemberListInfo(null);
 	//
 	
 	
 	var memberList = [];
 	
-	var memberListInfo = function(fb_id, fb_name, email, mp_number, miix_movie, dooh_play, movie_view, fb_like, fb_comment, fb_share, arr) {
+	var memberListInfo = function(fb_id, fb_name, email, mp_number, miixMovieVideo_count, doohPlay_count, movieViewed_count, fbLike_count, fbComment_count, fbShare_count, arr) {
 		arr.push({ 
 			fb: { userID: fb_id, userName: fb_name },
 			//_id: _id,
 			email: email, //Email
 			mobilePhoneNumber: mp_number, //手機
-			miixMovieCount: miix_movie, //已製作影片數
-			doohPlayCount: dooh_play, //DOOH刊登次數
-			movieViewedCount: movie_view, //影片觀看總次數
-			fbLikeCount: fb_like, //FB讚總數
-			fbCommentCount: fb_comment, //FB留言總數
-			fbShareCount: fb_share
+			miixMovieVideoCount: miixMovieVideo_count, //已製作影片數
+			doohPlayCount: doohPlay_count, //DOOH刊登次數
+			movieViewedCount: movieViewed_count, //影片觀看總次數
+			fbLikeCount: fbLike_count, //FB讚總數
+			fbCommentCount: fbComment_count, //FB留言總數
+			fbShareCount: fbShare_count
 		});
 	}
 
 	var async = require('async');
 	var next = 0,
 		limit;
-			  //      setInterval(timeoutcnl = 1,6000);
-		      //      setInterval(setMemberList,6000);
-	var setMemberList = function(data, set_cb){
-		var toDo = function(err, result){
 
+	var setMemberList = function(data, set_cb){
+//		var toDo = function(err, result){
+            console.log("admin_handler_setMemberList"); 
 			//console.dir(result);
-//					console.log(timeoutcnl);
-//					timeoutcnl = 1;
-//			if(timeoutcnl == 1){
-			//	timeoutcnl = 0;			
-			if(next == limit-1) {
-				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, result[0], result[1], result[2], result[3][0].totalLikes, result[3][0].totalComments, result[3][1].totalShares, memberList);
+			if(next == limit-1 || limit-1 < 0) {
+//				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, result[0], result[1], result[2], result[3][0].totalLikes, result[3][0].totalComments, result[3][1].totalShares, memberList);
+//				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, data[next].miixMovieVideo_count, data[next].doohPlay_count, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count,data[next].fbShare_count, memberList);
+                if(next > 0)
+			    memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, data[next].miixMovieVideo_count, data[next].doohPlay_count, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count,data[next].fbShare_count, memberList);				
 				next = 0;
 				set_cb(null, 'OK');
 			}
 			else {
-				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, result[0], result[1], result[2], result[3][0].totalLikes, result[3][0].totalComments, result[3][1].totalShares, memberList);
+//				memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, result[0], result[1], result[2], result[3][0].totalLikes, result[3][0].totalComments, result[3][1].totalShares, memberList);
+//                memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, data[next].miixMovieVideo_count, data[next].doohPlay_count, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count,data[next].fbShare_count, memberList);				
+                memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, data[next].miixMovieVideo_count, data[next].doohPlay_count, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count,data[next].fbShare_count, memberList);				
 				next += 1;
+                console.log("admin_handler_result_next:"+next); 
 				setMemberList(data, set_cb);
+//				console.log(data);
 			}
-//			}
 
-		}
+
+//		}
 					
 		
-		async.parallel([
-			function(callback){
-				video_mgr.getVideoCount(data[next]._id, 'miix', function(err, result){
-					if(err) callback(err, null);
-					else callback(null, result);
-				});
-			},
-			function(callback){
-				video_mgr.getVideoCount(data[next]._id, 'miix_story', function(err, result){
-					if(err) callback(err, null);
-					else callback(null, result);
-				});
-			},
-			function(callback){
-				member_mgr.getTotalView(data[next]._id, function(err, result){
-					if(err) callback(err, null);
-					else callback(null, result);
-				});
-			},
-			function(callback){
-				member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
-					if(err) callback(err, null);
-					else callback(null, result);
-				});
-			},
-		], toDo);
-	}	
+//		async.parallel([
+//			function(callback){
+//				video_mgr.getVideoCount(data[next]._id, 'miix', function(err, result){
+//					if(err) callback(err, null);
+//					else callback(null, result);
+//				});
+//			},
+//			function(callback){
+//				video_mgr.getVideoCount(data[next]._id, 'miix_story', function(err, result){
+//					if(err) callback(err, null);
+//					else callback(null, result);
+//				});
+//			},
+//			function(callback){
+//				member_mgr.getTotalView(data[next]._id, function(err, result){
+//					if(err) callback(err, null);
+//					else callback(null, result);
+//				});
+//			},
+//			function(callback){
+//				member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
+//					if(err) callback(err, null);
+//					else callback(null, result);
+//				});
+//			},
+//		], toDo);
+	}
 	
     if ( req.query.limit && req.query.skip ) {
         FM_LOG("[admin.memberList_get_cb]");
-        var cursor = member_mgr.listOfMembers( null, 'fb.userName fb.userID _id email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName',limit: req.query.limit, skip: req.query.skip}, function(err, result){
+        var cursor = FMDB.listOfdocModels( memberListInfos,null,'fb.userName fb.userID _id email mPhone miixMovieVideo_count doohPlay_count movieViewed_count fbLike_count fbComment_count fbShare_count', {sort:'fb.userName',limit: req.query.limit, skip: req.query.skip}, function(err, result){
             if(err) logger.error('[member_mgr.listOfMemebers]', err);
             if(result){
                 //FM_LOG(JSON.stringify(result));
@@ -190,18 +205,24 @@ FM.admin.memberList_get_cb = function(req, res){
                     fbShareCount: 35  } //FB分享總數  
                     ];
                     
-                //res.render( 'table_member', {'memberList': testArray} );
-				
+//                res.render( 'table_member', {'memberList': testArray} );
+//                console.log("admin_handler_result_skip="+req.query.skip); 
+//                console.log("admin_handler_result_length="+result.length);
+//                console.log("admin_handler_result_limit="+req.query.limit);
+//                console.log("admin_handler_limit="+limit);
+                //console.log(req.query.limit + "," + req.query.skip + "," + result.length + "," + limit);				
 				if(req.query.skip < result.length)
 					limit = req.query.limit;
 				else 
 					limit = result.length;
+//				if(req.query.limit > result.length )
+//                    limit = result.length;
 				
 				setMemberList(result, function(err, docs){
 					if(err) console.log(err);
 					else {
 
-					//	res.render( 'table_member', {'memberList': memberList} );
+						res.render( 'table_member', {'memberList': memberList} );
 					}
 				});
 
@@ -211,7 +232,7 @@ FM.admin.memberList_get_cb = function(req, res){
     else{
         res.send(400, {error: "Parameters are not correct"});
     }
-};
+};//end memberList_get_cb **********
 
 
 FM.admin.miixPlayList_get_cb = function(req, res){
