@@ -20,10 +20,11 @@ connectionHandler.sendRequestToRemote = function( targetID, reqToRemote, cb ) {
 connectionHandler.commandResponse_post_cb = function(req, res) {
 
 	var commandID = req.headers._command_id;
+	var remoteID = req.headers._remote_id;
 	var responseParameters = req.headers;
 
 	eventEmitter.emit('RESPONSE_'+commandID, responseParameters);
-	logger.info('Got response ' + commandID + 'from ' + this.name + ' :' );
+	logger.info('Got response ' + commandID + ' from ' + remoteID + ' :' );
 	logger.info(JSON.stringify(responseParameters));
 	
 	res.send('');

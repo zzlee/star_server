@@ -124,7 +124,9 @@ aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, mo
 	        starAeServerID = aeServerWithLowestLoad;
 	    }
 	    
-	    youtubeTokenMgr.getAccessToken( function(ytAccessToken){
+        logger.info('[aeServerMgr.createMiixMovie] aeServer to do rendering is : '+aeServerWithLowestLoad);
+
+        youtubeTokenMgr.getAccessToken( function(ytAccessToken){
 	        if (ytAccessToken) {
 	            var userDataFolder = path.join( workingPath, 'public/contents/user_project', movieProjectID, 'user_data');
 	            
