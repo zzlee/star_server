@@ -138,32 +138,37 @@ FM.DB = (function(){
             fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
             email: {type: String, default: 'xyz@feltmeng.com'},
             mPhone: { number: String, verified: {type: Boolean, default: false}, code: String },
-            miixMovieVideo_count: {type: Number, min: 0, default: 0},                            //籹紇计
-            doohPlay_count: {type: Number, min: 0, default: 0},                                  //DOOH祅Ω计
-            movieViewed_count: {type: Number, min: 0, default: 0},                               //紇芠羆Ω计
-            fbLike_count: {type: Number, min: 0, default: 0},                                    //FB苂羆计
-            fbComment_count: {type: Number, min: 0, default: 0},                                 //FB痙ē羆计
-            fbShare_count: {type: Number, min: 0, default: 0}                                    //FBだㄉΩ计
+            miixMovieVideo_count: {type: Number, min: 0, default: 0}, //籹紇计
+            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH祅Ω计
+            movieViewed_count: {type: Number, min: 0, default: 0},    //紇芠羆Ω计
+            fbLike_count: {type: Number, min: 0, default: 0},         //FB苂羆计
+            fbComment_count: {type: Number, min: 0, default: 0},      //FB痙ē羆计
+            fbShare_count: {type: Number, min: 0, default: 0}         //FBだㄉΩ计
             
         }); //  memberListInfo collection
         
         var MiixPlayListInfoSchema = new Schema({
-            fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
-            movieViewed_count: {type: Number, min: 0, default: 0},   //芠Ω计
-            fbLike_count: {type: Number, min: 0, default: 0},        //FB苂Ω计
-            fbComment_count: {type: Number, min: 0, default: 0},     //FB痙ē计
-            fbShare_count: {type: Number, min: 0, default: 0},       //FBだㄉΩ计
-            applyDoohPlay_count: {type: Number, min: 0, default: 0}, //щ絑Ω计
-            doohPlay_count: {type: Number, min: 0, default: 0}       //DOOH祅Ω计
+//            fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
+            projectId: {type: String},                                //  AE project ID
+            userPhotoUrl: {type: String},                             //酚
+            movieNo: {type: Number},                                  //紇絪腹
+            movieViewed_count: {type: Number, min: 0, default: 0},    //紇芠羆Ω计
+            fbLike_count: {type: Number, min: 0, default: 0},         //FB苂Ω计
+            fbComment_count: {type: Number, min: 0, default: 0},      //FB痙ē计
+            fbShare_count: {type: Number, min: 0, default: 0},        //FBだㄉΩ计
+            movieMaker: {type: String},                               //穦嘿
+            applyDoohPlay_count: {type: Number, min: 0, default: 0},  //щ絑Ω计
+            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH祅Ω计
+            timesOfPlaying: {type: Number}      
             
         }); //  miixPlayListInfo collection
         
         var StoryPlayListInfoSchema = new Schema({
             fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}       
-            movieViewed_count: {type: Number, min: 0, default: 0},   //芠Ω计
-            fbLike_count: {type: Number, min: 0, default: 0},        //FB苂Ω计
-            fbComment_count: {type: Number, min: 0, default: 0},     //FB痙ē计
-            fbShare_count: {type: Number, min: 0, default: 0}        //FBだㄉΩ计
+            movieViewed_count: {type: Number, min: 0, default: 0},    //芠Ω计
+            fbLike_count: {type: Number, min: 0, default: 0},         //FB苂Ω计
+            fbComment_count: {type: Number, min: 0, default: 0},      //FB痙ē计
+            fbShare_count: {type: Number, min: 0, default: 0}         //FBだㄉΩ计
             
         }); //  storyPlayListInfo collection
         
@@ -283,6 +288,12 @@ FM.DB = (function(){
                     case 'memberListInfo':
                         return MemberListInfo;
                         break;
+                    case 'miixPlayListInfo':
+                        return MiixPlayListInfo;
+                        break;
+                    case 'storyPlayListInfo':
+                        return StoryPlayListInfo;
+                        break;
                     default:
                         throw new error('DB Cannot find this Collection: ' + collection);
                         break;
@@ -356,19 +367,19 @@ FM.DB = (function(){
                 docModel.findByIdAndRemove(docid, cb);
             },
             //kaiser
-            updateModify: function(docModel, condition, jsonObj, options, cb){
-                FM_LOG("\n[updateModify]");
-                docModel.findOneAndUpdate(condition, {$set: jsonObj}, options,cb);
-                getValueOf
-//                docModel.findOneAndUpdate(condition, {$set: jsonObj}, options, function(err, result){
-//                    if(err)
-//                        createAdoc(docModel ,jsonObj, null); 
-//                    else{
-//                        return result;
-//                    }
-//                });
-                
-            },
+//            updateModify: function(docModel, condition, jsonObj, options, cb){
+//                FM_LOG("\n[updateModify]");
+//                docModel.findOneAndUpdate(condition, {$set: jsonObj}, options,cb);
+//                getValueOf
+////                docModel.findOneAndUpdate(condition, {$set: jsonObj}, options, function(err, result){
+////                    if(err)
+////                        createAdoc(docModel ,jsonObj, null); 
+////                    else{
+////                        return result;
+////                    }
+////                });
+//                
+//            },
             
             deleteAdoc2: function(docModel, cb){
                 logger.info("Delete all Doc: ");
