@@ -19,7 +19,6 @@ var DEBUG = true,
     FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str) ); } : function(str){} ;
     
 var FM = { admin: {} };
-var	timeoutcnl = 0;
 
 FM.admin.get_cb = function(req, res){
     /* TODO - Using RegularExpress/Command to parse every request, then pass req to corresponding function.
@@ -102,96 +101,9 @@ FM.admin.miixPlayList_get_cb = function(req, res){
 };
 
 FM.admin.storyPlayList_get_cb = function(req, res){
-    //TODO: need to implement
-	
-	var storyPlayList = [];
-	
-	var storyPlayListInfo = function(story_no, story_view, fb_like, fb_comment, fb_share, user_name, arr) {
-		arr.push({ 
-			movieNo: story_no, //影片編號
-            movieViewedCount: story_view, //觀看次數
-            fbLikeCount: fb_like, //FB讚次數
-            fbCommentCount: fb_comment, //FB留言數
-            fbShareCount: fb_share, //FB分享次數
-            movieMaker: user_name //會員名稱
-		});
-	}
-	
-	var async = require('async');
-	var next = 0,
-		limit;
-	
-	var setStoryPlayList = function(data, set_cb){
-		var toDo = function(err, result){
-			//console.log(result);
-	          console.log('setStoryplaylist'+err+result);
-			if(next == limit-1) {
-				storyPlayListInfo(data[next].no, result[1], result[2][0].likes, result[2][0].comments, result[2][1].shares, result[0], storyPlayList);
-				next = 0;
-				set_cb(null, 'OK');
-			}
-			else {
-				storyPlayListInfo(data[next].no, result[1], result[2][0].likes, result[2][0].comments, result[2][1].shares, result[0], storyPlayList);
-				next += 1;
-				setStoryPlayList(data, set_cb);
-			}
-		}
-		
-		async.parallel([
-			function(callback){
-				member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
-					if(err) callback(err, null);
-					else callback(null, result.fb.userName);
-				});
-			},
-			function(callback){
-				video_mgr.getVideoCount(data[next]._id, 'miix_story', function(err, result){
-					if(err) callback(err, null);
-					else callback(null, result);
-				});
-			},
-			function(callback){
-				if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
-				   (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
-				else {
-					video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
-						if(err) callback(err, null);
-						else callback(null, result);
-					});
-				}
-			},
-		], toDo);
-	}
 
-	var query = videos.find({'genre': 'miix_story'});
-    query.sort({'no': 1}).limit(req.query.limit).skip(req.query.skip).exec(function(err, result){
-		//console.dir(result);
-		
-		if(req.query.skip < result.length)
-			limit = req.query.limit;
-		else 
-			limit = result.length;
-			
-		//console.log(req.query.limit + "," + req.query.skip + "," + result.length + "," + limit);
-		
-		setStoryPlayList(result, function(err, result){
-			if(err) console.log(err);
-			else //console.log(result);
-			res.render('table_story_movie', {storyMovieList: storyPlayList});
-		});
-	});
-	
-    //res.send(200);
-    var testArray =
-        [ { movieNo: '075', //影片編號
-            movieViewedCount: 200, //觀看次數
-            fbLikeCount: 235, //FB讚次數
-            fbCommentCount: 203, //FB留言數
-            fbShareCount: 34, //FB分享次數
-            movieMaker: 'abc CC'} //會員名稱
-            ];
-    //res.render('table_story_movie', {storyMovieList: testArray});
-    
+    admincache_mgr.getStoryPlayListInfo(req, res);
+     
 };
 
 //GZ

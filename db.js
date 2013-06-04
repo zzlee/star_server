@@ -148,7 +148,6 @@ FM.DB = (function(){
         }); //  memberListInfo collection
         
         var MiixPlayListInfoSchema = new Schema({
-//            fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
             projectId: {type: String},                                //  AE project ID
             userPhotoUrl: {type: String},                             //酚
             movieNo: {type: Number},                                  //紇絪腹
@@ -164,11 +163,13 @@ FM.DB = (function(){
         }); //  miixPlayListInfo collection
         
         var StoryPlayListInfoSchema = new Schema({
-            fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}       
+            projectId: {type: String},                                //  AE project ID
+            movieNo: {type: Number},                                  //紇絪腹
             movieViewed_count: {type: Number, min: 0, default: 0},    //芠Ω计
             fbLike_count: {type: Number, min: 0, default: 0},         //FB苂Ω计
             fbComment_count: {type: Number, min: 0, default: 0},      //FB痙ē计
-            fbShare_count: {type: Number, min: 0, default: 0}         //FBだㄉΩ计
+            fbShare_count: {type: Number, min: 0, default: 0},        //FBだㄉΩ计
+            movieMaker: {type: String}                                //穦嘿
             
         }); //  storyPlayListInfo collection
         
@@ -367,20 +368,6 @@ FM.DB = (function(){
                 docModel.findByIdAndRemove(docid, cb);
             },
             //kaiser
-//            updateModify: function(docModel, condition, jsonObj, options, cb){
-//                FM_LOG("\n[updateModify]");
-//                docModel.findOneAndUpdate(condition, {$set: jsonObj}, options,cb);
-//                getValueOf
-////                docModel.findOneAndUpdate(condition, {$set: jsonObj}, options, function(err, result){
-////                    if(err)
-////                        createAdoc(docModel ,jsonObj, null); 
-////                    else{
-////                        return result;
-////                    }
-////                });
-//                
-//            },
-            
             deleteAdoc2: function(docModel, cb){
                 logger.info("Delete all Doc: ");
                 docModel.remove(docModel, cb);
