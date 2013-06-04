@@ -11,14 +11,14 @@ FM.globalConnectionMgr = (function(){
     function constructor(){
         //the methods exposed to public
         var _this = {
-            addConnection: function(id, type){
-                //console.log('%s is connected! [type=%s]', id, type);
-                connectedRemotes[id] = type;
+            addConnection: function(remoteID, type){
+                //console.log('%s is connected! [type=%s]', remoteID, type);
+                connectedRemotes[remoteID] = type;
             },
             
-            removeConnection: function(id){
-                //console.log('%s is disconnected!', id);
-                delete connectedRemotes[id];
+            removeConnection: function(remoteID){
+                //console.log('%s is disconnected!', remoteID);
+                delete connectedRemotes[remoteID];
             },
             
             getConnectedRemotes: function(type){
@@ -40,8 +40,17 @@ FM.globalConnectionMgr = (function(){
                 return result;
             },
             
-            sendRequestToRemote: function( targetID, reqToRemote, cb ) {
-                connectionHandler.sendRequestToRemote( targetID, reqToRemote, cb );
+            isConnectedTo: function(remoteID){
+                if (  connectedRemotes[remoteID] ){
+                    return true;
+                }
+                else{
+                    return false;
+                }
+            },
+            
+            sendRequestToRemote: function( targetedRemoteID, reqToRemote, cb ) {
+                connectionHandler.sendRequestToRemote( targetedRemoteID, reqToRemote, cb );
             }
             
                 
