@@ -43,8 +43,7 @@ FM.ADMINCACHE = (function(){
                     if(result == null){ 
                         FMDB.createAdoc(memberListInfos,vjson, null);
                     }else{
-                        var condition = {'fb.userID': data[next].fb.userID};
-                        FMDB.updateAdoc(memberListInfos, condition, vjson, null);
+                        FMDB.updateAdoc(memberListInfos, result, vjson, null);
                     }
                 });
                 next += 1;
@@ -144,8 +143,7 @@ FM.ADMINCACHE = (function(){
                     if(result == null){ 
                         FMDB.createAdoc(miixPlayListInfos,vjson, null);
                     }else{
-                        var condition = {'projectId': data[next].projectId};
-                        FMDB.updateAdoc(miixPlayListInfos, condition, vjson, null);
+                        FMDB.updateAdoc(miixPlayListInfos, result, vjson, null);
                     }
                 });
                 next += 1;
@@ -165,7 +163,11 @@ FM.ADMINCACHE = (function(){
             async.parallel([
                             function(callback){
                                 miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
-                                    if(err) callback(err, null);
+                                    if(err) {
+//                                        callback(err,null);
+                                        next += 1;
+                                        cacheMiixPlayList(data, set_cb);
+                                    }
                                     else callback(null, result);
                                 });
                             },
@@ -241,8 +243,7 @@ FM.ADMINCACHE = (function(){
                     if(result == null){ 
                         FMDB.createAdoc(storyPlayListInfos,vjson, null);
                     }else{
-                        var condition = {'projectId': data[next].projectId};
-                        FMDB.updateAdoc(storyPlayListInfos, condition, vjson, null);
+                        FMDB.updateAdoc(storyPlayListInfos, result, vjson, null);
                     }
                 });
                 next += 1;
