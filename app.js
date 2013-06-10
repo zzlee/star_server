@@ -187,15 +187,34 @@ http.createServer(app).listen(app.get('port'), function(){
 });
 
 
+
+
 /* 
+//test
+var aeServerMgr = require('./ae_server_mgr.js');
+var globalConnectionMgr = require('./global_connection_mgr.js');
+setInterval(function(){
+    var connectedServers = globalConnectionMgr.getConnectedRemotes('AE_SERVER');
+    console.dir(connectedServers);
+    aeServerMgr.getAeServerWithLowestLoad(function(aeServerWithLowestLoad, err){
+        console.log('aeServerWithLowestLoad= %s', aeServerWithLowestLoad);
+    });
+}, 5000);
+
+
+
 var aeServerMgr = require('./ae_server_mgr.js');
 var doohMgr = require('./dooh_mgr.js');
 var storyCamControllerMgr = require('./story_cam_controller_mgr.js');
 var storyContentMgr = require('./story_content_mgr.js');
+var globalConnectionMgr = require('./global_connection_mgr.js');
 
 
+setTimeout(function(){
+    var connectedServers = globalConnectionMgr.getConnectedRemotes('AE_SERVER');
+    console.dir(connectedServers);
+}, 6000);
 
-//test
 
 setTimeout(function(){
 //setInterval(function(){ 

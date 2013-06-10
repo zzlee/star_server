@@ -1,6 +1,6 @@
 var doohMgr = {};
 
-var connectionHandler = require('./routes/connection_handler.js');
+var globalConnectionMgr = require('./global_connection_mgr.js');
 
 doohMgr.downloadMovieFromMainServer = function(movieProjectID, downloadMovie_cb) {
 
@@ -13,7 +13,7 @@ doohMgr.downloadMovieFromMainServer = function(movieProjectID, downloadMovie_cb)
 		movieProjectID: movieProjectID
 	};
 	
-	connectionHandler.sendRequestToRemote( doohID, { command: "DOWNLOAD_MOVIE_FROM_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+	globalConnectionMgr.sendRequestToRemote( doohID, { command: "DOWNLOAD_MOVIE_FROM_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
 		//console.dir(responseParameters);
 		if (downloadMovie_cb )  {
 			downloadMovie_cb(responseParameters);

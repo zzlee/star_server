@@ -5,8 +5,10 @@ var path = require('path');
 var http = require('http');
 var url = require('url');
 var fs = require('fs');
-var connectionHandler = require('./routes/connection_handler.js');
+var async = require('async');
+var globalConnectionMgr = require('./global_connection_mgr.js');
 var youtubeTokenMgr = require( './youtube_mgr.js' );
+var videoDB = require('./video.js');
 
 //*****This function is deprecated.*****
 //use direct HTTP to ask AE Server to create Miix movie
@@ -71,90 +73,155 @@ aeServerMgr.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, 
 
 };
 
+var getAeServerWithLowestLoad = function(got_cb){
+    
+    var connectedAeServers = globalConnectionMgr.getConnectedRemotes('AE_SERVER');
+    var connectedAeServerWithLowestLoad = null;
+    var lowestLoadIndex =-1;
+    
+    
+    var iteratorGetAeServerLoadIndex = function(aeServerToAsk, interationDone_cb){
+        globalConnectionMgr.sendRequestToRemote( aeServerToAsk, { command: "GET_LOAD_INDEX", parameters: null }, function(responseParameters) {
+
+            if ((responseParameters.load_index < lowestLoadIndex) || (lowestLoadIndex == -1) ){
+                lowestLoadIndex = responseParameters.load_index;
+                connectedAeServerWithLowestLoad = aeServerToAsk;
+            }
+            
+            interationDone_cb();
+        });
+    };
+    
+    async.each(connectedAeServers, iteratorGetAeServerLoadIndex, function(err){
+        if (!err) {
+            if (got_cb){
+                got_cb(connectedAeServerWithLowestLoad, null);
+            }
+        }
+        else{
+            if (got_cb){
+                got_cb(null, err);
+            }
+        }
+        
+    });
+    
+};
+
+//for test 
+//aeServerMgr.getAeServerWithLowestLoad = getAeServerWithLowestLoad;
+
 var defaultAeServer = 'AE_Server_feltmeng_art_PC';
-//var defaultAeServer = 'AE_server_gance_Feltmeng_pc';
+
 
 //use long polling to ask AE Server to create Miix movie
 aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
-	//TODO:: get corresponding AE Server ID
-	var starAeServerID = defaultAeServer;
 
-	youtubeTokenMgr.getAccessToken( function(ytAccessToken){
-		if (ytAccessToken) {
-			var userDataFolder = path.join( workingPath, 'public/contents/user_project', movieProjectID, 'user_data');
-			
-			var commandParameters = {
-				userFileList: fs.readdirSync(userDataFolder),
-				movieProjectID: movieProjectID,
-				ownerStdID: ownerStdID,
-				ownerFbID: ownerFbID,
-				movieTitle: movieTitle,
-				ytAccessToken: ytAccessToken 
-			};
-						
-			connectionHandler.sendRequestToRemote( starAeServerID, { command: "RENDER_MIIX_MOVIE", parameters: commandParameters }, function(responseParameters) {
-				//console.dir(responseParameters);
-				if (createMovie_cb )  {
-					createMovie_cb(responseParameters);
-				}
-			});
-		}
-		else {
-			logger.info('[%s] Cannot get Youtube access token!', movieProjectID);
-		}
+	var starAeServerID = defaultAeServer;
 	
+	getAeServerWithLowestLoad(function(aeServerWithLowestLoad, err){
+	    if (!err){
+	        starAeServerID = aeServerWithLowestLoad;
+	    }
+	    
+        logger.info('[aeServerMgr.createMiixMovie] aeServer to do rendering is : '+aeServerWithLowestLoad);
+
+        youtubeTokenMgr.getAccessToken( function(ytAccessToken){
+	        if (ytAccessToken) {
+	            var userDataFolder = path.join( workingPath, 'public/contents/user_project', movieProjectID, 'user_data');
+	            
+	            var commandParameters = {
+	                userFileList: fs.readdirSync(userDataFolder),
+	                movieProjectID: movieProjectID,
+	                ownerStdID: ownerStdID,
+	                ownerFbID: ownerFbID,
+	                movieTitle: movieTitle,
+	                ytAccessToken: ytAccessToken 
+	            };
+	                        
+	            globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "RENDER_MIIX_MOVIE", parameters: commandParameters }, function(responseParameters) {
+	                //console.dir(responseParameters);
+	                if (createMovie_cb )  {
+	                    createMovie_cb(responseParameters);
+	                }
+	            });
+	        }
+	        else {
+	            logger.info('[%s] Cannot get Youtube access token!', movieProjectID);
+	        }
+	    
+	    });
+	    
 	});
+
+	
 
 };
 
 //use long polling to ask AE Server to create Story movie
 aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
-	//TODO:: get corresponding AE Server ID
-	var starAeServerID = defaultAeServer;
 
-	youtubeTokenMgr.getAccessToken( function(ytAccessToken){
-		if (ytAccessToken) {
-			var userDataFolder = path.join( workingPath, 'public/contents/user_project', movieProjectID, 'user_data');
-			
-			var commandParameters = {
-				userFileList: fs.readdirSync(userDataFolder),
-				movieProjectID: movieProjectID,
-				ownerStdID: ownerStdID,
-				ownerFbID: ownerFbID,
-				movieTitle: movieTitle,
-				ytAccessToken: ytAccessToken 
-			};
-						
-			connectionHandler.sendRequestToRemote( starAeServerID, { command: "RENDER_STORY_MOVIE", parameters: commandParameters }, function(responseParameters) {
-				//console.dir(responseParameters);
-				if (createMovie_cb )  {
-					createMovie_cb(responseParameters);
-				}
-			});
-		}
-		else {
-			logger.info('[%s] Cannot get Youtube access token!', movieProjectID);
-		}
+	var starAeServerID = defaultAeServer;
 	
-	});
+    getAeServerWithLowestLoad(function(aeServerWithLowestLoad, err){
+        if (!err){
+            starAeServerID = aeServerWithLowestLoad;
+        }
+        youtubeTokenMgr.getAccessToken( function(ytAccessToken){
+            if (ytAccessToken) {
+                var userDataFolder = path.join( workingPath, 'public/contents/user_project', movieProjectID, 'user_data');
+                
+                var commandParameters = {
+                    userFileList: fs.readdirSync(userDataFolder),
+                    movieProjectID: movieProjectID,
+                    ownerStdID: ownerStdID,
+                    ownerFbID: ownerFbID,
+                    movieTitle: movieTitle,
+                    ytAccessToken: ytAccessToken 
+                };
+                            
+                globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "RENDER_STORY_MOVIE", parameters: commandParameters }, function(responseParameters) {
+                    //console.dir(responseParameters);
+                    if (createMovie_cb )  {
+                        createMovie_cb(responseParameters);
+                    }
+                });
+            }
+            else {
+                logger.info('[%s] Cannot get Youtube access token!', movieProjectID);
+            }
+        
+        });
+    });
+
+	
 
 };
 
 
 aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
-	//TODO:: get corresponding AE Server ID
-	var starAeServerID = defaultAeServer;
-
-	var commandParameters = {
-		movieProjectID: movieProjectID
-	};
+    var starAeServerID;
+    videoDB.getAeIdByPid(movieProjectID,function(err, _aeID){
+        
+        if (!err){
+            starAeServerID = _aeID;
+        }
+        else{
+            starAeServerID = defaultAeServer;
+        }
+    
+    	var commandParameters = {
+    		movieProjectID: movieProjectID
+    	};
+    	
+    	globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "UPLOAD_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+    		//console.dir(responseParameters);
+    		if (uploadMovie_cb )  {
+    			uploadMovie_cb(responseParameters);
+    		}
+    	});
 	
-	connectionHandler.sendRequestToRemote( starAeServerID, { command: "UPLOAD_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
-		//console.dir(responseParameters);
-		if (uploadMovie_cb )  {
-			uploadMovie_cb(responseParameters);
-		}
 	});
 	
 
@@ -162,18 +229,28 @@ aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
 aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, downloadMovie_cb) {
 
-	//TODO:: get corresponding AE Server ID
-	var starAeServerID = defaultAeServer;
 
-	var commandParameters = {
-		movieProjectID: movieProjectID
-	};
+	var starAeServerID;
+	videoDB.getAeIdByPid(movieProjectID,function(err, _aeID){
+        
+        if (!err){
+            starAeServerID = _aeID;
+        }
+        else{
+            starAeServerID = defaultAeServer;
+        }
+
+    	var commandParameters = {
+    		movieProjectID: movieProjectID
+    	};
+    	
+    	globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_STORY_MOVIE_FROM_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+    		//console.dir(responseParameters);
+    		if (downloadMovie_cb )  {
+    			downloadMovie_cb(responseParameters);
+    		}
+    	});
 	
-	connectionHandler.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_STORY_MOVIE_FROM_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
-		//console.dir(responseParameters);
-		if (downloadMovie_cb )  {
-			downloadMovie_cb(responseParameters);
-		}
 	});
 
 
