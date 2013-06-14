@@ -8,7 +8,7 @@ var fs = require('fs');
 var async = require('async');
 var globalConnectionMgr = require('./global_connection_mgr.js');
 var youtubeTokenMgr = require( './youtube_mgr.js' );
-var videoDB = require('./video.js');
+
 
 //*****This function is deprecated.*****
 //use direct HTTP to ask AE Server to create Miix movie
@@ -202,6 +202,7 @@ aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movi
 aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
     var starAeServerID;
+    var videoDB = require('./video.js');
     videoDB.getAeIdByPid(movieProjectID,function(err, _aeID){
         
         if (!err){
@@ -231,6 +232,7 @@ aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, download
 
 
 	var starAeServerID;
+	var videoDB = require('./video.js');
 	videoDB.getAeIdByPid(movieProjectID,function(err, _aeID){
         
         if (!err){
