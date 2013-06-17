@@ -17,7 +17,7 @@ FM.DB = (function(){
             Schema = mongoose.Schema,
             ObjectID = Schema.Types.ObjectId,
             Mixed = Schema.Types.Mixed,
-            DB = 'feltmeng',
+            DB = 'admincache',
             connection = connectDB(),
             eduLv = 'elem jrHigh srHigh college university master doctor'.split(' '),
             occupationList = 'gov student edu industry business service'.split(' ');
@@ -36,8 +36,42 @@ FM.DB = (function(){
          *  }
          *
          */
-
+		 
+		 //kaiser start **************
+        var MemberListInfoSchema = new Schema({
+            fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
+            miixMovieVideo_count: {type: Number, min: 0, default: 0},                            //籹紇计
+			doohPlay_count: {type: Number, min: 0, default: 0},                                  //DOOH祅Ω计
+			movieViewed_count: {type: Number, min: 0, default: 0},                               //紇芠羆Ω计
+			fbLike_count: {type: Number, min: 0, default: 0},                                    //FB苂羆计
+			fbComment_count: {type: Number, min: 0, default: 0},                                 //FB痙ē羆计
+			fbShare_count: {type: Number, min: 0, default: 0}                                    //FBだㄉΩ计
+			
+        }); //  memberListInfo collection
 		
+        var MiixPlayListInfoSchema = new Schema({
+		    fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
+			movieViewed_count: {type: Number, min: 0, default: 0},   //芠Ω计
+			fbLike_count: {type: Number, min: 0, default: 0},        //FB苂Ω计
+			fbComment_count: {type: Number, min: 0, default: 0},     //FB痙ē计
+			fbShare_count: {type: Number, min: 0, default: 0},       //FBだㄉΩ计
+			applyDoohPlay_count: {type: Number, min: 0, default: 0}, //щ絑Ω计
+			doohPlay_count: {type: Number, min: 0, default: 0}       //DOOH祅Ω计
+ 			
+        }); //  miixPlayListInfo collection
+		
+		var StoryPlayListInfoSchema = new Schema({
+		    fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}		
+			movieViewed_count: {type: Number, min: 0, default: 0},   //芠Ω计
+			fbLike_count: {type: Number, min: 0, default: 0},        //FB苂Ω计
+			fbComment_count: {type: Number, min: 0, default: 0},     //FB痙ē计
+			fbShare_count: {type: Number, min: 0, default: 0}        //FBだㄉΩ计
+ 			
+        }); //  storyPlayListInfo collection
+		
+		 //kaiser end ***************
+		 
+		 
         var MemberSchema = new Schema({
             fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
             fullname: {type: String},
@@ -56,6 +90,7 @@ FM.DB = (function(){
             video_count: {type: Number, min: 0, default: 0},
             thumbnail: {type: String},    //  path/to/filename
 			doohTimes: {type: Number, min: 0, default: 0}
+			
         }); //  members collection
         
         var VideoSchema = new Schema({
@@ -83,7 +118,6 @@ FM.DB = (function(){
 			doohPlayedTimes: {type: Number, min: 0, default: 0},	//JF
 			timesOfPlaying: {type: Number}		//JF
         }); //  videos collection
-
         var CommentSchema = new Schema({
             fb_id: {type: String},
             owner_id: {type: ObjectID},
@@ -132,50 +166,7 @@ FM.DB = (function(){
 			platform: {type: String},
 			os_version: {type: String}
 		}); 
-
-        //kaiser start **************
-        var MemberListInfoSchema = new Schema({
-            fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
-            email: {type: String, default: 'xyz@feltmeng.com'},
-            mPhone: { number: String, verified: {type: Boolean, default: false}, code: String },
-            miixMovieVideo_count: {type: Number, min: 0, default: 0}, //籹紇计
-            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH祅Ω计
-            movieViewed_count: {type: Number, min: 0, default: 0},    //紇芠羆Ω计
-            fbLike_count: {type: Number, min: 0, default: 0},         //FB苂羆计
-            fbComment_count: {type: Number, min: 0, default: 0},      //FB痙ē羆计
-            fbShare_count: {type: Number, min: 0, default: 0}         //FBだㄉΩ计
-            
-        }); //  memberListInfo collection
-        
-        var MiixPlayListInfoSchema = new Schema({
-            projectId: {type: String},                                //  AE project ID
-            userPhotoUrl: {type: String},                             //酚
-            movieNo: {type: Number},                                  //紇絪腹
-            movieViewed_count: {type: Number, min: 0, default: 0},    //紇芠羆Ω计
-            fbLike_count: {type: Number, min: 0, default: 0},         //FB苂Ω计
-            fbComment_count: {type: Number, min: 0, default: 0},      //FB痙ē计
-            fbShare_count: {type: Number, min: 0, default: 0},        //FBだㄉΩ计
-            movieMaker: {type: String},                               //穦嘿
-            applyDoohPlay_count: {type: Number, min: 0, default: 0},  //щ絑Ω计
-            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH祅Ω计
-            timesOfPlaying: {type: Number}      
-            
-        }); //  miixPlayListInfo collection
-        
-        var StoryPlayListInfoSchema = new Schema({
-            projectId: {type: String},                                //  AE project ID
-            movieNo: {type: Number},                                  //紇絪腹
-            movieViewed_count: {type: Number, min: 0, default: 0},    //芠Ω计
-            fbLike_count: {type: Number, min: 0, default: 0},         //FB苂Ω计
-            fbComment_count: {type: Number, min: 0, default: 0},      //FB痙ē计
-            fbShare_count: {type: Number, min: 0, default: 0},        //FBだㄉΩ计
-            movieMaker: {type: String}                                //穦嘿
-            
-        }); //  storyPlayListInfo collection
-        
-         //kaiser end ***************		
-		
-		
+				
         /****************** End of DB Schema ******************/
 		
         var Member = connection.model('Member', MemberSchema, 'member'),
@@ -184,11 +175,10 @@ FM.DB = (function(){
             Event = connection.model('Event', EventSchema, 'event'),
             Program = connection.model('Program', ProgramSchema, 'program'),
             Admin = connection.model('Admin', AdminSchema, 'admin'),
-			Analysis = connection.model('Analysis', AnalysisSchema, 'analysis'),
-            MemberListInfo = connection.model('MemberListInfo', MemberListInfoSchema, 'memberListInfo'),//kaiser
-            MiixPlayListInfo = connection.model('MiixPlayListInfo', MiixPlayListInfoSchema, 'miixPlayListInfo'),
-            StoryPlayListInfo = connection.model('StoryPlayListInfo', StoryPlayListInfoSchema, 'storyPlayListInfo');
-           
+			Analysis = connection.model('Analysis', AnalysisSchema, 'analysis'),		
+			MemberListInfo = connection.model('MemberListInfo', MemberListInfoSchema, 'memberListInfo'),
+			MiixPlayListInfo = connection.model('MiixPlayListInfo', MiixPlayListInfoSchema, 'miixPlayListInfo'),
+			StoryPlayListInfo = connection.model('StoryPlayListInfo', StoryPlayListInfoSchema, 'storyPlayListInfo');
             
         var dbModels = [];
         dbModels["member"] = Member;
@@ -200,7 +190,7 @@ FM.DB = (function(){
 		dbModels["analysis"] = Analysis;
         dbModels["memberListInfo"] = MemberListInfo;//kaiser
         dbModels["miixPlayListInfo"] = MiixPlayListInfo;
-        dbModels["storyPlayListInfo"] = StoryPlayListInfo;  
+		dbModels["storyPlayListInfo"] = StoryPlayListInfo;		
         
         var dbSchemas = [];
         dbSchemas["member"] = MemberSchema;
@@ -210,16 +200,16 @@ FM.DB = (function(){
         dbSchemas['program'] = ProgramSchema;
         dbSchemas["admin"] = AdminSchema;
 		dbSchemas["analysis"] = AnalysisSchema;
-        dbSchemas['memberListInfo'] = MemberListInfoSchema;//kaiser
+        dbSchemas['memberListInfo'] = MemberListInfoSchema;
         dbSchemas["miixPlayListInfo"] = MiixPlayListInfoSchema;
-        dbSchemas["storyPlayListInfo"] = StoryPlayListInfoSchema;
+		dbSchemas["storyPlayListInfo"] = StoryPlayListInfoSchema;		
             
         function connectDB(){
                 try{
                     mongoose.connect('mongodb://localhost:27017/'+DB);
                     return mongoose.connection;
                 }catch(err){
-                    logger.info('Connect DB failed: '+err);
+                 //   logger.info('Connect DB failed: '+err);
                 }
             };
 
@@ -286,15 +276,9 @@ FM.DB = (function(){
                     case 'event':
                         return Event;
                         break;
-                    case 'memberListInfo':
+                    case 'memberListInfo'://kaiser
                         return MemberListInfo;
-                        break;
-                    case 'miixPlayListInfo':
-                        return MiixPlayListInfo;
-                        break;
-                    case 'storyPlayListInfo':
-                        return StoryPlayListInfo;
-                        break;
+                        break;						
                     default:
                         throw new error('DB Cannot find this Collection: ' + collection);
                         break;
@@ -367,16 +351,7 @@ FM.DB = (function(){
                 logger.info("Delete a Doc: " + docid);
                 docModel.findByIdAndRemove(docid, cb);
             },
-            //kaiser
-            deleteAdoc2: function(docModel, cb){
-                logger.info("Delete all Doc: ");
-                docModel.remove(docModel, cb);
-            },
-            
-            listOfdocModels: function(docModel,condition, fields, options, cb){
-                docModel.find(condition, fields, options, cb);
-            },
-            //kaiser end
+
             getValueOfById: function(docModel, docid, path, cb){
                 var doc = this.readAdocById(docModel, docid, function(err, result){
                     if(err)
@@ -436,160 +411,12 @@ FM.DB = (function(){
     };  //  End of Return
 })(); //  End of Singleton
 
-FM.SCHEDULE = (function(){
-    var uInstance = null;
-    
-    function constructor(){
-        var FMDB = FM.DB.getInstance();
-            events = FMDB.getDocModel("event");
-        
-        return {
-        /*
-         * Public
-         */
-            listOfReservated : function(range, cb){
-                var evt,
-                    list = [];
-                var query = events.find();
-                query.or( [ 
-                            { start: {$gte: range.start, $lt: range.end} },
-                            { end: {$gt: range.start, $lte: range.end} },
-                            { $and: [ {start: {$lte: range.start}}, {end: {$gte: range.end}} ] } 
-                          ] ).sort({start: 1}).exec(cb);
-                
-                /* peudo
-                 *   if(range.start < evt.start && evt.start < range.end)
-                 *       list.push(evt);
-                 *   if(range.start < evt.end && evt.end < range.end)
-                 *       list.push(evt);
-                 *   if(evt.start < range.start && range.end < evt.end)
-                 *       list.push(evt);
-                 */    
-            },
-            
-            reserve : function(evt){
-                FMDB.createAdoc(events, evt);
-            }
-        };
-    } //    End of Constructor
-    
-    return {
-        getInstance: function(){
-            if(!uInstance){
-                uInstance = constructor();
-            }
-            return uInstance;
-        }
-    };
-})();
-
-FM.MEMBER = (function(){
-    var uInstance = null;
-    
-    function consctructor(){
-        var FMDB = FM.DB.getInstance();
-            members = FMDB.getDocModel("member");
-        
-        return {
-        /*
-         *  Public Members
-         */
-            addMember: function(pfjson){
-                FMDB.createAdoc(members, pfjson);
-            },
-            
-            deleteMember: function(memberID){
-                var field = {"_id":1};
-                FMDB.getValueOf(members, {"memberID":memberID}, field, function(err, result){
-                    if(err) throw err;
-                    FMDB.deleteAdoc(members, result[field]);
-                    logger.info("deleteMember " + memberID + result[field]);
-                });
-            },
-            
-            isValid: function(memberID, pwd){
-                var field = {"password":1};
-                FMDB.getValueOf(members, {"memberID":memberID}, field, function(err, result){
-                    if(err) logger.error("" + err);
-                    if(pwd === password)
-                        return true;
-                    return false; 
-                });
-            },
-            
-            listOfMembers: function(cb){
-                members.find(cb);
-            },
-            
-            getProfile: function(memberID, cb){
-                FMDB.readAdoc(members, {"memberID":memberID}, cb)
-            },
-            
-            getVideosOf: function(memberID, cb){
-                var field = {"video_ids":1};
-                FMDB.getValueOf(members, {"memberID" : memberID}, field, cb);
-            }
-        };
-    } //    End of Constructor.
-    
-    return {
-        getInstance: function(){
-            if(!uInstance){
-                uInstance = constructor();
-            }
-            return uInstance;
-        }
-    }; //   End of Return uInstance.
-})(); // End of FM.MEMBER
 
 
 
-FM.VIDEO = (function(){
-    var uInstance;
-    
-    function constructor(){
-        var FMDB = FM.DB.getInstance();
-            videos = FMDB.getDocModel("video");
-        
-        return {
-        /*
-         *  Public Members
-         */
-            getListByLoc: function(locationUID){
-                var query = videos.find({});
-                query.sort('timestamp', -1).exec(function(err, doc){
-                    if(err){
-                       logger.error('locationQuery failed: '+err);
-                    }else{
-                        logger.info('locationQuery '+locationUID+': '+doc);
-                    }
-                });
-            },
-
-            latest: function(latestNum, cb){
-                var query = videos.find({});
-                query.sort('timestamp', -1),limit(latestNum).exec(cb);
-            },
-
-            top: function(topNum, cb){
-                var query = videos.find({});
-                query.sort('likes', -1).limit(topNum).exec(cb);
-            }
-        };
-    }
-    
-    return {
-        getInstance: function(){
-            if(!uInstance){
-                uInstance = constructor();
-            }
-            return uInstance;
-        }
-    };  // End of Return uInstance
-})(); // End of FM.VIDEO;
 
 
-module.exports = FM.DB.getInstance();
+//module.exports = FM.DB.getInstance();
 
 
 
