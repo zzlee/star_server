@@ -1,11 +1,11 @@
-var module = (function() {
+var playlist = (function() {
 
     var _private = {
         i:5,
         create : function() {
             //console.log( "current value:" + this.i);
         },
-        list : function( adapter, condition, token, list_cb ) {
+        list : function( condition, list_cb, adapter, token ) {
             //this.i = val;
             if(!condition.limit) condition.limit = 99999;
             if(!condition.sort) condition.sort = 'name';
@@ -24,9 +24,9 @@ var module = (function() {
 
     return {
 
-        playlist : function( adapter, option ) {
+        list : function( adapter, option ) {
             if(option.token){
-                _private.list( adapter, option.condition, option.token, list_cb );
+                _private.list( option.condition, list_cb, adapter, option.token );
             }
             //_private.set(args.val);
             //_private.get();
@@ -39,4 +39,4 @@ var module = (function() {
  
  
 // Outputs: "current value: 10" and "running"
-module.playlist( {run: true, val:10} );
+module.exports.playlist = playlist;
