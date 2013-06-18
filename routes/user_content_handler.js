@@ -10,6 +10,7 @@ var workingPath = process.cwd();
 
 //POST /miix/videos/user_content_files
 userContentHandler.upload_photo_cb = function(req, res){
+    var awsS3 = require('../aws_s3.js');
 
     var processFile = function( _userDataDir, _imageFileToProcess, _areaToCrop, _resizeTo, _osVersion, _callback1 ) {
         //var fileNameBody = _imageFileToProcess.substring(0, _imageFileToProcess.lastIndexOf(".") )
@@ -18,7 +19,7 @@ userContentHandler.upload_photo_cb = function(req, res){
         var fileAutoOrinted = path.join( _userDataDir, "temp_auto_orient."+fileNameExt );
         var fileCropped = path.join( _userDataDir, "temp_cropped."+fileNameExt );
         var fileResized = path.join( _userDataDir, "_"+_imageFileToProcess );
-        var imgWidth, imgHeight;
+        var imgWidth=0, imgHeight=0;
         
         var gm = require('gm');
         var cropAndResize = function( _fileToProcess, _callback2 ) {
@@ -124,7 +125,7 @@ userContentHandler.upload_photo_cb = function(req, res){
             }
         });
         
-    }
+    };
 
     var moveFile = function( _tmp_path, _target_path, _moveFile_cb )  {
         var util = require('util');
@@ -153,7 +154,7 @@ userContentHandler.upload_photo_cb = function(req, res){
                 res.send( {err:'Fail to do util.pump(): '+err } );
             }
         });			
-    }
+    };
 
     //get the temporary location of the file
     var tmp_path = req.files['file'].path;
@@ -185,7 +186,7 @@ userContentHandler.upload_photo_cb = function(req, res){
         else {  //req.body.format == "image"
         
             var areaToCrop, resizeTo;        
-            areaToCrop = { 	x: req.body.croppedArea_x,
+            areaToCrop = {  x: req.body.croppedArea_x,
                             y: req.body.croppedArea_y,
                             width: req.body.croppedArea_width,
                             height: req.body.croppedArea_height };
@@ -194,7 +195,20 @@ userContentHandler.upload_photo_cb = function(req, res){
             
             moveFile( tmp_path, target_path, function() { 
                 processFile( userDataDir, req.files['file'].name, areaToCrop, resizeTo, req.body.osVersion, function() {
-                    res.send(200, {message: "User content file is succesfully uploaded."});;
+                    var localPath = path.join( userDataDir, "_"+req.files['file'].name);
+                    var s3Path =  '/user_project/' + req.body.projectID + '/user_data/'+ req.files['file'].name;
+                    //console.log('s3Path = %s', s3Path);
+                    awsS3.uploadToAwsS3(localPath, s3Path, 'image/jpeg', function(err,result){
+                        if (!err){
+                            logger.log('User content file is successfully saved to S3 '+s3Path);
+                            res.send(200, {message: "User content file is succesfully uploaded."});
+                        }
+                        else {
+                            logger.log('User content file is failed to be saved to S3 '+s3Path);
+                            res.send(500 , {message: "Failed to saved to S3"});
+                        }
+                    });
+                    
                 });
             });
         }

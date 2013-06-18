@@ -171,7 +171,7 @@ FM.VIDEO = (function(){
 										if(body.error) 
 											callback(null, {comments: comments_count, likes: likes_count} );
 										else {
-											comments_count = body.comments.count;
+											comments_count = (body.comments) ? body.comments.count: 0;
 											likes_count = (body.likes) ? body.likes.count : 0;
 											
 											callback(null, {comments: comments_count, likes: likes_count} );
