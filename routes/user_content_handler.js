@@ -4,12 +4,13 @@ var fs = require('fs');
 var path = require('path');
 var workingPath = process.cwd();
 
+var miixContentMgr = require(workingPath+'/miix_content_mgr.js');
 /*
  * handle file upload
  */
 
 //POST /miix/videos/user_content_files
-userContentHandler.upload_photo_cb = function(req, res){
+userContentHandler.uploadUserContentFile_cb = function(req, res){
     var awsS3 = require('../aws_s3.js');
 
     var processFile = function( _userDataDir, _imageFileToProcess, _areaToCrop, _resizeTo, _osVersion, _callback1 ) {
@@ -223,6 +224,78 @@ userContentHandler.upload_photo_cb = function(req, res){
 
 };
 
+
+//POST /miix/videos/user_content_description
+userContentHandler.uploadUserDataInfo_cb = function(req, res) {
+
+    var movieProjectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectID);
+    var userDataDir = path.join( movieProjectDir, 'user_data');
+    
+    var writeTo_customized_content_xml_cb = function (err) {
+        if (!err) {
+            logger.log('customized_content.xml is generated.');
+            
+            //check if all the user data exist; (if yes, start generating the movie in startGeneratingMovie()
+            var allUserContentExist = true;
+            if( Object.prototype.toString.call( req.body.customizableObjects ) === '[object Array]' ) {
+                for (var i in req.body.customizableObjects) {
+                    allUserContentExist = allUserContentExist && fs.existsSync( path.join( userDataDir, "_"+req.body.customizableObjects[i].content) );
+                }
+            }
+            else {
+                allUserContentExist = fs.existsSync( path.join( userDataDir, "_"+req.body.customizableObjects.content) );
+            }
+
+            if ( allUserContentExist ) {
+                logger.log('Start generating movie '+ req.body.projectID +'!');
+                res.send(null);
+                //movieMaker.renderMovie(req.body.projectID, req.body.ownerID);
+                var videoTitle =  "MiixCard movie";
+                //aeServerManager.createMovie(aeServer, req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
+                //aeServerManager.createMovie_longPolling("gance_Feltmeng_pc", req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
+                miixContentMgr.generateMiixMoive(req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
+            }
+            else {
+                res.send( {err:"Some or all user contents are missing."} );
+            }
+            
+        }
+    }
+    
+
+
+    //==append the content in customized_content.xml==
+    var builder = require('xmlbuilder');
+    var userDataXml = builder.create('customized_content',{'version': '1.0', 'encoding': 'UTF-8', 'standalone': true});
+    userDataXml.ele('template_ID', req.body.templateID);
+    var customizableObjectListXml = userDataXml.ele('customizable_object_list');
+    
+
+    if( Object.prototype.toString.call( req.body.customizableObjects ) === '[object Array]' ) {
+        for (var i in req.body.customizableObjects) {
+            //append the content in customized_content.xml
+            var customizableObjectXml = customizableObjectListXml.ele('customizable_object');
+            customizableObjectXml.ele('ID', req.body.customizableObjects[i].ID );
+            customizableObjectXml.ele('format', req.body.customizableObjects[i].format);
+            customizableObjectXml.ele('content', "_"+req.body.customizableObjects[i].content);
+        }
+    }
+    else {
+        //append the content in customized_content.xml
+        var customizableObjectXml = customizableObjectListXml.ele('customizable_object');
+        customizableObjectXml.ele('ID', req.body.customizableObjects.ID );
+        customizableObjectXml.ele('format', req.body.customizableObjects.format);
+        customizableObjectXml.ele('content', "_"+req.body.customizableObjects.content);
+    }
+    
+    //finalize customized_content.xml 
+    var xmlString = userDataXml.end({ 'pretty': true, 'indent': '  ', 'newline': '\n' });
+    //logger.log(userDataXml);
+    if ( fs.existsSync(userDataDir) ) {
+        fs.writeFile(userDataDir+'/customized_content.xml', xmlString, writeTo_customized_content_xml_cb ); 
+    }
+
+};
 
 
 
