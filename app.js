@@ -148,11 +148,10 @@ app.get('/admin/story_play_list', routes.admin.storyPlayList_get_cb);
 app.get('/admin/list_size', routes.admin.listSize_get_cb);
 
 /**
- *       GET/miix_admin/user_content_items
+ *       GET/miix_admin/user_content_items?offset=0&limit=20
  * @param  request
  * 
- *         query    {number}pageNumber start.
- *                  {number}pageNumber end.
+ *         query    
  *                  
  * @return response json{userContent(photo url or userContent link in s3), 
  *                       UGCLevel(Range A~E),
@@ -165,15 +164,13 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
  *       PUT /miix_admin/user_content_items/{id}
  * @param  request  {string}projectId.
  * 
- *         query    {string}projectId.
- *                  
  *         body     {string}UGCLevel(Range A~E)    
  *                  
  * @return response {string}status 
  */
 
 /**
- * É‹    GET /miix_admin/doohs/{dooh_id}/timeslots
+ * É‹    GET /miix_admin/doohs/{dooh_id}/timeslots?&offset=0&limit=20
  * @param  request  {string}dooh.client(dooh_id)
  * 
  *         query    {number}searchTime start.
@@ -183,20 +180,16 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
  *                       startTime,
  *                       endTime,
  *                       UGC_Url,
- *                       UGC_ID                     }
+ *                       UGC_ID}
  */
 
 /**
  * É‹    PUT /miix_admin/doohs/{dooh_id}/timeslots/{timeslot_id}
  * @param  request  {string}timeslot_id.
- * 
- *         query    {string}timeslot_id.
  *                  
  *         body     json{timeslotnumber(Range 1~20), 
- *                       startTime,
- *                       endTime,
  *                       UGC_Url,
- *                       UGC_ID                     }    
+ *                       UGC_ID}    
  *                  
  * @return response {string}status 
  */
