@@ -30,13 +30,13 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
                 .resize(_resizeTo.width, _resizeTo.height)
                 .write(fileResized, function (err) {
                     if (!err) {
-                        logger.log('File cropping/resizing done');
+                        logger.info('File cropping/resizing done');
                         fs.unlink(fileCropped);
                         if ( _callback2 )
                             _callback2();
                     }
                     else  {
-                        logger.log(err);
+                        logger.info(err);
                         res.send( {err:'Fail to resize the image file: '+err } );
                     }
                 });
@@ -54,7 +54,7 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
                         fs.unlink(fileAutoOrinted);
                     }
                     else  {
-                        logger.log(err);
+                        logger.info(err);
                         res.send( {err:'Fail to crop the image file: '+err } );
                     }
                 });
@@ -76,7 +76,7 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
                         getSize();
                     }
                     else  {
-                        logger.log(err);
+                        logger.info(err);
                         res.send( {err:'Fail to auto orient the image file: '+err } );
                     }
                 });
@@ -103,7 +103,7 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
                     });
                 }
                 else  {
-                    logger.log(err);
+                    logger.info(err);
                     res.send( {err:'Fail to remove EXIF in image file: '+err } );
                 }
             });
@@ -138,31 +138,31 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
             if (!err) {
                 fs.unlink(_tmp_path, function() {
                     if (!err) {
-                        logger.log( 'Finished uploading to ' + _target_path );
+                        logger.info( 'Finished uploading to ' + _target_path );
                         
                         if ( _moveFile_cb ) {
                             _moveFile_cb();
                         }
                     }
                     else {
-                        logger.log('Fail to delete temporary uploaded file: '+err);
+                        logger.info('Fail to delete temporary uploaded file: '+err);
                         res.send( {err:'Fail to delete temporary uploaded file: '+err});
                     }
                 });
             }
             else {
-                logger.log('Fail to do util.pump(): '+err);
+                logger.info('Fail to do util.pump(): '+err);
                 res.send( {err:'Fail to do util.pump(): '+err } );
             }
         });			
     };
 
     //get the temporary location of the file
-    var tmp_path = req.files['file'].path;
+    var tmp_path = req.files.file.path;
     //set where the file should actually exists 
     var target_path;
     
-    logger.log('req.body.fileObjectID= '+ req.body.fileObjectID);
+    logger.info('req.body.fileObjectID= '+ req.body.fileObjectID);
     
     
     if ( req.body.projectID ) {
@@ -174,11 +174,11 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
         if ( !fs.existsSync(userDataDir) ) {
             fs.mkdirSync( userDataDir );  //TODO: check if this is expensive... 
         }
-        target_path = path.join( userDataDir, req.files['file'].name);
+        target_path = path.join( userDataDir, req.files.file.name);
         
         if (req.body.format == "video"){
             moveFile( tmp_path, target_path, function() { 
-                var newPath = path.join( userDataDir, "_"+req.files['file'].name );
+                var newPath = path.join( userDataDir, "_"+req.files.file.name );
                 fs.rename(target_path, newPath, function(){
                     res.send(200, {message: "User content file is succesfully uploaded."});
                 });
@@ -195,17 +195,17 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
             resizeTo = { width: req.body.obj_OriginalWidth, height: req.body.obj_OriginalHeight};
             
             moveFile( tmp_path, target_path, function() { 
-                processFile( userDataDir, req.files['file'].name, areaToCrop, resizeTo, req.body.osVersion, function() {
-                    var localPath = path.join( userDataDir, "_"+req.files['file'].name);
-                    var s3Path =  '/user_project/' + req.body.projectID + '/user_data/'+ req.files['file'].name;
+                processFile( userDataDir, req.files.file.name, areaToCrop, resizeTo, req.body.osVersion, function() {
+                    var localPath = path.join( userDataDir, "_"+req.files.file.name);
+                    var s3Path =  '/user_project/' + req.body.projectID + '/user_data/'+ req.files.file.name;
                     //console.log('s3Path = %s', s3Path);
                     awsS3.uploadToAwsS3(localPath, s3Path, 'image/jpeg', function(err,result){
                         if (!err){
-                            logger.log('User content file is successfully saved to S3 '+s3Path);
+                            logger.info('User content file is successfully saved to S3 '+s3Path);
                             res.send(200, {message: "User content file is succesfully uploaded."});
                         }
                         else {
-                            logger.log('User content file is failed to be saved to S3 '+s3Path);
+                            logger.info('User content file is failed to be saved to S3 '+s3Path);
                             res.send(500 , {message: "Failed to saved to S3"});
                         }
                     });
@@ -216,7 +216,7 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
         
     }
     else {
-        target_path = path.join( workingPath, 'public/uploads', req.files['file'].name);  
+        target_path = path.join( workingPath, 'public/uploads', req.files.file.name);  
         moveFile( tmp_path, target_path);
     }
     
@@ -227,15 +227,17 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
 
 //POST /miix/videos/user_content_description
 userContentHandler.uploadUserDataInfo_cb = function(req, res) {
+    var awsS3 = require('../aws_s3.js');
 
     var movieProjectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectID);
     var userDataDir = path.join( movieProjectDir, 'user_data');
+    var userContentDescriptionFilePath = path.join( userDataDir, 'customized_content.xml');
     
-    var writeTo_customized_content_xml_cb = function (err) {
+    var saveToS3_cb = function (err) {
         if (!err) {
-            logger.log('customized_content.xml is generated.');
+            logger.info('customized_content.xml is successfully saved to S3.');
             
-            //check if all the user data exist; (if yes, start generating the movie in startGeneratingMovie()
+            //check if all the user data exist; (if yes, start generating the movie in miixContentMgr.generateMiixMoive
             var allUserContentExist = true;
             if( Object.prototype.toString.call( req.body.customizableObjects ) === '[object Array]' ) {
                 for (var i in req.body.customizableObjects) {
@@ -247,21 +249,36 @@ userContentHandler.uploadUserDataInfo_cb = function(req, res) {
             }
 
             if ( allUserContentExist ) {
-                logger.log('Start generating movie '+ req.body.projectID +'!');
+                logger.info('Start generating movie '+ req.body.projectID +'!');
                 res.send(null);
-                //movieMaker.renderMovie(req.body.projectID, req.body.ownerID);
+
                 var videoTitle =  "MiixCard movie";
-                //aeServerManager.createMovie(aeServer, req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
-                //aeServerManager.createMovie_longPolling("gance_Feltmeng_pc", req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
                 miixContentMgr.generateMiixMoive(req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
             }
             else {
-                res.send( {err:"Some or all user contents are missing."} );
+                res.send(500, {error: "Some or all user contents are missing."} );
+                logger.error('Cannot generate UGC because some or all user contents are missing.');
             }
             
         }
-    }
+        else{
+            res.send(500, {error: "Fail to save user content description to S3."} );
+            logger.error('Cannot generate UGC because it fails to save user content description to S3');
+        }
+    };
     
+    var writeToCustomizedContentXml_cb = function (err) {
+        if (!err) {
+            //==save customized_content.xml to S3==
+            var s3Path =  '/user_project/' + req.body.projectID + '/user_data/'+ "customized_content.xml";
+            awsS3.uploadToAwsS3(userContentDescriptionFilePath, s3Path, 'text/xml',saveToS3_cb);
+            
+        }
+        else {
+            res.send(500, {error: "Fail to generate customized_content.xml ."} );
+            logger.error('Cannot generate UGC because it fails to generate customized_content.xml');
+        }
+    };
 
 
     //==append the content in customized_content.xml==
@@ -269,12 +286,13 @@ userContentHandler.uploadUserDataInfo_cb = function(req, res) {
     var userDataXml = builder.create('customized_content',{'version': '1.0', 'encoding': 'UTF-8', 'standalone': true});
     userDataXml.ele('template_ID', req.body.templateID);
     var customizableObjectListXml = userDataXml.ele('customizable_object_list');
+    var customizableObjectXml = "";
     
 
     if( Object.prototype.toString.call( req.body.customizableObjects ) === '[object Array]' ) {
         for (var i in req.body.customizableObjects) {
             //append the content in customized_content.xml
-            var customizableObjectXml = customizableObjectListXml.ele('customizable_object');
+            customizableObjectXml = customizableObjectListXml.ele('customizable_object');
             customizableObjectXml.ele('ID', req.body.customizableObjects[i].ID );
             customizableObjectXml.ele('format', req.body.customizableObjects[i].format);
             customizableObjectXml.ele('content', "_"+req.body.customizableObjects[i].content);
@@ -282,7 +300,7 @@ userContentHandler.uploadUserDataInfo_cb = function(req, res) {
     }
     else {
         //append the content in customized_content.xml
-        var customizableObjectXml = customizableObjectListXml.ele('customizable_object');
+        customizableObjectXml = customizableObjectListXml.ele('customizable_object');
         customizableObjectXml.ele('ID', req.body.customizableObjects.ID );
         customizableObjectXml.ele('format', req.body.customizableObjects.format);
         customizableObjectXml.ele('content', "_"+req.body.customizableObjects.content);
@@ -290,9 +308,9 @@ userContentHandler.uploadUserDataInfo_cb = function(req, res) {
     
     //finalize customized_content.xml 
     var xmlString = userDataXml.end({ 'pretty': true, 'indent': '  ', 'newline': '\n' });
-    //logger.log(userDataXml);
+    //logger.info(userDataXml);
     if ( fs.existsSync(userDataDir) ) {
-        fs.writeFile(userDataDir+'/customized_content.xml', xmlString, writeTo_customized_content_xml_cb ); 
+        fs.writeFile(userContentDescriptionFilePath, xmlString, writeToCustomizedContentXml_cb ); 
     }
 
 };
