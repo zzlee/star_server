@@ -197,7 +197,7 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
             moveFile( tmp_path, target_path, function() { 
                 processFile( userDataDir, req.files.file.name, areaToCrop, resizeTo, req.body.osVersion, function() {
                     var localPath = path.join( userDataDir, "_"+req.files.file.name);
-                    var s3Path =  '/user_project/' + req.body.projectID + '/user_data/'+ req.files.file.name;
+                    var s3Path =  '/user_project/' + req.body.projectID + '/user_data/_'+ req.files.file.name;
                     //console.log('s3Path = %s', s3Path);
                     awsS3.uploadToAwsS3(localPath, s3Path, 'image/jpeg', function(err,result){
                         if (!err){
