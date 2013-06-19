@@ -23,13 +23,12 @@ scalaMgr.connectServer({
  * @param {string} startDate The start date.
  * @param {string} endDate The end date.
  * @param {function} timeslot_cb Report timeslot list in json.
- *     @param {string} id The time slot id. i.e. 20130618_1432_3, date_time_times
- *     @param {string} startDate The start date.
- *     @param {string} startTime The start time. (inaccuracy)
- *     @param {string} startDate The end date.
- *     @param {string} startTime The end time. (inaccuracy)
+ *     @param {string} id The time slot id. i.e. 20130618_14_3, ymd_hours_times
+ *     @param {string} startTime The start time.
+ *     @param {string} playlistName The playlistName for timeslots.
+ *     @param {boolean} valid The valid show this timeslot is valid.
 **/
-scalaMgr.listTimeslot(startDate, endDate, timeslot_cb);
+//scalaMgr.listTimeslot(startDate, endDate, timeslot_cb);
 
 /**
  * Set item in timeslot to server.
@@ -40,4 +39,4 @@ scalaMgr.listTimeslot(startDate, endDate, timeslot_cb);
  * @param {string} timeslotId The id in specific timeslot.
  * @param {function} reportStatus_cb Report status. i.e. { value: success }
 **/
-scalaMgr.setItemToEvent(item, timeslotId, reportStatus_cb);
+//scalaMgr.setItemToEvent(item, timeslotId, reportStatus_cb);
