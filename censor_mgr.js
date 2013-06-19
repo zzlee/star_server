@@ -24,8 +24,7 @@ var getUGCList = function(get_cb){
 /**
  * @param  request  {string}dooh_ID
  * 
- *         query    {number}startDate
- *                  {number}endDate
+ *         query    
  *                  
  * @return response json{startDate,
  *                       endDate,
