@@ -6,7 +6,9 @@ var admin_mgr = require("../admin.js"),
     member_mgr = require("../member.js"),
     schedule_mgr = require("../schedule.js"),
     video_mgr = require("../video.js"),
+    tokenMgr = require("../token_mgr.js"),
     admincache_mgr = require("../admin_cache.js");
+
 
 
 var FMDB = require('../db.js'),
@@ -56,7 +58,16 @@ FM.admin.login_get_cb = function(req, res){
                     id: req.query.id
                 };
                 
-                res.send(200);
+                tokenMgr.getToken(req.query.id, function(_err, _token){
+                    if (!err){
+                        res.send(200, {token: _token});
+                    }
+                    else {
+                        res.send(401, {message: _err});
+                    }
+                });
+                
+                
                 
                 /*
                 member_mgr.listOfMembers( null, 'fb.userName fb.userID email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result2){
@@ -73,7 +84,7 @@ FM.admin.login_get_cb = function(req, res){
                 */
                 
             }else{
-                res.send({message: "Wrong ID/PASSWORD Match!"});
+                res.send(401,{message: "Wrong ID/PASSWORD Match!"});
             }
         });
         

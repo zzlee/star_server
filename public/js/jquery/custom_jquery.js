@@ -4,8 +4,8 @@
  
 //var DOMAIN = "http://www.feltmeng.idv.tw/admin/",
 //     SDOMAIN = "https://www.feltmeng.idv.tw/admin/";
-var DOMAIN = "/admin/",
-     SDOMAIN = "/admin/";
+var DOMAIN = "/miix_admin/",
+     SDOMAIN = "/miix_admin/";
 
 var FM = {};    
 
@@ -96,14 +96,11 @@ $(document).ready(function(){
         });
         console.log("Input: " + JSON.stringify(inputData) );
         if(inputData.id && inputData.password){
-            $.get(url, inputData, function(res){
-                if(res.message)
-                    console.log("[Response of Login] message:" + res.message);
-                else
-                    //$('html').html(res);
-                    //$('html').replaceWith(res);
-                    //$('html').load('/frame.html');
+            $.get(url, inputData, function(res, textStatus){
+                if(res.token)
                     location.reload();
+                else
+                    console.log("[Response of Login] message:" + res.message);
             });
         }        
         
@@ -121,9 +118,9 @@ $(document).ready(function(){
 // Main Page 
 $(document).ready(function(){
 
-    FM.memberList = new PageList( 'memberList', 8, '/admin/member_list');
-    FM.miixPlayList = new PageList( 'miixMovieList', 5, '/admin/miix_play_list');
-    FM.storyPlayList = new PageList( 'storyMovieList', 8, '/admin/story_play_list');
+    FM.memberList = new PageList( 'memberList', 8, '/miix_admin/member_list');
+    FM.miixPlayList = new PageList( 'miixMovieList', 5, '/miix_admin/miix_play_list');
+    FM.storyPlayList = new PageList( 'storyMovieList', 8, '/miix_admin/story_play_list');
     
     FM.currentContent = FM.memberList;
 
