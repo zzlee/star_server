@@ -26,8 +26,6 @@ scalaMgr.connectServer({
  * @param {string} startDate The start date.
  * @param {string} endDate The end date.
  * @param {function} timeslot_cb Report timeslot list in json.
- *     @param {string} id The time slot id. i.e. 20130618_14_3, ymd_hours_times
- *     @param {string} startTime The start time.
  *     @param {string} playlistInfo The playlistInfo have name, time, duration, mode and more.
  *     @param {boolean} valid The valid show this timeslot is valid.
 **/
@@ -39,10 +37,10 @@ scalaMgr.listTimeslot(name, channel, frame, startDate, endDate, timeslot_cb);
  * @param {object} item The item upload to scala server.
  *     @param {string} path The path is file path.
  *     @param {string} filename The filename is file title.
- * @param {string} timeslotId The id in specific timeslot.
- * @param {function} reportStatus_cb Report status. i.e. { value: success }
+ * @param {string} playTime The playTime is program play to DOOH in specific time.
+ * @param {function} reportStatus_cb Report media id and playlistItem id in playlist.
 **/
-scalaMgr.addItemToEvent(item, timeslotId, reportStatus_cb);
+scalaMgr.addItemToEvent(item, playTime, reportStatus_cb);
 
 /**
  * Push event list to all playlist in server.
