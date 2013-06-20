@@ -16,7 +16,7 @@ var connect = (function() {
                 //assert.ifError(err);
                 //console.log('%d -> %j', res.statusCode, res.headers);
                 //console.log('%j', res.headers);
-                //console.log(obj.token);
+                //console.log(obj);
                 
                 connect_cb(adapter, obj.token);
             });
