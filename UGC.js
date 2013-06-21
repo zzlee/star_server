@@ -244,9 +244,9 @@ FM.UGC = (function(){
 			
             
             //GZ
-			getVideoCountWithGenre: function(videoGenre, cb){
-				var condition = { 'genre': videoGenre };
-				videos.count(condition, cb);
+			getUGCCountWithGenre: function(UGCGenre, cb){
+				var condition = { 'genre': UGCGenre };
+				UGCs.count(condition, cb);
 			},
             
             _GZ_test: function(){

@@ -5,7 +5,7 @@ var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var storyCamControllerMgr = require(workingPath+'/story_cam_controller_mgr.js');
 var memberDB = require(workingPath+'/member.js');
-var videoDB = require(workingPath+'/video.js');
+var UGCDB = require(workingPath+'/UGC.js');
 var fmapi = require(workingPath+'/routes/api.js'); 
 
 var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID, downloaded_cb){
@@ -52,7 +52,7 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
     var movieTitle;
     
     var getUserIdAndName = function( finish_cb ){
-        videoDB.getOwnerIdByPid( movieProjectID, function( err, _ownerStdID) {
+        UGCDB.getOwnerIdByPid( movieProjectID, function( err, _ownerStdID) {
             if (!err) {
                 ownerStdID = _ownerStdID;
                 memberDB.getUserNameAndID( ownerStdID, function(err2, result){
@@ -105,7 +105,7 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
                                              "genre":"miix_story",
                                              "aeId": aeServerID,
                                              "projectId":storyMovieProjectID};
-                                videoDB.addVideo(vjson, function(err, result){
+                                UGCDB.addUGC(vjson, function(err, result){
                                     if(err) {
                                         throw err;
                                     }

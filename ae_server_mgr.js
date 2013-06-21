@@ -202,8 +202,8 @@ aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movi
 aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
     var starAeServerID;
-    var videoDB = require('./video.js');
-    videoDB.getAeIdByPid(movieProjectID,function(err, _aeID){
+    var UGCDB = require('./UGC.js');
+    UGCDB.getAeIdByPid(movieProjectID,function(err, _aeID){
         
         if (!err){
             starAeServerID = _aeID;
@@ -232,8 +232,8 @@ aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, download
 
 
 	var starAeServerID;
-	var videoDB = require('./video.js');
-	videoDB.getAeIdByPid(movieProjectID,function(err, _aeID){
+	var UGCDB = require('./UGC.js');
+	UGCDB.getAeIdByPid(movieProjectID,function(err, _aeID){
         
         if (!err){
             starAeServerID = _aeID;

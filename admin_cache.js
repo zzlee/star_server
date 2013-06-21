@@ -1,7 +1,7 @@
 
 var FMDB = require('./db.js'),
     ADCDB = require('./admin_cache_db.js'),
-    video_mgr = require('./video.js'),
+    UGC_mgr = require('./UGC.js'),
     ObjectID = require('mongodb').ObjectID,
     fb_handler = require('./fb_handler.js'),
 	member_mgr = require('./member.js'),
@@ -62,13 +62,13 @@ FM.ADMINCACHE = (function(){
             //get count  
             async.parallel([
                             function(callback){
-                                video_mgr.getVideoCount(data[next]._id, 'miix', function(err, result){
+                                UGC_mgr.getUGCCount(data[next]._id, 'miix', function(err, result){
                                     if(err) callback(err, null);
                                     else callback(null, result);
                                 });
                             },
                             function(callback){
-                                video_mgr.getVideoCount(data[next]._id, 'miix_story', function(err, result){
+                                UGC_mgr.getUGCCount(data[next]._id, 'miix_story', function(err, result){
                                     if(err) callback(err, null);
                                     else callback(null, result);
                                 });
@@ -89,7 +89,7 @@ FM.ADMINCACHE = (function(){
 
         };//cacheMemberList End ******
 
-        member_mgr_t.listOfMembers( null, 'fb.userName fb.userID _id email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result){
+        member_mgr_t.listOfMembers( null, 'fb.userName fb.userID _id email mPhone ugc_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result){
             if(err) console.log('[member_mgr.listOfMemebers]', err);
             if(result){
 
@@ -105,16 +105,16 @@ FM.ADMINCACHE = (function(){
     /**     Member End     **/
 
 
-    /**     MiixVideo     **/
-    var cacheMiixVideo = function(){
+    /**     MiixUGC     **/
+    var cacheMiixUGC = function(){
 
         //TODO: need to implement
 
         var member_mgr = require('./member.js');
-        var video_mgr = require('./video.js');
+        var UGC_mgr = require('./video.js');
         var miix_content_mgr = require('./miix_content_mgr.js');
 
-        var videos = FMDB.getDocModel("video");
+        var UGCs = FMDB.getDocModel("ugc");
         var miixPlayListInfos = FMDB.getDocModel("miixPlayListInfo");
 
         var async = require('async');
@@ -172,7 +172,7 @@ FM.ADMINCACHE = (function(){
                                 });
                             },
                             function(callback){
-                                video_mgr.getVideoCount(data[next]._id, 'miix', function(err, result){
+                                UGC_mgr.getUGCCount(data[next]._id, 'miix', function(err, result){
                                     if(err) callback(err, null);
                                     else callback(null, result);
                                 });
@@ -188,7 +188,7 @@ FM.ADMINCACHE = (function(){
                                 if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
                                         (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
                                 else {
-                                    video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
+                                    UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
                                         if(err) callback(err, null);
                                         else callback(null, result);
                                     });
@@ -197,7 +197,7 @@ FM.ADMINCACHE = (function(){
                             ], toDo);
         };
 
-        var query = videos.find({'genre': 'miix'});
+        var query = UGCs.find({'genre': 'miix'});
         query.sort({'no':1}).exec(function(err, result){
 
             limit = result.length;
@@ -216,9 +216,9 @@ FM.ADMINCACHE = (function(){
         //TODO: need to implement
 
         var member_mgr = require('./member.js');
-        var video_mgr = require('./video.js');
+        var UGC_mgr = require('./video.js');
 
-        var videos = FMDB.getDocModel("video");
+        var UGCs = FMDB.getDocModel("UGC");
         var storyPlayListInfos = FMDB.getDocModel("storyPlayListInfo");
 
         var async = require('async');
@@ -268,7 +268,7 @@ FM.ADMINCACHE = (function(){
                                 });
                             },
                             function(callback){
-                                video_mgr.getVideoCount(data[next]._id, 'miix_story', function(err, result){
+                                UGC_mgr.getVideoCount(data[next]._id, 'miix_story', function(err, result){
                                     if(err) callback(err, null);
                                     else callback(null, result);
                                 });
@@ -277,7 +277,7 @@ FM.ADMINCACHE = (function(){
                                 if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
                                         (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
                                 else {
-                                    video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
+                                    UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
                                         if(err) callback(err, null);
                                         else callback(null, result);
                                     });
@@ -286,7 +286,7 @@ FM.ADMINCACHE = (function(){
                             ], toDo);
         };
 
-        var query = videos.find({'genre': 'miix_story'});
+        var query = UGCs.find({'genre': 'miix_story'});
         query.sort({'no': 1}).exec(function(err, result){
 
             limit = result.length;

@@ -5,14 +5,14 @@ var workingPath = process.cwd();
 var admin_mgr = require("../admin.js"),
     member_mgr = require("../member.js"),
     schedule_mgr = require("../schedule.js"),
-    video_mgr = require("../video.js"),
+    UGC_mgr = require("../UGC.js"),
     tokenMgr = require("../token_mgr.js"),
     admincache_mgr = require("../admin_cache.js");
 
 
 
 var FMDB = require('../db.js'),
-	videos = FMDB.getDocModel("video"),
+	UGCs = FMDB.getDocModel("UGC"),
 	members = FMDB.getDocModel("member"),
     memberListInfos = FMDB.getDocModel("memberListInfo"),
 	miix_content_mgr = require('../miix_content_mgr.js');
@@ -126,12 +126,12 @@ FM.admin.listSize_get_cb = function(req, res){
         });
     }
     else if (req.query.listType == 'miixMovieList'){
-        video_mgr.getVideoCountWithGenre('miix', function(err, count) {
+        UGC_mgr.getUGCCountWithGenre('miix', function(err, count) {
             res.send({err: err, size: count});
         });
     }
     else if (req.query.listType == 'storyMovieList'){
-        video_mgr.getVideoCountWithGenre('miix_story', function(err, count) {
+        UGC_mgr.getUGCCountWithGenre('miix_story', function(err, count) {
             res.send({err: err, size: count});
         });
     }
