@@ -147,6 +147,53 @@ app.get('/admin/miix_play_list', routes.admin.miixPlayList_get_cb);
 app.get('/admin/story_play_list', routes.admin.storyPlayList_get_cb);
 app.get('/admin/list_size', routes.admin.listSize_get_cb);
 
+/**
+ *       GET/miix_admin/user_content_items?offset=0&limit=20
+ * @param  request
+ * 
+ *         query    
+ *                  
+ * @return response json{userContent(photo url or userContent link in s3), 
+ *                       UGCLevel(Range A~E),
+ *                       FBProfilePicture(link),
+ *                       FB_ID,
+ *                       doohPlayedTimes}
+ */
+
+/**
+ *       PUT /miix_admin/user_content_items/{id}
+ * @param  request  {string}projectId.
+ * 
+ *         body     {string}UGCLevel(Range A~E)    
+ *                  
+ * @return response {string}status 
+ */
+
+/**
+ * É‹    GET /miix_admin/doohs/{dooh_id}/timeslots?&offset=0&limit=20
+ * @param  request  {string}dooh.client(dooh_id)
+ * 
+ *         query    {number}searchTime start.
+ *                  {number}searchTime end.
+ *                  
+ * @return response json{timeslotnumber(Range 1~20), 
+ *                       startTime,
+ *                       endTime,
+ *                       UGC_Url,
+ *                       UGC_ID}
+ */
+
+/**
+ * É‹    PUT /miix_admin/doohs/{dooh_id}/timeslots/{timeslot_id}
+ * @param  request  {string}timeslot_id.
+ *                  
+ *         body     json{timeslotnumber(Range 1~20), 
+ *                       UGC_Url,
+ *                       UGC_ID}    
+ *                  
+ * @return response {string}status 
+ */
+
 //internal
 app.post('/internal/dooh_periodic_data', routes.dooh_handler.importPeriodicData);
 app.get('/internal/dooh_current_video', routes.dooh_handler.dooh_current_video);
