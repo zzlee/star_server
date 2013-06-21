@@ -105,10 +105,10 @@ app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh);
 app.get('/miix_admin', routes.admin.get_cb); 
 app.get('/miix_admin/login', routes.admin.login_get_cb); //TODO: change to a better resource name of RESTful style
 app.get('/miix_admin/logout', routes.admin.logout_get_cb); //TODO: change to a better resource name of RESTful style
-app.get('/miix_admin/members', routes.admin.memberList_get_cb);
-app.get('/miix_admin/miix_movies', routes.admin.miixPlayList_get_cb); 
-app.get('/miix_admin/story_movies', routes.admin.storyPlayList_get_cb);
-app.get('/miix_admin/list_size', routes.admin.listSize_get_cb);
+app.get('/miix_admin/members', routes.authorizationHandler.checkAuth, routes.admin.memberList_get_cb);
+app.get('/miix_admin/miix_movies', routes.authorizationHandler.checkAuth, routes.admin.miixPlayList_get_cb); 
+app.get('/miix_admin/story_movies', routes.authorizationHandler.checkAuth, routes.admin.storyPlayList_get_cb);
+app.get('/miix_admin/list_size', routes.authorizationHandler.checkAuth, routes.admin.listSize_get_cb);
 
 
 /**

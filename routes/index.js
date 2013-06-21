@@ -18,6 +18,9 @@ exports.command_get_cb = connectionHandler.command_get_cb;
 var storyCamControllerHandler = require('./story_cam_controller_handler.js');
 exports.storyCamControllerHandler = storyCamControllerHandler;
 
+var authorizationHandler = require('./authorization_handler.js');
+exports.authorizationHandler = authorizationHandler;
+
 //JF
 var dooh_handler = require('./dooh_handler.js');
 exports.dooh_handler = dooh_handler;

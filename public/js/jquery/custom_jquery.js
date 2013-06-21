@@ -17,7 +17,7 @@ function PageList( listType, rowsPerPage, urlToGetListContent){
     this.urlToGetListContent = urlToGetListContent;
     this.totalPageNumber = 1;
     this.listType = listType;
-    $.get('/admin/list_size', {listType: listType}, function(res){
+    $.get('/admin/list_size', {listType: listType, token: localStorage.token}, function(res){
         if (!res.err){
             var listSize = res.size;
             _this.totalPageNumber = Math.ceil(res.size/_this.rowsPerPage); 
@@ -28,7 +28,7 @@ function PageList( listType, rowsPerPage, urlToGetListContent){
 
 PageList.prototype.showPageContent = function(Page){
     var _this = this;
-    $.get(this.urlToGetListContent, {skip: (Page-1)*this.rowsPerPage, limit: this.rowsPerPage}, function(res){
+    $.get(this.urlToGetListContent, {skip: (Page-1)*this.rowsPerPage, limit: this.rowsPerPage, token: localStorage.token}, function(res){
         if(res.message){
             console.log("[Response] message:" + res.message);
         }else{
@@ -39,7 +39,7 @@ PageList.prototype.showPageContent = function(Page){
         }
     });
     
-    $.get('/admin/list_size', {listType: this.listType}, function(res){
+    $.get('/admin/list_size', {listType: this.listType, token: localStorage.token}, function(res){
         if (!res.err){
             var listSize = res.size;
             _this.totalPageNumber = Math.ceil(res.size/_this.rowsPerPage); 
@@ -97,10 +97,13 @@ $(document).ready(function(){
         console.log("Input: " + JSON.stringify(inputData) );
         if(inputData.id && inputData.password){
             $.get(url, inputData, function(res, textStatus){
-                if(res.token)
+                if(res.token){
                     location.reload();
-                else
+                    localStorage.token = res.token;
+                }
+                else{
                     console.log("[Response of Login] message:" + res.message);
+                }
             });
         }        
         
@@ -108,6 +111,7 @@ $(document).ready(function(){
 
     $("#logoutBtn").click(function(){
         $.get(DOMAIN + "logout", function(res){
+            delete localStorage.token;
             location.reload();
         });
     });
@@ -118,9 +122,9 @@ $(document).ready(function(){
 // Main Page 
 $(document).ready(function(){
 
-    FM.memberList = new PageList( 'memberList', 8, '/miix_admin/member_list');
-    FM.miixPlayList = new PageList( 'miixMovieList', 5, '/miix_admin/miix_play_list');
-    FM.storyPlayList = new PageList( 'storyMovieList', 8, '/miix_admin/story_play_list');
+    FM.memberList = new PageList( 'memberList', 8, '/miix_admin/members');
+    FM.miixPlayList = new PageList( 'miixMovieList', 5, '/miix_admin/miix_movies');
+    FM.storyPlayList = new PageList( 'storyMovieList', 8, '/miix_admin/story_movies');
     
     FM.currentContent = FM.memberList;
 
