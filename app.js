@@ -10,7 +10,7 @@ var http = require('http'),
     crypto = require('crypto'),
     Db = require('mongodb').Db,
     dbserver = require('mongodb').Server,
-    dbserver_config = new dbserver('localhost', 27017, {auto_reconnect: true, native_parser: true} ),
+    dbserver_config = new dbserver('192.168.5.189', 27017, {auto_reconnect: true, native_parser: true} ),
     fmdb = new Db('feltmeng', dbserver_config, {}),
     mongoStore = require('connect-mongodb'),
     app = express(),
@@ -26,10 +26,12 @@ var http = require('http'),
 require('winston-mongodb').MongoDB;
 var logger = new(winston.Logger)({
 	transports: [ 
-		new winston.transports.MongoDB({ db: 'feltmeng', level: 'info'}),
+		new winston.transports.MongoDB({host:'192.168.5.189', db: 'feltmeng', level: 'info'}),
 		new winston.transports.File({ filename: './log/winston.log'})	
 	],
-	exceptionHandlers: [new winston.transports.File({filename: './log/exceptions.log'})]
+	exceptionHandlers: [new winston.transports.MongoDB({host:'192.168.5.189', db: 'feltmeng', level: 'info'}),
+	                    new winston.transports.File({filename: './log/exceptions.log'})
+	]
 	
 });  
 
