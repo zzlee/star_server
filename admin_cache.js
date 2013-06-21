@@ -159,42 +159,44 @@ FM.ADMINCACHE = (function(){
 
             };//toDo End ******
 
-            //get count 
-            async.parallel([
-                            function(callback){
-                                miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
-                                    if(err) {
-//                                        callback(err,null);
-                                        next += 1;
-                                        cacheMiixPlayList(data, set_cb);
-                                    }
-                                    else callback(null, result);
-                                });
-                            },
-                            function(callback){
-                                video_mgr.getVideoCount(data[next]._id, 'miix', function(err, result){
-                                    if(err) callback(err, null);
-                                    else callback(null, result);
-                                });
-                            },
-                            function(callback){
-                                member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
-                                    if(err) callback(err, null);
-                                    else if(result == null) callback(null, 'No User');
-                                    else callback(null, result.fb.userName);
-                                });
-                            },
-                            function(callback){
-                                if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
-                                        (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
-                                else {
-                                    video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
+            if (data[next]) { //quick dirty fix 
+                //get count 
+                async.parallel([
+                                function(callback){
+                                    miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
+                                        if(err) {
+    //                                        callback(err,null);
+                                            next += 1;
+                                            cacheMiixPlayList(data, set_cb);
+                                        }
+                                        else callback(null, result);
+                                    });
+                                },
+                                function(callback){
+                                    video_mgr.getVideoCount(data[next]._id, 'miix', function(err, result){
                                         if(err) callback(err, null);
                                         else callback(null, result);
                                     });
-                                }
-                            },
-                            ], toDo);
+                                },
+                                function(callback){
+                                    member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
+                                        if(err) callback(err, null);
+                                        else if(result == null) callback(null, 'No User');
+                                        else callback(null, result.fb.userName);
+                                    });
+                                },
+                                function(callback){
+                                    if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
+                                            (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
+                                    else {
+                                        video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
+                                            if(err) callback(err, null);
+                                            else callback(null, result);
+                                        });
+                                    }
+                                },
+                                ], toDo);
+            }
         };
 
         var query = videos.find({'genre': 'miix'});
@@ -344,12 +346,12 @@ FM.ADMINCACHE = (function(){
                     arr.push({ 
                         fb: { userID: fb_id, userName: fb_name },
                         email: email,                        //Email
-                        mobilePhoneNumber: mp_number,        //¤â¾÷
-                        miixMovieVideoCount: miixMovieVideo_count, //¤w»s§@¼v¤ù¼Æ
-                        doohPlayCount: doohPlay_count,       //DOOH¥Zµn¦¸¼Æ
-                        movieViewedCount: movieViewed_count, //¼v¤ùÆ[¬ÝÁ`¦¸¼Æ
-                        fbLikeCount: fbLike_count,           //FBÆgÁ`¼Æ
-                        fbCommentCount: fbComment_count,     //FB¯d¨¥Á`¼Æ
+                        mobilePhoneNumber: mp_number,        //ï¿½ï¿½ï¿½
+                        miixMovieVideoCount: miixMovieVideo_count, //ï¿½wï¿½sï¿½@ï¿½vï¿½ï¿½ï¿½
+                        doohPlayCount: doohPlay_count,       //DOOHï¿½Zï¿½nï¿½ï¿½ï¿½ï¿½
+                        movieViewedCount: movieViewed_count, //ï¿½vï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½
+                        fbLikeCount: fbLike_count,           //FBï¿½gï¿½`ï¿½ï¿½
+                        fbCommentCount: fbComment_count,     //FBï¿½dï¿½ï¿½ï¿½`ï¿½ï¿½
                         fbShareCount: fbShare_count
                     });
                 };
@@ -409,15 +411,15 @@ FM.ADMINCACHE = (function(){
 
                 var miixPlayListInfo = function(userPhotoUrl, movieNo, movieViewed_count, fbLike_count, fbComment_count, fbShare_count, movieMaker, applyDoohPlay_count, doohPlay_count, timesOfPlaying, arr) {
                     arr.push({ 
-                        userPhotoUrl: userPhotoUrl,          //¯À§÷·Ó¤ù
-                        movieNo: movieNo,                    //¼v¤ù½s¸¹
-                        movieViewedCount: movieViewed_count, //Æ[¬Ý¦¸¼Æ
-                        fbLikeCount: fbLike_count,           //FBÆg¦¸¼Æ
-                        fbCommentCount: fbComment_count,     //FB¯d¨¥¼Æ
-                        fbShareCount: fbShare_count,         //FB¤À¨É¦¸¼Æ
-                        movieMaker: movieMaker,              //·|­û¦WºÙ
-                        applyDoohPlayCount: applyDoohPlay_count, //§ë½Z¦¸¼Æ
-                        doohPlayCount: doohPlay_count,       //DOOH¥Zµn¦¸¼Æ
+                        userPhotoUrl: userPhotoUrl,          //ï¿½ï¿½ï¿½ï¿½ï¿½Ó¤ï¿½
+                        movieNo: movieNo,                    //ï¿½vï¿½ï¿½sï¿½ï¿½
+                        movieViewedCount: movieViewed_count, //ï¿½[ï¿½Ý¦ï¿½ï¿½ï¿½
+                        fbLikeCount: fbLike_count,           //FBï¿½gï¿½ï¿½ï¿½ï¿½
+                        fbCommentCount: fbComment_count,     //FBï¿½dï¿½ï¿½ï¿½ï¿½
+                        fbShareCount: fbShare_count,         //FBï¿½ï¿½ï¿½É¦ï¿½ï¿½ï¿½
+                        movieMaker: movieMaker,              //ï¿½|ï¿½ï¿½Wï¿½ï¿½
+                        applyDoohPlayCount: applyDoohPlay_count, //ï¿½ï¿½Zï¿½ï¿½ï¿½ï¿½
+                        doohPlayCount: doohPlay_count,       //DOOHï¿½Zï¿½nï¿½ï¿½ï¿½ï¿½
                         timesOfPlaying: timesOfPlaying 
                     });
                 };
@@ -477,12 +479,12 @@ FM.ADMINCACHE = (function(){
 
                 var storyPlayListInfo = function(movieNo, movieViewed_count, fbLike_count, fbComment_count, fbShare_count, movieMaker, arr) {
                     arr.push({ 
-                        movieNo: movieNo,                    //¼v¤ù½s¸¹
-                        movieViewedCount: movieViewed_count, //Æ[¬Ý¦¸¼Æ
-                        fbLikeCount: fbLike_count,           //FBÆg¦¸¼Æ
-                        fbCommentCount: fbComment_count,     //FB¯d¨¥¼Æ
-                        fbShareCount: fbShare_count,         //FB¤À¨É¦¸¼Æ
-                        movieMaker: movieMaker               //·|­û¦WºÙ
+                        movieNo: movieNo,                    //ï¿½vï¿½ï¿½sï¿½ï¿½
+                        movieViewedCount: movieViewed_count, //ï¿½[ï¿½Ý¦ï¿½ï¿½ï¿½
+                        fbLikeCount: fbLike_count,           //FBï¿½gï¿½ï¿½ï¿½ï¿½
+                        fbCommentCount: fbComment_count,     //FBï¿½dï¿½ï¿½ï¿½ï¿½
+                        fbShareCount: fbShare_count,         //FBï¿½ï¿½ï¿½É¦ï¿½ï¿½ï¿½
+                        movieMaker: movieMaker               //ï¿½|ï¿½ï¿½Wï¿½ï¿½
                     });
                 };
 
