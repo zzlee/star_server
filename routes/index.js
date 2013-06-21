@@ -1,8 +1,4 @@
 ﻿//GZ  
-var movieGeneration = require('./movie_generation.js');   //TODO: move to userContentHandler
-exports.uploadUserData_cb = movieGeneration.uploadUserData_cb;
-exports.uploadUserDataInfo_cb = movieGeneration.uploadUserDataInfo_cb;
-
 var movieTemplate = require('./movie_template.js'); 
 exports.getTemplateList_cb = movieTemplate.getTemplateList_cb;
 exports.getTemplateDescription_cb = movieTemplate.getTemplateDescription_cb;
@@ -12,7 +8,8 @@ var youtube = require('./yt_oauth2_handler.js');
 exports.YoutubeOAuth2_cb = youtube.YoutubeOAuth2_cb;
 
 var userContentHandler = require('./user_content_handler.js');
-exports.upload_photo_cb = userContentHandler.upload_photo_cb;
+exports.uploadUserContentFile_cb = userContentHandler.uploadUserContentFile_cb;
+exports.uploadUserDataInfo_cb = userContentHandler.uploadUserDataInfo_cb;
 
 var connectionHandler = require('./connection_handler.js');
 exports.commandResponse_post_cb = connectionHandler.commandResponse_post_cb;
@@ -20,6 +17,9 @@ exports.command_get_cb = connectionHandler.command_get_cb;
 
 var storyCamControllerHandler = require('./story_cam_controller_handler.js');
 exports.storyCamControllerHandler = storyCamControllerHandler;
+
+var authorizationHandler = require('./authorization_handler.js');
+exports.authorizationHandler = authorizationHandler;
 
 //JF
 var dooh_handler = require('./dooh_handler.js');

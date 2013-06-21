@@ -91,7 +91,7 @@ app.post('/members/device_tokens', routes.api.deviceToken);
 /**
  *  Miix client 
  */
-app.post('/miix/videos/user_content_files', routes.upload_photo_cb );
+app.post('/miix/videos/user_content_files', routes.uploadUserContentFile_cb );
 app.post('/miix/videos/user_content_description',routes.uploadUserDataInfo_cb);  //TODO: /miix/videos/user_content_descriptions is better
 app.get('/miix/videos/new_videos', routes.api.newVideoList);
 
@@ -105,10 +105,10 @@ app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh);
 app.get('/miix_admin', routes.admin.get_cb); 
 app.get('/miix_admin/login', routes.admin.login_get_cb); //TODO: change to a better resource name of RESTful style
 app.get('/miix_admin/logout', routes.admin.logout_get_cb); //TODO: change to a better resource name of RESTful style
-app.get('/miix_admin/members', routes.admin.memberList_get_cb);
-app.get('/miix_admin/miix_movies', routes.admin.miixPlayList_get_cb); 
-app.get('/miix_admin/story_movies', routes.admin.storyPlayList_get_cb);
-app.get('/miix_admin/list_size', routes.admin.listSize_get_cb);
+app.get('/miix_admin/members', routes.authorizationHandler.checkAuth, routes.admin.memberList_get_cb);
+app.get('/miix_admin/miix_movies', routes.authorizationHandler.checkAuth, routes.admin.miixPlayList_get_cb); 
+app.get('/miix_admin/story_movies', routes.authorizationHandler.checkAuth, routes.admin.storyPlayList_get_cb);
+app.get('/miix_admin/list_size', routes.authorizationHandler.checkAuth, routes.admin.listSize_get_cb);
 
 
 /**
@@ -131,7 +131,7 @@ app.get('/get_template_list', routes.getTemplateList_cb ); //not used in MiixCar
 app.get('/get_template_raw_data', routes.getTemplateRawData_cb ); //not used in MiixCard v1.2
 app.get('/get_template_description', routes.getTemplateDescription_cb ); //not used in MiixCard v1.2
 app.get('/get_template_customizable_object_list', routes.getTemplateCustomizableObjectList_cb ); //not used in MiixCard v1.2
-app.post('/upload_user_data', routes.uploadUserData_cb ); //not used in MiixCard v1.2
+//app.post('/upload_user_data', routes.uploadUserData_cb ); //not used in MiixCard v1.2
 
 app.get('/oauth2callback', routes.YoutubeOAuth2_cb );
 
