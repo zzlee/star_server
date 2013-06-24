@@ -12,7 +12,7 @@ var admin_mgr = require("../admin.js"),
 
 
 var FMDB = require('../db.js'),
-	UGCs = FMDB.getDocModel("UGC"),
+	UGCs = FMDB.getDocModel("ugc"),
 	members = FMDB.getDocModel("member"),
     memberListInfos = FMDB.getDocModel("memberListInfo"),
 	miix_content_mgr = require('../miix_content_mgr.js');

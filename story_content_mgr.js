@@ -110,8 +110,8 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
                                         throw err;
                                     }
                                     else {
-                                        fmapi._fbPostVideoThenAdd(vjson); 
-                                        logger.info('fmapi._fbPostVideoThenAdd(vjson) called. vjson='+JSON.stringify(vjson));
+                                        fmapi._fbPostUGCThenAdd(vjson); 
+                                        logger.info('fmapi._fbPostUGCThenAdd(vjson) called. vjson='+JSON.stringify(vjson));
                                     }
                                 });
                             };
