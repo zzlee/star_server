@@ -2,6 +2,8 @@
  * @fileoverview Implementation of scheduleMgr
  */
 
+var db = require('./db.js');
+var programs = db.getDocModel("program");
 
 /**
  * The manager who handles the scheduling of playing UGC on DOOHs
@@ -43,7 +45,7 @@ var scheduleMgr = {};
  *     <li>resultProgramList: An array of objects containing program info:
  *         <ul>
  *         <li>id: A number specifying the ID of a program time slot item  
- *         <li>interval: An object specifying the starting and ending time of the program item
+ *         <li>timeSlot: An object specifying the starting and ending time of program's time slot
  *             <ul>
  *             <li>start: Date()-readable string specifying the start of the interval
  *             <li>end: Date()-readable string specifying the end of the interval
