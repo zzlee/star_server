@@ -8,7 +8,7 @@
  *
  * @mixin
  */
-scheduleMgr = {};
+var scheduleMgr = {};
 
 
 /**
