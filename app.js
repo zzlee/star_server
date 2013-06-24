@@ -95,9 +95,9 @@ app.post('/members/device_tokens', routes.api.deviceToken);
  */
 app.post('/miix/videos/user_content_files', routes.uploadUserContentFile_cb );
 app.post('/miix/videos/user_content_description',routes.uploadUserDataInfo_cb);  //TODO: /miix/videos/user_content_descriptions is better
-app.get('/miix/videos/new_videos', routes.api.newVideoList);
+app.get('/miix/videos/new_videos', routes.api.newUGCList);
 
-app.post('/miix/videos/miix_videos', routes.api.submitAVideo);
+app.post('/miix/videos/miix_videos', routes.api.submitAUGC);
 app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh);
 
 
@@ -122,7 +122,7 @@ app.post('/internal/command_responses', routes.commandResponse_post_cb);
 
 app.post('/internal/dooh/movie_playing_state', routes.dooh_handler.doohMoviePlayingState_post_cb);  //TODO: PUT /internal/dooh/movie_playing_state is better
 app.post('/internal/dooh/dooh_periodic_data', routes.dooh_handler.importPeriodicData);  //TODO: POST /internal/adapter/schedule_periodic_data is better
-app.get('/internal/dooh/dooh_current_video', routes.dooh_handler.dooh_current_video);  
+app.get('/internal/dooh/dooh_current_video', routes.dooh_handler.dooh_current_UGC);  
 
 app.post('/internal/story_cam_controller/available_story_movie', routes.storyCamControllerHandler.availableStoryMovie_post_cb);
 
@@ -198,7 +198,7 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
 
 //internal
 app.post('/internal/dooh_periodic_data', routes.dooh_handler.importPeriodicData);
-app.get('/internal/dooh_current_video', routes.dooh_handler.dooh_current_video);
+app.get('/internal/dooh_current_video', routes.dooh_handler.dooh_current_UGC);
 app.post('/internal/dooh_timeslot_rawdata', routes.timeDataGet);
 
 
@@ -209,8 +209,8 @@ app.get('/api/userProfile', routes.api.userProfile); //not used in MiixCard v1.0
 app.get('/api/profile', routes.api.profile); //not used in MiixCard v1.0 or later
 app.get('/api/fbGetComment', routes.api.fbGetCommentReq); 
 app.get('/api/fbGetThumbnail', routes.api.fbGetThumbnail);
-app.get('/api/newVideoList', routes.api.newVideoList);
-app.get('/api/newStreetVideoList', routes.api.newStreetVideoList); //not used in MiixCard v1.2
+app.get('/api/newVideoList', routes.api.newUGCList);
+app.get('/api/newStreetVideoList', routes.api.newStreetUGCList); //not used in MiixCard v1.2
 app.get('/api/codeGeneration', routes.api.codeGenerate);
 
 //member.js
@@ -223,7 +223,7 @@ app.post('/api/reject', routes.api.reject); //not used in MiixCard v1.0 or later
 app.post('/api/prove', routes.api.prove); //not used in MiixCard v1.0 or later
 app.post('/api/signupwithFB', routes.api.signupwithFB);
 app.post('/api/deviceToken', routes.api.deviceToken);
-app.post('/api/submitAVideo', routes.api.submitAVideo);
+app.post('/api/submitAVideo', routes.api.submitAUGC);
 app.post('/api/submitDooh', routes.api.submitDooh);
 app.post('/api/codeVerification', routes.api.codeVerify);
 

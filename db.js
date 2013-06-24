@@ -22,8 +22,10 @@ FM.DB = (function(){
             eduLv = 'elem jrHigh srHigh college university master doctor'.split(' '),
             occupationList = 'gov student edu industry business service'.split(' ');
             evtStatus = 'waiting proved'.split(' ');
-			UGCStatus = 'good soso bad waiting none'.split(' ');
+            UGCStatus = 'good soso bad waiting none'.split(' ');
             UGCGenre = 'miix miix_street miix_story'.split(' ');
+            videoStatus = 'good soso bad waiting none'.split(' ');
+            videoGenre = 'miix miix_street miix_story'.split(' ');
         
 		/****************** DB Schema ******************/
 		

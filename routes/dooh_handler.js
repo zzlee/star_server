@@ -4,7 +4,7 @@
  
 var FM = { dooh_handler: {} };
 var schedule_handler = require("../schedule.js"),
-    video_handler = require("../video.js");
+    UGC_handler = require("../UGC.js");
 
 var DEBUG = true,
     FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str)); } : function(str){} ;
@@ -38,12 +38,12 @@ FM.dooh_handler.importPeriodicData = function(req, res) {
 
 
 //DEPRECATED: not used in current v1_2 
-//GET /internal/dooh/dooh_current_video
-FM.dooh_handler.dooh_current_video = function(req, res){
-    FM_LOG("[dooh_handler.dooh_current_video]");
+//GET /internal/dooh/dooh_current_UGC
+FM.dooh_handler.dooh_current_UGC = function(req, res){
+    FM_LOG("[dooh_handler.dooh_current_UGC]");
     if(req.query.id){
         FM_LOG("id:" + req.query.id);
-        video_handler.nextDoohVideo(function(err, result){
+        UGC_handler.nextDoohUGC(function(err, result){
             if(err){
                 logger.error("err:"+err);
                 res.send(500, {error: "Internal Server Error!"});
@@ -53,7 +53,7 @@ FM.dooh_handler.dooh_current_video = function(req, res){
                 if(result)
                     res.send(200, {projectId: result.projectId});
                 else
-                    res.send(200, {message: "No Current Video"});
+                    res.send(200, {message: "No Current Content"});
             }
         });
         

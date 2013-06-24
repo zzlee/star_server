@@ -94,11 +94,11 @@ FM.ADMINCACHE = (function(){
             if(result){
 
                 limit = result.length;
-
+                if(limit > 0){
                 cacheMemberList(result, function(err, docs){
                     if(err) console.log(err);
                 });
-
+                }
             }
         });
     };
@@ -111,7 +111,7 @@ FM.ADMINCACHE = (function(){
         //TODO: need to implement
 
         var member_mgr = require('./member.js');
-        var UGC_mgr = require('./video.js');
+        var UGC_mgr = require('./UGC.js');
         var miix_content_mgr = require('./miix_content_mgr.js');
 
         var UGCs = FMDB.getDocModel("ugc");
@@ -199,26 +199,27 @@ FM.ADMINCACHE = (function(){
 
         var query = UGCs.find({'genre': 'miix'});
         query.sort({'no':1}).exec(function(err, result){
-
+ 
             limit = result.length;
-
+            if(limit > 0){
             cacheMiixPlayList(result, function(err, result){
                 if(err) console.log(err);
             });
+            }
         });
 
     };
-    /**     MiixVideo End     **/        
+    /**     MiixUGC End     **/        
 
-    /**     StoryVideo     **/
-    var cacheStoryVideo = function(){
+    /**     StoryUGC     **/
+    var cacheStoryUGC = function(){
 
         //TODO: need to implement
 
         var member_mgr = require('./member.js');
-        var UGC_mgr = require('./video.js');
+        var UGC_mgr = require('./UGC.js');
 
-        var UGCs = FMDB.getDocModel("UGC");
+        var UGCs = FMDB.getDocModel("ugc");
         var storyPlayListInfos = FMDB.getDocModel("storyPlayListInfo");
 
         var async = require('async');
@@ -268,7 +269,7 @@ FM.ADMINCACHE = (function(){
                                 });
                             },
                             function(callback){
-                                UGC_mgr.getVideoCount(data[next]._id, 'miix_story', function(err, result){
+                                UGC_mgr.getUGCCount(data[next]._id, 'miix_story', function(err, result){
                                     if(err) callback(err, null);
                                     else callback(null, result);
                                 });
@@ -290,14 +291,15 @@ FM.ADMINCACHE = (function(){
         query.sort({'no': 1}).exec(function(err, result){
 
             limit = result.length;
-
+            if(limit > 0){
             cacheStoryPlayList(result, function(err, result){
                 if(err) console.log(err);
             });
+            }
         });
 
     };
-    /**     StoryVideo End     **/  
+    /**     StoryUGC End     **/  
 
     var retrieveDataAndUpdateCacheDB = function(){    
 
@@ -305,9 +307,9 @@ FM.ADMINCACHE = (function(){
 
         cacheMember();
 
-        cacheMiixVideo();
+        cacheMiixUGC();
 
-        cacheStoryVideo();
+        cacheStoryUGC();
 
         /*
          * Timer
@@ -400,7 +402,7 @@ FM.ADMINCACHE = (function(){
             },
             /**     Member End     **/
 
-            /**     MiixVideo     **/
+            /**     MiixUGC     **/
             getMiixPlayListInfo : function(req, res){
 
                 //TODO: need to implement
@@ -466,9 +468,9 @@ FM.ADMINCACHE = (function(){
                 }
 
             },
-            /**     MiixVideo End     **/
+            /**     MiixUGC End     **/
 
-            /**     StoryVideo     **/
+            /**     StoryUGC     **/
             getStoryPlayListInfo : function(req, res){
 
                 //TODO: need to implement
@@ -515,14 +517,13 @@ FM.ADMINCACHE = (function(){
                                 limit = req.query.limit;
                             else 
                                 limit = result.length;
-
-                            setStoryPlayList(result, function(err, docs){
-                                if(err) console.log(err);
-                                else {
-                                    res.render( 'table_story_movie', {storyMovieList: storyPlayList} );
-                                }
-                            });
-
+                            
+                                setStoryPlayList(result, function(err, docs){
+                                    if(err) console.log(err);
+                                    else {
+                                        res.render( 'table_story_movie', {storyMovieList: storyPlayList} );
+                                    }
+                                });
                         }
                     });
                 }
@@ -531,7 +532,7 @@ FM.ADMINCACHE = (function(){
                 }
 
             },
-            /**     StoryVideo End     **/                
+            /**     StoryUGC End     **/                
 
             /*    TEST    */
 
