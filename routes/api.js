@@ -944,7 +944,7 @@ FM.api.profile = function(req, res){
             FM_LOG("[getUGCListByFB] " + JSON.stringify(result));
             var data;
             if(result){
-               data = {"UGCWorks": result};
+               data = {"videoWorks": result};
             }else{
                 data = {"message": "No UGC"};
             }
@@ -978,7 +978,7 @@ FM.api.newUGCList = function(req, res){
             
             var data;
             if(result){
-               data = {"UGCWorks": result};
+               data = {"videoWorks": result};
             }else{
                 data = {"message": "No UGC"};
             }
