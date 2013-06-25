@@ -247,13 +247,43 @@ aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, download
         };
         
         globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_STORY_MOVIE_FROM_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
-        //console.dir(responseParameters);
-        if (downloadMovie_cb )  {
-            downloadMovie_cb(responseParameters);
-        }
+            //console.dir(responseParameters);
+            if (downloadMovie_cb )  {
+                downloadMovie_cb(responseParameters);
+            }
         });
 	
 	});
+
+
+};
+
+aeServerMgr.downloadStoryMovieFromS3 = function(movieProjectID, downloadMovie_cb) {
+
+
+    var starAeServerID;
+    var UGCDB = require('./UGC.js');
+    UGCDB.getAeIdByPid(movieProjectID,function(err, _aeID){
+        
+        if (!err){
+            starAeServerID = _aeID;
+        }
+        else{
+            starAeServerID = defaultAeServer;
+        }
+
+        var commandParameters = {
+            movieProjectID: movieProjectID
+        };
+        
+        globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_STORY_MOVIE_FROM_S3", parameters: commandParameters }, function(responseParameters) {
+            //console.dir(responseParameters);
+            if (downloadMovie_cb )  {
+                downloadMovie_cb(responseParameters);
+            }
+        });
+    
+    });
 
 
 };

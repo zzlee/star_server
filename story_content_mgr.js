@@ -10,15 +10,19 @@ var fmapi = require(workingPath+'/routes/api.js');
 
 var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID, downloaded_cb){
 
-    storyCamControllerMgr.uploadStoryMovieToMainServer(movieProjectID, function(resParametes){
-        logger.info('uploading story movie from Story Cam Controller to Main Server finished. ');
+    //storyCamControllerMgr.uploadStoryMovieToMainServer(movieProjectID, function(resParametes){
+        //logger.info('uploading story movie from Story Cam Controller to Main Server finished. ');
+    storyCamControllerMgr.uploadStoryMovieToS3(movieProjectID, function(resParametes){
+        logger.info('uploading story movie from Story Cam Controller to S3 finished. ');
         logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
         
         //TODO:: check the file size. If not correct, re-upload.
         
         if ( (resParametes.err == 'null') || (!resParametes.err) ) {
-            aeServerMgr.downloadStoryMovieFromMainServer(movieProjectID, function(resParameter2){
-                logger.info('downloading story movie from Main Server to AE Server.');
+            //aeServerMgr.downloadStoryMovieFromMainServer(movieProjectID, function(resParameter2){
+                //logger.info('downloading story movie from Main Server to AE Server.');
+            aeServerMgr.downloadStoryMovieFromS3(movieProjectID, function(resParameter2){
+                logger.info('downloading story movie from S3 to AE Server.');
                 logger.info('res: _command_id='+resParameter2._command_id+' err='+resParameter2.err);
                 
                 //TODO:: check the file size. If not correct, re-download.
