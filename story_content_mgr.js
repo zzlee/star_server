@@ -25,31 +25,31 @@ var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID
                 
                 if ( (resParameter2.err == 'null') || (!resParameter2.err) ) {
                     if (downloaded_cb){
-                        downloaded_cb(null)
+                        downloaded_cb(null);
                     }
                 }
                 else{
                     if (downloaded_cb){
-                        downloaded_cb('Fail to download story movie from Main Server to AE Server')
+                        downloaded_cb('Fail to download story movie from Main Server to AE Server');
                     }				
                 }
             }); 
         }
         else{
             if (downloaded_cb){
-                downloaded_cb('Fail to download story movie from Story Cam Controllerr to Main Server')
+                downloaded_cb('Fail to download story movie from Story Cam Controllerr to Main Server');
             }				
         }
     }); 
     
 
-}
+};
 
 storyContentMgr.generateStoryMV = function(movieProjectID) {
-    var ownerStdID;
-    var ownerFbID;
-    var ownerFbName;
-    var movieTitle;
+    var ownerStdID = null;
+    var ownerFbID = null;
+    //var ownerFbName = null;
+    var movieTitle = null;
     
     var getUserIdAndName = function( finish_cb ){
         UGCDB.getOwnerIdByPid( movieProjectID, function( err, _ownerStdID) {
@@ -58,7 +58,7 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
                 memberDB.getUserNameAndID( ownerStdID, function(err2, result){
                     if (!err2) {
                         ownerFbID = result.fb.userID;
-                        ownerFbName = result.fb.userName;
+                        //ownerFbName = result.fb.userName;
                         movieTitle = "Miix movie playing on a DOOH";
                         if (finish_cb){
                             finish_cb(null);
@@ -73,7 +73,7 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
             }
         });
     
-    }
+    };
     
     
     downloadStoryMovieFromStoryCamControllerToAeServer( movieProjectID, function(err){
@@ -114,9 +114,9 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
                                         logger.info('fmapi._fbPostUGCThenAdd(vjson) called. vjson='+JSON.stringify(vjson));
                                     }
                                 });
-                            };
+                            }
                             
-                        };
+                        }
                         
                     });
                 }
