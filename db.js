@@ -109,7 +109,8 @@ FM.DB = (function(){
             aeId: {type: String},
             triedDoohTimes: {type: Number, min: 0, default: 0}, //JF
             doohPlayedTimes: {type: Number, min: 0, default: 0},    //JF
-            timesOfPlaying: {type: Number}      //JF
+            timesOfPlaying: {type: Number},     //JF
+            rating: {type: String} //range A~E      kaiser
         }); //  UGC collection
         
         var CommentSchema = new Schema({

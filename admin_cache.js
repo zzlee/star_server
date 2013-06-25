@@ -1,6 +1,5 @@
 
 var FMDB = require('./db.js'),
-    ADCDB = require('./admin_cache_db.js'),
     UGC_mgr = require('./UGC.js'),
     ObjectID = require('mongodb').ObjectID,
     fb_handler = require('./fb_handler.js'),

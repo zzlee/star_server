@@ -161,7 +161,7 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
  *                       FB_ID,
  *                       doohPlayedTimes}
  */
-
+app.get('/admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
 /**
  *       PUT /miix_admin/user_content_items/{id}
  * @param  request  {string}projectId.
