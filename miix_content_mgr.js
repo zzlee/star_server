@@ -16,7 +16,7 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
     //console.log('generateMiixMoive is called.');
     
     aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
-    
+        
         if ( responseParameters.youtube_video_id ) {
             var aeServerID = responseParameters.ae_server_id;
             var youtubeVideoID = responseParameters.youtube_video_id;
@@ -35,7 +35,7 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
                              "genre":"miix",
                              "aeId": aeServerID,
                              "projectId":movieProjectID};
-                fmapi._fbPostVideoThenAdd(vjson); //TODO: split these tasks to different rolls
+                fmapi._fbPostUGCThenAdd(vjson); //TODO: split these tasks to different rolls
                 
             };
             
