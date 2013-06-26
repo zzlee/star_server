@@ -180,7 +180,22 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
             moveFile( tmp_path, target_path, function() { 
                 var newPath = path.join( userDataDir, "_"+req.files.file.name );
                 fs.rename(target_path, newPath, function(){
-                    res.send(200, {message: "User content file is succesfully uploaded."});
+                    //save to S3
+                    var s3Path =  '/user_project/' + req.body.projectID + '/user_data/_'+ req.files.file.name;
+                    //console.log('s3Path = %s', s3Path);
+                    //TODO: check for file extension to set proper content type
+                    awsS3.uploadToAwsS3(newPath, s3Path, 'video/quicktime', function(err,result){
+                        if (!err){
+                            logger.info('User content file is successfully saved to S3 '+s3Path);
+                            res.send(200, {message: "User content file is succesfully uploaded."});
+                        }
+                        else {
+                            logger.info('User content file is failed to be saved to S3 '+s3Path);
+                            res.send(500 , {message: "Failed to saved to S3"});
+                        }
+                    });
+                    
+                    
                 });
             });
         }
@@ -196,6 +211,7 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
             
             moveFile( tmp_path, target_path, function() { 
                 processFile( userDataDir, req.files.file.name, areaToCrop, resizeTo, req.body.osVersion, function() {
+                    //save to S3
                     var localPath = path.join( userDataDir, "_"+req.files.file.name);
                     var s3Path =  '/user_project/' + req.body.projectID + '/user_data/_'+ req.files.file.name;
                     //console.log('s3Path = %s', s3Path);
