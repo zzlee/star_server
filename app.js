@@ -150,7 +150,7 @@ app.get('/admin/story_play_list', routes.admin.storyPlayList_get_cb);
 app.get('/admin/list_size', routes.admin.listSize_get_cb);
 
 /**
- *       GET/miix_admin/user_content_items?offset=0&limit=20
+ *       GET /miix_admin/user_content_items?offset=0&limit=20
  * @param  request
  * 
  *         query    

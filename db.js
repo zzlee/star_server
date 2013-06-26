@@ -248,7 +248,8 @@ FM.DB = (function(){
             
         function connectDB(){
                 try{
-                    mongoose.connect('mongodb://192.168.5.189:27017/'+DB);
+//                    mongoose.connect('mongodb://192.168.5.189:27017/'+DB);
+                    mongoose.connect('mongodb://localhost:27017/'+DB);
                     return mongoose.connection;
                 }catch(err){
                     logger.info('Connect DB failed: '+err);

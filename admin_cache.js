@@ -91,7 +91,6 @@ FM.ADMINCACHE = (function(){
         member_mgr_t.listOfMembers( null, 'fb.userName fb.userID _id email mPhone ugc_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result){
             if(err) console.log('[member_mgr.listOfMemebers]', err);
             if(result){
-
                 limit = result.length;
                 if(limit > 0){
                 cacheMemberList(result, function(err, docs){
@@ -158,7 +157,8 @@ FM.ADMINCACHE = (function(){
 
             };//toDo End ******
 
-            //get count 
+            //get count
+            if(data[next].ownerId._id != null && data[next].projectId != null){
             async.parallel([
                             function(callback){
                                 miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
@@ -194,16 +194,19 @@ FM.ADMINCACHE = (function(){
                                 }
                             },
                             ], toDo);
+            }
         };
 
         var query = UGCs.find({'genre': 'miix'});
         query.sort({'no':1}).exec(function(err, result){
- 
-            limit = result.length;
-            if(limit > 0){
-            cacheMiixPlayList(result, function(err, result){
-                if(err) console.log(err);
-            });
+            if(err) console.log(err);
+            if(result){
+                limit = result.length;
+                if(limit > 0){
+                    cacheMiixPlayList(result, function(err, result){
+                        if(err) console.log(err);
+                    });
+                }
             }
         });
 
@@ -260,6 +263,7 @@ FM.ADMINCACHE = (function(){
             };//toDo End ******
 
             //get count
+            if(data[next].ownerId._id != null && data[next].projectId != null){
             async.parallel([
                             function(callback){
                                 member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
@@ -284,16 +288,19 @@ FM.ADMINCACHE = (function(){
                                 }
                             },
                             ], toDo);
+            }
         };
 
         var query = UGCs.find({'genre': 'miix_story'});
         query.sort({'no': 1}).exec(function(err, result){
-
-            limit = result.length;
-            if(limit > 0){
-            cacheStoryPlayList(result, function(err, result){
-                if(err) console.log(err);
-            });
+            if(err) console.log(err);
+            if(result){
+                limit = result.length;
+                if(limit > 0){
+                    cacheStoryPlayList(result, function(err, result){
+                        if(err) console.log(err);
+                    });
+                }
             }
         });
 
