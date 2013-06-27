@@ -29,14 +29,23 @@ censorMgr.getUGCList = function(condition,sort,get_cb){
             get_cb(err,null);
         }
         if(result){
-            mappingUserProfilePicture(result,cb);
-            
             limit = result.length;
-            console.log("getUGCList_limit"+limit);
-            get_cb(null,result);
-            
-            console.log("query"+result);
-            console.log("----------------------------------------");
+            mappingUserProfilePicture(result,limit,function(err,res){
+                if(err) {
+                    get_cb(err,null);
+                    console.log("mappingUserProfilePicture_err="+err);
+                }
+                if(result){
+//                    
+//                    console.log("getUGCList_limit"+limit);
+//                    
+//                    console.log("query"+result);
+//                    console.log("----------------------------------------");
+                    get_cb(null,result);
+                } 
+
+            });
+            //test
         }
     });
 
@@ -107,49 +116,63 @@ var getTimeslots = function(get_cb){
  */
 
 var mappingUserProfilePicture = function(data,limit,get_cb){
-    
-    var UGCList = function(userContent, FB_ID, title, description, rating, doohPlayedTimes, arr) {
-        arr.push({ 
-            userContent: userContent,
-            FB_ID: FB_ID,
-            title: title,
-            description: description,
-            rating: rating,
-            doohPlayedTimes:doohPlayedTimes 
-        });
-    };  
-    
-    for(next = 0; next < limit; next++){
-        
-       getUserContent(data[next].fb_id,function(err, result){
-           if(err) logger.error('[mappingUserProfilePicture.getUserContent]', err);
-       if(result){
-           UGCList(result,data[next].fb_id,data[next].fb_id,data[next].fb_id,data[next].fb_id,data[next].fb_id,UGCList);
-       }
-   }); 
-               
-    }
-    
+//    
+//    var UGCList = [];
+//
+//    var UGCListInfo = function(userContent, FB_ID, title, description, rating, doohPlayedTimes, arr) {
+//        arr.push({ 
+//            userContent: userContent,
+//            FB_ID: FB_ID,
+//            title: title,
+//            description: description,
+//            rating: rating,
+//            doohPlayedTimes:doohPlayedTimes 
+//        });
+//    };
+//    console.log('map'+limit);
+//
+//    for(next = 0; next < limit; next++){
+//        var fb_id = '100005962359785';
+//
+//        getUserContent(fb_id,function(err, result){
+//            console.log('++++++++'+result);
+//            if(err) {logger.error('[mappingUserProfilePicture.getUserContent]', err);
+//            get_cb(err,null);
+//            }
+//            if(result){
+//                UGCListInfo(result,data[next].fb_id,data[next].title,data[next].description,data[next].rating,data[next].doohPlayedTimes,UGCList);
+//                get_cb(null,UGCList);
+//            }
+//        }); 
+//
+//    }
+
 };
 
 
 var getUserContent = function(fb_id,get_cb){
 
     fb_handler.getUserProfilePicture(fb_id,function(err, result){
-        if(err)
-            get_cb(JSON.stringify(err),null);
-        else
-            get_cb(null,JSON.stringify(result));
+        if(err){
+//            get_cb(JSON.stringify(err),null);
+            console.log('getUserContent_err'+err);
+            get_cb(err,null);
+        }
+        else{
+            console.log(JSON.stringify(result.picture.data.url));
+//            get_cb(null,JSON.stringify(result));
+            get_cb(null,JSON.stringify(result.picture.data.url));
+        }
     });
 
 };
 //kaiser test
-var fb_id = '100005962359785';
-getUserContent(fb_id,function(err,res){
-    if(err) console.log("getUserContent_err="+err);
-    else console.log("getUserContent="+res);
-
-});
+//var fb_id = '100005962359785';
+//getUserContent(fb_id,function(err,res){
+//    if(err) console.log("getUserContent_err="+err);
+//    else console.log("getUserContent="+res);
+//
+//});
 
 /**
  * @param  request  {string}_id
