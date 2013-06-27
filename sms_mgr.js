@@ -34,11 +34,9 @@ FM.smsMgr = (function(){
              */
             sendMessageToMobile: function( mobileNo,smsMessage, cb){
                 
-              var sourceProdID = 'TEST';
-              var sourceMsgID = '10001';
-              console.log('passwordBeforeMD5'+memberID+memberpassword+sourceProdID+sourceMsgID);
+              var sourceProdID = 'feltmeng';
+              var sourceMsgID = Math.random()*10000;
               var password = md5(memberID+':'+memberpassword+':'+sourceProdID+':'+sourceMsgID);
-              console.log('password'+password);
               var charSet = 'B';
               
              /**
@@ -69,7 +67,6 @@ FM.smsMgr = (function(){
                     }else if(body.error){
 						cb(body.error, null);
 					}else{
-                        
                         cb(null, body);
                     }
                 });
@@ -79,7 +76,7 @@ FM.smsMgr = (function(){
             /** TEST */
             _testkaiser: function(){
                 var mobileNo = '0911820138';
-                var smsMessage = 'hello world';
+                var smsMessage = '5678';
 
                 this.sendMessageToMobile( mobileNo,smsMessage, function(err, result){
                     if(err)
@@ -103,6 +100,6 @@ FM.smsMgr = (function(){
 })();
 
 /* TEST */
-//FM.MOBILE_HANDLER.getInstance()._testkaiser();
+//FM.smsMgr.getInstance()._testkaiser();
 
 module.exports = FM.smsMgr.getInstance();

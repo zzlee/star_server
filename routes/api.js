@@ -1113,7 +1113,7 @@ FM.api.codeGenerate = function(req, res){
         var phoneNum = req.query.phoneNum,
             fb_userID = req.query.fb_userID,
             _id = ObjectID.createFromHexString(req.query.userID);
-        //console.log(JSON.stringify(req.query));    
+//        console.log(JSON.stringify(req.query));    
         var metadata = {number: phoneNum, verified: false, code: code};
         memberDB.updateMember(_id, {mPhone: metadata}, function(err, result){
             if(err){
@@ -1122,12 +1122,12 @@ FM.api.codeGenerate = function(req, res){
                 return;
             }
             var smsMgr = require("../sms_mgr.js");
-            smsMgr.sendMessageToMobile.send(phoneNum, code, function(err, result){
+            smsMgr.sendMessageToMobile(phoneNum, code, function(err, result){
                 if (err){
-                    res.send(401, {message:"手機認證碼發送失敗!"});
+                    res.send(401, {message:"手機認證碼發送失敗"});
                 }
                 else{
-                    res.send(200);
+                    res.send(200, {message:"手機認證碼已發送"});
                 }
             });
 
