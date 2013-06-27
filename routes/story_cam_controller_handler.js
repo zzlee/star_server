@@ -19,6 +19,6 @@ FM.storyCamControllerHandler.availableStoryMovie_post_cb = function(req, res) {
 		res.send(400, {error: "Bad Request!"} );
 	}
 
-}
+};
 
 module.exports = FM.storyCamControllerHandler;
