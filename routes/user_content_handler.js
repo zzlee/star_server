@@ -248,6 +248,7 @@ userContentHandler.uploadUserDataInfo_cb = function(req, res) {
     var movieProjectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectID);
     var userDataDir = path.join( movieProjectDir, 'user_data');
     var userContentDescriptionFilePath = path.join( userDataDir, 'customized_content.xml');
+    var customizableObjects = JSON.parse(req.body.customizableObjects);
     
     var saveToS3_cb = function (err) {
         if (!err) {
@@ -255,13 +256,13 @@ userContentHandler.uploadUserDataInfo_cb = function(req, res) {
             
             //check if all the user data exist; (if yes, start generating the movie in miixContentMgr.generateMiixMoive
             var allUserContentExist = true;
-            if( Object.prototype.toString.call( req.body.customizableObjects ) === '[object Array]' ) {
-                for (var i in req.body.customizableObjects) {
-                    allUserContentExist = allUserContentExist && fs.existsSync( path.join( userDataDir, "_"+req.body.customizableObjects[i].content) );
+            if( Object.prototype.toString.call( customizableObjects ) === '[object Array]' ) {
+                for (var i in customizableObjects) {
+                    allUserContentExist = allUserContentExist && fs.existsSync( path.join( userDataDir, "_"+customizableObjects[i].content) );
                 }
             }
             else {
-                allUserContentExist = fs.existsSync( path.join( userDataDir, "_"+req.body.customizableObjects.content) );
+                allUserContentExist = fs.existsSync( path.join( userDataDir, "_"+customizableObjects.content) );
             }
 
             if ( allUserContentExist ) {
@@ -269,7 +270,7 @@ userContentHandler.uploadUserDataInfo_cb = function(req, res) {
                 res.send(null);
 
                 var videoTitle =  "MiixCard movie";
-                miixContentMgr.generateMiixMoive(req.body.projectID, req.body.ownerID._id, req.body.ownerID.fb_userID, videoTitle);
+                miixContentMgr.generateMiixMoive(req.body.projectID, req.body.ownerID, req.body.ownerFbUserID, videoTitle);
             }
             else {
                 res.send(500, {error: "Some or all user contents are missing."} );
@@ -305,21 +306,21 @@ userContentHandler.uploadUserDataInfo_cb = function(req, res) {
     var customizableObjectXml = "";
     
 
-    if( Object.prototype.toString.call( req.body.customizableObjects ) === '[object Array]' ) {
-        for (var i in req.body.customizableObjects) {
+    if( Object.prototype.toString.call( customizableObjects ) === '[object Array]' ) {
+        for (var i in customizableObjects) {
             //append the content in customized_content.xml
             customizableObjectXml = customizableObjectListXml.ele('customizable_object');
-            customizableObjectXml.ele('ID', req.body.customizableObjects[i].ID );
-            customizableObjectXml.ele('format', req.body.customizableObjects[i].format);
-            customizableObjectXml.ele('content', "_"+req.body.customizableObjects[i].content);
+            customizableObjectXml.ele('ID', customizableObjects[i].ID );
+            customizableObjectXml.ele('format', customizableObjects[i].format);
+            customizableObjectXml.ele('content', "_"+customizableObjects[i].content);
         }
     }
     else {
         //append the content in customized_content.xml
         customizableObjectXml = customizableObjectListXml.ele('customizable_object');
-        customizableObjectXml.ele('ID', req.body.customizableObjects.ID );
-        customizableObjectXml.ele('format', req.body.customizableObjects.format);
-        customizableObjectXml.ele('content', "_"+req.body.customizableObjects.content);
+        customizableObjectXml.ele('ID', customizableObjects.ID );
+        customizableObjectXml.ele('format', customizableObjects.format);
+        customizableObjectXml.ele('content', "_"+customizableObjects.content);
     }
     
     //finalize customized_content.xml 
