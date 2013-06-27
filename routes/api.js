@@ -1121,9 +1121,18 @@ FM.api.codeGenerate = function(req, res){
                 res.send({error: 'Internal Server Error'});
                 return;
             }
-            
+            var smsMgr = require("../sms_mgr.js");
+            smsMgr.sendMessageToMobile.send(phoneNum, code, function(err, result){
+                if (err){
+                    res.send(401, {message:"手機認證碼發送失敗!"});
+                }
+                else{
+                    res.send(200);
+                }
+            });
+
             FM_LOG("[codeGenerate] Succeed!" + JSON.stringify(result));
-            res.send(200, {message: '手機號碼:「'+ phoneNum +'」，驗證碼：「'+ code +'」。'});
+//            res.send(200, {message: '手機號碼:「'+ phoneNum +'」，驗證碼：「'+ code +'」。'});
         });
         
     }else{
