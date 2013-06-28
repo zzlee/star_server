@@ -61,6 +61,25 @@ storyCamControllerMgr.uploadStoryMovieToMainServer = function(movieProjectID, up
 
 };
 
+storyCamControllerMgr.uploadStoryMovieToS3 = function(movieProjectID, uploadMovie_cb) {
+
+    //TODO:: get corresponding storyCamController ID
+    var storyCamControllerID = correspondingStoryCamController;
+
+    var commandParameters = {
+        movieProjectID: movieProjectID
+    };
+    
+    globalConnectionMgr.sendRequestToRemote( storyCamControllerID, { command: "UPLOAD_STORY_MOVIE_TO_S3", parameters: commandParameters }, function(responseParameters) {
+        //console.dir(responseParameters);
+        if (uploadMovie_cb )  {
+            uploadMovie_cb(responseParameters);
+        }
+    });
+
+
+};
+
 
 
 module.exports = storyCamControllerMgr;

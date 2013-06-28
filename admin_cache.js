@@ -1,7 +1,7 @@
 
 var FMDB = require('./db.js'),
     ADCDB = require('./admin_cache_db.js'),
-    video_mgr = require('./video.js'),
+    UGC_mgr = require('./UGC.js'),
     ObjectID = require('mongodb').ObjectID,
     fb_handler = require('./fb_handler.js'),
 	member_mgr = require('./member.js'),
@@ -60,61 +60,62 @@ FM.ADMINCACHE = (function(){
             };//toDo End ******
 
             //get count  
-            async.parallel([
-                            function(callback){
-                                video_mgr.getVideoCount(data[next]._id, 'miix', function(err, result){
-                                    if(err) callback(err, null);
-                                    else callback(null, result);
-                                });
-                            },
-                            function(callback){
-                                video_mgr.getVideoCount(data[next]._id, 'miix_story', function(err, result){
-                                    if(err) callback(err, null);
-                                    else callback(null, result);
-                                });
-                            },
-                            function(callback){
-                                member_mgr.getTotalView(data[next]._id, function(err, result){
-                                    if(err) callback(err, null);
-                                    else callback(null, result);
-                                });
-                            },
-                            function(callback){
-                                member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
-                                    if(err) callback(err, null);
-                                    else callback(null, result);
-                                });
-                            },
-                            ], toDo);
-
+            if(data[next] !== null && data[next].fb.userID !== null){
+                async.parallel([
+                                function(callback){
+                                    UGC_mgr.getUGCCount(data[next]._id, 'miix', function(err, result){
+                                        if(err) callback(err, null);
+                                        else callback(null, result);
+                                    });
+                                },
+                                function(callback){
+                                    UGC_mgr.getUGCCount(data[next]._id, 'miix_story', function(err, result){
+                                        if(err) callback(err, null);
+                                        else callback(null, result);
+                                    });
+                                },
+                                function(callback){
+                                    member_mgr.getTotalView(data[next]._id, function(err, result){
+                                        if(err) callback(err, null);
+                                        else callback(null, result);
+                                    });
+                                },
+                                function(callback){
+                                    member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
+                                        if(err) callback(err, null);
+                                        else callback(null, result);
+                                    });
+                                },
+                                ], toDo);
+            }
         };//cacheMemberList End ******
 
-        member_mgr_t.listOfMembers( null, 'fb.userName fb.userID _id email mPhone video_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result){
+        member_mgr_t.listOfMembers( null, 'fb.userName fb.userID _id email mPhone ugc_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result){
             if(err) console.log('[member_mgr.listOfMemebers]', err);
             if(result){
 
                 limit = result.length;
-
-                cacheMemberList(result, function(err, docs){
-                    if(err) console.log(err);
-                });
-
+                if(limit > 0){
+                    cacheMemberList(result, function(err, docs){
+                        if(err) console.log(err);
+                    });
+                }
             }
         });
     };
     /**     Member End     **/
 
 
-    /**     MiixVideo     **/
-    var cacheMiixVideo = function(){
+    /**     MiixUGC     **/
+    var cacheMiixUGC = function(){
 
         //TODO: need to implement
 
         var member_mgr = require('./member.js');
-        var video_mgr = require('./video.js');
+        var UGC_mgr = require('./UGC.js');
         var miix_content_mgr = require('./miix_content_mgr.js');
 
-        var videos = FMDB.getDocModel("video");
+        var UGCs = FMDB.getDocModel("ugc");
         var miixPlayListInfos = FMDB.getDocModel("miixPlayListInfo");
 
         var async = require('async');
@@ -159,8 +160,8 @@ FM.ADMINCACHE = (function(){
 
             };//toDo End ******
 
-            if (data[next]) { //quick dirty fix 
-                //get count 
+            //get count 
+            if(data[next] !== null && data[next].ownerId._id !== null && data[next].projectId !== null && data[next].fb_id !== null){
                 async.parallel([
                                 function(callback){
                                     miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
@@ -173,7 +174,7 @@ FM.ADMINCACHE = (function(){
                                     });
                                 },
                                 function(callback){
-                                    video_mgr.getVideoCount(data[next]._id, 'miix', function(err, result){
+                                    UGC_mgr.getUGCCount(data[next]._id, 'miix', function(err, result){
                                         if(err) callback(err, null);
                                         else callback(null, result);
                                     });
@@ -189,7 +190,7 @@ FM.ADMINCACHE = (function(){
                                     if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
                                             (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
                                     else {
-                                        video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
+                                        UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
                                             if(err) callback(err, null);
                                             else callback(null, result);
                                         });
@@ -199,28 +200,29 @@ FM.ADMINCACHE = (function(){
             }
         };
 
-        var query = videos.find({'genre': 'miix'});
+        var query = UGCs.find({'genre': 'miix'});
         query.sort({'no':1}).exec(function(err, result){
-
+ 
             limit = result.length;
-
-            cacheMiixPlayList(result, function(err, result){
-                if(err) console.log(err);
-            });
+            if(limit > 0){
+                cacheMiixPlayList(result, function(err, result){
+                    if(err) console.log(err);
+                });
+            }
         });
 
     };
-    /**     MiixVideo End     **/        
+    /**     MiixUGC End     **/        
 
-    /**     StoryVideo     **/
-    var cacheStoryVideo = function(){
+    /**     StoryUGC     **/
+    var cacheStoryUGC = function(){
 
         //TODO: need to implement
 
         var member_mgr = require('./member.js');
-        var video_mgr = require('./video.js');
+        var UGC_mgr = require('./UGC.js');
 
-        var videos = FMDB.getDocModel("video");
+        var UGCs = FMDB.getDocModel("ugc");
         var storyPlayListInfos = FMDB.getDocModel("storyPlayListInfo");
 
         var async = require('async');
@@ -262,6 +264,7 @@ FM.ADMINCACHE = (function(){
             };//toDo End ******
 
             //get count
+            if(data[next] !== null && data[next].ownerId._id !== null && data[next].projectId !== null && data[next].fb_id !== null){
             async.parallel([
                             function(callback){
                                 member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
@@ -270,7 +273,7 @@ FM.ADMINCACHE = (function(){
                                 });
                             },
                             function(callback){
-                                video_mgr.getVideoCount(data[next]._id, 'miix_story', function(err, result){
+                                UGC_mgr.getUGCCount(data[next]._id, 'miix_story', function(err, result){
                                     if(err) callback(err, null);
                                     else callback(null, result);
                                 });
@@ -279,27 +282,29 @@ FM.ADMINCACHE = (function(){
                                 if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
                                         (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
                                 else {
-                                    video_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
+                                    UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
                                         if(err) callback(err, null);
                                         else callback(null, result);
                                     });
                                 }
                             },
                             ], toDo);
+            }
         };
 
-        var query = videos.find({'genre': 'miix_story'});
+        var query = UGCs.find({'genre': 'miix_story'});
         query.sort({'no': 1}).exec(function(err, result){
 
             limit = result.length;
-
-            cacheStoryPlayList(result, function(err, result){
-                if(err) console.log(err);
-            });
+            if(limit > 0){
+                cacheStoryPlayList(result, function(err, result){
+                    if(err) console.log(err);
+                });
+            }
         });
 
     };
-    /**     StoryVideo End     **/  
+    /**     StoryUGC End     **/  
 
     var retrieveDataAndUpdateCacheDB = function(){    
 
@@ -307,9 +312,9 @@ FM.ADMINCACHE = (function(){
 
         cacheMember();
 
-        cacheMiixVideo();
+        cacheMiixUGC();
 
-        cacheStoryVideo();
+        cacheStoryUGC();
 
         /*
          * Timer
@@ -347,7 +352,7 @@ FM.ADMINCACHE = (function(){
                         fb: { userID: fb_id, userName: fb_name },
                         email: email,                        //Email
                         mobilePhoneNumber: mp_number,        //���
-                        miixMovieVideoCount: miixMovieVideo_count, //�w�s�@�v���
+                        miixMovieVideoCount: miixMovieVideo_count, //�w�s�@�v����
                         doohPlayCount: doohPlay_count,       //DOOH�Z�n����
                         movieViewedCount: movieViewed_count, //�v���[���`����
                         fbLikeCount: fbLike_count,           //FB�g�`��
@@ -402,7 +407,7 @@ FM.ADMINCACHE = (function(){
             },
             /**     Member End     **/
 
-            /**     MiixVideo     **/
+            /**     MiixUGC     **/
             getMiixPlayListInfo : function(req, res){
 
                 //TODO: need to implement
@@ -412,12 +417,12 @@ FM.ADMINCACHE = (function(){
                 var miixPlayListInfo = function(userPhotoUrl, movieNo, movieViewed_count, fbLike_count, fbComment_count, fbShare_count, movieMaker, applyDoohPlay_count, doohPlay_count, timesOfPlaying, arr) {
                     arr.push({ 
                         userPhotoUrl: userPhotoUrl,          //�����Ӥ�
-                        movieNo: movieNo,                    //�v��s��
+                        movieNo: movieNo,                    //�v���s��
                         movieViewedCount: movieViewed_count, //�[�ݦ���
                         fbLikeCount: fbLike_count,           //FB�g����
                         fbCommentCount: fbComment_count,     //FB�d����
                         fbShareCount: fbShare_count,         //FB���ɦ���
-                        movieMaker: movieMaker,              //�|��W��
+                        movieMaker: movieMaker,              //�|���W��
                         applyDoohPlayCount: applyDoohPlay_count, //��Z����
                         doohPlayCount: doohPlay_count,       //DOOH�Z�n����
                         timesOfPlaying: timesOfPlaying 
@@ -468,9 +473,9 @@ FM.ADMINCACHE = (function(){
                 }
 
             },
-            /**     MiixVideo End     **/
+            /**     MiixUGC End     **/
 
-            /**     StoryVideo     **/
+            /**     StoryUGC     **/
             getStoryPlayListInfo : function(req, res){
 
                 //TODO: need to implement
@@ -479,12 +484,12 @@ FM.ADMINCACHE = (function(){
 
                 var storyPlayListInfo = function(movieNo, movieViewed_count, fbLike_count, fbComment_count, fbShare_count, movieMaker, arr) {
                     arr.push({ 
-                        movieNo: movieNo,                    //�v��s��
+                        movieNo: movieNo,                    //�v���s��
                         movieViewedCount: movieViewed_count, //�[�ݦ���
                         fbLikeCount: fbLike_count,           //FB�g����
                         fbCommentCount: fbComment_count,     //FB�d����
                         fbShareCount: fbShare_count,         //FB���ɦ���
-                        movieMaker: movieMaker               //�|��W��
+                        movieMaker: movieMaker               //�|���W��
                     });
                 };
 
@@ -517,14 +522,13 @@ FM.ADMINCACHE = (function(){
                                 limit = req.query.limit;
                             else 
                                 limit = result.length;
-
-                            setStoryPlayList(result, function(err, docs){
-                                if(err) console.log(err);
-                                else {
-                                    res.render( 'table_story_movie', {storyMovieList: storyPlayList} );
-                                }
-                            });
-
+                            
+                                setStoryPlayList(result, function(err, docs){
+                                    if(err) console.log(err);
+                                    else {
+                                        res.render( 'table_story_movie', {storyMovieList: storyPlayList} );
+                                    }
+                                });
                         }
                     });
                 }
@@ -533,7 +537,7 @@ FM.ADMINCACHE = (function(){
                 }
 
             },
-            /**     StoryVideo End     **/                
+            /**     StoryUGC End     **/                
 
             /*    TEST    */
 

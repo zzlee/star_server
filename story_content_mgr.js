@@ -5,60 +5,64 @@ var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var storyCamControllerMgr = require(workingPath+'/story_cam_controller_mgr.js');
 var memberDB = require(workingPath+'/member.js');
-var videoDB = require(workingPath+'/video.js');
+var UGCDB = require(workingPath+'/UGC.js');
 var fmapi = require(workingPath+'/routes/api.js'); 
 
 var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID, downloaded_cb){
 
-    storyCamControllerMgr.uploadStoryMovieToMainServer(movieProjectID, function(resParametes){
-        logger.info('uploading story movie from Story Cam Controller to Main Server finished. ');
+    //storyCamControllerMgr.uploadStoryMovieToMainServer(movieProjectID, function(resParametes){
+        //logger.info('uploading story movie from Story Cam Controller to Main Server finished. ');
+    storyCamControllerMgr.uploadStoryMovieToS3(movieProjectID, function(resParametes){
+        logger.info('uploading story movie from Story Cam Controller to S3 finished. ');
         logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
         
         //TODO:: check the file size. If not correct, re-upload.
         
         if ( (resParametes.err == 'null') || (!resParametes.err) ) {
-            aeServerMgr.downloadStoryMovieFromMainServer(movieProjectID, function(resParameter2){
-                logger.info('downloading story movie from Main Server to AE Server.');
+            //aeServerMgr.downloadStoryMovieFromMainServer(movieProjectID, function(resParameter2){
+                //logger.info('downloading story movie from Main Server to AE Server.');
+            aeServerMgr.downloadStoryMovieFromS3(movieProjectID, function(resParameter2){
+                logger.info('downloading story movie from S3 to AE Server.');
                 logger.info('res: _command_id='+resParameter2._command_id+' err='+resParameter2.err);
                 
                 //TODO:: check the file size. If not correct, re-download.
                 
                 if ( (resParameter2.err == 'null') || (!resParameter2.err) ) {
                     if (downloaded_cb){
-                        downloaded_cb(null)
+                        downloaded_cb(null);
                     }
                 }
                 else{
                     if (downloaded_cb){
-                        downloaded_cb('Fail to download story movie from Main Server to AE Server')
+                        downloaded_cb('Fail to download story movie from Main Server to AE Server');
                     }				
                 }
             }); 
         }
         else{
             if (downloaded_cb){
-                downloaded_cb('Fail to download story movie from Story Cam Controllerr to Main Server')
+                downloaded_cb('Fail to download story movie from Story Cam Controllerr to Main Server');
             }				
         }
     }); 
     
 
-}
+};
 
 storyContentMgr.generateStoryMV = function(movieProjectID) {
-    var ownerStdID;
-    var ownerFbID;
-    var ownerFbName;
-    var movieTitle;
+    var ownerStdID = null;
+    var ownerFbID = null;
+    //var ownerFbName = null;
+    var movieTitle = null;
     
     var getUserIdAndName = function( finish_cb ){
-        videoDB.getOwnerIdByPid( movieProjectID, function( err, _ownerStdID) {
+        UGCDB.getOwnerIdByPid( movieProjectID, function( err, _ownerStdID) {
             if (!err) {
                 ownerStdID = _ownerStdID;
                 memberDB.getUserNameAndID( ownerStdID, function(err2, result){
                     if (!err2) {
                         ownerFbID = result.fb.userID;
-                        ownerFbName = result.fb.userName;
+                        //ownerFbName = result.fb.userName;
                         movieTitle = "Miix movie playing on a DOOH";
                         if (finish_cb){
                             finish_cb(null);
@@ -73,7 +77,7 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
             }
         });
     
-    }
+    };
     
     
     downloadStoryMovieFromStoryCamControllerToAeServer( movieProjectID, function(err){
@@ -105,18 +109,18 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
                                              "genre":"miix_story",
                                              "aeId": aeServerID,
                                              "projectId":storyMovieProjectID};
-                                videoDB.addVideo(vjson, function(err, result){
+                                UGCDB.addUGC(vjson, function(err, result){
                                     if(err) {
                                         throw err;
                                     }
                                     else {
-                                        fmapi._fbPostVideoThenAdd(vjson); 
-                                        logger.info('fmapi._fbPostVideoThenAdd(vjson) called. vjson='+JSON.stringify(vjson));
+                                        fmapi._fbPostUGCThenAdd(vjson); 
+                                        logger.info('fmapi._fbPostUGCThenAdd(vjson) called. vjson='+JSON.stringify(vjson));
                                     }
                                 });
-                            };
+                            }
                             
-                        };
+                        }
                         
                     });
                 }

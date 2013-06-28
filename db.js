@@ -22,8 +22,9 @@ FM.DB = (function(){
             eduLv = 'elem jrHigh srHigh college university master doctor'.split(' '),
             occupationList = 'gov student edu industry business service'.split(' ');
             evtStatus = 'waiting proved'.split(' '); //DEPRECATED, not used in v1.2 or later
-            programTimeSlotStatus = 'Ok NeedToBeRescheduled'.split(' ');
-			videoStatus = 'good soso bad waiting none'.split(' ');
+            UGCStatus = 'good soso bad waiting none'.split(' ');
+            UGCGenre = 'miix miix_street miix_story'.split(' ');
+            videoStatus = 'good soso bad waiting none'.split(' ');
             videoGenre = 'miix miix_street miix_story'.split(' ');
         
 		/****************** DB Schema ******************/
@@ -52,9 +53,9 @@ FM.DB = (function(){
             gender: {type: Boolean},    //  0:Male 1:Female
             education: {type: String, enum: eduLv},
             notification: {type: Boolean, default: true},
-            video_ids: {type: [ObjectID]},
+            ugc_ids: {type: [ObjectID]},
             activity_ids: {type: [ObjectID]},
-            video_count: {type: Number, min: 0, default: 0},
+            ugc_count: {type: Number, min: 0, default: 0},
             thumbnail: {type: String},    //  path/to/filename
 			doohTimes: {type: Number, min: 0, default: 0}
         }); //  members collection
@@ -84,7 +85,33 @@ FM.DB = (function(){
 			doohPlayedTimes: {type: Number, min: 0, default: 0},	//JF
 			timesOfPlaying: {type: Number}		//JF
         }); //  videos collection
-
+        
+        var UGCSchema = new Schema({
+            fb_id: {type: String},
+            title: {type: String},
+            description: {type: String},
+            url: { youtube: String, tudou: String },  //  Youtube, Tudou
+            ownerId: { _id:ObjectID, userID: String },
+            locationId: {type: ObjectID},
+            projectId: {type: String},  //  AE project ID
+            hitRate: {type: Number, min:0},
+            comments: {type: Mixed},    //  "data": []
+            vote: {type: Number, default: 0, min:0},
+            likes: {type: Number, default: 0, min:0},
+            status: {type: String, enum: UGCStatus, default: 'none'},
+            createdOn: {type: Date, default: Date.now},
+            doohTimes: { times: {type: Number, default: 0, min: 0}, event: [ObjectID], submited_time: Date},
+            playedTimes: {type: Number, min: 0},
+            review: {type: Number},
+            vip: {type: Boolean, default: false},
+            genre: {type: String, enum: UGCGenre, default: 'miix'},
+            no: {type: Number},
+            aeId: {type: String},
+            triedDoohTimes: {type: Number, min: 0, default: 0}, //JF
+            doohPlayedTimes: {type: Number, min: 0, default: 0},    //JF
+            timesOfPlaying: {type: Number}      //JF
+        }); //  UGC collection
+        
         var CommentSchema = new Schema({
             fb_id: {type: String},
             owner_id: {type: ObjectID},
@@ -151,38 +178,38 @@ FM.DB = (function(){
             fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
             email: {type: String, default: 'xyz@feltmeng.com'},
             mPhone: { number: String, verified: {type: Boolean, default: false}, code: String },
-            miixMovieVideo_count: {type: Number, min: 0, default: 0}, //ï¿½wï¿½sï¿½@ï¿½vï¿½ï¿½ï¿½
-            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOHï¿½Zï¿½nï¿½ï¿½ï¿½ï¿½
-            movieViewed_count: {type: Number, min: 0, default: 0},    //ï¿½vï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½
-            fbLike_count: {type: Number, min: 0, default: 0},         //FBï¿½gï¿½`ï¿½ï¿½
-            fbComment_count: {type: Number, min: 0, default: 0},      //FBï¿½dï¿½ï¿½ï¿½`ï¿½ï¿½
-            fbShare_count: {type: Number, min: 0, default: 0}         //FBï¿½ï¿½ï¿½É¦ï¿½ï¿½ï¿½
+            miixMovieVideo_count: {type: Number, min: 0, default: 0}, //¤w»s§@¼v¤ù¼Æ
+            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH¥Zµn¦¸¼Æ
+            movieViewed_count: {type: Number, min: 0, default: 0},    //¼v¤ùÆ[¬ÝÁ`¦¸¼Æ
+            fbLike_count: {type: Number, min: 0, default: 0},         //FBÆgÁ`¼Æ
+            fbComment_count: {type: Number, min: 0, default: 0},      //FB¯d¨¥Á`¼Æ
+            fbShare_count: {type: Number, min: 0, default: 0}         //FB¤À¨É¦¸¼Æ
             
         }); //  memberListInfo collection
         
         var MiixPlayListInfoSchema = new Schema({
             projectId: {type: String},                                //  AE project ID
-            userPhotoUrl: {type: String},                             //ï¿½ï¿½ï¿½ï¿½ï¿½Ó¤ï¿½
-            movieNo: {type: Number},                                  //ï¿½vï¿½ï¿½sï¿½ï¿½
-            movieViewed_count: {type: Number, min: 0, default: 0},    //ï¿½vï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½
-            fbLike_count: {type: Number, min: 0, default: 0},         //FBï¿½gï¿½ï¿½ï¿½ï¿½
-            fbComment_count: {type: Number, min: 0, default: 0},      //FBï¿½dï¿½ï¿½ï¿½ï¿½
-            fbShare_count: {type: Number, min: 0, default: 0},        //FBï¿½ï¿½ï¿½É¦ï¿½ï¿½ï¿½
-            movieMaker: {type: String},                               //ï¿½|ï¿½ï¿½Wï¿½ï¿½
-            applyDoohPlay_count: {type: Number, min: 0, default: 0},  //ï¿½ï¿½Zï¿½ï¿½ï¿½ï¿½
-            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOHï¿½Zï¿½nï¿½ï¿½ï¿½ï¿½
+            userPhotoUrl: {type: String},                             //¯À§÷·Ó¤ù
+            movieNo: {type: Number},                                  //¼v¤ù½s¸¹
+            movieViewed_count: {type: Number, min: 0, default: 0},    //¼v¤ùÆ[¬ÝÁ`¦¸¼Æ
+            fbLike_count: {type: Number, min: 0, default: 0},         //FBÆg¦¸¼Æ
+            fbComment_count: {type: Number, min: 0, default: 0},      //FB¯d¨¥¼Æ
+            fbShare_count: {type: Number, min: 0, default: 0},        //FB¤À¨É¦¸¼Æ
+            movieMaker: {type: String},                               //·|­û¦WºÙ
+            applyDoohPlay_count: {type: Number, min: 0, default: 0},  //§ë½Z¦¸¼Æ
+            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH¥Zµn¦¸¼Æ
             timesOfPlaying: {type: Number}      
             
         }); //  miixPlayListInfo collection
         
         var StoryPlayListInfoSchema = new Schema({
             projectId: {type: String},                                //  AE project ID
-            movieNo: {type: Number},                                  //ï¿½vï¿½ï¿½sï¿½ï¿½
-            movieViewed_count: {type: Number, min: 0, default: 0},    //ï¿½[ï¿½Ý¦ï¿½ï¿½ï¿½
-            fbLike_count: {type: Number, min: 0, default: 0},         //FBï¿½gï¿½ï¿½ï¿½ï¿½
-            fbComment_count: {type: Number, min: 0, default: 0},      //FBï¿½dï¿½ï¿½ï¿½ï¿½
-            fbShare_count: {type: Number, min: 0, default: 0},        //FBï¿½ï¿½ï¿½É¦ï¿½ï¿½ï¿½
-            movieMaker: {type: String}                                //ï¿½|ï¿½ï¿½Wï¿½ï¿½
+            movieNo: {type: Number},                                  //¼v¤ù½s¸¹
+            movieViewed_count: {type: Number, min: 0, default: 0},    //Æ[¬Ý¦¸¼Æ
+            fbLike_count: {type: Number, min: 0, default: 0},         //FBÆg¦¸¼Æ
+            fbComment_count: {type: Number, min: 0, default: 0},      //FB¯d¨¥¼Æ
+            fbShare_count: {type: Number, min: 0, default: 0},        //FB¤À¨É¦¸¼Æ
+            movieMaker: {type: String}                                //·|­û¦WºÙ
             
         }); //  storyPlayListInfo collection
         
@@ -201,7 +228,8 @@ FM.DB = (function(){
 			Analysis = connection.model('Analysis', AnalysisSchema, 'analysis'),
             MemberListInfo = connection.model('MemberListInfo', MemberListInfoSchema, 'memberListInfo'),//kaiser
             MiixPlayListInfo = connection.model('MiixPlayListInfo', MiixPlayListInfoSchema, 'miixPlayListInfo'),
-            StoryPlayListInfo = connection.model('StoryPlayListInfo', StoryPlayListInfoSchema, 'storyPlayListInfo');
+            StoryPlayListInfo = connection.model('StoryPlayListInfo', StoryPlayListInfoSchema, 'storyPlayListInfo'),
+            UGC = connection.model('UGC', UGCSchema, 'ugc');
            
             
         var dbModels = [];
@@ -216,6 +244,7 @@ FM.DB = (function(){
         dbModels["memberListInfo"] = MemberListInfo;//kaiser
         dbModels["miixPlayListInfo"] = MiixPlayListInfo;
         dbModels["storyPlayListInfo"] = StoryPlayListInfo;  
+        dbModels["ugc"] = UGC;
         
         //???? nobody uses it, so this section can be removed? 
         var dbSchemas = [];
@@ -229,7 +258,7 @@ FM.DB = (function(){
         dbSchemas['memberListInfo'] = MemberListInfoSchema;//kaiser
         dbSchemas["miixPlayListInfo"] = MiixPlayListInfoSchema;
         dbSchemas["storyPlayListInfo"] = StoryPlayListInfoSchema;
-        //????
+        dbSchemas["ugc"] = UGCSchema;
             
         function connectDB(){
                 try{
@@ -245,7 +274,7 @@ FM.DB = (function(){
          *  Public members. In Constructor().
          */
             locatioinQuery: function(locationUID){
-                var query = Video.find({});
+                var query = UGC.find({});
                 query.sort('timestamp', -1).exec(function(err, doc){
                     if(err){
                         logger.info('locationQuery failed: '+err);
@@ -256,7 +285,7 @@ FM.DB = (function(){
             },
 
             ownerQuery: function(ownerUID){
-                var query = Video.find({});
+                var query = UGC.find({});
                 query.where('_id', ownerUID).sort('timestamp', -1).exec(function(err, doc){
                     if(err){
                         logger.info('ownerQuery failed: '+err);
@@ -267,7 +296,7 @@ FM.DB = (function(){
             },
 
             latestQuery: function(latestNum){
-                var query = Video.find({});
+                var query = UGC.find({});
                 query.sort('timestamp', -1),limit(latestNum).exec(function(err, doc){
                     if(err){
                         logger.info('latestQuery failed: '+err);
@@ -278,7 +307,7 @@ FM.DB = (function(){
             },
 
             rankQuery: function(topNum){
-                var query = Video.find({});
+                var query = UGC.find({});
                 query.sort('hitRate', -1).limit(topNum).exec(function(err, doc){
                     if(err){
                         logger.info('rankQuery failed: '+err);
@@ -311,6 +340,9 @@ FM.DB = (function(){
                         break;
                     case 'storyPlayListInfo':
                         return StoryPlayListInfo;
+                        break;
+                    case 'ugc':
+                        return UGC;
                         break;
                     default:
                         throw new error('DB Cannot find this Collection: ' + collection);
@@ -408,7 +440,7 @@ FM.DB = (function(){
             },
             
             
-            videoDump: function(){
+            ugcDump: function(){
                 var Member = connection.model('Member', MemberSchema, 'member');
                 var query = Member.find();
                 var ownerId1 = ObjectID,
@@ -427,9 +459,9 @@ FM.DB = (function(){
                             title = "Star-"+i;
                             //var doc = new Video({"title":title});
                             if(i%2 == 0){
-                                createAdoc( connection, 'Video', {"title":title}, ownerId1);
+                                createAdoc( connection, 'UGC', {"title":title}, ownerId1);
                             }else{
-                                createAdoc( connection, 'Video', {"title":title}, ownerId2);
+                                createAdoc( connection, 'UGC', {"title":title}, ownerId2);
                             }
                         }
                     }

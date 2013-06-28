@@ -28,7 +28,7 @@ exports.dooh_handler = dooh_handler;
 //GL
 var member_handler = require("../member.js"),
     scheduleDB = require("../schedule.js"),
-    videoDB = require("../video.js"),
+    UGCDB = require("../UGC.js"),
     api = require("./api.js"),
     admin_handler = require("./admin_handler.js");
     
@@ -104,8 +104,8 @@ exports.signup = function(req, res, next){
                                 "url": {"youtube":"http://www.youtube.com/embed/YsvYa77EySg"},
                                 "projectId": "5376"};
                 
-                videoDB.addVideo(vjson1, function(err, vdoc){
-                    videoDB.addVideo(vjson2, function(err, vdoc){
+                UGCDB.addUGC(vjson1, function(err, vdoc){
+                    UGCDB.addUGC(vjson2, function(err, vdoc){
                         next();
                     });
                 });
@@ -142,7 +142,7 @@ exports.signup = function(req, res, next){
  *            "url": {"youtube": "http://www.youtube.com/embed/l1zFS47cyzw"},
  *            "projectId": projectId };
  */
-exports.addVideo = function(req, res, next){
+exports.addUGC = function(req, res, next){
     
     var ownerId = req.session.user.userId,
         projectId = "2711";
@@ -156,7 +156,7 @@ exports.addVideo = function(req, res, next){
                         "title": "From Facebook"
                     };
                     
-        videoDB.addVideo(vjson, function(err, vdoc){
+        UGCDB.addUGC(vjson, function(err, vdoc){
             next();
         });
     }  
@@ -278,7 +278,7 @@ exports.event = function(req, res, next){
 
 exports.profile = function(req, res, next){
     if(req.session.user){
-        videoDB.getVideoListById(req.session.user.userId, function(err, result){
+        UGCDB.getUGCListById(req.session.user.userId, function(err, result){
             videoWorks = result;
             logger.log("videoWorks: " + videoWorks);
             next();

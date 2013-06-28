@@ -4,7 +4,7 @@ var workingPath = process.cwd();
 var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var memberDB = require(workingPath+'/member.js');
-var videoDB = require(workingPath+'/video.js');
+var UGCDB = require(workingPath+'/UGC.js');
 var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
 
 var fs = require('fs');
@@ -16,7 +16,7 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
     //console.log('generateMiixMoive is called.');
     
     aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
-    
+        
         if ( responseParameters.youtube_video_id ) {
             var aeServerID = responseParameters.ae_server_id;
             var youtubeVideoID = responseParameters.youtube_video_id;
@@ -35,7 +35,7 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
                              "genre":"miix",
                              "aeId": aeServerID,
                              "projectId":movieProjectID};
-                fmapi._fbPostVideoThenAdd(vjson); //TODO: split these tasks to different rolls
+                fmapi._fbPostUGCThenAdd(vjson); //TODO: split these tasks to different rolls
                 
             };
             
@@ -50,6 +50,7 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
 FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
 
     //deliver Miix movie content to DOOH
+    /*
     aeServerMgr.uploadMovieToMainServer(movieProjectID, function(resParametes){
         logger.info('uploading Miix movie from AE Server to Main Server finished.');
         logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
@@ -65,6 +66,15 @@ FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
             });						
         }
     });
+    */
+    
+    doohMgr.downloadMovieFromS3(movieProjectID, function(resParametes){
+        logger.info('downloading Miix movie from S3.');
+        logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+        
+        //TODO:: check the file size. If not correct, re-download.
+    });                     
+
 
                     
     //add Miix movie to the nearest time slot in schedule

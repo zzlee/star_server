@@ -1,5 +1,5 @@
 var FMDB = require('./db.js'),
-    videoDB = require('./video.js');
+    UGCDB = require('./UGC.js');
     
 var FM = {};
 var DEBUG = true,

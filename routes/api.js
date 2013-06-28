@@ -6,7 +6,7 @@
 
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
-    videoDB = require("../video.js"),
+    UGCDB = require("../UGC.js"),
     fb_handler = require("../fb_handler.js");
     
 
@@ -193,7 +193,7 @@ FM.api._fbExtendToken = function(accessToken, callback){
              
 // Inter
 // TODO: it is suggested that these codes are handled by different roles (such as SocialNetworkMgr, VideoDB, PushMgr)
-FM.api._fbPostVideoThenAdd = function(vjson){ 
+FM.api._fbPostUGCThenAdd = function(vjson){ 
     
     /* Keep for testing in case.
     var vjson2 = {  "title":"A Awesome World",
@@ -236,13 +236,13 @@ FM.api._fbPostVideoThenAdd = function(vjson){
                     vjsonData.fb_id = fb_id;
                     
                 }
-                videoDB.updateOne({"projectId":pid}, vjsonData, {"upsert": true}, function(err, vdoc){
+                UGCDB.updateOne({"projectId":pid}, vjsonData, {"upsert": true}, function(err, vdoc){
                     if(err)
                         logger.error(err);
                     
                     //debug
-                    videoDB.getNewVideoListByFB(vjsonData.ownerId.userID, 'miix', 0, function(err, result){
-                        logger.info('[result of adding one new miix video into db]: '+JSON.stringify(result));
+                    UGCDB.getNewUGCListByFB(vjsonData.ownerId.userID, 'miix', 0, function(err, result){
+                        logger.info('[result of adding one new miix UGC into db]: '+JSON.stringify(result));
                     });
                     
                     memberDB.getDeviceTokenById(oid, function(err, result){
@@ -267,9 +267,9 @@ FM.api._fbPostVideoThenAdd = function(vjson){
 
 
 //DEPRECATED
-FM.api._fbPostVideo = function(projectID, content){
+FM.api._fbPostUGC = function(projectID, content){
         
-    videoDB.getValueByProject(projectID, "ownerId _id url.youtube", function(err, result){    
+    UGCDB.getValueByProject(projectID, "ownerId _id url.youtube", function(err, result){    
         if(result){
             var ownerId = result["ownerId"];
             var v_oid = result["_id"];
@@ -300,7 +300,7 @@ FM.api._fbPostVideo = function(projectID, content){
                             FM_LOG("\n[Response after POST on FB:]\n" + JSON.stringify(response) ); 
                             //var fb_id = full_id.substring(full_id.lastIndexOf("_")+1);
                             var newdata = {"fb_id": fb_id};
-                            videoDB.update(v_oid, newdata);
+                            UGCDB.update(v_oid, newdata);
                         }
                     });
                 }
@@ -755,8 +755,8 @@ FM.api.signup = function(req, res){
                                 "url": {"youtube":"http://www.youtube.com/embed/YsvYa77EySg"},
                                 "projectId": "5376"};
                 
-                videoDB.addVideo(vjson1, function(err, vdoc){
-                    videoDB.addVideo(vjson2, function(err, vdoc){
+                UGCDB.addUGC(vjson1, function(err, vdoc){
+                    UGCDB.addUGC(vjson2, function(err, vdoc){
                         FM.api.profile(req, res);
                     });
                 });
@@ -938,15 +938,15 @@ FM.api.profile = function(req, res){
     
         var userID = req.query.userID;
         
-        videoDB.getVideoListByFB(userID, function(err, result){
+        UGCDB.getUGCListByFB(userID, function(err, result){
         
             if(err) throw err;
-            FM_LOG("[getVideoListByFB] " + JSON.stringify(result));
+            FM_LOG("[getUGCListByFB] " + JSON.stringify(result));
             var data;
             if(result){
                data = {"videoWorks": result};
             }else{
-                data = {"message": "No video"};
+                data = {"message": "No UGC"};
             }
             res.send(data);
         });
@@ -955,8 +955,8 @@ FM.api.profile = function(req, res){
 
 //	GET
 //GET /miix/videos/new_videos
-FM.api.newVideoList = function(req, res){
-    FM_LOG("[api.newVideoList]: ");
+FM.api.newUGCList = function(req, res){
+    FM_LOG("[api.newUGCList]: ");
     logger.info(req.query);
     
     if(req.query && req.query.userID && req.query.after){
@@ -966,21 +966,21 @@ FM.api.newVideoList = function(req, res){
         var after = new Date(parseInt(req.query.after));
         FM_LOG(genre +" [AFTER]: " + after.toISOString());
         
-        videoDB.getNewVideoListByFB(userID, genre, after, function(err, result){
+        UGCDB.getNewUGCListByFB(userID, genre, after, function(err, result){
         
             if(err){
-                logger.error("[api.newVideoList] error: ", err);
+                logger.error("[api.newUGCList] error: ", err);
                 res.send({error: "Internal Server Error."});
                 return;
             }
             
-            FM_LOG("[getNewVideoListByFB] "+ genre + ": " + JSON.stringify(result));
+            FM_LOG("[getNewUGCListByFB] "+ genre + ": " + JSON.stringify(result));
             
             var data;
             if(result){
                data = {"videoWorks": result};
             }else{
-                data = {"message": "No video"};
+                data = {"message": "No UGC"};
             }
             res.send(data);
         });
@@ -991,28 +991,28 @@ FM.api.newVideoList = function(req, res){
 };
 
 //  GET
-FM.api.newStreetVideoList = function(req, res){
-    FM_LOG("[api.newStreetVideoList]: ");
+FM.api.newStreetUGCList = function(req, res){
+    FM_LOG("[api.newStreetUGCList]: ");
     
     if(req.query && req.query.userID){
     
         var userID = req.query.userID;
         var after = new Date(parseInt(req.query.after));
         
-        videoDB.getNewStreetVideoListByFB( userID, after, function(err, result){
+        UGCDB.getNewStreetUGCListByFB( userID, after, function(err, result){
             if(err){
-                logger.error("[api.newStreetVideoList] error: ", err);
+                logger.error("[api.newStreetUGCList] error: ", err);
                 res.send({error: "Internal Server Error."});
                 return;
             }
             
-            FM_LOG("[getNewStreetVideoListByFB] " + JSON.stringify(result));
+            FM_LOG("[getNewStreetUGCListByFB] " + JSON.stringify(result));
 
             var data;
             if(result){
-                data = {streetVideos: result};
+                data = {streetUGCs: result};
             }else{
-                data = {message: "No video"};
+                data = {message: "No UGC"};
             }
             res.send(data);
         });
@@ -1034,8 +1034,8 @@ var vjson2 = {  "title":"A Awesome World",
 
 // POST
 //POST /miix/videos/miix_videos
-FM.api.submitAVideo = function(req, res){
-    FM_LOG("[api.submitAVideo]");
+FM.api.submitAUGC = function(req, res){
+    FM_LOG("[api.submitAUGC]");
     
     if(req.body && req.body.userID && req.body.pid && req.body._id){
         var _id = ObjectID.createFromHexString(req.body._id);
@@ -1043,14 +1043,14 @@ FM.api.submitAVideo = function(req, res){
         var pid = req.body.pid;
         var genre = (req.body.genre) ? req.body.genre : 'miix';
         
-        FM_LOG("User[" + userID + "] submit a Video[" + pid +"]");
+        FM_LOG("User[" + userID + "] submit a UGC[" + pid +"]");
         var vjson = {
                 "ownerId": {"_id": _id, "userID": userID},
                 "projectId": pid,
                 "genre": genre
             };
 
-        videoDB.addVideo(vjson, function(err, result){
+        UGCDB.addUGC(vjson, function(err, result){
             if(err) throw err;
             if(result)
                 res.send(result);
@@ -1077,9 +1077,9 @@ FM.api.submitDooh = function(req, res){
         var update = {status: 'waiting', "doohTimes.submited_time": Date.now(), inc: { "triedDoohTimes": 1 }};
         //JF: add $inc: { "triedDoohTimes": 1 }
         
-        videoDB.updateOne(condition, update, null, function(err, result){
+        UGCDB.updateOne(condition, update, null, function(err, result){
             if(err){
-                logger.error("[submitDooh]videoDB.updateOne", err);
+                logger.error("[submitDooh]UGCDB.updateOne", err);
                 res.send({error: "Internal Server Error!"});
                 
             }else{
@@ -1113,7 +1113,7 @@ FM.api.codeGenerate = function(req, res){
         var phoneNum = req.query.phoneNum,
             fb_userID = req.query.fb_userID,
             _id = ObjectID.createFromHexString(req.query.userID);
-        //console.log(JSON.stringify(req.query));    
+//        console.log(JSON.stringify(req.query));    
         var metadata = {number: phoneNum, verified: false, code: code};
         memberDB.updateMember(_id, {mPhone: metadata}, function(err, result){
             if(err){
@@ -1121,9 +1121,18 @@ FM.api.codeGenerate = function(req, res){
                 res.send({error: 'Internal Server Error'});
                 return;
             }
-            
+            var smsMgr = require("../sms_mgr.js");
+            smsMgr.sendMessageToMobile(phoneNum, code, function(err, result){
+                if (err){
+                    res.send(401, {message:"手機認證碼發送失敗"});
+                }
+                else{
+                    res.send(200, {message:"手機認證碼已發送"});
+                }
+            });
+
             FM_LOG("[codeGenerate] Succeed!" + JSON.stringify(result));
-            res.send(200, {message: '手機號碼:「'+ phoneNum +'」，驗證碼：「'+ code +'」。'});
+//            res.send(200, {message: '手機號碼:「'+ phoneNum +'」，驗證碼：「'+ code +'」。'});
         });
         
     }else{
@@ -1168,7 +1177,7 @@ FM.api.userProfile = function(req, res){
         var user = req.query.user;
         user._id = ObjectID.createFromHexString(user._id);  // cast String to ObjectID before using.
        
-        videoDB.getVideoListById(user._id, function(err, result){
+        UGCDB.getUGCListById(user._id, function(err, result){
             if(err) throw err;        
             res.send(result);
         });

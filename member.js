@@ -1,5 +1,5 @@
 var FMDB = require('./db.js'),
-    videoDB = require('./video.js'),
+    UGCDB = require('./UGC.js'),
     ObjectID = require('mongodb').ObjectID,
     fb_handler = require('./fb_handler.js'),
     youtubeInfo = require('./youtube_mgr.js');
@@ -109,13 +109,13 @@ FM.MEMBER = (function(){
 				});
             },
             
-            getVideosOf: function(memberID, cb){
-                var field = {"video_ids":1};
+            getUGCsOf: function(memberID, cb){
+                var field = {"ugc_ids":1};
                 FMDB.getValueOf(members, {"memberID" : memberID}, field, cb);
             },
             
-            getVideosByOID: function(oid, cb){
-                videoDB.getVideoListById(oid, cb);
+            getUGCsByOID: function(oid, cb){
+                UGCDB.getUGCListById(oid, cb);
                 /*
                 FMDB.getValueOfById(members, oid, field, function(err, result){
                     var length = result["video_ids"].length;
@@ -130,12 +130,12 @@ FM.MEMBER = (function(){
                     comments_count = 0,
                     shares_count = 0;
                     
-                videoDB.getVideoListOnFB(userID, function(err, videos){
+                UGCDB.getUGCListOnFB(userID, function(err, UGCs){
                     if(err){
                          cb(err, null);
-                         logger.error("[videoDB.getVideoListOnFB] ", err);
+                         logger.error("[UGCDB.getUGCListOnFB] ", err);
                          
-                    }else if(videos && videos.length > 0){
+                    }else if(UGCs && UGCs.length > 0){
                         var async = require("async");
                         
                         FM.MEMBER.getInstance().getFBAccessTokenByFBId(userID, function(err, fb_auth){
@@ -152,8 +152,8 @@ FM.MEMBER = (function(){
                                     function(callback){
                                         var batch = [];
                                         
-                                        for(var idx in videos){
-                                            var relative_url = videos[idx].fb_id + "?fields=comments,likes";
+                                        for(var idx in UGCs){
+                                            var relative_url = UGCs[idx].fb_id + "?fields=comments,likes";
                                             batch.push( {"method": "GET", "relative_url": relative_url} );
                                         }
                                         
@@ -177,8 +177,8 @@ FM.MEMBER = (function(){
                                     function(callback){
                                         var batch = [];
                                         
-                                        for(var idx in videos){
-                                            var relative_url = videos[idx].url.youtube;
+                                        for(var idx in UGCs){
+                                            var relative_url = UGCs[idx].url.youtube;
                                             batch.push( {"method": "GET", "relative_url": relative_url} );
                                         }
                                         
@@ -298,25 +298,25 @@ FM.MEMBER = (function(){
             },
 			
 			//JF
-			updateVideoCount: function(_id, cb){
-				videoDB.getVideoCount(_id, "miix", function(err, result){
+			updateUGCCount: function(_id, cb){
+				UGCDB.getUGCCount(_id, "miix", function(err, result){
 					var condition = {'_id': _id};
-					FMDB.updateOne(members, condition, {'video_count': result}, null, cb);
+					FMDB.updateOne(members, condition, {'ugc_count': result}, null, cb);
 				});
 			},
 			
 			updateDoohTimes: function(_id, cb){
-				videoDB.getVideoCount(_id, "miix_story", function(err, result){
+				UGCDB.getUGCCount(_id, "miix_story", function(err, result){
 					var condition = {'_id': _id};
 					FMDB.updateOne(members, condition, {'doohTimes': result}, null, cb);
 				});
 			},
 			
 			getTotalView: function(_id, totalView_cb){
-				var videos = FMDB.getDocModel("video"),
+				var UGCs = FMDB.getDocModel("ugc"),
 					async = require('async');
 				var condition = {'ownerId._id': _id};
-				videos.find(condition, {}, function(err, result){
+				UGCs.find(condition, {}, function(err, result){
 					if(result.length == 0) totalView_cb(null, 0);
 					else {
 						var count = [];
@@ -334,7 +334,7 @@ FM.MEMBER = (function(){
 							count.push(
 								function(callback){
 									//console.log(typeof(result[i].url.youtube) + ", " + result[i].url.youtube);
-									if((typeof(result[i].url.youtube) != null)&&(typeof(result[i].url.youtube) != 'undefined')) videoDB.getViewCount(result[i].url.youtube, callback);
+									if((typeof(result[i].url.youtube) != null)&&(typeof(result[i].url.youtube) != 'undefined')) UGCDB.getViewCount(result[i].url.youtube, callback);
 									else callback(null, 0);
 								}
 							);

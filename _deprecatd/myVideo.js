@@ -1,22 +1,22 @@
 /*
- *  Video Adapter
+ *  UGC Adapter
  */
 
-var videoDB = require('./video.js'),
+var UGCDB = require('./UGC.js'),
     memberDB = require("./member.js");
 
 module.exports = function(userId){
-    var listOfVideo = [];
+    var listOfUGC = [];
     
-    memberDB.getVideosByOID(userId, function(err, result){
+    memberDB.getUGCsByOID(userId, function(err, result){
         if(err) throw err;
         if(result){
             for(var i in result){
-                videoDB.getVideoById(result[i], function(err, ));
+                UGCDB.getUGCById(result[i], function(err, ));
             }
-            logger.info("getVideosByOID: " + result));
+            logger.info("getUGCsByOID: " + result));
         }
     });
     
-    return listOfVideo;
+    return listOfUGC;
 };
