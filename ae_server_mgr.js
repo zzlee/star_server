@@ -115,7 +115,7 @@ var defaultAeServer = 'AE_Server_feltmeng_art_PC';
 
 
 //use long polling to ask AE Server to create Miix movie
-aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
+aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, mediaType, createMovie_cb) {
 
 	var starAeServerID = defaultAeServer;
 	
@@ -136,7 +136,8 @@ aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, mo
                     ownerStdID: ownerStdID,
                     ownerFbID: ownerFbID,
                     movieTitle: movieTitle,
-                    ytAccessToken: ytAccessToken 
+                    ytAccessToken: ytAccessToken,
+                    mediaType: mediaType
                 };
                             
                 globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "RENDER_MIIX_MOVIE", parameters: commandParameters }, function(responseParameters) {

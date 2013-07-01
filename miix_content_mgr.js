@@ -14,8 +14,9 @@ var xml2js = require('xml2js');
 FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbID, movieTitle) {
     
     //console.log('generateMiixMoive is called.');
+    var mediaType = "H.264";
     
-    aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
+    aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, mediaType, function(responseParameters){
         
         if ( responseParameters.youtube_video_id ) {
             var aeServerID = responseParameters.ae_server_id;
