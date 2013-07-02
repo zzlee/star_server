@@ -52,7 +52,7 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
     
 };
 
-FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
+FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, miixMovieProjectID ) {
 
     //deliver Miix movie content to DOOH
     /*
@@ -73,12 +73,26 @@ FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
     });
     */
     
-    doohMgr.downloadMovieFromS3(movieProjectID, function(resParametes){
-        logger.info('downloading Miix movie from S3.');
-        logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+    UGCDB.getValueByProject(miixMovieProjectID, "fileExtension", function(err3, result){ 
+        if (!err3){
+            if (result){
+                var miixMovieFileExtension = result.fileExtension;
+                doohMgr.downloadMovieFromS3(miixMovieProjectID, miixMovieFileExtension,  function(resParametes){
+                    logger.info('downloading Miix movie from S3.');
+                    logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+                    
+                    //TODO:: check the file size. If not correct, re-download.
+                }); 
+            }                              
+            cb3(null);
+        }
+        else {
+            cb3("UGCDB.getValueByProject() failed: "+err3);
+        }
         
-        //TODO:: check the file size. If not correct, re-download.
-    });                     
+    });
+    
+                        
 
 
                     

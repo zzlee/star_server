@@ -175,7 +175,7 @@ storyContentMgr.generateStoryMV = function(miixMovieProjectID) {
                   },
                   function(cb3){
                       //get the file extension of this Miix movie
-                      UGCDB.getValueByProject(miixMovieProjectID, "ownerId _id url.youtube", function(err3, result){ 
+                      UGCDB.getValueByProject(miixMovieProjectID, "fileExtension", function(err3, result){ 
                           if (!err3){
                               if (result){
                                   miixMovieFileExtension = result.fileExtension;
