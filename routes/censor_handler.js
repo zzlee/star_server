@@ -6,15 +6,15 @@ var FM = { censor_handler: {} };
 
 var censor_mgr = require("../censor_mgr.js");
 var apis = require("../routes/api.js");
+
 //FM.censor.userContentItems_get_cb = function(req, res){
 //    
 //};
-//
-//
+
 //FM.censor.timeslots_get_cb = function(req, res){
+//
 //};
 
-console.log("censor_mgr");
 
 /**
  * @param  request  {json}sort:{?}
@@ -45,27 +45,7 @@ console.log("censor_mgr");
  */
 FM.censor_handler.getUGCList_get_cb = function(req,res){
     
-//    var query ={
-//            'accessToken':"116813818475773|d9EXxXNwTt2eCbSkIWYs9dJv-N0",
-//            'fb_id':'100005962359785',
-////            'commenter':
-//    }
-//    apis.fbGetThumbnail(query,res);
-//    
-//    admincache_mgr.getMemberListInfo(req, res);
-    
-    console.log("censor_mgr");
     censor_mgr.getUGCList(req,res);
-//    censor_mgr.getUGCList(req.condition, req.sort, function(err, result){
-//        
-//        console.log("censor_mgr"+err+result);
-//        if(err) logger.error("[censor_handler.getUGCList_get_cb] ", err);
-//        if(result){
-////            res.render( 'table_censorUGC', {ugcCensorMovieList: result} );
-//        }else{
-//            res.send(401,{message: "Wrong Condition/Sort Match!"});
-//        }
-//    });
 
  };
 
