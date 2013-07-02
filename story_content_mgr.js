@@ -35,19 +35,34 @@ var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID
                 }
                 else{
                     if (downloaded_cb){
-                        downloaded_cb('Fail to download story movie from Main Server to AE Server');
+                        downloaded_cb('Fail to download story movie from S3 to AE Server');
                     }				
                 }
             }); 
         }
         else{
             if (downloaded_cb){
-                downloaded_cb('Fail to download story movie from Story Cam Controllerr to Main Server');
+                downloaded_cb('Fail to download story movie from Story Cam Controllerr to S3');
             }				
         }
     }); 
     
 
+};
+
+var downloadMiixMovieFromS3 = function(_miixMovieProjectID, _miixMovieFileExtension, downloaded_cb){
+    aeServerMgr.downloadMiixMovieFromS3(_miixMovieProjectID, _miixMovieFileExtension, function(resParameter3){
+        if ( (resParameter3.err == 'null') || (!resParameter3.err) ) {
+            if (downloaded_cb){
+                downloaded_cb(null);
+            }
+        }
+        else{
+            if (downloaded_cb){
+                downloaded_cb('Fail to download Miix movie from S3');
+            }               
+        } 
+    });
 };
 
 storyContentMgr.generateStoryMV = function(miixMovieProjectID) {
@@ -173,6 +188,11 @@ storyContentMgr.generateStoryMV = function(miixMovieProjectID) {
                           
                       });
                       
+                  },
+                  function(cb5){
+                      downloadMiixMovieFromS3(miixMovieProjectID, miixMovieFileExtension, function(err5){
+                          cb5(err5);
+                      });
                   },
                   function(cb4){
                       aeServerMgr.createStoryMV( miixMovieProjectID, miixMovieFileExtension, ownerStdID, ownerFbID, movieTitle, function(responseParameters){

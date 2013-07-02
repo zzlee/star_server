@@ -290,5 +290,23 @@ aeServerMgr.downloadStoryMovieFromS3 = function(movieProjectID, downloadMovie_cb
 
 };
 
+aeServerMgr.downloadMiixMovieFromS3 = function(miixMovieProjectID, miixMovieFileExtension, downloadMovie_cb) {
+
+
+    var commandParameters = {
+        miixMovieProjectID: miixMovieProjectID,
+        miixMovieFileExtension: miixMovieFileExtension
+    };
+    
+    globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_MIIX_MOVIE_FROM_S3", parameters: commandParameters }, function(responseParameters) {
+        //console.dir(responseParameters);
+        if (downloadMovie_cb )  {
+            downloadMovie_cb(responseParameters);
+        }
+    });
+    
+
+};
+
 
 module.exports = aeServerMgr;
