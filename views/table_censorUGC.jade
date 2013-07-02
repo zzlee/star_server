@@ -1,5 +1,22 @@
 ﻿
 form#mainform(action='')
+
+    label 查詢影片
+    input(name='', type='text')
+    input(type='button', value='搜尋')
+    br
+    label
+      | 篩選條件
+      input(type='button', value='尚未審核')
+      input(type='button', value='已經審核')
+      input(type='button', value='All')
+      | and / or
+      label 投件時間
+      input(type='datetime-local', name='txtLocalDateTime')
+      | 到
+      input(type='datetime-local', name='txtLocalDateTime')
+      input(type='button', value='送出')
+
     table#product-table(border='0', width='100%', cellpadding='0', cellspacing='0')
         tr
           th.table-header-repeat.line-left.minwidth-1(width='10')

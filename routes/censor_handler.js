@@ -7,22 +7,12 @@ var FM = { censor_handler: {} };
 var censor_mgr = require("../censor_mgr.js");
 var apis = require("../routes/api.js");
 
-//FM.censor.userContentItems_get_cb = function(req, res){
-//    
-//};
-
-//FM.censor.timeslots_get_cb = function(req, res){
-//
-//};
-
-
 /**
  * @param  request  {json}sort:{?}
  *                        ex:{
- *                            sort:{rating:1,
- *                                  doohPlayedTimes:-1,
- *                                  description:-1
- *                                 }
+ *                            'rating':1,
+ *                            'doohPlayedTimes':-1,
+ *                            'description':-1
  *                           };
  *                  {json}condition:{?}
  *                        ex:{
@@ -48,5 +38,9 @@ FM.censor_handler.getUGCList_get_cb = function(req,res){
     censor_mgr.getUGCList(req,res);
 
  };
+ 
+//FM.censor.timeslots_get_cb = function(req, res){
+ //
+ //};
 
 module.exports = FM.censor_handler;

@@ -185,6 +185,7 @@ $(document).ready(function(){
         });
         */
     });
+    
 
     $('#UGCListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
@@ -192,16 +193,8 @@ $(document).ready(function(){
         
         FM.currentContent = FM.UGCList;
         FM.currentContent.showCurrentPageContent();
-        /*
-        FM.storyPlayList(0, 20, function(res){
-            if(res.message){
-                console.log("[Response of playList] message:" + res.message);
-            }else{
-                FM.currentContent = FM.storyPlayList;
-                $('#table-content').html(res);
-            }
-        });
-        */
+        
+
     });
     
     $('#goToNextPage').click(function(){

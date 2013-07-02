@@ -25,8 +25,6 @@ var async = require('async');
  *                       doohPlayedTimes}
  */
 censorMgr.getUGCList = function(req,res){
-    console.log('req'+ req);
-    console.log('req'+ req.query);
 
     //kaiser test ¤Ucondition
     var condition;
@@ -58,7 +56,6 @@ censorMgr.getUGCList = function(req,res){
 
     var limit = 0;
     var next = 0;
-    var nextMap = 0;
     var nextAsync = 0;
     var UGCList = [];
 
@@ -82,7 +79,6 @@ censorMgr.getUGCList = function(req,res){
         var toDo = function(err, result){
             console.log('toDo'+err+result);
 
-            nextMap += 1;
             if(next == limit - 1) {
                 UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, UGCList);
                 set_cb(null, 'ok'); 
@@ -95,7 +91,6 @@ censorMgr.getUGCList = function(req,res){
                 mappingUGCList(data, set_cb);
             }
             console.log('next',next);
-            console.log('nextMap'+nextMap);
 
         };//toDo End ******
 
