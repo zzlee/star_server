@@ -160,7 +160,7 @@ aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, mo
 };
 
 //use long polling to ask AE Server to create Story movie
-aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
+aeServerMgr.createStoryMV = function(movieProjectID, miixMovieFileExtension, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
 
 	var starAeServerID = defaultAeServer;
 	
@@ -175,6 +175,7 @@ aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movi
                 var commandParameters = {
                     userFileList: fs.readdirSync(userDataFolder),
                     movieProjectID: movieProjectID,
+                    miixMovieFileExtension: miixMovieFileExtension,
                     ownerStdID: ownerStdID,
                     ownerFbID: ownerFbID,
                     movieTitle: movieTitle,

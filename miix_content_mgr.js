@@ -25,6 +25,7 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
             var ownerStdID = responseParameters.owner_std_id;
             var ownerFbID = responseParameters.owner_fb_id;
             var movieTitle = responseParameters.movie_title;
+            var fileExtension = responseParameters.movie_file_extension;
             
             
             if ( responseParameters.err == 'null' || (!responseParameters.err) ) {
@@ -35,7 +36,10 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
                              "url": url,
                              "genre":"miix",
                              "aeId": aeServerID,
-                             "projectId":movieProjectID};
+                             "projectId": movieProjectID,
+                             "mediaType": mediaType,
+                             "fileExtension": fileExtension
+                             };
                 fmapi._fbPostUGCThenAdd(vjson); //TODO: split these tasks to different rolls
                 
             };

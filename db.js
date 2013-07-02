@@ -107,6 +107,8 @@ FM.DB = (function(){
             genre: {type: String, enum: UGCGenre, default: 'miix'},
             no: {type: Number},
             aeId: {type: String},
+            mediaType: {type: String},
+            fileExtension: {type: String},
             triedDoohTimes: {type: Number, min: 0, default: 0}, //JF
             doohPlayedTimes: {type: Number, min: 0, default: 0},    //JF
             timesOfPlaying: {type: Number}      //JF
@@ -166,38 +168,38 @@ FM.DB = (function(){
             fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
             email: {type: String, default: 'xyz@feltmeng.com'},
             mPhone: { number: String, verified: {type: Boolean, default: false}, code: String },
-            miixMovieVideo_count: {type: Number, min: 0, default: 0}, //¤w»s§@¼v¤ù¼Æ
-            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH¥Zµn¦¸¼Æ
-            movieViewed_count: {type: Number, min: 0, default: 0},    //¼v¤ùÆ[¬ÝÁ`¦¸¼Æ
-            fbLike_count: {type: Number, min: 0, default: 0},         //FBÆgÁ`¼Æ
-            fbComment_count: {type: Number, min: 0, default: 0},      //FB¯d¨¥Á`¼Æ
-            fbShare_count: {type: Number, min: 0, default: 0}         //FB¤À¨É¦¸¼Æ
+            miixMovieVideo_count: {type: Number, min: 0, default: 0}, //ï¿½wï¿½sï¿½@ï¿½vï¿½ï¿½ï¿½
+            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOHï¿½Zï¿½nï¿½ï¿½ï¿½ï¿½
+            movieViewed_count: {type: Number, min: 0, default: 0},    //ï¿½vï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½
+            fbLike_count: {type: Number, min: 0, default: 0},         //FBï¿½gï¿½`ï¿½ï¿½
+            fbComment_count: {type: Number, min: 0, default: 0},      //FBï¿½dï¿½ï¿½ï¿½`ï¿½ï¿½
+            fbShare_count: {type: Number, min: 0, default: 0}         //FBï¿½ï¿½ï¿½É¦ï¿½ï¿½ï¿½
             
         }); //  memberListInfo collection
         
         var MiixPlayListInfoSchema = new Schema({
             projectId: {type: String},                                //  AE project ID
-            userPhotoUrl: {type: String},                             //¯À§÷·Ó¤ù
-            movieNo: {type: Number},                                  //¼v¤ù½s¸¹
-            movieViewed_count: {type: Number, min: 0, default: 0},    //¼v¤ùÆ[¬ÝÁ`¦¸¼Æ
-            fbLike_count: {type: Number, min: 0, default: 0},         //FBÆg¦¸¼Æ
-            fbComment_count: {type: Number, min: 0, default: 0},      //FB¯d¨¥¼Æ
-            fbShare_count: {type: Number, min: 0, default: 0},        //FB¤À¨É¦¸¼Æ
-            movieMaker: {type: String},                               //·|­û¦WºÙ
-            applyDoohPlay_count: {type: Number, min: 0, default: 0},  //§ë½Z¦¸¼Æ
-            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH¥Zµn¦¸¼Æ
+            userPhotoUrl: {type: String},                             //ï¿½ï¿½ï¿½ï¿½ï¿½Ó¤ï¿½
+            movieNo: {type: Number},                                  //ï¿½vï¿½ï¿½sï¿½ï¿½
+            movieViewed_count: {type: Number, min: 0, default: 0},    //ï¿½vï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½ï¿½
+            fbLike_count: {type: Number, min: 0, default: 0},         //FBï¿½gï¿½ï¿½ï¿½ï¿½
+            fbComment_count: {type: Number, min: 0, default: 0},      //FBï¿½dï¿½ï¿½ï¿½ï¿½
+            fbShare_count: {type: Number, min: 0, default: 0},        //FBï¿½ï¿½ï¿½É¦ï¿½ï¿½ï¿½
+            movieMaker: {type: String},                               //ï¿½|ï¿½ï¿½Wï¿½ï¿½
+            applyDoohPlay_count: {type: Number, min: 0, default: 0},  //ï¿½ï¿½Zï¿½ï¿½ï¿½ï¿½
+            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOHï¿½Zï¿½nï¿½ï¿½ï¿½ï¿½
             timesOfPlaying: {type: Number}      
             
         }); //  miixPlayListInfo collection
         
         var StoryPlayListInfoSchema = new Schema({
             projectId: {type: String},                                //  AE project ID
-            movieNo: {type: Number},                                  //¼v¤ù½s¸¹
-            movieViewed_count: {type: Number, min: 0, default: 0},    //Æ[¬Ý¦¸¼Æ
-            fbLike_count: {type: Number, min: 0, default: 0},         //FBÆg¦¸¼Æ
-            fbComment_count: {type: Number, min: 0, default: 0},      //FB¯d¨¥¼Æ
-            fbShare_count: {type: Number, min: 0, default: 0},        //FB¤À¨É¦¸¼Æ
-            movieMaker: {type: String}                                //·|­û¦WºÙ
+            movieNo: {type: Number},                                  //ï¿½vï¿½ï¿½sï¿½ï¿½
+            movieViewed_count: {type: Number, min: 0, default: 0},    //ï¿½[ï¿½Ý¦ï¿½ï¿½ï¿½
+            fbLike_count: {type: Number, min: 0, default: 0},         //FBï¿½gï¿½ï¿½ï¿½ï¿½
+            fbComment_count: {type: Number, min: 0, default: 0},      //FBï¿½dï¿½ï¿½ï¿½ï¿½
+            fbShare_count: {type: Number, min: 0, default: 0},        //FBï¿½ï¿½ï¿½É¦ï¿½ï¿½ï¿½
+            movieMaker: {type: String}                                //ï¿½|ï¿½ï¿½Wï¿½ï¿½
             
         }); //  storyPlayListInfo collection
         

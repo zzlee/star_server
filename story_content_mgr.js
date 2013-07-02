@@ -1,5 +1,6 @@
 var storyContentMgr = {};
 
+var async = require('async');
 var workingPath = process.cwd();
 var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
@@ -49,14 +50,15 @@ var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID
 
 };
 
-storyContentMgr.generateStoryMV = function(movieProjectID) {
+storyContentMgr.generateStoryMV = function(miixMovieProjectID) {
     var ownerStdID = null;
     var ownerFbID = null;
     //var ownerFbName = null;
     var movieTitle = null;
+    var miixMovieFileExtension = ".flv";
     
     var getUserIdAndName = function( finish_cb ){
-        UGCDB.getOwnerIdByPid( movieProjectID, function( err, _ownerStdID) {
+        UGCDB.getOwnerIdByPid( miixMovieProjectID, function( err, _ownerStdID) {
             if (!err) {
                 ownerStdID = _ownerStdID;
                 memberDB.getUserNameAndID( ownerStdID, function(err2, result){
@@ -67,25 +69,31 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
                         if (finish_cb){
                             finish_cb(null);
                         }					
+                    } 
+                    else {
+                        if (finish_cb){
+                            finish_cb("memberDB.getUserNameAndID() failed: "+err2);
+                        }
                     }
                 });
             }
             else{
                 if (finish_cb){
-                    finish_cb(err);
+                    finish_cb("UGCDB.getOwnerIdByPid() failed: "+err);
                 }
             }
         });
     
     };
     
-    
-    downloadStoryMovieFromStoryCamControllerToAeServer( movieProjectID, function(err){
+    /*
+    downloadStoryMovieFromStoryCamControllerToAeServer( miixMovieProjectID, function(err){
         
         if (!err){
             getUserIdAndName(function(err2){
                 if (!err2){
-                    aeServerMgr.createStoryMV( movieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
+                    //TODO: get the file extension of this Miix movie
+                    aeServerMgr.createStoryMV( miixMovieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
                     
                         logger.info('generating Story MV finished. ');
                         logger.info('res: _command_id='+responseParameters._command_id+' err='+responseParameters.err+' youtube_video_id='+responseParameters.youtube_video_id);
@@ -134,7 +142,91 @@ storyContentMgr.generateStoryMV = function(movieProjectID) {
         }
         
         
-    });
+    });*/
+    
+    
+    
+    //------ using async -----
+    async.series([
+                  function(cb1){
+                      downloadStoryMovieFromStoryCamControllerToAeServer( miixMovieProjectID, function(err1){
+                          cb1(err1);
+                      });
+                  },
+                  function(cb2){
+                      getUserIdAndName(function(err2){
+                          cb2(err2);
+                      });
+                  },
+                  function(cb3){
+                      //get the file extension of this Miix movie
+                      UGCDB.getValueByProject(miixMovieProjectID, "ownerId _id url.youtube", function(err3, result){ 
+                          if (!err3){
+                              if (result){
+                                  miixMovieFileExtension = result.fileExtension;
+                              }                              
+                              cb3(null);
+                          }
+                          else {
+                              cb3("UGCDB.getValueByProject() failed: "+err3);
+                          }
+                          
+                      });
+                      
+                  },
+                  function(cb4){
+                      aeServerMgr.createStoryMV( miixMovieProjectID, miixMovieFileExtension, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
+                          
+                          logger.info('generating Story MV finished. ');
+                          logger.info('res: _command_id='+responseParameters._command_id+' err='+responseParameters.err+' youtube_video_id='+responseParameters.youtube_video_id);
+                          
+                          if ( responseParameters.youtube_video_id ) {
+                              var aeServerID = responseParameters.ae_server_id;
+                              var youtubeVideoID = responseParameters.youtube_video_id;
+                              var storyMovieProjectID = responseParameters.movie_project_id;
+                              logger.info('storyMovieProjectID= '+storyMovieProjectID);
+                              //var youtubeVideoID = "VNrn-jhmLBE"; //GZ temporarily hard code for test
+                              
+                              
+                              
+                              if ( responseParameters.err == 'null' || (!responseParameters.err) ) {
+                              
+                                  
+                                  var url = {"youtube":"http://www.youtube.com/embed/"+youtubeVideoID};           
+                                  var vjson = {"title": movieTitle,
+                                               "ownerId": {"_id": ownerStdID, "userID": ownerFbID},
+                                               "url": url,
+                                               "genre":"miix_story",
+                                               "aeId": aeServerID,
+                                               "projectId":storyMovieProjectID};
+                                  UGCDB.addUGC(vjson, function(err, result){
+                                      if(err) {
+                                          cb4("UGCDB.addUGC() failed : "+ err);
+                                      }
+                                      else {
+                                          fmapi._fbPostUGCThenAdd(vjson); 
+                                          logger.info('fmapi._fbPostUGCThenAdd(vjson) called. vjson='+JSON.stringify(vjson));
+                                          cb4(null);
+                                      }
+                                  });
+                              }
+                              
+                          }
+                          else {
+                              cb4("Failed to created Story MV.");
+                          }
+                         
+                      });
+                  }
+              ],
+              
+              
+              function(err, results){
+                  if (err) {
+                      logger.error(err);
+                  }
+              });
+    
 };
 
 module.exports = storyContentMgr;
