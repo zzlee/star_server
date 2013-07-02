@@ -1,0 +1,71 @@
+﻿
+form#mainform(action='')
+    table#product-table(border='0', width='100%', cellpadding='0', cellspacing='0')
+        tr
+          th.table-header-repeat.line-left.minwidth-1(width='10')
+            a(href='') 素材照片
+          th.table-header-repeat.line-left.minwidth-1(width='10')
+            a(href='') 影片編號
+          th.table-header-repeat.line-left.minwidth-1(width='10')
+            a(href='') 上傳素材
+          th.table-header-repeat.line-left.minwidth-1(width='75')
+            a(href='') facebook
+          th.table-header-repeat.line-left.minwidth-1(width='10')
+            a(href='') facebook picture
+          th.table-header-repeat.line-left(width='100')
+            a(href='') title
+          th.table-header-repeat.line-left(width='100')
+            a(href='') description
+          th.table-header-repeat.line-left(width='100')
+            a(href='') description
+          th.table-header-repeat.line-left(width='100')
+            a(href='') DOOH刊登次數
+          th.table-header-repeat.line-left(width='200')
+            a(href='') rating
+
+        if(ugcCensorMovieList)
+            each ugcCensor, i in ugcCensorMovieList
+                if i%2
+                    tr
+                      td
+                        img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
+                      td #{ugcCensor.ugcCensorNo}
+                      td #{ugcCensor.userContent}
+                      td #{ugcCensor.fb_id}
+                      td
+                        img(src='#{ugcCensor.fbPictureUrl}', alt='', width='100')
+                      td #{ugcCensor.title}
+                      td #{ugcCensor.description}
+                      td #{ugcCensor.description}
+                      td #{ugcCensor.doohPlayedTimes}
+                      td
+                             select  name=ugcCensor.rating
+                                     <option ugcCensor.rating=" ">rating
+                                     <option ugcCensor.rating="a">A
+                                     <option ugcCensor.rating="b">B
+                                     <option ugcCensor.rating="c">C
+                                     <option ugcCensor.rating="d">D
+                                     <option ugcCensor.rating="e">E
+
+                else
+                    tr.alternate-row
+                      td
+                        img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
+                      td #{ugcCensor.ugcCensorNo}
+                      td #{ugcCensor.userContent}
+                      td #{ugcCensor.fb_id}
+                      td
+                        img(src='#{ugcCensor.fbPictureUrl}', alt='', width='100')
+                      td #{ugcCensor.title}
+                      td #{ugcCensor.description}
+                      td #{ugcCensor.description}
+                      td #{ugcCensor.doohPlayedTimes}
+                      td
+                             select  name=ugcCensor.rating
+                                     <option ugcCensor.rating=" ">rating
+                                     <option ugcCensor.rating="a">A
+                                     <option ugcCensor.rating="b">B
+                                     <option ugcCensor.rating="c">C
+                                     <option ugcCensor.rating="d">D
+                                     <option ugcCensor.rating="e">E
+

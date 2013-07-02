@@ -125,6 +125,7 @@ $(document).ready(function(){
     FM.memberList = new PageList( 'memberList', 8, '/miix_admin/members');
     FM.miixPlayList = new PageList( 'miixMovieList', 5, '/miix_admin/miix_movies');
     FM.storyPlayList = new PageList( 'storyMovieList', 8, '/miix_admin/story_movies');
+    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
     
     FM.currentContent = FM.memberList;
 
@@ -185,6 +186,23 @@ $(document).ready(function(){
         */
     });
 
+    $('#UGCListBtn').click(function(){
+        $('#main_menu ul[class="current"]').attr("class", "select");
+        $('#UGCList').attr("class", "current");
+        
+        FM.currentContent = FM.UGCList;
+        FM.currentContent.showCurrentPageContent();
+        /*
+        FM.storyPlayList(0, 20, function(res){
+            if(res.message){
+                console.log("[Response of playList] message:" + res.message);
+            }else{
+                FM.currentContent = FM.storyPlayList;
+                $('#table-content').html(res);
+            }
+        });
+        */
+    });
     
     $('#goToNextPage').click(function(){
         FM.currentContent.showNextPageContent();

@@ -111,6 +111,7 @@ app.get('/miix_admin/members', routes.authorizationHandler.checkAuth, routes.adm
 app.get('/miix_admin/miix_movies', routes.authorizationHandler.checkAuth, routes.admin.miixPlayList_get_cb); 
 app.get('/miix_admin/story_movies', routes.authorizationHandler.checkAuth, routes.admin.storyPlayList_get_cb);
 app.get('/miix_admin/list_size', routes.authorizationHandler.checkAuth, routes.admin.listSize_get_cb);
+app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.censor_handler.getUGCList_get_cb);
 
 
 /**
