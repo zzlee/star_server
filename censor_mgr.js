@@ -35,13 +35,20 @@ censorMgr.getUGCList = function(req,res){
     var rating = '';
 
     condition = {
+            'no':3,
 //          'createdOn': {$gte: 'Jan 01, 2012', $lt: 'Jun 27, 2013'},
             'genre':'miix',
-            'ownerId':{ $exists: true},
-            'projectId':{ $exists: true},
+//            'ownerId':{ $exists: true},
+//            'projectId':{ $exists: true},
             //'doohPlayedTimes':doohPlayedTimes,
             //'rating':rating
     };
+    if(req.query.condition)
+//    condition = JSON.stringify(req.query.condition);
+    condition = req.query.condition;
+    console.log('req_condition'+req.query.condition);
+    console.log('req.condition'+condition);
+    console.log(JSON.stringify(req.query));
     sort = {
             'no':1,
 //          rating:1,
@@ -77,26 +84,27 @@ censorMgr.getUGCList = function(req,res){
     var mappingUGCList = function(data, set_cb){
 
         var toDo = function(err, result){
-            console.log('toDo'+err+result);
+//            console.log('toDo'+err+result);
 
             if(next == limit - 1) {
                 UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, UGCList);
                 set_cb(null, 'ok'); 
                 next = 0;
-                console.log(UGCList);
+//                console.log(UGCList);
             }
             else{
                 UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, UGCList);
                 next += 1;
                 mappingUGCList(data, set_cb);
             }
-            console.log('next',next);
+//            console.log('next',next);
 
         };//toDo End ******
 
         //async
         nextAsync += 1;
-        console.log('nextAsync'+nextAsync);
+//        console.log('nextAsync'+nextAsync);
+        if(data[next] != null){
         async.parallel([
                         function(callback){
                             miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
@@ -127,21 +135,24 @@ censorMgr.getUGCList = function(req,res){
 
                         }
                         ], toDo);
+        }
 
     };
 
     if ( req.query.limit && req.query.skip ) {
         FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no', {sort :sort ,limit: req.query.limit ,skip: req.query.skip}, function(err, result){
-            console.log("listOfdocModels="+err+result);
+//            console.log("listOfdocModels="+err+result);
             if(err) {logger.error('[censorMgr_db.listOfUGCs]', err);
             get_cb(null,err);
             }
             if(result){
 
-                if(req.query.skip < result.length)
+                if(req.query.skip < result.length && req.query.limit < result.length)
                     limit = req.query.limit;
                 else 
                     limit = result.length;
+                
+                console.log('limit'+limit+result);
 
                 if(limit > 0){ 
                     mappingUGCList(result, function(err,docs){
@@ -232,11 +243,11 @@ var vjson = {
         rating : 'd',
 };
 var _id = '51c939f65fcfaf8823000002';
-setUGCAttribute(_id,vjson,function(err,res){
-    if(err) console.log("setUGCAttribute_err"+err);
-    else console.log("setUGCAttribute_change="+res);
-
-});
+//setUGCAttribute(_id,vjson,function(err,res){
+//    if(err) console.log("setUGCAttribute_err"+err);
+//    else console.log("setUGCAttribute_change="+res);
+//
+//});
 
 
 module.exports = censorMgr;

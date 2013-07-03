@@ -187,15 +187,130 @@ $(document).ready(function(){
     });
     
 
+
     $('#UGCListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#UGCList').attr("class", "current");
         
         FM.currentContent = FM.UGCList;
         FM.currentContent.showCurrentPageContent();
+        console.log('listbtn');               
+
+    });
+//ajax    
+    $(document).ajaxComplete(function(event,request, settings) {
+        console.log('settings'+settings);
+        //Search
+        $('#ugcSearchBtn').click(function(){
+            console.log('ugcSearch');
+            var inputSearchData = {};
+            var url = DOMAIN + "ugc_censor";
+            $('#condition-inner input[class="ugcSearchBtn"]').each(function(){
+                console.log("item: " + $(this).attr("value"));
+//                inputSearchData[$(this).attr("name")] = $(this).attr("value");
+                inputSearchData = {'no':$(this).attr("value")};
+            });
+            console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
+            if(inputSearchData != null){
+                $.get(url, {"condition":inputSearchData,"skip":"0","limit":"5","token":"53768608"}, function(res, textStatus){
+                    
+                    if(res.token){
+
+//                        location.reload();
+//                        localStorage.token = res.token;
+
+                    }
+                    else{
+                        console.log("[Response of Login] message:" + res.message);
+                    }
+                });
+            }
+        });
+        //checkbox
+        $('#checkboxGroup input').click(function(){
+            console.log('checkboxGroup');
+            
+            if($(this).prop('checked')){
+               $('#checkboxGroup li input:checkbox').prop('checked',false);
+               $(this).prop('checked',true);
+            }
+         });
+      });
+
+
+    
+    $('#ugcSearchBtn').click(function(){
+        console.log('ugcSearch');
+    var inputData = {};
+    $('#condition-inner input[class="ugcSearchInput"]').each(function(){
+        console.log("item: " + $(this).attr("value"));
+        inputData[$(this).attr("name")] = $(this).attr("value");
+    });
+    console.log("Input: " + JSON.stringify(inputData) );
+//    if(inputData.id && inputData.password){
+//        $.get(url, inputData, function(res, textStatus){
+//            if(res.token){
+//                location.reload();
+//                localStorage.token = res.token;
+//            }
+//            else{
+//                console.log("[Response of Login] message:" + res.message);
+//            }
+//        });
+//    }
+    });
+    //test
+    $('#ugcSearch').click(function(){
+        $('#main_menu ul[class="current"]').attr("class", "select");
+        $('#UGCList').attr("class", "current");
+        
+        FM.currentContent = FM.UGCList;
+        FM.currentContent.showCurrentPageContent();
+        
+        console.log('ugcSearch');
         
 
     });
+
+    
+
+    
+    function setCheckbox() {
+        console.log('setchk');
+        $(':checkbox[name=cb]').each(function(){
+            $(this).click(function(){
+                if($(this).attr('checked')){
+                    $(':checkbox[name=cb]').removeAttr('checked');
+                    $(this).attr('checked','checked');
+                }
+            });
+        });
+    };
+    function CheckBoxList_Click(sender) 
+    {
+            var container = sender.parentNode;        
+            if(container.tagName.toUpperCase() == "TD") { // table 布局，否則為span布局
+                container = container.parentNode.parentNode; // 層次: <table><tr><td><input />
+            }        
+            var chkList = container.getElementsByTagName("input");
+            var senderState = sender.checked;
+            for(var i=0; i<chkList.length;i++) {
+                chkList[i].checked = false;
+            }     
+            sender.checked = senderState;          
+    }
+    var currentSelected = "";
+    //chooseOne()函式，參數為觸發該函式的元素本身
+    function chooseOne(cb) {
+        //先判斷是否有點選過任何的checkbox
+        //若有的話，把原先的變為未勾選
+        if(currentSelected!="") currentSelected.checked = false;
+        //變更目前勾選的checkbox
+        if(cb.checked)  currentSelected = cb;
+        else    currentSelected="";
+    }
+    //test
+    
     
     $('#goToNextPage').click(function(){
         FM.currentContent.showNextPageContent();

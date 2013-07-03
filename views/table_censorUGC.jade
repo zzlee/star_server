@@ -1,11 +1,12 @@
 ﻿
 form#mainform(action='')
 
-    label 查詢影片
-    input(name='', type='text')
-    input(type='button', value='搜尋')
-    br
-    label
+    #condition-inner
+      label 查詢影片
+      input(class='ugcSearchBtn', type='text' ,name='ugcSearchText' ,onfocus='this.value=\'\'')
+      input#ugcSearchBtn(type='button', class='ugcSearch', value='搜尋')
+      br
+      label
       | 篩選條件
       input(type='button', value='尚未審核')
       input(type='button', value='已經審核')
@@ -16,73 +17,89 @@ form#mainform(action='')
       | 到
       input(type='datetime-local', name='txtLocalDateTime')
       input(type='button', value='送出')
+    .clear
 
     table#product-table(border='0', width='100%', cellpadding='0', cellspacing='0')
         tr
           th.table-header-repeat.line-left.minwidth-1(width='10')
-            a(href='') 素材照片
-          th.table-header-repeat.line-left.minwidth-1(width='10')
             a(href='') 影片編號
           th.table-header-repeat.line-left.minwidth-1(width='10')
-            a(href='') 上傳素材
+            a(href='') 播放時間
+          th.table-header-repeat.line-left.minwidth-1(width='10')
+            a(href='') 上傳素材(文)
+          th.table-header-repeat.line-left.minwidth-1(width='10')
+            a(href='') 上傳素材(圖)
           th.table-header-repeat.line-left.minwidth-1(width='75')
             a(href='') facebook
           th.table-header-repeat.line-left.minwidth-1(width='10')
-            a(href='') facebook picture
+            a(href='') facebook 照片
           th.table-header-repeat.line-left(width='100')
-            a(href='') title
-          th.table-header-repeat.line-left(width='100')
-            a(href='') description
-          th.table-header-repeat.line-left(width='100')
-            a(href='') description
-          th.table-header-repeat.line-left(width='100')
-            a(href='') DOOH刊登次數
+            a(href='') 已刊登次數
           th.table-header-repeat.line-left(width='200')
-            a(href='') rating
+            a(href='') 審核
 
         if(ugcCensorMovieList)
             each ugcCensor, i in ugcCensorMovieList
                 if i%2
                     tr
-                      td
-                        img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
                       td #{ugcCensor.ugcCensorNo}
                       td #{ugcCensor.userContent}
+                      td #{ugcCensor.userContent}
+                      td
+                        img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
                       td #{ugcCensor.fb_id}
                       td
                         img(src='#{ugcCensor.fbPictureUrl}', alt='', width='100')
-                      td #{ugcCensor.title}
-                      td #{ugcCensor.description}
-                      td #{ugcCensor.description}
                       td #{ugcCensor.doohPlayedTimes}
                       td
-                             select  name=ugcCensor.rating
-                                     <option ugcCensor.rating=" ">rating
-                                     <option ugcCensor.rating="a">A
-                                     <option ugcCensor.rating="b">B
-                                     <option ugcCensor.rating="c">C
-                                     <option ugcCensor.rating="d">D
-                                     <option ugcCensor.rating="e">E
+                         #checkboxGroup
+                         input(type='checkbox', value='a', name='cb')
+                         |   A
+                         br
+                         input(type='checkbox', value='b', name='cb')
+                         |   B
+                         br
+                         input(type='checkbox', value='c', name='cb')
+                         |   C
+                         br
+                         input(type='checkbox', value='d', name='cb')
+                         |   D
+                         br
+                         input(type='checkbox', value='e', name='cb')
+                         |   E
+                         br
+                         input(type='checkbox', value='f', name='cb')
+                         |   F
+
 
                 else
                     tr.alternate-row
-                      td
-                        img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
                       td #{ugcCensor.ugcCensorNo}
                       td #{ugcCensor.userContent}
+                      td #{ugcCensor.userContent}
+                      td
+                        img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
                       td #{ugcCensor.fb_id}
                       td
                         img(src='#{ugcCensor.fbPictureUrl}', alt='', width='100')
-                      td #{ugcCensor.title}
-                      td #{ugcCensor.description}
-                      td #{ugcCensor.description}
                       td #{ugcCensor.doohPlayedTimes}
                       td
-                             select  name=ugcCensor.rating
-                                     <option ugcCensor.rating=" ">rating
-                                     <option ugcCensor.rating="a">A
-                                     <option ugcCensor.rating="b">B
-                                     <option ugcCensor.rating="c">C
-                                     <option ugcCensor.rating="d">D
-                                     <option ugcCensor.rating="e">E
+                         input(type='checkbox', value='checkbox')
+                         |   A
+                         br
+                         input(type='checkbox', value='checkbox')
+                         |   B
+                         br
+                         input(type='checkbox', value='checkbox')
+                         |   C
+                         br
+                         input(type='checkbox', value='checkbox')
+                         |   D
+                         br
+                         input(type='checkbox', value='checkbox')
+                         |   E
+                         br
+                         input(type='checkbox', value='checkbox')
+                         |   F
+
 
