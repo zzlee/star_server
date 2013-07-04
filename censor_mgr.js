@@ -29,26 +29,23 @@ censorMgr.getUGCList = function(req,res){
     //kaiser test 下condition
     var condition;
     var sort;
-    var start = new Date('May 01, 2013');
-    var end = new Date('Jun 27, 2013');
+    var start = new Date('03 01, 2013');
+    var end = new Date('06 27, 2013');
     var doohPlayedTimes = 0;
     var rating = '';
-
+    console.dir(req.query);
+    
     condition = {
-            'no':3,
-//          'createdOn': {$gte: 'Jan 01, 2012', $lt: 'Jun 27, 2013'},
+//            'no':3,
+//          'createdOn': {$gte: 'Jul 01, 2013 22:00', $lt: 'Jul 04, 2013 00:00'},
+//          'createdOn': {$gte: start, $lt: end},
             'genre':'miix',
 //            'ownerId':{ $exists: true},
 //            'projectId':{ $exists: true},
             //'doohPlayedTimes':doohPlayedTimes,
-            //'rating':rating
+//            'rating':{ $exists: false}
     };
-    if(req.query.condition)
-//    condition = JSON.stringify(req.query.condition);
-    condition = req.query.condition;
-    console.log('req_condition'+req.query.condition);
-    console.log('req.condition'+condition);
-    console.log(JSON.stringify(req.query));
+
     sort = {
             'no':1,
 //          rating:1,
@@ -56,6 +53,36 @@ censorMgr.getUGCList = function(req,res){
 //          description:-1
     };
     //test End
+    
+    if(req.query.condition) {
+        condition = req.query.condition;
+        //投件時間
+        if(req.query.condition.TimeStart && req.query.condition.TimeEnd){
+            start = new Date(req.query.condition.TimeStart);
+            startutc = start.toUTCString();
+            end = new Date(req.query.condition.TimeEnd);
+            endutc = end.toUTCString();
+            console.log('-----------------------');
+            console.dir('start~end[utc]'+startutc+','+endutc);
+            console.log('-----------------------');
+            console.dir('start~end'+start+','+end);
+            console.log('-----------------------');
+            condition ={
+                'genre':'miix',
+                'createdOn': {$gte: startutc, $lt: endutc}
+        };
+        }
+        //已經審核
+        if(req.query.condition == 'rating') condition ={
+                'genre':'miix',
+                'rating':{ $exists: true}
+        };
+        //尚未審核
+        if(req.query.condition == 'norating') condition ={
+                'genre':'miix',
+                'rating':{ $exists: false}
+        };
+    }
 
     //TODO: need to implement
     var miix_content_mgr = require('./miix_content_mgr.js');
@@ -143,7 +170,7 @@ censorMgr.getUGCList = function(req,res){
         FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no', {sort :sort ,limit: req.query.limit ,skip: req.query.skip}, function(err, result){
 //            console.log("listOfdocModels="+err+result);
             if(err) {logger.error('[censorMgr_db.listOfUGCs]', err);
-            get_cb(null,err);
+            res.send(400, {error: "Parameters are not correct"});
             }
             if(result){
 

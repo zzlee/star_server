@@ -8,15 +8,15 @@ form#mainform(action='')
       br
       label
       | 篩選條件
-      input(type='button', value='尚未審核')
-      input(type='button', value='已經審核')
-      input(type='button', value='All')
+      input#ugcSearchNoRatingBtn(type='button', value='尚未審核')
+      input#ugcSearchRatingBtn(type='button', value='已經審核')
+      input#ugcSearchAllBtn(type='button', value='All')
       | and / or
       label 投件時間
-      input(type='datetime-local', name='txtLocalDateTime')
+      input(class='ugcSearchDateBtn', type='datetime-local', name='TimeStart', onfocus='this.value=\'\'')
       | 到
-      input(type='datetime-local', name='txtLocalDateTime')
-      input(type='button', value='送出')
+      input(class='ugcSearchDateBtn', type='datetime-local', name='TimeEnd', onfocus='this.value=\'\'')
+      input#ugcSearchDateBtn(type='button', class='ugcSearchDate', value='送出')
     .clear
 
     table#product-table(border='0', width='100%', cellpadding='0', cellspacing='0')

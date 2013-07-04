@@ -9,6 +9,8 @@ var DOMAIN = "/miix_admin/",
 
 var FM = {};    
 
+var conditions = {};
+
 // PageList object implementation
 function PageList( listType, rowsPerPage, urlToGetListContent){
     var _this = this;
@@ -26,9 +28,9 @@ function PageList( listType, rowsPerPage, urlToGetListContent){
     });
 }; 
 
-PageList.prototype.showPageContent = function(Page){
+PageList.prototype.showPageContent = function(Page,condition){
     var _this = this;
-    $.get(this.urlToGetListContent, {skip: (Page-1)*this.rowsPerPage, limit: this.rowsPerPage, token: localStorage.token}, function(res){
+    $.get(this.urlToGetListContent, {skip: (Page-1)*this.rowsPerPage, limit: this.rowsPerPage, token: localStorage.token, condition:conditions}, function(res){
         if(res.message){
             console.log("[Response] message:" + res.message);
         }else{
@@ -121,11 +123,11 @@ $(document).ready(function(){
 
 // Main Page 
 $(document).ready(function(){
-
+    var condition = {'no':1};
     FM.memberList = new PageList( 'memberList', 8, '/miix_admin/members');
     FM.miixPlayList = new PageList( 'miixMovieList', 5, '/miix_admin/miix_movies');
     FM.storyPlayList = new PageList( 'storyMovieList', 8, '/miix_admin/story_movies');
-    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
+    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
     
     FM.currentContent = FM.memberList;
 
@@ -200,30 +202,100 @@ $(document).ready(function(){
 //ajax    
     $(document).ajaxComplete(function(event,request, settings) {
         console.log('settings'+settings);
-        //Search
+        /**
+         * 查詢影片 搜尋 click
+         */
         $('#ugcSearchBtn').click(function(){
             console.log('ugcSearch');
             var inputSearchData = {};
-            var url = DOMAIN + "ugc_censor";
+//            var url = DOMAIN + "ugc_censor";
             $('#condition-inner input[class="ugcSearchBtn"]').each(function(){
                 console.log("item: " + $(this).attr("value"));
 //                inputSearchData[$(this).attr("name")] = $(this).attr("value");
                 inputSearchData = {'no':$(this).attr("value")};
+                conditions = inputSearchData;
             });
             console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
-            if(inputSearchData != null){
-                $.get(url, {"condition":inputSearchData,"skip":"0","limit":"5","token":"53768608"}, function(res, textStatus){
-                    
-                    if(res.token){
+            if(conditions != null){
+                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                $('#main_menu ul[class="current"]').attr("class", "select");
+                $('#UGCList').attr("class", "current");
+                FM.currentContent = FM.UGCList;
+                FM.currentContent.showCurrentPageContent();
+                conditions = {};
+            }
+        });
+        /**
+         * 篩選條件 尚未審核 click
+         */
+        $('#ugcSearchNoRatingBtn').click(function(){
+            console.log('ugcSearchNoRatingBtn');
 
-//                        location.reload();
-//                        localStorage.token = res.token;
+            conditions = 'norating';
+            console.log("inputSearchData: " + JSON.stringify(conditions) );
+            if(conditions != null){
+                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                $('#main_menu ul[class="current"]').attr("class", "select");
+                $('#UGCList').attr("class", "current");
+                FM.currentContent = FM.UGCList;
+                FM.currentContent.showCurrentPageContent();
+                conditions = {};
+            }
+        });
+        /**
+         * 篩選條件 已經審核 click
+         */
+        $('#ugcSearchRatingBtn').click(function(){
+            console.log('ugcSearchNoRatingBtn');
 
-                    }
-                    else{
-                        console.log("[Response of Login] message:" + res.message);
-                    }
-                });
+            conditions = 'rating';
+            console.log("inputSearchData: " + JSON.stringify(conditions) );
+            if(conditions != null){
+                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                $('#main_menu ul[class="current"]').attr("class", "select");
+                $('#UGCList').attr("class", "current");
+                FM.currentContent = FM.UGCList;
+                FM.currentContent.showCurrentPageContent();
+                conditions = {};
+            }
+        });
+        /**
+         * 篩選條件 All click
+         */
+        $('#ugcSearchAllBtn').click(function(){
+            console.log('ugcSearchNoRatingBtn');
+
+            console.log("inputSearchData: " + JSON.stringify(conditions) );
+                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                $('#main_menu ul[class="current"]').attr("class", "select");
+                $('#UGCList').attr("class", "current");
+                FM.currentContent = FM.UGCList;
+                FM.currentContent.showCurrentPageContent();
+                conditions = {};
+            
+        });
+        /**
+         * 投件時間 送出 click
+         */
+        $('#ugcSearchDateBtn').click(function(){
+            console.log('ugcSearchDateBtn');
+            var inputSearchData = {};
+//            var url = DOMAIN + "ugc_censor";
+            $('#condition-inner input[class="ugcSearchDateBtn"]').each(function(){
+                console.log("item: " + $(this).attr("value"));
+//                inputSearchData[$(this).attr("name")] = $(this).attr("value");
+                inputSearchData[$(this).attr("name")] = $(this).attr("value");
+//                inputSearchData = {'date':$(this).attr("value")};
+                conditions = inputSearchData;
+            });
+            console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
+            if(conditions != null){
+                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                $('#main_menu ul[class="current"]').attr("class", "select");
+                $('#UGCList').attr("class", "current");
+                FM.currentContent = FM.UGCList;
+                FM.currentContent.showCurrentPageContent();
+                conditions = {};
             }
         });
         //checkbox
