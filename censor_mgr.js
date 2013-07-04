@@ -33,7 +33,7 @@ censorMgr.getUGCList = function(req,res){
     var end = new Date('06 27, 2013');
     var doohPlayedTimes = 0;
     var rating = '';
-    console.dir(req.query);
+//    console.dir(req.query);
     
     condition = {
 //            'no':3,
@@ -62,11 +62,11 @@ censorMgr.getUGCList = function(req,res){
             startutc = start.toUTCString();
             end = new Date(req.query.condition.TimeEnd);
             endutc = end.toUTCString();
-            console.log('-----------------------');
-            console.dir('start~end[utc]'+startutc+','+endutc);
-            console.log('-----------------------');
-            console.dir('start~end'+start+','+end);
-            console.log('-----------------------');
+//            console.log('-----------------------');
+//            console.dir('start~end[utc]'+startutc+','+endutc);
+//            console.log('-----------------------');
+//            console.dir('start~end'+start+','+end);
+//            console.log('-----------------------');
             condition ={
                 'genre':'miix',
                 'createdOn': {$gte: startutc, $lt: endutc}
@@ -179,13 +179,13 @@ censorMgr.getUGCList = function(req,res){
                 else 
                     limit = result.length;
                 
-                console.log('limit'+limit+result);
+//                console.log('limit'+limit+result);
 
                 if(limit > 0){ 
                     mappingUGCList(result, function(err,docs){
                         if(err) console.log('mapping_err'+err);
                         else{
-                            console.log('render');
+//                            console.log('render');
                             res.render( 'table_censorUGC', {ugcCensorMovieList: UGCList} );
                         }
                     });
