@@ -33,7 +33,7 @@ var player = (function() {
         },
         generatePlan: function( uuid, plan_cb ){
             adapter.get('/ContentManager/api/rest/players/' + uuid + '/generatePlan?token=' + token, function(err, req, res, obj) {
-                console.log('%d -> %j', res.statusCode, res.headers);
+                //console.log('%d -> %j', res.statusCode, res.headers);
                 plan_cb('done');
             });
         }

@@ -19,6 +19,8 @@ function scalaMgr( url, account ){
     var async = require('async');
     var restify = require('restify').createJsonClient({url: url});
     
+    var pushFlag = false;
+    
     var playlist = require('./playlistMgr.js')
       , channel = require('./channelMgr.js')
       , item = require('./itemMgr.js')
@@ -44,6 +46,27 @@ function scalaMgr( url, account ){
     
     require('./connectMgr.js').init( restify, account );
     
+    var weekdays = { 'SUNDAY' : 0, 'MONDAY' : 1, 'TUESDAY' : 2, 
+                 'WEDNESDAY' : 3,'THURSDAY' : 4, 'FRIDAY' : 5, 'SATURDAY' : 6 };
+    var checkWeekday = function( check, weekslots, check_cb ){
+        if(typeof(weekslots) === 'string') {
+            if(check == weekdays[weekslots]) check_cb('OK');
+            else check_cb('FAILED');
+        }
+        else for(var i=0; i < weekslots.length; i++) {
+            if(check == weekdays[weekslots[i]]) { check_cb('OK'); break; }
+            if(i == weekslots.length - 1) check_cb('FAILED');
+        }
+    };
+    var durationToNumber = function( time ){
+        var duration = time[0].split(':');
+        return (Number(duration[0]) * 60 + Number(duration[1])) * 1000;
+    };
+    var timeToInt = function( time ){
+        time = time.split(':');
+        return new Date(1970, 01, 01, time[0], time[1], time[2]).getTime();
+    };
+    
     /**
      * List timeslots from server.
      * 
@@ -56,7 +79,35 @@ function scalaMgr( url, account ){
      *     @param {string} playlistInfo The playlistInfo have name, time, duration, mode and more.
      *     @param {boolean} valid The valid show this timeslot is valid.
      */
-    var listTimeslot = function(){};
+    var listTimeslot = function(oneday, timeslot_cb){
+        var interval = [];
+    
+        var option = {
+            channel : { id: 1, frames: 1 }, //hardcode
+            date : new Date(oneday),
+        };
+        contractor.schedule.findTimeslots(option, function(list){
+            for(var i=0; i < list.timeslots.length; i++){
+                if(list.timeslots[i].playlist.name.match(/FM/i)) {
+                    checkWeekday(option.date.getDay(), list.timeslots[i].weekdays, function(status){
+                        var timeslotDeadline;
+                        if(list.timeslots[i].endTime == '24:00:00') timeslotDeadline = new Date(list.timeslots[i].endDate + ' 23:59:59');
+                        else timeslotDeadline = new Date(list.timeslots[i].endDate + ' ' + list.timeslots[i].endTime);
+                        if((option.date.getTime() <= timeslotDeadline.getTime()) && (status == 'OK')){
+                            interval.push({
+                                //playlist: list.timeslots[i].playlist.name,
+                                start: timeToInt(list.timeslots[i].startTime),
+                                end: timeToInt(list.timeslots[i].endTime),
+                                duration: durationToNumber(list.timeslots[i].playlist.prettifyDuration.replace('(','').replace(')','').split(' - '))
+                            });
+                        }
+                    });
+                }
+                if(i == list.timeslots.length-1) timeslot_cb(null, interval);
+            }
+        });
+        
+    };
     
     /**
      * Add item in timeslot to server.
@@ -75,7 +126,7 @@ function scalaMgr( url, account ){
         var itemPlaySetting = {
             playlist: { id: '', name: 'FM_DOOH' },
             item: { id: '', useValidRange: true, playFullscreen: true },
-            media: { id: '' },
+            media: { id: '', duration: '' },
             //playDate: play.getFullYear() + '-' + play.getMonth() + '-' + play.getDate(),
             //playTime: play.getHours() + ':' + play.getMinutes()
             playTime : playTime
@@ -90,9 +141,10 @@ function scalaMgr( url, account ){
             function(status, callback){
                 //Step.2: find out media(file) id
                 if(status == 'OK') {
-                    contractor.media.findMediaIdByName(file.name, function(err, mediaId){
+                    contractor.media.findMediaIdByName(file.name, function(err, mediaInfo){
                         if(!err) {
-                            itemPlaySetting.media.id = mediaId;
+                            itemPlaySetting.media.id = mediaInfo.id;
+                            itemPlaySetting.media.duration = mediaInfo.duration;
                             callback(null, 'OK');
                         }
                         else callback(err, null);
@@ -135,7 +187,6 @@ function scalaMgr( url, account ){
                     //Step.6: update item play info. to playlist
                     if(status == 'OK') {
                         contractor.playlist.updatePlaylistItemSchedule(itemPlaySetting, function(err, itemSetting_cb){
-                            //itemPlaySetting.playlist.id = playlistId;
                             if(!err) callback(null, 'OK');
                             else callback(err, null);
                         });
@@ -151,56 +202,55 @@ function scalaMgr( url, account ){
     /**
      * Push event list to all playlist in server.
      * 
+     * @param {object} option Input setting of playlist, subplaylist and player.
+     *     @param {object} playlist Setting playlist and subplaylist by name.
+     *         @param {string} search Find out available playlist.
+     *         @param {string} play Find out subplaylist.
+     *     @param {object} player Setting player.
+     *         @param {string} name Player name.
      * @param {function} reportStatus_cb Report status. i.e. { value: success }
      */
-    var pushEvent = function(playerName, reportPush_cb){
-        if(typeof(playerName) == 'function'){
-            reportPush_cb = playerName;
-            playerName = 'feltmeng';
-        }
-        contractor.player.findPlayerIdByName(playerName, function(err, playerId){
-            contractor.player.pushProgram({"ids": [playerId]}, function(res){
-                reportPush_cb(res);
-            });
+    var pushEvent = function( option, reportPush_cb ){
+        //if(!pushFlag) console.log(pushFlag);
+        async.parallel([
+            function(callback){
+                contractor.playlist.list( { sort: 'id', fields: 'id,name', search: option.playlist.search }, function(err, playlist){
+                    callback(null, playlist);
+                });
+            },
+            function(callback){
+                contractor.playlist.list( { sort: 'id', fields: 'id,name', search: option.playlist.play }, function(err, playlist){
+                    callback(null, playlist);
+                });
+            },
+        ], function(err, result){
+            
+            var pushSubplaylist = { subplaylist: { id: result[1].list[0].id, name: result[1].list[0].name } };
+            
+            for(var i=0; i<result[0].count; i++){
+                pushSubplaylist.id = result[0].list[i].id;
+                pushSubplaylist.name = result[0].list[i].name;
+                
+                contractor.playlist.pushSubplaylist(pushSubplaylist, function(err, res){});
+                if(i == result[0].count-1) {
+                    if(!option.player.name) playerName = 'feltmeng';
+                    else playerName = option.player.name;
+                    contractor.player.findPlayerIdByName(playerName, function(err, playerId){
+                        contractor.player.pushProgram({"ids": [playerId]}, function(res){
+                            reportPush_cb(res);
+                        });
+                    });
+                }
+            }
+            
         });
     };
     
-    //return contractor;
     return {
         listTimeslot : listTimeslot,
         setItemToPlaylist : setItemToPlaylist,
-        pushEvent : pushEvent,
+        pushEvent : pushEvent
     };
 }
-//scalaMgr( 'http://server-pc:8080', { username: 'administrator', password: '53768608' } );
 
 module.exports = scalaMgr;
-
-//_test()
-/*
-var testMgr = scalaMgr( 'http://server-pc:8080', { username: 'administrator', password: '53768608' } );
-setTimeout(function(){
-    
-    var file = {
-        name : 'fc2_save_2013-06-27-153828-0000.mp4',
-        path : 'C:\\tmp\\',
-        savepath : ''
-    };
-    testMgr.setItemToPlaylist(file, '2013-06-28 08:00',  function(err, status){
-        console.log(status);
-    });
-    
-    testMgr.schedule.findTimeslots( {
-        channel : { id : 1, frames : 1 },
-        date : '2013-06-24'
-    }, function( list ){
-        console.log(list);
-    });
-    
-    
-    testMgr.pushEvent('feltmeng', function(res){
-        console.log(res);
-    });
-    
-}, 5000);
-*/
