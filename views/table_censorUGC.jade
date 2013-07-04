@@ -17,7 +17,7 @@ form#mainform(action='')
       | 到
       input(class='ugcSearchDateBtn', type='datetime-local', name='TimeEnd', onfocus='this.value=\'\'')
       input#ugcSearchDateBtn(type='button', class='ugcSearchDate', value='送出')
-    .clear
+    
 
     table#product-table(border='0', width='100%', cellpadding='0', cellspacing='0')
         tr
@@ -53,23 +53,24 @@ form#mainform(action='')
                       td #{ugcCensor.doohPlayedTimes}
                       td
                          #checkboxGroup
-                         input(type='checkbox', value='a', name='cb')
+                         input#ugcCensor.ugcCensorNoa(type='radio', value='a', name='#{ugcCensor.ugcCensorNo}')
                          |   A
                          br
-                         input(type='checkbox', value='b', name='cb')
+                         input#ugcCensor.ugcCensorNob(type='radio', value='b', name='#{ugcCensor.ugcCensorNo}')
                          |   B
                          br
-                         input(type='checkbox', value='c', name='cb')
+                         input#ugcCensor.ugcCensorNoc(type='radio', value='c', name='#{ugcCensor.ugcCensorNo}')
                          |   C
                          br
-                         input(type='checkbox', value='d', name='cb')
+                         input#ugcCensor.ugcCensorNod(type='radio', value='d', name='#{ugcCensor.ugcCensorNo}')
                          |   D
                          br
-                         input(type='checkbox', value='e', name='cb')
+                         input#ugcCensor.ugcCensorNoe(type='radio', value='e', name='#{ugcCensor.ugcCensorNo}')
                          |   E
                          br
-                         input(type='checkbox', value='f', name='cb')
+                         input#ugcCensor.ugcCensorNof(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}')
                          |   F
+                         .clear
 
 
                 else
@@ -84,22 +85,23 @@ form#mainform(action='')
                         img(src='#{ugcCensor.fbPictureUrl}', alt='', width='100')
                       td #{ugcCensor.doohPlayedTimes}
                       td
-                         input(type='checkbox', value='checkbox')
+                         #checkboxGroup
+                         input#ugcCensor.ugcCensorNoa(type='radio', value='a', name='#{ugcCensor.ugcCensorNo}')
                          |   A
                          br
-                         input(type='checkbox', value='checkbox')
+                         input#ugcCensor.ugcCensorNob(type='radio', value='b', name='#{ugcCensor.ugcCensorNo}')
                          |   B
                          br
-                         input(type='checkbox', value='checkbox')
+                         input#ugcCensor.ugcCensorNoc(type='radio', value='c', name='#{ugcCensor.ugcCensorNo}')
                          |   C
                          br
-                         input(type='checkbox', value='checkbox')
+                         input#ugcCensor.ugcCensorNod(type='radio', value='d', name='#{ugcCensor.ugcCensorNo}')
                          |   D
                          br
-                         input(type='checkbox', value='checkbox')
+                         input#ugcCensor.ugcCensorNoe(type='radio', value='e', name='#{ugcCensor.ugcCensorNo}')
                          |   E
                          br
-                         input(type='checkbox', value='checkbox')
+                         input#ugcCensor.ugcCensorNof(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}')
                          |   F
-
+                         .clear
 

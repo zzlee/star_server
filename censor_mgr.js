@@ -59,9 +59,11 @@ censorMgr.getUGCList = function(req,res){
         //投件時間
         if(req.query.condition.TimeStart && req.query.condition.TimeEnd){
             start = new Date(req.query.condition.TimeStart);
-            startutc = start.toUTCString();
+            h = start.getHours()-8;
+            startutc = start.setHours(h);
             end = new Date(req.query.condition.TimeEnd);
-            endutc = end.toUTCString();
+            h = end.getHours()-8;
+            endutc = end.setHours(h);
 //            console.log('-----------------------');
 //            console.dir('start~end[utc]'+startutc+','+endutc);
 //            console.log('-----------------------');

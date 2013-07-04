@@ -11,6 +11,7 @@ var FM = {};
 
 var conditions = {};
 
+
 // PageList object implementation
 function PageList( listType, rowsPerPage, urlToGetListContent){
     var _this = this;
@@ -280,34 +281,59 @@ $(document).ready(function(){
         $('#ugcSearchDateBtn').click(function(){
             console.log('ugcSearchDateBtn');
             var inputSearchData = {};
-//            var url = DOMAIN + "ugc_censor";
+            var flag = 0;
+            
             $('#condition-inner input[class="ugcSearchDateBtn"]').each(function(){
                 console.log("item: " + $(this).attr("value"));
-//                inputSearchData[$(this).attr("name")] = $(this).attr("value");
                 inputSearchData[$(this).attr("name")] = $(this).attr("value");
-//                inputSearchData = {'date':$(this).attr("value")};
+                if($(this).attr("value") == "" && flag == 0){
+                alert('you have to enter full date!!');
+                flag = 1; 
+                }
                 conditions = inputSearchData;
             });
             console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
-            if(conditions != null){
+            
                 FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
                 $('#main_menu ul[class="current"]').attr("class", "select");
                 $('#UGCList').attr("class", "current");
                 FM.currentContent = FM.UGCList;
                 FM.currentContent.showCurrentPageContent();
                 conditions = {};
-            }
         });
         //checkbox
-        $('#checkboxGroup input').click(function(){
+        $('#ugcCensor.ugcCensorNoa').click(function(){
             console.log('checkboxGroup');
-            
-            if($(this).prop('checked')){
-               $('#checkboxGroup li input:checkbox').prop('checked',false);
-               $(this).prop('checked',true);
-            }
+            console.log($(this).attr("name"));
+
          });
-      });
+        $('#ugcCensor.ugcCensorNob').click(function(){
+            console.log('checkboxGroup__B');
+            console.log($(this).attr("name"));
+
+         });
+        $('#ugcCensor.ugcCensorNoc').click(function(){
+            console.log('checkboxGroup__C');
+            console.log($(this).attr("name"));
+
+         });
+        $('#ugcCensor.ugcCensorNod').click(function(){
+            console.log('checkboxGroup__D');
+            console.log($(this).attr("name"));
+
+         });
+        $('#ugcCensor.ugcCensorNoe').click(function(){
+            console.log('checkboxGroup__E');
+            console.log($(this).attr("name"));
+
+         });
+        $('#ugcCensor.ugcCensorNof').click(function(){
+            console.log('checkboxGroup__F');
+            console.log($(this).attr("name"));
+
+         });
+      
+    });//ajax End
 
 
     
