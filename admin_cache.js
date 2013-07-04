@@ -60,33 +60,35 @@ FM.ADMINCACHE = (function(){
             };//toDo End ******
 
             //get count  
-            if(data[next] !== null && data[next].fb.userID !== null){
-                async.parallel([
-                                function(callback){
-                                    UGC_mgr.getUGCCount(data[next]._id, 'miix', function(err, result){
-                                        if(err) callback(err, null);
-                                        else callback(null, result);
-                                    });
-                                },
-                                function(callback){
-                                    UGC_mgr.getUGCCount(data[next]._id, 'miix_story', function(err, result){
-                                        if(err) callback(err, null);
-                                        else callback(null, result);
-                                    });
-                                },
-                                function(callback){
-                                    member_mgr.getTotalView(data[next]._id, function(err, result){
-                                        if(err) callback(err, null);
-                                        else callback(null, result);
-                                    });
-                                },
-                                function(callback){
-                                    member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
-                                        if(err) callback(err, null);
-                                        else callback(null, result);
-                                    });
-                                },
-                                ], toDo);
+            if(data[next]){
+                if( data[next].fb.userID ){
+                    async.parallel([
+                                    function(callback){
+                                        UGC_mgr.getUGCCount(data[next]._id, 'miix', function(err, result){
+                                            if(err) callback(err, null);
+                                            else callback(null, result);
+                                        });
+                                    },
+                                    function(callback){
+                                        UGC_mgr.getUGCCount(data[next]._id, 'miix_story', function(err, result){
+                                            if(err) callback(err, null);
+                                            else callback(null, result);
+                                        });
+                                    },
+                                    function(callback){
+                                        member_mgr.getTotalView(data[next]._id, function(err, result){
+                                            if(err) callback(err, null);
+                                            else callback(null, result);
+                                        });
+                                    },
+                                    function(callback){
+                                        member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
+                                            if(err) callback(err, null);
+                                            else callback(null, result);
+                                        });
+                                    },
+                                    ], toDo);
+                }
             }
         };//cacheMemberList End ******
 
@@ -161,42 +163,44 @@ FM.ADMINCACHE = (function(){
             };//toDo End ******
 
             //get count 
-            if(data[next] !== null && data[next].ownerId._id !== null && data[next].projectId !== null && data[next].fb_id !== null){
-                async.parallel([
-                                function(callback){
-                                    miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
-                                        if(err) {
-    //                                        callback(err,null);
-                                            next += 1;
-                                            cacheMiixPlayList(data, set_cb);
-                                        }
-                                        else callback(null, result);
-                                    });
-                                },
-                                function(callback){
-                                    UGC_mgr.getUGCCount(data[next]._id, 'miix', function(err, result){
-                                        if(err) callback(err, null);
-                                        else callback(null, result);
-                                    });
-                                },
-                                function(callback){
-                                    member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
-                                        if(err) callback(err, null);
-                                        else if(result == null) callback(null, 'No User');
-                                        else callback(null, result.fb.userName);
-                                    });
-                                },
-                                function(callback){
-                                    if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
-                                            (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
-                                    else {
-                                        UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
+            if(data[next]){
+                if( data[next].ownerId._id && data[next].projectId && data[next].fb_id ){
+                    async.parallel([
+                                    function(callback){
+                                        miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
+                                            if(err) {
+        //                                        callback(err,null);
+                                                next += 1;
+                                                cacheMiixPlayList(data, set_cb);
+                                            }
+                                            else callback(null, result);
+                                        });
+                                    },
+                                    function(callback){
+                                        UGC_mgr.getUGCCount(data[next]._id, 'miix', function(err, result){
                                             if(err) callback(err, null);
                                             else callback(null, result);
                                         });
-                                    }
-                                },
-                                ], toDo);
+                                    },
+                                    function(callback){
+                                        member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
+                                            if(err) callback(err, null);
+                                            else if(result == null) callback(null, 'No User');
+                                            else callback(null, result.fb.userName);
+                                        });
+                                    },
+                                    function(callback){
+                                        if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
+                                                (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
+                                        else {
+                                            UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
+                                                if(err) callback(err, null);
+                                                else callback(null, result);
+                                            });
+                                        }
+                                    },
+                                    ], toDo);
+                }
             }
         };
 
@@ -264,31 +268,33 @@ FM.ADMINCACHE = (function(){
             };//toDo End ******
 
             //get count
-            if(data[next] !== null && data[next].ownerId._id !== null && data[next].projectId !== null && data[next].fb_id !== null){
-            async.parallel([
-                            function(callback){
-                                member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
-                                    if(err) callback(err, null);
-                                    else callback(null, result.fb.userName);
-                                });
-                            },
-                            function(callback){
-                                UGC_mgr.getUGCCount(data[next]._id, 'miix_story', function(err, result){
-                                    if(err) callback(err, null);
-                                    else callback(null, result);
-                                });
-                            },
-                            function(callback){
-                                if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
-                                        (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
-                                else {
-                                    UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
+            if(data[next]){
+                if( data[next].ownerId._id && data[next].projectId && data[next].fb_id ){
+                async.parallel([
+                                function(callback){
+                                    member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
+                                        if(err) callback(err, null);
+                                        else callback(null, result.fb.userName);
+                                    });
+                                },
+                                function(callback){
+                                    UGC_mgr.getUGCCount(data[next]._id, 'miix_story', function(err, result){
                                         if(err) callback(err, null);
                                         else callback(null, result);
                                     });
-                                }
-                            },
-                            ], toDo);
+                                },
+                                function(callback){
+                                    if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
+                                            (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
+                                    else {
+                                        UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
+                                            if(err) callback(err, null);
+                                            else callback(null, result);
+                                        });
+                                    }
+                                },
+                                ], toDo);
+                }
             }
         };
 
