@@ -7,7 +7,7 @@
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
     UGCDB = require("../UGC.js"),
-    fb_handler = require("../fb_handler.js");
+    fbMgr = require("../facebook_mgr.js");
     
 
 
@@ -563,11 +563,11 @@ FM.api.signupwithFB = function(req, res){
                     
                 }
                 
-                fb_handler.isTokenValid(userID, function(err, result){
+                fbMgr.isTokenValid(userID, function(err, result){
                     
                     // Extending new/short access_token replaces invalid existed access_token.
                     if(!result.is_valid){
-                        fb_handler.extendToken(accessToken, function(err, response){
+                        fbMgr.extendToken(accessToken, function(err, response){
                             if(err){
                                 res.send( {"data":{"_id": oid.toHexString(), "accessToken": accessToken, "expiresIn": expiresIn, "verified": mPhone_verified  }, "message":"success"} );
                             }else{
@@ -593,7 +593,7 @@ FM.api.signupwithFB = function(req, res){
                         // existed access_token is valid. Check if expire within 20days, then renew it.
                         if( parseInt(fb.auth.expiresIn) - Date.now() < 20*86400*1000 ){
                     
-                            fb_handler.extendToken(authRes.accessToken, function(err, response){
+                            fbMgr.extendToken(authRes.accessToken, function(err, response){
                                 if(err){
                                     res.send( {"data":{"_id": oid.toHexString(), "accessToken": existed_access_token, "verified": mPhone_verified  }, "message":"success"} );
                                     
