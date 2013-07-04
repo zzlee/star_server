@@ -44,6 +44,7 @@ exports.signinFB = function(req, res){
     res.render('signinFB', { title: "導向Facebook認證頁！" });
 };
 
+//DEPRECATED
 exports.signin = function(req, res, next) {
     /*
      *  Once member sign-in, we should save profile in session to be used in same session.
@@ -71,13 +72,14 @@ exports.signin = function(req, res, next) {
 };
 
 
-
+//DEPRECATED
 exports.signout = function (req, res, next) {
     logger.log(req.session.user.name + " Log-Out!");
     delete req.session.user;
     next();
 };
 
+//DEPRECATED
 exports.signup = function(req, res, next){
     logger.log("Get POST SignUp Req: " + JSON.stringify(req.body));
     
@@ -137,6 +139,9 @@ exports.signup = function(req, res, next){
         res.redirect("/");
     }
 };
+
+
+//DEPRECATED
 /*
  *  vjson = { "ownerId": ownerId,
  *            "url": {"youtube": "http://www.youtube.com/embed/l1zFS47cyzw"},
@@ -162,6 +167,7 @@ exports.addUGC = function(req, res, next){
     }  
 };
 
+//DEPRECATED
 exports.addEvent = function(req, res, next){
     /*
      *  
@@ -225,6 +231,7 @@ exports.addEvent = function(req, res, next){
     }
 };
 
+//DEPRECATED
 exports.censorship = function(req, res){
 
     scheduleDB.listOfWaiting(function(err, result){
@@ -245,14 +252,17 @@ exports.censorship = function(req, res){
     
 };
 
+//DEPRECATED
 exports.reject = function(req, res){
     scheduleDB.reject(evtid, cb);
 };
 
+//DEPRECATED
 exports.proved = function(req, res){
     scheduleDB.proved(evtid, cb);
 };
 
+//DEPRECATED
 var videoWorks = null,
     evtList = [];
 
@@ -275,7 +285,7 @@ exports.event = function(req, res, next){
 };
 
 
-
+//DEPRECATED
 exports.profile = function(req, res, next){
     if(req.session.user){
         UGCDB.getUGCListById(req.session.user.userId, function(err, result){
@@ -289,7 +299,7 @@ exports.profile = function(req, res, next){
     }
 };
 
-
+//DEPRECATED
 var eventAdapter = function(events){
     evtList = [];
     for( var i in events ){
@@ -300,7 +310,7 @@ var eventAdapter = function(events){
 };
 
 
-
+//DEPRECATED
 exports.schedule = function(req, res){
     res.render( 'schedule', { 
                                 title: "節目表",
@@ -311,7 +321,7 @@ exports.schedule = function(req, res){
                             } );
 };
 
-
+//DEPRECATED
 exports.index = function (req, res) {
     res.render('index', { title: "我是大明星",
                           signin: "會員登入",
@@ -332,6 +342,7 @@ exports.index = function (req, res) {
                         } );
 };
 
+//DEPRECATED
 exports.login = function(req, res){
 	res.render('login');
 }; 

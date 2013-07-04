@@ -213,6 +213,7 @@ FM.facebookMgr = (function(){
                 });
             },
             
+            //TODO: need to verify
             postOnFeed: function(fb_id, message, cb){
                 if(!fb_id || !message){
                     cb( {error: "fb_id/message is necessary."}, null );
@@ -239,9 +240,19 @@ FM.facebookMgr = (function(){
                 });
             },
             
+            //TODO: need further implement.  Check FM.api.fbGetCommentReq() in api.js
+            getComment: function(cb){
+                
+            },
+            
+            //TODO: need further implement.  Check FM.api.fbGetThumbnail() in api.js
+            getThumbnail: function(cb){
+                
+            },
             
             /** TEST */
             _test: function(){
+                
                 var token = "AAABqPdYntP0BADKwGxVqhtQCaWm3dIJtuzPtWZA2KMRVbuzWqP0TmMQlxZAOwYscjwyv4131iWE0CM9UjIO8E6ZAkvMNmblXj18rLi4EAZDZD";
                 this.extendToken( token, function(err, result){
                     if(err)
