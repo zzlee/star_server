@@ -5,7 +5,7 @@
 var db = require('./db.js');
 var async = require('async');
 
-var programTimeSlot = db.getDocModel("programTimeSlot");
+var programTimeSlotModel = db.getDocModel("programTimeSlot");
 
 /**
  * The manager who handles the scheduling of playing UGC on DOOHs
@@ -19,6 +19,59 @@ var TIME_INTERVAL_RANKIGN = [{startHour: 17, endHour: 23},  //start with the tim
                              {startHour: 8, endHour: 16},
                              {startHour: 0, endHour: 7}];
 
+var programPlanningPattern =(function(){    
+    var i = -1;
+    var PROGRAM_SEQUENCE = [ "miix", "cultural_and_creative", "mood", "check_in" ];
+    
+    return {
+        getProgramGenreToPlan: function(){
+            i++;
+            if (i >= PROGRAM_SEQUENCE.length){
+                i = 0;
+            }
+            return PROGRAM_SEQUENCE[i];
+        },
+        
+        reset: function(){
+            i = -1;
+        }
+    };
+})();
+
+
+var paddingContent =(function(){ 
+    var PADDING_CONTENT_TABLE = {
+            MIIX: [{dir: "content/padding_content", file:"miix01.jpg", format:"image"},
+                   {dir: "content/padding_content", file:"miix02.jpg", format:"image"}],
+            CULTURAL_AND_CREATIVE: [{dir: "content/padding_content", file:"cc01.jpg", format:"image"},
+                                    {dir: "content/padding_content", file:"cc02.jpg", format:"image"},
+                                    {dir: "content/padding_content", file:"cc03.jpg", format:"image"},
+                                    {dir: "content/padding_content", file:"cc04.jpg", format:"image"}
+                                    ],
+            MOOD: [{dir: "content/padding_content", file:"mood01.jpg", format:"image"},
+                   {dir: "content/padding_content", file:"mood02.jpg", format:"image"},
+                   {dir: "content/padding_content", file:"mood03.jpg", format:"image"},
+                   {dir: "content/padding_content", file:"mood04.jpg", format:"image"}
+                   ],
+            CHECK_IN: [{dir: "content/padding_content", file:"check_in01.jpg", format:"image"},
+                       {dir: "content/padding_content", file:"check_in02.jpg", format:"image"},
+                       {dir: "content/padding_content", file:"check_in03.jpg", format:"image"},
+                       {dir: "content/padding_content", file:"check_in04.jpg", format:"image"}
+                       ]                                
+    };
+        
+    return {
+        get: function(id, cb){
+            var idArray = id.split('-');
+            var genre = idArray[0]; 
+            var index = idArray[1];
+            if (cb){
+                cb(null, PADDING_CONTENT_TABLE[genre][index]);
+            } 
+        }
+    };
+})();
+        
 /**
  * Automatically selects applied UGC items (based on a predefined rule) and put them
  * in "to-be-played" list for a specific DOOH.<br>
@@ -79,12 +132,57 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             result[i] = {id: i};
         }
         */
-        var result = [ {id: "1", contentType: "A"},
-                       {id: "2", contentType: "A"},
-                       {id: "3", contentType: "B"},
-                       {id: "4", contentType: "B"},
-                       {id: "5", contentType: "C"},
-                       {id: "6", contentType: "D"},
+        var result = [ {id: "1", genre: "miix"},
+                       {id: "2", genre: "cultural_and_creative"},
+                       {id: "3", genre: "check_in"},
+                       {id: "4", genre: "miix"},
+                       {id: "5", genre: "check_in"},
+                       {id: "6", genre: "check_in"},
+                       {id: "7", genre: "miix"},
+                       {id: "8", genre: "check_in"},
+                       {id: "9", genre: "miix"},
+                       {id: "10", genre: "cultural_and_creative"},
+                       {id: "11", genre: "miix"},
+                       {id: "12", genre: "check_in"},
+                       {id: "13", genre: "mood"},
+                       {id: "14", genre: "cultural_and_creative"},
+                       {id: "15", genre: "miix"},
+                       {id: "16", genre: "mood"},
+                       {id: "17", genre: "check_in"},
+                       {id: "18", genre: "check_in"},
+                       {id: "19", genre: "miix"},
+                       {id: "20", genre: "cultural_and_creative"},
+                       {id: "21", genre: "miix"},
+                       {id: "22", genre: "check_in"},
+                       {id: "23", genre: "cultural_and_creative"},
+                       {id: "24", genre: "mood"},
+                       {id: "25", genre: "mood"},
+                       {id: "26", genre: "miix"},
+                       {id: "27", genre: "cultural_and_creative"},
+                       {id: "28", genre: "miix"},
+                       {id: "29", genre: "check_in"},
+                       {id: "30", genre: "miix"},
+                       {id: "31", genre: "miix"},
+                       {id: "32", genre: "check_in"},
+                       {id: "33", genre: "mood"},
+                       {id: "34", genre: "cultural_and_creative"},
+                       {id: "35", genre: "miix"},
+                       {id: "36", genre: "mood"},
+                       {id: "37", genre: "check_in"},
+                       {id: "38", genre: "check_in"},
+                       {id: "39", genre: "mood"},
+                       {id: "40", genre: "mood"},
+                       {id: "41", genre: "miix"},
+                       {id: "42", genre: "check_in"},
+                       {id: "43", genre: "mood"},
+                       {id: "44", genre: "check_in"},
+                       {id: "45", genre: "mood"},
+                       {id: "46", genre: "miix"},
+                       {id: "47", genre: "check_in"},
+                       {id: "48", genre: "miix"},
+                       {id: "49", genre: "check_in"},
+                       {id: "50", genre: "miix"},
+                       
                        ];
         
         get_cb(result, null);
@@ -119,7 +217,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                         //pick up one UGC from the sorted list 
                         var indexOfUgcCandidate = 0;
                         
-                        FMDB.updateAdoc(events, aTimeSlot._id, {"ugc._id":"proved"}, function(err_2, result){
+                        db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"ugc._id":"proved"}, function(err_2, result){
                             
                             
                             interationDone_cb2(err_2);
@@ -169,7 +267,6 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                 //generate program time slot documents (in programTimeSlot collection) according to available intervals and corresponding cycle durations
                 var availableTimeIntervals = result;
                 var iteratorGenerateTimeSlot = function(anAvailableTimeInterval, interationDone_cb){
-                    var programTimeSlotModel = db.getDocModel("programTimeSlot");
                     
                     //add time slots in this available time interval
                     var timeToAddTimeSlot = anAvailableTimeInterval.interval.start;
