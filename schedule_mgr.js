@@ -41,19 +41,19 @@ var programPlanningPattern =(function(){
 
 var paddingContent =(function(){ 
     var PADDING_CONTENT_TABLE = {
-            MIIX: [{dir: "content/padding_content", file:"miix01.jpg", format:"image"},
+            miix: [{dir: "content/padding_content", file:"miix01.jpg", format:"image"},
                    {dir: "content/padding_content", file:"miix02.jpg", format:"image"}],
-            CULTURAL_AND_CREATIVE: [{dir: "content/padding_content", file:"cc01.jpg", format:"image"},
+            cultural_and_creative: [{dir: "content/padding_content", file:"cc01.jpg", format:"image"},
                                     {dir: "content/padding_content", file:"cc02.jpg", format:"image"},
                                     {dir: "content/padding_content", file:"cc03.jpg", format:"image"},
                                     {dir: "content/padding_content", file:"cc04.jpg", format:"image"}
                                     ],
-            MOOD: [{dir: "content/padding_content", file:"mood01.jpg", format:"image"},
+            mood: [{dir: "content/padding_content", file:"mood01.jpg", format:"image"},
                    {dir: "content/padding_content", file:"mood02.jpg", format:"image"},
                    {dir: "content/padding_content", file:"mood03.jpg", format:"image"},
                    {dir: "content/padding_content", file:"mood04.jpg", format:"image"}
                    ],
-            CHECK_IN: [{dir: "content/padding_content", file:"check_in01.jpg", format:"image"},
+            check_in: [{dir: "content/padding_content", file:"check_in01.jpg", format:"image"},
                        {dir: "content/padding_content", file:"check_in02.jpg", format:"image"},
                        {dir: "content/padding_content", file:"check_in03.jpg", format:"image"},
                        {dir: "content/padding_content", file:"check_in04.jpg", format:"image"}
@@ -267,7 +267,99 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
     
     var generateTimeSlot = function( _cb1){
         
-        var generateTimeSlotsOfMicroInterval = function(interval, _cb2){
+        //Micro interval means a time slot containing purely our programs 
+        var generateTimeSlotsOfMicroInterval = function(interval, generatedTimeSlotsOfMicroInterval_cb){
+            
+            var genre = programPlanningPattern.getProgramGenreToPlan(); //the genra that will be uesed in this micro interval
+            var numberOfUGC;
+            if (genre=="miix"){
+                numberOfUGC = 1;
+            }
+            else{
+                numberOfUGC = 3;
+            }
+            var paddingContents;
+            
+            var ProgramTimeSlot = programTimeSlotModel;
+            var vjsonDefault = {
+                    dooh: dooh,
+                    timeslot: {
+                        start: interval.start, 
+                        end: interval.end,
+                        startHour: (new Date(interval.start)).getHours()},
+                    //content: {ugcId:"12345676", ugcProjcetId:"3142462123"}
+                    genre: genre
+                    };
+            
+            async.series([
+                          function(callback1){
+                              // get all the padding contents
+                              var indexArrayPaddingContents = []; for (var i = 0; i < numberOfUGC+1; i++) { indexArrayPaddingContents.push(i); }
+                              
+                              var iteratorGetPaddingContents = function(indexOfPaddingContents, interationDone_getPaddingContents_cb){
+                                  paddingContent.get(genre+'-'+indexOfPaddingContents , function(err_get, paddingContent){
+                                      interationDone_getPaddingContents_cb(err_get, paddingContent);
+                                  });
+                              };
+                              async.mapSeries(indexArrayPaddingContents, iteratorGetPaddingContents, function(err, results){
+                                  paddingContents = results;
+                                  //console.log('paddingContents=');
+                                  //console.dir(paddingContents);
+                                  callback1(null);
+                              });
+                              
+                          },
+                          function(callback2){
+                              // put padding program 0
+                              var aProgramTimeSlot = new ProgramTimeSlot(vjsonDefault);
+                              aProgramTimeSlot.content = paddingContents[0];
+                              aProgramTimeSlot.markModified('content');
+                              aProgramTimeSlot.save(function(err1, _result){     
+                                  if (err1) console.log("err1="+err1);
+                                  callback2(err1);
+                              });
+                          },
+                          function(callback3){
+                              // put following programs: UGC 0, padding 1, UGC 1, padding 2, .....
+                              var indexArrayUgcPrograms = []; for (var i = 0; i < numberOfUGC; i++) { indexArrayUgcPrograms.push(i); }
+                              
+                              var iteratorPutUgcAndPaddingProgrames = function(indexOfUgcContents, interationDone_putUgcAndPaddingPrograms_cb){
+                                  
+                                  async.series([
+                                                function(cb1){
+                                                    //put UGC program
+                                                    var aProgramTimeSlot = new ProgramTimeSlot(vjsonDefault);
+                                                    aProgramTimeSlot.type = 'UGC';
+                                                    aProgramTimeSlot.save(function(err2, _result){     
+                                                        cb1(err2);
+                                                    });
+                                                },
+                                                function(cb2){
+                                                    //put padding program
+                                                    var aProgramTimeSlot = new ProgramTimeSlot(vjsonDefault);
+                                                    aProgramTimeSlot.type = 'padding';
+                                                    aProgramTimeSlot.content = paddingContents[indexOfUgcContents+1];
+                                                    aProgramTimeSlot.markModified('content');
+                                                    aProgramTimeSlot.save(function(err3, _result){     
+                                                        cb2(err3);
+                                                    });
+                                                }
+                                  ],
+                                  function(err, results){
+                                      interationDone_putUgcAndPaddingPrograms_cb(err);
+                                  });
+                                  
+                              };
+                              async.eachSeries(indexArrayUgcPrograms, iteratorPutUgcAndPaddingProgrames, function(err){
+                                  callback3(null);
+                              });
+                              
+                          }
+            ],
+            function(err, results){
+                generatedTimeSlotsOfMicroInterval_cb(err);
+            });
+
             
         };
         
@@ -291,9 +383,16 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
 
                     async.whilst(
                         function () { return timeToAddTimeSlot+anAvailableTimeInterval.cycleDuration <= anAvailableTimeInterval.interval.end; },
-                        function (callback) {
-                            //TODO: add time slots of a micro timeslot (of the same genre) to db
+                        function (cb_whilst) {
                             
+                            // add time slots of a micro timeslot (of the same genre) to db
+                            var inteval = { start: timeToAddTimeSlot, end:timeToAddTimeSlot+programPeriod  };
+                            generateTimeSlotsOfMicroInterval(inteval, function(err1){
+                                timeToAddTimeSlot += programPeriod;
+                                cb_whilst(err1);
+                            });
+                            
+                            /*
                             var ProgramTimeSlot = programTimeSlotModel;
                             var vjson = {
                                     dooh: dooh,
@@ -310,8 +409,12 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                             aProgramTimeSlot.save(function(err1, _result){     
                                 if (err1) console.log("err1="+err1);
                                 timeToAddTimeSlot += programPeriod;
-                                callback(err1);
+                                cb_whilst(err1);
                             });
+                            */
+                            
+                            
+                            
                             /*
                             var genre = programPlanningPattern.getProgramGenreToPlan();
                             
@@ -376,13 +479,14 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             sortedUgcList = _sortedUgcList;
             generateTimeSlot( function(err_2){
                 if (!err_2) {
-                    console.log('generateTimeSlot() done! ')
+                    console.log('generateTimeSlot() done! ');
+                    /*
                     putUgcIntoTimeSlots(function(err_3, result){
-                        console.log('putUgcIntoTimeSlots() done! ')
+                        console.log('putUgcIntoTimeSlots() done! ');
                         if (created_cb){
                             created_cb(err_3, result);
                         }                        
-                    });
+                    });*/
                 }
                 else {
                     if (created_cb){

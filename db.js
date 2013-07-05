@@ -167,7 +167,8 @@ FM.DB = (function(){
                 startHour: Number 
                 },
             //status: {type: String, enum: programTimeSlotStatus}
-            type: {type: String, enum: programTimeSlotType} //UGC or padding contnet
+            type: {type: String, enum: programTimeSlotType}, //UGC or padding contnet
+            genre: {type: String, enum: UGCGenre} //miix, miix_street, miix_story, cultural_and_creative, mood, or check_in
         }); 
         
         
