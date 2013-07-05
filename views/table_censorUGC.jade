@@ -22,6 +22,8 @@ form#mainform(action='')
     table#product-table(border='0', width='100%', cellpadding='0', cellspacing='0')
         tr
           th.table-header-repeat.line-left.minwidth-1(width='10')
+            a(href='') 主題類別
+          th.table-header-repeat.line-left.minwidth-1(width='10')
             a(href='') 影片編號
           th.table-header-repeat.line-left.minwidth-1(width='10')
             a(href='') 播放時間
@@ -33,15 +35,19 @@ form#mainform(action='')
             a(href='') facebook
           th.table-header-repeat.line-left.minwidth-1(width='10')
             a(href='') facebook 照片
-          th.table-header-repeat.line-left(width='100')
+          th.table-header-repeat.line-left.minwidth-1(width='10')
             a(href='') 已刊登次數
-          th.table-header-repeat.line-left(width='200')
+          th.table-header-repeat.line-left.minwidth-1(width='10')
             a(href='') 審核
+          th.table-header-repeat.line-left.minwidth-1(width='10')
+            a(href='') 本次必登
 
         if(ugcCensorMovieList)
             each ugcCensor, i in ugcCensorMovieList
                 if i%2
                     tr
+                      td 
+                         label.label_design 文創
                       td #{ugcCensor.ugcCensorNo}
                       td #{ugcCensor.userContent}
                       td #{ugcCensor.userContent}
@@ -53,28 +59,63 @@ form#mainform(action='')
                       td #{ugcCensor.doohPlayedTimes}
                       td
                          #checkboxGroup
-                         input#ugcCensor.ugcCensorNoa(type='radio', value='a', name='#{ugcCensor.ugcCensorNo}')
-                         |   A
-                         br
-                         input#ugcCensor.ugcCensorNob(type='radio', value='b', name='#{ugcCensor.ugcCensorNo}')
-                         |   B
-                         br
-                         input#ugcCensor.ugcCensorNoc(type='radio', value='c', name='#{ugcCensor.ugcCensorNo}')
-                         |   C
-                         br
-                         input#ugcCensor.ugcCensorNod(type='radio', value='d', name='#{ugcCensor.ugcCensorNo}')
-                         |   D
-                         br
-                         input#ugcCensor.ugcCensorNoe(type='radio', value='e', name='#{ugcCensor.ugcCensorNo}')
-                         |   E
-                         br
-                         input#ugcCensor.ugcCensorNof(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}')
-                         |   F
+                           if(ugcCensor.rating == 'a')
+                             input#ugcCensor.ugcCensorNoa(type='radio', value='a', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             |   A
+                             br
+                           else
+                             input#ugcCensor.ugcCensorNoa(type='radio', value='a', name='#{ugcCensor.ugcCensorNo}')
+                             |   A
+                             br
+                           if(ugcCensor.rating == 'b')
+                             input#ugcCensor.ugcCensorNob(type='radio', value='b', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             |   B
+                             br
+                           else
+                             input#ugcCensor.ugcCensorNob(type='radio', value='b', name='#{ugcCensor.ugcCensorNo}')
+                             |   B
+                             br
+                           if(ugcCensor.rating == 'c')
+                             input#ugcCensor.ugcCensorNoc(type='radio', value='c', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             |   C
+                             br
+                           else
+                             input#ugcCensor.ugcCensorNoc(type='radio', value='c', name='#{ugcCensor.ugcCensorNo}')
+                             |   C
+                             br
+                           if(ugcCensor.rating == 'd')
+                             input#ugcCensor.ugcCensorNod(type='radio', value='d', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             |   D
+                             br
+                           else
+                             input#ugcCensor.ugcCensorNod(type='radio', value='d', name='#{ugcCensor.ugcCensorNo}')
+                             |   D
+                             br
+                           if(ugcCensor.rating == 'e')
+                             input#ugcCensor.ugcCensorNoe(type='radio', value='e', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             |   E
+                             br
+                           else
+                             input#ugcCensor.ugcCensorNoe(type='radio', value='e', name='#{ugcCensor.ugcCensorNo}')
+                             |   E
+                             br
+                           if(ugcCensor.rating == 'f')
+                             input#ugcCensor.ugcCensorNoa(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             |   F
+                             br
+                           else
+                             input#ugcCensor.ugcCensorNoa(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}')
+                             |   F
+                             br
                          .clear
+                      td 
+                        input#ugc(type='checkbox')
 
 
                 else
                     tr.alternate-row
+                      td 
+                         label.label_mood 心情
                       td #{ugcCensor.ugcCensorNo}
                       td #{ugcCensor.userContent}
                       td #{ugcCensor.userContent}
@@ -86,22 +127,55 @@ form#mainform(action='')
                       td #{ugcCensor.doohPlayedTimes}
                       td
                          #checkboxGroup
-                         input#ugcCensor.ugcCensorNoa(type='radio', value='a', name='#{ugcCensor.ugcCensorNo}')
-                         |   A
-                         br
-                         input#ugcCensor.ugcCensorNob(type='radio', value='b', name='#{ugcCensor.ugcCensorNo}')
-                         |   B
-                         br
-                         input#ugcCensor.ugcCensorNoc(type='radio', value='c', name='#{ugcCensor.ugcCensorNo}')
-                         |   C
-                         br
-                         input#ugcCensor.ugcCensorNod(type='radio', value='d', name='#{ugcCensor.ugcCensorNo}')
-                         |   D
-                         br
-                         input#ugcCensor.ugcCensorNoe(type='radio', value='e', name='#{ugcCensor.ugcCensorNo}')
-                         |   E
-                         br
-                         input#ugcCensor.ugcCensorNof(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}')
-                         |   F
+                           if(ugcCensor.rating == 'a')
+                             input#ugcCensor.ugcCensorNoa(type='radio', value='a', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             |   A
+                             br
+                           else
+                             input#ugcCensor.ugcCensorNoa(type='radio', value='a', name='#{ugcCensor.ugcCensorNo}')
+                             |   A
+                             br
+                           if(ugcCensor.rating == 'b')
+                             input#ugcCensor.ugcCensorNob(type='radio', value='b', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             |   B
+                             br
+                           else
+                             input#ugcCensor.ugcCensorNob(type='radio', value='b', name='#{ugcCensor.ugcCensorNo}')
+                             |   B
+                             br
+                           if(ugcCensor.rating == 'c')
+                             input#ugcCensor.ugcCensorNoc(type='radio', value='c', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             |   C
+                             br
+                           else
+                             input#ugcCensor.ugcCensorNoc(type='radio', value='c', name='#{ugcCensor.ugcCensorNo}')
+                             |   C
+                             br
+                           if(ugcCensor.rating == 'd')
+                             input#ugcCensor.ugcCensorNod(type='radio', value='d', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             |   D
+                             br
+                           else
+                             input#ugcCensor.ugcCensorNod(type='radio', value='d', name='#{ugcCensor.ugcCensorNo}')
+                             |   D
+                             br
+                           if(ugcCensor.rating == 'e')
+                             input#ugcCensor.ugcCensorNoe(type='radio', value='e', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             |   E
+                             br
+                           else
+                             input#ugcCensor.ugcCensorNoe(type='radio', value='e', name='#{ugcCensor.ugcCensorNo}')
+                             |   E
+                             br
+                           if(ugcCensor.rating == 'f')
+                             input#ugcCensor.ugcCensorNoa(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             |   F
+                             br
+                           else
+                             input#ugcCensor.ugcCensorNoa(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}')
+                             |   F
+                             br
                          .clear
+                      td 
+                        input#ugc(type='checkbox')
 

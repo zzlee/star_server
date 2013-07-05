@@ -1561,3 +1561,31 @@ a:hover.back-login	{
 #time choose{
 	margin:0 10px 10px 10px;
 	}
+	
+	
+.label label-design{
+	display:block;
+	color: rgba(255,255,255,1);
+	background-color: rgba(153,0,0,1);
+	padding: 3px;
+}
+.label_design{
+	background:rgba(153,0,0,1);
+	color:#fff;
+	padding:3px;
+	}
+.label_mood{
+	background:rgba(153,102,0,1);
+	color:#fff;
+	padding:3px;
+	}
+.label_checkin{
+	background: rgba(0,102,255,1);
+	color:#fff;
+	padding:3px;
+	}
+.label_video{
+	background: rgba(153,0,204,1);
+	color:#fff;
+	padding:3px;
+	}

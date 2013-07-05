@@ -39,6 +39,20 @@ FM.censor_handler.getUGCList_get_cb = function(req,res){
 
  };
  
+ /**
+  * @param  request  {number}no
+  * 
+  *         body     {string}UGCLevel(Range A~E)    
+  *                  
+  * @return response {string}status 
+  *                       
+  */
+ FM.censor_handler.setUGCAttribute_get_cb = function(req,res){
+     
+     censor_mgr.setUGCAttribute(req,res);
+
+  };
+ 
 //FM.censor.timeslots_get_cb = function(req, res){
  //
  //};

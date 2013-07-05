@@ -162,7 +162,7 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
  *                       FB_ID,
  *                       doohPlayedTimes}
  */
-app.get('/admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
+app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
 /**
  *       PUT /miix_admin/user_content_items/{id}
  * @param  request  {string}projectId.
@@ -171,7 +171,7 @@ app.get('/admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
  *                  
  * @return response {string}status 
  */
-
+app.get('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);
 /**
  * É‹    GET /miix_admin/doohs/{dooh_id}/timeslots?&offset=0&limit=20
  * @param  request  {string}dooh.client(dooh_id)

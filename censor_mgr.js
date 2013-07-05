@@ -31,23 +31,23 @@ censorMgr.getUGCList = function(req,res){
     var sort;
     var start = new Date('03 01, 2013');
     var end = new Date('06 27, 2013');
-    var doohPlayedTimes = 0;
-    var rating = '';
+//    var doohPlayedTimes = 0;
+//    var rating = '';
 //    console.dir(req.query);
     
     condition = {
-//            'no':3,
+            'no':{ $exists: true},
 //          'createdOn': {$gte: 'Jul 01, 2013 22:00', $lt: 'Jul 04, 2013 00:00'},
 //          'createdOn': {$gte: start, $lt: end},
             'genre':'miix',
-//            'ownerId':{ $exists: true},
-//            'projectId':{ $exists: true},
+            'ownerId':{ $exists: true},
+            'projectId':{ $exists: true}
             //'doohPlayedTimes':doohPlayedTimes,
 //            'rating':{ $exists: false}
     };
 
     sort = {
-            'no':1,
+            'no':1
 //          rating:1,
 //          doohPlayedTimes:-1,
 //          description:-1
@@ -71,17 +71,26 @@ censorMgr.getUGCList = function(req,res){
 //            console.log('-----------------------');
             condition ={
                 'genre':'miix',
+                'no':{ $exists: true},
+                'ownerId':{ $exists: true},
+                'projectId':{ $exists: true},
                 'createdOn': {$gte: startutc, $lt: endutc}
         };
         }
         //¤w¸g¼f®Ö
         if(req.query.condition == 'rating') condition ={
                 'genre':'miix',
+                'no':{ $exists: true},
+                'ownerId':{ $exists: true},
+                'projectId':{ $exists: true},
                 'rating':{ $exists: true}
         };
         //©|¥¼¼f®Ö
         if(req.query.condition == 'norating') condition ={
                 'genre':'miix',
+                'no':{ $exists: true},
+                'ownerId':{ $exists: true},
+                'projectId':{ $exists: true},
                 'rating':{ $exists: false}
         };
     }
@@ -133,7 +142,7 @@ censorMgr.getUGCList = function(req,res){
         //async
         nextAsync += 1;
 //        console.log('nextAsync'+nextAsync);
-        if(data[next] != null){
+        if(data[next] !== null){
         async.parallel([
                         function(callback){
                             miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
@@ -158,7 +167,7 @@ censorMgr.getUGCList = function(req,res){
                         function(callback){
                             member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
                                 if(err) callback(err, null);
-                                else if(result == null) callback(null, 'No User');
+                                else if(result === null) callback(null, 'No User');
                                 else callback(null, result.fb.userName);
                             });
 
@@ -248,31 +257,49 @@ var getUserContent = function(fb_id,get_cb){
 //});
 
 /**
- * @param  request  {string}_id
+ * @param  request  {number}no
  * 
  *         body     {string}UGCLevel(Range A~E)    
  *                  
  * @return response {string}status 
  *                       
  */
-var setUGCAttribute = function(_id,vjson,get_cb){
+censorMgr.setUGCAttribute = function(req,res){
+    var UGC_mgr = require('./UGC.js');
+    console.dir(req.query);
+    var no = req.query.no;
+    var vjson = {rating : req.query.rating};
+    console.log('setUGCAttribute'+no+vjson);
 
-    FMDB.updateAdoc(UGCs,_id,vjson, function(err, result){
-        if(err) {logger.error('[db.updateAdoc]', err);
-        get_cb(err,null);
-        }
+    UGC_mgr.getOwnerIdByNo(no, function(err, result){
+        if(err) logger.error('[setUGCAttribute_getOwnerIdByNo]', err);
+
         if(result){
-            get_cb(null,result.rating);
+            console.log('getOwnerIdByNo_result'+result);
+            FMDB.updateAdoc(UGCs,result,vjson, function(err, result){
+                if(err) {
+                    logger.error('[setUGCAttribute_updateAdoc]', err);
+                res.send(400, {error: "Parameters are not correct"});
+//                get_cb(err,null);
+                }
+                if(result){
+                    console.log('updateAdoc_result'+result);
+//                    get_cb(null,result.rating);
+                }
+            });
         }
+
     });
+
 };
 
 //kaiser test
-var vjson = {
-        rating : 'd',
-};
-var _id = '51c939f65fcfaf8823000002';
-//setUGCAttribute(_id,vjson,function(err,res){
+//var vjson = {
+//        rating : 'd'
+//};
+////var _id = '51c939f65fcfaf8823000002';
+//var no = 1;
+//setUGCAttribute(no,vjson,function(err,res){
 //    if(err) console.log("setUGCAttribute_err"+err);
 //    else console.log("setUGCAttribute_change="+res);
 //
