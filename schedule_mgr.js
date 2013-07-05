@@ -21,7 +21,7 @@ var TIME_INTERVAL_RANKIGN = [{startHour: 17, endHour: 23},  //start with the tim
 
 var programPlanningPattern =(function(){    
     var i = -1;
-    var PROGRAM_SEQUENCE = [ "miix", "cultural_and_creative", "mood", "check_in" ];
+    var PROGRAM_SEQUENCE = [ "miix", "cultural_and_creative", "mood", "check_in" ]; 
     
     return {
         getProgramGenreToPlan: function(){
@@ -185,7 +185,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                        
                        ];
         
-        get_cb(result, null);
+        get_cb(null, result);
         
     };
     
@@ -195,75 +195,86 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                       {interval:{start:(new Date("2013/5/5 13:00:00")).getTime(), end:(new Date("2013/5/5 13:30:00")).getTime()},cycleDuration: 5*60*1000},
                       {interval:{start:(new Date("2013/5/5 19:00:00")).getTime(), end:(new Date("2013/5/5 19:40:00")).getTime()},cycleDuration: 5*60*1000}
                       ];
-        list_cb(result, null);
+        list_cb(null, result );
     };
     
     
     
-    var putUgcIntoTimeSlots = function(err){
+    var putUgcIntoTimeSlots = function(finishPut_cb){
         
         var ugcCandidateList = sortedUgcList.slice(0); //clone the full array of ugcCandidateList
         
+        //== PutUgcIntoTimeSlots_eachRankedTimeIntervalInADay
         var iteratorPutUgcIntoTimeSlots_eachRankedTimeIntervalInADay = function(aTimeIntervalInADay, interationDone_cb1){
             //query the time slots (in programTimeSlot collection) belonging to this interval and put UGC to them one by one
             //console.log("aTimeIntervalInADay=");
             //console.dir(aTimeIntervalInADay);
-            programTimeSlotModel.find({ "timeslot.startHour": {$lte:aTimeIntervalInADay.endHour, $gte:aTimeIntervalInADay.startHour} }, function (err_1, timeSlots) {
+            programTimeSlotModel.find({ "timeslot.startHour": {$lte:aTimeIntervalInADay.endHour, $gte:aTimeIntervalInADay.startHour} }, function (_err_1, timeSlots) {
                 
-                if (!err_1){
+                if (!_err_1){
                     
+                    //-- PutUgcIntoTimeSlots_eachTimeSlot
                     var iteratorPutUgcIntoTimeSlots_eachTimeSlot = function(aTimeSlot, interationDone_cb2){
                         
                         //pick up one UGC from the sorted list 
                         var indexOfUgcCandidate = 0;
                         
-                        db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"ugc._id":"proved"}, function(err_2, result){
+                        db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"content.ugcId":"abcde"}, function(_err_2, result){
                             
                             
-                            interationDone_cb2(err_2);
+                            interationDone_cb2(_err_2);
                         });
                         
                     };
                     
-                    async.eachSeries(timeSlots, iteratorPutUgcIntoTimeSlots_eachTimeSlot, function(err_3){
-                        interationDone_cb1(err_3);
+                    async.eachSeries(timeSlots, iteratorPutUgcIntoTimeSlots_eachTimeSlot, function(_err_3){
+                        interationDone_cb1(_err_3);
                     });
+                    // -- end of PutUgcIntoTimeSlots_eachTimeSlot
+                    
                 }
                 else{
-                    interationDone_cb1(err_1);
+                    interationDone_cb1(_err_1);
                 }
                 
                 //console.log("timeSlots=");
                 //console.dir(timeSlots);
-                interationDone_cb(err);
             });
             
             
                 
         };
         
-        async.eachSeries(TIME_INTERVAL_RANKIGN, iteratorPutUgcIntoTimeSlots_eachRankedTimeIntervalInADay, function(err3){
-            if (!err3) {
+        async.eachSeries(TIME_INTERVAL_RANKIGN, iteratorPutUgcIntoTimeSlots_eachRankedTimeIntervalInADay, function(_err_4){
+            if (!_err_4) {
                 
                 var resultProgramList;
                 //TODO: query the db to get resultProgramList 
                 
-                    if (created_cb){
-                        created_cb(resultProgramList, null);
-                    }
+                finishPut_cb(resultProgramList, null);
             }
             else{
-                if (created_cb){
-                    created_cb(null,'Failed to add empty program time slots: '+err3);
+                if (finishPut_cb){
+                    finishPut_cb(null,'Failed to add empty program time slots into ranked intervals in a day: '+_err_4);
                 }
             }
             
         });
-    };
+        //== end of PutUgcIntoTimeSlots_eachRankedTimeIntervalInADay
+        
+        
+    };  //end of putUgcIntoTimeSlots()
     
     var generateTimeSlot = function( _cb1){
-        scalaMgr_listAvailableTimeInterval(intervalOfPlanningDoohProgrames,function(result, err){
+        
+        var generateTimeSlotsOfMicroInterval = function(interval, _cb2){
+            
+        };
+        
+        
+        scalaMgr_listAvailableTimeInterval(intervalOfPlanningDoohProgrames,function(err, result){
             if (!err){
+                
                 //generate program time slot documents (in programTimeSlot collection) according to available intervals and corresponding cycle durations
                 var availableTimeIntervals = result;
                 var iteratorGenerateTimeSlot = function(anAvailableTimeInterval, interationDone_cb){
@@ -281,20 +292,49 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                     async.whilst(
                         function () { return timeToAddTimeSlot+anAvailableTimeInterval.cycleDuration <= anAvailableTimeInterval.interval.end; },
                         function (callback) {
-                            //add one time slot to db
+                            //TODO: add time slots of a micro timeslot (of the same genre) to db
+                            
+                            var ProgramTimeSlot = programTimeSlotModel;
                             var vjson = {
                                     dooh: dooh,
                                     timeslot: {
                                         start: timeToAddTimeSlot, 
-                                        end:timeToAddTimeSlot+programPeriod,
+                                        end: timeToAddTimeSlot+programPeriod,
+                                        startHour: (new Date(timeToAddTimeSlot)).getHours()},
+                                    //content: {dir: "content/padding_content", file:"check_in01.jpg", format:"image"}
+                                    content: {ugcId:"12345676", ugcProjcetId:"3142462123"}
+                                    };
+                            
+                            var aProgramTimeSlot = new ProgramTimeSlot(vjson);
+                            aProgramTimeSlot.markModified('content');
+                            aProgramTimeSlot.save(function(err1, _result){     
+                                if (err1) console.log("err1="+err1);
+                                timeToAddTimeSlot += programPeriod;
+                                callback(err1);
+                            });
+                            /*
+                            var genre = programPlanningPattern.getProgramGenreToPlan();
+                            
+                            var vjson = {
+                                    dooh: dooh,
+                                    timeslot: {
+                                        start: timeToAddTimeSlot, 
+                                        end: timeToAddTimeSlot+programPeriod,
                                         startHour: (new Date(timeToAddTimeSlot)).getHours()}
                                     };
+                            
+                            if (vjson.content){
+                                delete vjson.content;
+                            }
+                            
+                            //TODO: set vjson.content
+                            
                             db.createAdoc(programTimeSlotModel, vjson, function(err1, _result){     
                                 if (err1) console.log("err1="+err1);
                                 timeToAddTimeSlot += programPeriod;
                                 callback(err1);
                             });
-                            
+                            */
                             //console.log("New time slot: %s %s", new Date(vjson.timeslot.start), new Date(vjson.timeslot.end));
                             //console.dir(vjson);
 
@@ -312,12 +352,10 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                     if (!err0) {
                         
                         //do the next step.... 
-                        _cb1();
+                        _cb1(null);
                     }
                     else{
-                        if (created_cb){
-                            created_cb(null,'Failed to add empty program time slots: '+err0);
-                        }
+                        _cb1('Failed to generate time slots in available time intervals: '+err0);
                     }
                     
                 });
@@ -325,26 +363,37 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                
             }
             else{
-                if (created_cb){
-                    created_cb(null,'Failed to read available time interval list.');
-                }
+                _cb1('Failed to read available time interval list.', null);                    
             }
             
         });
         
-    };
+    };  //end of generateTimeSlot()
     
-    censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(_sortedUgcList, err){
+    censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
         
-        if (!err){
+        if (!err_1){
             sortedUgcList = _sortedUgcList;
-            generateTimeSlot( function(){
-                putUgcIntoTimeSlots();
+            generateTimeSlot( function(err_2){
+                if (!err_2) {
+                    console.log('generateTimeSlot() done! ')
+                    putUgcIntoTimeSlots(function(err_3, result){
+                        console.log('putUgcIntoTimeSlots() done! ')
+                        if (created_cb){
+                            created_cb(err_3, result);
+                        }                        
+                    });
+                }
+                else {
+                    if (created_cb){
+                        created_cb('Failed to read sorted UGC list.', null);
+                    }
+                }
             });
         }
         else{
             if (created_cb){
-                created_cb(null,'Failed to read sorted UGC list.');
+                created_cb('Failed to read sorted UGC list.', null);
             }
         }
     });

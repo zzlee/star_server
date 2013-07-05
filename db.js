@@ -32,6 +32,7 @@ FM.DB = (function(){
             //check_in: a.k.a. 打卡
             
             programTimeSlotType = 'UGC padding'.split(' '),
+            programTimeSlotContnetType = 'file web_page'.split(' '),
             
             videoStatus = 'good soso bad waiting none'.split(' '), //DEPRECATE, keep for reference
             videoGenre = 'miix miix_street miix_story'.split(' '); //DEPRECATE, keep for reference 
@@ -157,11 +158,8 @@ FM.DB = (function(){
         });
         
         var ProgramTimeSlotSchema = new Schema({
-            ugc: { 
-                _id: ObjectID,
-                projectId: String,
-                url: String
-                },
+            content: Schema.Types.Mixed,
+            contentType: {type: String, enum: programTimeSlotContnetType}, //file or web_page
             dooh: {_id: ObjectID},
             timeslot: { 
                 start: Number, 
@@ -169,7 +167,7 @@ FM.DB = (function(){
                 startHour: Number 
                 },
             //status: {type: String, enum: programTimeSlotStatus}
-            type: {type: String, enum: programTimeSlotType}
+            type: {type: String, enum: programTimeSlotType} //UGC or padding contnet
         }); 
         
         
