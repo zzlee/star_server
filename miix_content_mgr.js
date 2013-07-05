@@ -50,6 +50,7 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
 FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
 
     //deliver Miix movie content to DOOH
+    /*
     aeServerMgr.uploadMovieToMainServer(movieProjectID, function(resParametes){
         logger.info('uploading Miix movie from AE Server to Main Server finished.');
         logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
@@ -65,6 +66,15 @@ FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
             });						
         }
     });
+    */
+    
+    doohMgr.downloadMovieFromS3(movieProjectID, function(resParametes){
+        logger.info('downloading Miix movie from S3.');
+        logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+        
+        //TODO:: check the file size. If not correct, re-download.
+    });                     
+
 
                     
     //add Miix movie to the nearest time slot in schedule

@@ -15,7 +15,7 @@ var youtubeTokenMgr = require( './youtube_mgr.js' );
 aeServerMgr.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, ownerFbID, movieTitle) {
 
 	var userDataFolder = path.join( workingPath, 'public/contents/user_project', movieProjectID, 'user_data');
-	var userFileList = fs.readdirSync(userDataFolder).toString();
+	//var userFileList = fs.readdirSync(userDataFolder).toString();
 
 	youtubeTokenMgr.getAccessToken( function(ytAccessToken){
 		if (ytAccessToken) {
@@ -120,38 +120,38 @@ aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, mo
 	var starAeServerID = defaultAeServer;
 	
 	getAeServerWithLowestLoad(function(aeServerWithLowestLoad, err){
-	    if (!err){
-	        starAeServerID = aeServerWithLowestLoad;
-	    }
-	    
+    if (!err){
+        starAeServerID = aeServerWithLowestLoad;
+    }
+    
         logger.info('[aeServerMgr.createMiixMovie] aeServer to do rendering is : '+aeServerWithLowestLoad);
 
         youtubeTokenMgr.getAccessToken( function(ytAccessToken){
-	        if (ytAccessToken) {
-	            var userDataFolder = path.join( workingPath, 'public/contents/user_project', movieProjectID, 'user_data');
-	            
-	            var commandParameters = {
-	                userFileList: fs.readdirSync(userDataFolder),
-	                movieProjectID: movieProjectID,
-	                ownerStdID: ownerStdID,
-	                ownerFbID: ownerFbID,
-	                movieTitle: movieTitle,
-	                ytAccessToken: ytAccessToken 
-	            };
-	                        
-	            globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "RENDER_MIIX_MOVIE", parameters: commandParameters }, function(responseParameters) {
-	                //console.dir(responseParameters);
-	                if (createMovie_cb )  {
-	                    createMovie_cb(responseParameters);
-	                }
-	            });
-	        }
-	        else {
-	            logger.info('[%s] Cannot get Youtube access token!', movieProjectID);
-	        }
-	    
-	    });
-	    
+            if (ytAccessToken) {
+                var userDataFolder = path.join( workingPath, 'public/contents/user_project', movieProjectID, 'user_data');
+                
+                var commandParameters = {
+                    userFileList: fs.readdirSync(userDataFolder),
+                    movieProjectID: movieProjectID,
+                    ownerStdID: ownerStdID,
+                    ownerFbID: ownerFbID,
+                    movieTitle: movieTitle,
+                    ytAccessToken: ytAccessToken 
+                };
+                            
+                globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "RENDER_MIIX_MOVIE", parameters: commandParameters }, function(responseParameters) {
+                    //console.dir(responseParameters);
+                    if (createMovie_cb )  {
+                        createMovie_cb(responseParameters);
+                    }
+                });
+            }
+            else {
+                logger.info('[%s] Cannot get Youtube access token!', movieProjectID);
+            }
+        
+        });
+        
 	});
 
 	
@@ -212,16 +212,16 @@ aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
             starAeServerID = defaultAeServer;
         }
     
-    	var commandParameters = {
-    		movieProjectID: movieProjectID
-    	};
-    	
-    	globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "UPLOAD_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
-    		//console.dir(responseParameters);
-    		if (uploadMovie_cb )  {
-    			uploadMovie_cb(responseParameters);
-    		}
-    	});
+        var commandParameters = {
+            movieProjectID: movieProjectID
+        };
+        
+        globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "UPLOAD_MOVIE_TO_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+            //console.dir(responseParameters);
+            if (uploadMovie_cb )  {
+                uploadMovie_cb(responseParameters);
+            }
+        });
 	
 	});
 	
@@ -242,18 +242,48 @@ aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, download
             starAeServerID = defaultAeServer;
         }
 
-    	var commandParameters = {
-    		movieProjectID: movieProjectID
-    	};
-    	
-    	globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_STORY_MOVIE_FROM_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
-    		//console.dir(responseParameters);
-    		if (downloadMovie_cb )  {
-    			downloadMovie_cb(responseParameters);
-    		}
-    	});
+        var commandParameters = {
+            movieProjectID: movieProjectID
+        };
+        
+        globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_STORY_MOVIE_FROM_MAIN_SERVER", parameters: commandParameters }, function(responseParameters) {
+            //console.dir(responseParameters);
+            if (downloadMovie_cb )  {
+                downloadMovie_cb(responseParameters);
+            }
+        });
 	
 	});
+
+
+};
+
+aeServerMgr.downloadStoryMovieFromS3 = function(movieProjectID, downloadMovie_cb) {
+
+
+    var starAeServerID;
+    var UGCDB = require('./UGC.js');
+    UGCDB.getAeIdByPid(movieProjectID,function(err, _aeID){
+        
+        if (!err){
+            starAeServerID = _aeID;
+        }
+        else{
+            starAeServerID = defaultAeServer;
+        }
+
+        var commandParameters = {
+            movieProjectID: movieProjectID
+        };
+        
+        globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_STORY_MOVIE_FROM_S3", parameters: commandParameters }, function(responseParameters) {
+            //console.dir(responseParameters);
+            if (downloadMovie_cb )  {
+                downloadMovie_cb(responseParameters);
+            }
+        });
+    
+    });
 
 
 };

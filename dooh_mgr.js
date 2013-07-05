@@ -2,12 +2,14 @@ var doohMgr = {};
 
 var globalConnectionMgr = require('./global_connection_mgr.js');
 
+//TODO:: get corresponding DOOH ID
+var doohID = 'DOOH_server_winXP_vm';
+//var doohID = 'DOOH_gance_winXP_vm';
+//var doohID = 'DOOH_gance_Feltmeng_pc';
+
+
 doohMgr.downloadMovieFromMainServer = function(movieProjectID, downloadMovie_cb) {
 
-	//TODO:: get corresponding DOOH ID
-	var doohID = 'DOOH_server_winXP_vm';
-    //var doohID = 'DOOH_gance_winXP_vm';
-	//var doohID = 'DOOH_gance_Feltmeng_pc';
 
 	var commandParameters = {
 		movieProjectID: movieProjectID
@@ -21,6 +23,20 @@ doohMgr.downloadMovieFromMainServer = function(movieProjectID, downloadMovie_cb)
 	});
 
 
-}
+};
+
+doohMgr.downloadMovieFromS3 = function(movieProjectID, downloadMovie_cb) {
+    
+    var commandParameters = {
+            movieProjectID: movieProjectID
+        };
+        
+        globalConnectionMgr.sendRequestToRemote( doohID, { command: "DOWNLOAD_MOVIE_FROM_S3", parameters: commandParameters }, function(responseParameters) {
+            //console.dir(responseParameters);
+            if (downloadMovie_cb )  {
+                downloadMovie_cb(responseParameters);
+            }
+        });
+};
 
 module.exports = doohMgr;
