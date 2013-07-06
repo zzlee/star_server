@@ -209,21 +209,29 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             //query the time slots (in programTimeSlot collection) belonging to this interval and put UGC to them one by one
             //console.log("aTimeIntervalInADay=");
             //console.dir(aTimeIntervalInADay);
-            programTimeSlotModel.find({ "timeslot.startHour": {$lte:aTimeIntervalInADay.endHour, $gte:aTimeIntervalInADay.startHour} }, function (_err_1, timeSlots) {
+            programTimeSlotModel.find({ "timeslot.startHour": {$lte:aTimeIntervalInADay.endHour, $gte:aTimeIntervalInADay.startHour}, "type": "UGC" }).sort({timeStamp:1}).exec(function (_err_1, timeSlots) {
                 
                 if (!_err_1){
+                    
+                    //console.log("timeSlots=");
+                    //console.dir(timeSlots);
+                    
                     
                     //-- PutUgcIntoTimeSlots_eachTimeSlot
                     var iteratorPutUgcIntoTimeSlots_eachTimeSlot = function(aTimeSlot, interationDone_cb2){
                         
                         //pick up one UGC from the sorted list 
                         var indexOfUgcCandidate = 0;
+                        for (var i=0; i<sortedUgcList.length; i++){
+                            
+                        }
                         
                         db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"content.ugcId":"abcde"}, function(_err_2, result){
                             
-                            
+                            console.dir(result);
                             interationDone_cb2(_err_2);
                         });
+                        
                         
                     };
                     
@@ -267,8 +275,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
     
     var generateTimeSlot = function( _cb1){
         
-        //Micro interval means a time slot containing purely our programs 
-        var generateTimeSlotsOfMicroInterval = function(interval, generatedTimeSlotsOfMicroInterval_cb){
+         
+        var generateTimeSlotsOfMicroInterval = function(interval, generatedTimeSlotsOfMicroInterval_cb){ //Micro interval means a time slot containing purely our programs
             
             var genre = programPlanningPattern.getProgramGenreToPlan(); //the genra that will be uesed in this micro interval
             var numberOfUGC;
@@ -290,6 +298,14 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                     //content: {ugcId:"12345676", ugcProjcetId:"3142462123"}
                     genre: genre
                     };
+            
+            var timeStampIndex = 0;
+            
+            var pad = function(n, width, z) { //function for padding the number ns with character z 
+                z = z || '0';
+                n = n + '';
+                return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+            };
             
             async.series([
                           function(callback1){
@@ -313,6 +329,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                               // put padding program 0
                               var aProgramTimeSlot = new ProgramTimeSlot(vjsonDefault);
                               aProgramTimeSlot.content = paddingContents[0];
+                              aProgramTimeSlot.timeStamp = interval.start + '-' + pad(timeStampIndex, 3);
+                              timeStampIndex++;
                               aProgramTimeSlot.markModified('content');
                               aProgramTimeSlot.save(function(err1, _result){     
                                   if (err1) console.log("err1="+err1);
@@ -330,6 +348,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                                                     //put UGC program
                                                     var aProgramTimeSlot = new ProgramTimeSlot(vjsonDefault);
                                                     aProgramTimeSlot.type = 'UGC';
+                                                    aProgramTimeSlot.timeStamp = interval.start + '-' + pad(timeStampIndex, 3);
+                                                    timeStampIndex++;
                                                     aProgramTimeSlot.save(function(err2, _result){     
                                                         cb1(err2);
                                                     });
@@ -340,6 +360,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                                                     aProgramTimeSlot.type = 'padding';
                                                     aProgramTimeSlot.content = paddingContents[indexOfUgcContents+1];
                                                     aProgramTimeSlot.markModified('content');
+                                                    aProgramTimeSlot.timeStamp = interval.start + '-' + pad(timeStampIndex, 3);
+                                                    timeStampIndex++;
                                                     aProgramTimeSlot.save(function(err3, _result){     
                                                         cb2(err3);
                                                     });
@@ -480,13 +502,13 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             generateTimeSlot( function(err_2){
                 if (!err_2) {
                     console.log('generateTimeSlot() done! ');
-                    /*
+                    
                     putUgcIntoTimeSlots(function(err_3, result){
                         console.log('putUgcIntoTimeSlots() done! ');
                         if (created_cb){
                             created_cb(err_3, result);
                         }                        
-                    });*/
+                    });
                 }
                 else {
                     if (created_cb){
