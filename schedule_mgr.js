@@ -21,19 +21,24 @@ var TIME_INTERVAL_RANKIGN = [{startHour: 17, endHour: 23},  //start with the tim
 
 var programPlanningPattern =(function(){    
     var i = -1;
-    var PROGRAM_SEQUENCE = [ "miix", "cultural_and_creative", "mood", "check_in" ]; 
+    var DEFAULT_PROGRAM_SEQUENCE = [ "miix", "cultural_and_creative", "mood", "check_in" ]; 
+    var programSequence = DEFAULT_PROGRAM_SEQUENCE;
     
     return {
         getProgramGenreToPlan: function(){
             i++;
-            if (i >= PROGRAM_SEQUENCE.length){
+            if (i >= programSequence.length){
                 i = 0;
             }
-            return PROGRAM_SEQUENCE[i];
+            return programSequence[i];
         },
         
         reset: function(){
             i = -1;
+        },
+        
+        set: function(_programSequence){
+            programSequence = _programSequence;
         }
     };
 })();
@@ -202,7 +207,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
     
     var putUgcIntoTimeSlots = function(finishPut_cb){
         
-        var ugcCandidateList = sortedUgcList.slice(0); //clone the full array of ugcCandidateList
+        var candidateUgcList = sortedUgcList.slice(0); //clone the full array of sortedUgcList
+        var indexOfcandidateToSelect = 0;
         
         //== PutUgcIntoTimeSlots_eachRankedTimeIntervalInADay
         var iteratorPutUgcIntoTimeSlots_eachRankedTimeIntervalInADay = function(aTimeIntervalInADay, interationDone_cb1){
@@ -214,19 +220,26 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                 if (!_err_1){
                     
                     //console.log("timeSlots=");
-                    //console.dir(timeSlots);
-                    
-                    
+                    //console.dir(timeSlots);   
                     //-- PutUgcIntoTimeSlots_eachTimeSlot
                     var iteratorPutUgcIntoTimeSlots_eachTimeSlot = function(aTimeSlot, interationDone_cb2){
                         
+                        var selectedUgc = null;
+                        
                         //pick up one UGC from the sorted list 
-                        var indexOfUgcCandidate = 0;
-                        for (var i=0; i<sortedUgcList.length; i++){
+                        for (indexOfcandidateToSelect=0; indexOfcandidateToSelect<=candidateUgcList.length; indexOfcandidateToSelect++){
                             
+                            if (indexOfcandidateToSelect == candidateUgcList.length){
+                                candidateUgcList = candidateUgcList.concat(sortedUgcList);
+                            }
+                            
+                            if ( candidateUgcList[indexOfcandidateToSelect].genre == aTimeSlot.genre){
+                                selectedUgc = candidateUgcList.splice(indexOfcandidateToSelect, 1)[0];
+                                break;
+                            }
                         }
                         
-                        db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"content.ugcId":"abcde"}, function(_err_2, result){
+                        db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"content": selectedUgc }, function(_err_2, result){
                             
                             console.dir(result);
                             interationDone_cb2(_err_2);
@@ -496,6 +509,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
     };  //end of generateTimeSlot()
     
     censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
+        
+        //TODO: check all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
         
         if (!err_1){
             sortedUgcList = _sortedUgcList;
