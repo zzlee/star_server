@@ -103,14 +103,19 @@ var paddingContent =(function(){
  *     </ul>
  *     For example, {start: 1371861000000, end: 1371862000000} 
  * 
+ * @param {Array} programSequence An array of strings showing the sequence of program genres to use when 
+ *     when the system is planning the program(s) of a "micro time interval" <br>
+ *     Note: the string must be "miix", "cultural_and_creative", "mood", or "check_in"
+ *     For example, ["miix", "check_in", "check_in", "mood", "cultural_and_creative" ] <br>
+ * 
  * @param {Function} created_cb The callback function called when the result program list is created.<br>
  *     The function signature is created_cb(err, numberOfProgramTimeSlots):
  *     <ul>
  *     <li>err: error message if any error happens
- *     <li>numberOfProgramTimeSlots: number of program time slots generated
+ *     <li>numberOfProgramTimeSlots: number of UGC program time slots generated
  *     </ul>
  */
-scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, created_cb ){
+scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, created_cb ){
     var programTimeSlotModel = db.getDocModel("programTimeSlot");
     
     var sortedUgcList = null;
@@ -195,6 +200,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         
         var candidateUgcList = sortedUgcList.slice(0); //clone the full array of sortedUgcList
         var indexOfcandidateToSelect = 0;
+        var counter = 0;
         
         //== PutUgcIntoTimeSlots_eachRankedTimeIntervalInADay
         var iteratorPutUgcIntoTimeSlots_eachRankedTimeIntervalInADay = function(aTimeIntervalInADay, interationDone_cb1){
@@ -226,8 +232,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                         }
                         
                         db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"content": selectedUgc }, function(_err_2, result){
-                            
-                            //console.dir(result);
+                            counter++;
+                            console.dir(result);
                             interationDone_cb2(_err_2);
                         });
                         
@@ -255,10 +261,9 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         async.eachSeries(TIME_INTERVAL_RANKIGN, iteratorPutUgcIntoTimeSlots_eachRankedTimeIntervalInADay, function(_err_4){
             if (!_err_4) {
                 
-                var resultProgramList;
-                //TODO: get the number of program time slots chreated
+                var numberOfProgramTimeSlots = counter;
                 
-                finishPut_cb(null, resultProgramList);
+                finishPut_cb(null, numberOfProgramTimeSlots);
             }
             else{
                 if (finishPut_cb){
@@ -384,7 +389,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             
         };
         
-        
+        //TODO: call the real ScalaMgr
         scalaMgr_listAvailableTimeInterval(intervalOfPlanningDoohProgrames,function(err, result){
             if (!err){
                 
@@ -438,6 +443,11 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         
     };  //end of generateTimeSlot()
     
+    if (programSequence){
+        programPlanningPattern.set(programSequence);
+    }
+    
+    //TODO: call the real censorMgr
     censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
         
         //TODO: check the genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
