@@ -106,6 +106,19 @@ FM.UGC = (function(){
                 var query = UGCs.find();
 				query.where("ownerId.userID", userID).where("genre", "miix_street").ne("fb_id", null).where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(cb);
             },
+            //kaiser            
+            getOwnerIdByNo: function(no, cb){
+                UGCs.findOne({no: no}, '_id', function(err, result){
+                    if(err){
+                        logger.error("[getOwnerIdByNo]", err);
+                        cb(err, null);
+                    }else if(result){
+                        cb(null, result._id);
+                    }else{
+                        cb(null, result);
+                    }
+                });
+            },
 			
             update: function(oid, newdata){
                 FMDB.updateAdoc(UGCs, oid, newdata, function(res){

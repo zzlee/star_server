@@ -238,7 +238,28 @@ FM.FB_HANDLER = (function(){
                     }
                 });
             },
-            
+            //kaiser
+            getUserProfilePicture: function(fb_id, cb){
+                
+                var path = "/"+fb_id+"/?fields=picture&width=240&height=240";
+                var qs = { "access_token": app_access_token};
+                
+                request({
+                    method: 'GET',
+                    uri:  fb_url + path,
+                    qs: qs,
+                    json: true,
+                    
+                }, function(error, response, body){
+                    if(error){
+                        cb(error, null);
+                    }else if(body.error){
+                        cb(body, null);
+                    }else{
+                        cb(null, body);
+                    }
+                });
+            },
             
             /** TEST */
             _test: function(){
@@ -250,7 +271,17 @@ FM.FB_HANDLER = (function(){
                         console.log("result: " + JSON.stringify(result));
                 });
             },
-        };
+            //kaiser test
+            _testkaiser: function(){
+                var fb_id = '100005962359785'
+                this.getUserProfilePicture( fb_id, function(err, result){
+                    if(err)
+                        console.log("err: " + JSON.stringify(err));
+                    else
+                        console.log("result: "+JSON.stringify(result));
+                });
+            },
+        };//end return
     }
     
     return {
@@ -266,5 +297,6 @@ FM.FB_HANDLER = (function(){
 
 /* TEST */
 //FM.FB_HANDLER.getInstance()._test();
+//FM.FB_HANDLER.getInstance()._testkaiser();
 
 module.exports = FM.FB_HANDLER.getInstance();

@@ -111,6 +111,7 @@ app.get('/miix_admin/members', routes.authorizationHandler.checkAuth, routes.adm
 app.get('/miix_admin/miix_movies', routes.authorizationHandler.checkAuth, routes.admin.miixPlayList_get_cb); 
 app.get('/miix_admin/story_movies', routes.authorizationHandler.checkAuth, routes.admin.storyPlayList_get_cb);
 app.get('/miix_admin/list_size', routes.authorizationHandler.checkAuth, routes.admin.listSize_get_cb);
+app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.censor_handler.getUGCList_get_cb);
 
 
 /**
@@ -150,7 +151,7 @@ app.get('/admin/story_play_list', routes.admin.storyPlayList_get_cb);
 app.get('/admin/list_size', routes.admin.listSize_get_cb);
 
 /**
- *       GET/miix_admin/user_content_items?offset=0&limit=20
+ *       GET /miix_admin/user_content_items?offset=0&limit=20
  * @param  request
  * 
  *         query    
@@ -161,7 +162,7 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
  *                       FB_ID,
  *                       doohPlayedTimes}
  */
-
+app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
 /**
  *       PUT /miix_admin/user_content_items/{id}
  * @param  request  {string}projectId.
@@ -170,7 +171,7 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
  *                  
  * @return response {string}status 
  */
-
+app.get('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);
 /**
  * ��    GET /miix_admin/doohs/{dooh_id}/timeslots?&offset=0&limit=20
  * @param  request  {string}dooh.client(dooh_id)
