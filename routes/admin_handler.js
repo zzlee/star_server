@@ -100,7 +100,17 @@ FM.admin.logout_get_cb = function(req, res){
 
 FM.admin.memberList_get_cb = function(req, res){
     
-    admincache_mgr.getMemberListInfo(req, res);
+    FM_LOG("[admin.memberList_get_cb]");
+    var skip =  req.query.skip;
+    var limit = req.query.limit;
+    admincache_mgr.getMemberListInfo(limit, skip, function(err, memberList){
+        if (!err){
+            res.render( 'table_member', {'memberList': memberList} );
+        }
+        else{
+            res.send(400, {error: err});
+        }
+    });
     
 };
 
