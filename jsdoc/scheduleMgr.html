@@ -64,7 +64,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line11">line 11</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line15">line 15</a>
     </li></ul></dd>
     
     
@@ -98,7 +98,7 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="createProgramList"><span class="type-signature">&lt;static> </span>createProgramList<span class="signature">(dooh, intervalOfSelectingUGC, intervalOfDoohProgrames, created_cb)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="createProgramList"><span class="type-signature">&lt;static> </span>createProgramList<span class="signature">(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, created_cb)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -156,7 +156,7 @@
             
             
             
-            <td class="description last">The ID of the DOOH upon which the selected UGCs are played</td>
+            <td class="description last">The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH upon which the selected UGCs are played</td>
         </tr>
 	
 	
@@ -179,14 +179,14 @@
             
             
             
-            <td class="description last">An object specifying the starting and ending of      of the time interval for scheduleMgr to select the applied UGC items <br>    <ul>    <li>start: Date()-readable string specifying the start of the interval    <li>end: Date()-readable string specifying the end of the interval    </ul>    For example, {start: '2013/6/21 8:30', end: '2013/6/21 13:00'}</td>
+            <td class="description last">An object specifying the starting and ending of      of the time interval for scheduleMgr to select the applied UGC items <br>    <ul>    <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)    <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)    </ul>    For example, {start: 1371861000000, end: 1371862000000}</td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>intervalOfDoohProgrames</code></td>
+                <td class="name"><code>intervalOfPlanningDoohProgrames</code></td>
             
             
             <td class="type">
@@ -202,7 +202,7 @@
             
             
             
-            <td class="description last">An object specifying the starting and ending of      of the time interval which the generated schedule covers       <ul>    <li>start: Date()-readable string specifying the start of the interval    <li>end: Date()-readable string specifying the end of the interval    </ul>    For example, {start: '2013/6/22 8:30', end: '2013/6/22 13:00'}</td>
+            <td class="description last">An object specifying the starting and ending of      of the time interval which the generated schedule covers       <ul>    <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)    <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)    </ul>    For example, {start: 1371861000000, end: 1371862000000}</td>
         </tr>
 	
 	
@@ -225,7 +225,7 @@
             
             
             
-            <td class="description last">The callback function called when the result program list is created.<br>    The function signature is created_cb(resultProgramList, err) :    <ul>    <li>resultProgramList: An array of objects containing program info:        <ul>        <li>id: A number specifying the ID of a program time slot item          <li>interval: An object specifying the starting and ending time of the program item            <ul>            <li>start: Date()-readable string specifying the start of the interval            <li>end: Date()-readable string specifying the end of the interval            </ul>        <li>ugc: A number specifying the ID of the UGC contained in this program. (This is            actually the id of items store in ugc collection.)         </ul>        For example, <br>        [{_id:43524, interval:{start:'2013/6/22 8:30:00', end:'2013/6/22 8:30:30'}, ugc:48593},<br>         {_id:43525, interval:{start:'2013/6/22 8:30:00', end:'2013/6/22 8:30:30'}, ugc:48353},<br>         {_id:43544, interval:{start:'2013/6/22 8:30:00', end:'2013/6/22 8:30:30'}, ugc:43593}]            <li>err: error message if any error happens    </ul></td>
+            <td class="description last">The callback function called when the result program list is created.<br>    The function signature is created_cb(err, numberOfProgramTimeSlots):    <ul>    <li>err: error message if any error happens    <li>numberOfProgramTimeSlots: number of program time slots generated    </ul></td>
         </tr>
 	
 	
@@ -256,7 +256,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line62">line 62</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line113">line 113</a>
     </li></ul></dd>
     
     
@@ -284,7 +284,7 @@
         
             
 <dt>
-    <h4 class="name" id="setProgram"><span class="type-signature">&lt;static> </span>setProgram<span class="signature">(dooh, programTimeSlot, ugcToSet, set_cb)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getProgramList"><span class="type-signature">&lt;static> </span>getProgramList<span class="signature">(dooh, interval, skip, limit, created_cb)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -292,7 +292,7 @@
     
     
     <div class="description">
-        Set a specific UGC to be played in a specific program time slot (of a specific DOOH <br><br>
+        Get the programs (of a specific DOOH) of a specific interval.<br><br>
     </div>
     
 
@@ -342,7 +342,216 @@
             
             
             
-            <td class="description last">The ID of the DOOH where the program is to be updated</td>
+            <td class="description last">The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>interval</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">An object specifying the starting and ending of of the time interval to query     <ul>    <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)    <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)    </ul>    For example, {start: 1371861000000, end: 1371862000000}</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>skip</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>limit</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>created_cb</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The callback function called when the result program list is created.<br>    The function signature is got_cb(err, resultProgramList):    <ul>    <li>err: error message if any error happens    <li>resultProgramList: An array of objects containing program info:        <ul>        <li>id: A string (i.e. a hex string representation of its ObjectID in MongoDB) specifying the ID of a program time slot item          <li>timeSlot: An object specifying the starting and ending time of program's time slot            <ul>            <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)            <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)            </ul>        <li>ugc: A number specifying the ID of the UGC contained in this program. (This is            actually the id of items store in UGC collection.)         </ul>        For example, <br>        [{id:43524, timeSlot:{start:1371861000000, end :1371862000000}, ugc:48593},<br>         {id:43525, timeSlot:{start:1371881000000, end:1371882000000}, ugc:48353},<br>         {id:43544, timeSlot:{start:1371897000000, end:1371898000000}, ugc:43593}]            </ul></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line512">line 512</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="removeUgcfromProgramAndAutoSetNewOne"><span class="type-signature">&lt;static> </span>removeUgcfromProgramAndAutoSetNewOne<span class="signature">(dooh, programTimeSlot, removed_cb)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Remove the UGC from a specific progrm (of a specific DOOH) and automatically set a new UGC back to this program time slot <br><br>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>dooh</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated</td>
         </tr>
 	
 	
@@ -372,7 +581,124 @@
 	
         <tr>
             
-                <td class="name"><code>ugcToSet</code></td>
+                <td class="name"><code>removed_cb</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The callback function called when the specific .<br>    The function signature is removed_cb(err) where err is the error message indicating failure:     if successful, err returns null; if failed, err returns the error message.</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line587">line 587</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="setUgcToProgram"><span class="type-signature">&lt;static> </span>setUgcToProgram<span class="signature">(dooh, programTimeSlot, ugcNo, set_cb)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Set an UGC of specific No to be played in a specific program time slot (of a specific DOOH <br><br>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>dooh</code></td>
             
             
             <td class="type">
@@ -388,7 +714,53 @@
             
             
             
-            <td class="description last">The ID of the UGC item to put in the specified program time slot</td>
+            <td class="description last">The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>programTimeSlot</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The ID of the program time slot item</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>ugcNo</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The reference No the UGC item to put in the specified program time slot</td>
         </tr>
 	
 	
@@ -442,7 +814,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line118">line 118</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line570">line 570</a>
     </li></ul></dd>
     
     
@@ -470,7 +842,7 @@
         
             
 <dt>
-    <h4 class="name" id="updateProgramList"><span class="type-signature">&lt;static> </span>updateProgramList<span class="signature">(dooh, intervalOfDoohProgrames, updated_cb)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="updateProgramList"><span class="type-signature">&lt;static> </span>updateProgramList<span class="signature">(dooh, intervalToUpdate, updated_cb)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -528,14 +900,14 @@
             
             
             
-            <td class="description last">The ID of the DOOH whose programs are to be updated</td>
+            <td class="description last">The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH whose programs are to be updated</td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>intervalOfDoohProgrames</code></td>
+                <td class="name"><code>intervalToUpdate</code></td>
             
             
             <td class="type">
@@ -551,7 +923,7 @@
             
             
             
-            <td class="description last">An object specifying the starting and ending of      of the time interval in which the scheduled programs will be updated       <ul>    <li>start: Date()-readable string specifying the start of the interval    <li>end: Date()-readable string specifying the end of the interval    </ul>    For example, {start: '2013/6/22 8:30', end: '2013/6/22 13:00'}</td>
+            <td class="description last">An object specifying the starting and ending of      of the time interval in which the scheduled programs will be updated       <ul>    <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)    <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)    </ul>    For example, {start: 1371861000000, end: 1371862000000}</td>
         </tr>
 	
 	
@@ -574,7 +946,7 @@
             
             
             
-            <td class="description last">The callback function called when the program list is updated.<br>    The function signature is updated_cb(listOfProgramsOutOfSchedule, err) :    <ul>    <li>listOfProgramsOutOfSchedule: An array of objects containing program info:        <ul>        <li>programTimeSlot: A number specifying the ID of the program item which is removed from the schedule             after updating         <li>ugc: A number specifying the ID of the UGC contained in this removed program. (This is            actually the id of items store in ugc collection.)         </ul>        For example, <br>        [{_id:43524, ugc:48593},<br>         {_id:43525, ugc:48353},<br>         {_id:43544, ugc:43593}]            <li>err: error message if any error happens    </ul></td>
+            <td class="description last">The callback function called when the program list is updated.<br>    The function signature is updated_cb(err, listOfProgramsOutOfSchedule) :    <ul>    <li>listOfProgramsOutOfSchedule: An array of objects containing program info:        <ul>        <li>programTimeSlot: A string specifying the ID (the hex string representation of its ObjectID in MongoDB) of the program item which is removed from the schedule             after updating         <li>ugc: A string specifying the ID (the hex string representation of its ObjectID in MongoDB) of the UGC contained in this removed program. (This is            actually the id of items store in ugc collection.)         </ul>        For example, <br>        [{programTimeSlot:43524, ugc:48593},<br>         {programTimeSlot:43525, ugc:48353},<br>         {programTimeSlot:43544, ugc:43593}]            <li>err: error message if any error happens    </ul></td>
         </tr>
 	
 	
@@ -605,7 +977,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line100">line 100</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line550">line 550</a>
     </li></ul></dd>
     
     
@@ -652,7 +1024,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Jun 24 2013 14:55:14 GMT+0800 (TST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Jul 07 2013 09:09:20 GMT+0800 (TST)
 </footer>
 
 <script> prettyPrint(); </script>

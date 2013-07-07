@@ -93,35 +93,21 @@ var paddingContent =(function(){
  *     <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)
  *     <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)
  *     </ul>
- *     For example, {start: '2013/6/21 8:30', end: '2013/6/21 13:00'} 
+ *     For example, {start: 1371861000000, end: 1371862000000} 
  *
  * @param {Object} intervalOfPlanningDoohProgrames An object specifying the starting and ending of  
  *     of the time interval which the generated schedule covers   
  *     <ul>
  *     <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)
- *     <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970) *     </ul>
- *     For example, {start: '2013/6/22 8:30', end: '2013/6/22 13:00'} 
+ *     <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)
+ *     </ul>
+ *     For example, {start: 1371861000000, end: 1371862000000} 
  * 
  * @param {Function} created_cb The callback function called when the result program list is created.<br>
- *     The function signature is created_cb(resultProgramList, err):
+ *     The function signature is created_cb(err, numberOfProgramTimeSlots):
  *     <ul>
- *     <li>resultProgramList: An array of objects containing program info:
- *         <ul>
- *         <li>id: A string (i.e. a hex string representation of its ObjectID in MongoDB) specifying the ID of a program time slot item  
- *         <li>timeSlot: An object specifying the starting and ending time of program's time slot
- *             <ul>
- *             <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)
- *             <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)
- *             </ul>
- *         <li>ugc: A number specifying the ID of the UGC contained in this program. (This is
- *             actually the id of items store in UGC collection.) 
- *         </ul>
- *         For example, <br>
- *         [{id:43524, timeSlot:{start:1371861000000, end :1371862000000}, ugc:48593},<br>
- *          {id:43525, timeSlot:{start:1371881000000, end:1371882000000}, ugc:48353},<br>
- *          {id:43544, timeSlot:{start:1371897000000, end:1371898000000}, ugc:43593}]
- *         
  *     <li>err: error message if any error happens
+ *     <li>numberOfProgramTimeSlots: number of program time slots generated
  *     </ul>
  */
 scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, created_cb ){
@@ -241,7 +227,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                         
                         db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"content": selectedUgc }, function(_err_2, result){
                             
-                            console.dir(result);
+                            //console.dir(result);
                             interationDone_cb2(_err_2);
                         });
                         
@@ -270,13 +256,13 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             if (!_err_4) {
                 
                 var resultProgramList;
-                //TODO: query the db to get resultProgramList 
+                //TODO: get the number of program time slots chreated
                 
-                finishPut_cb(resultProgramList, null);
+                finishPut_cb(null, resultProgramList);
             }
             else{
                 if (finishPut_cb){
-                    finishPut_cb(null,'Failed to add empty program time slots into ranked intervals in a day: '+_err_4);
+                    finishPut_cb('Failed to add empty program time slots into ranked intervals in a day: '+_err_4, null);
                 }
             }
             
@@ -402,10 +388,11 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         scalaMgr_listAvailableTimeInterval(intervalOfPlanningDoohProgrames,function(err, result){
             if (!err){
                 
+                //TODO: check if these available time intervals cover existing planned program time slots. If yes, maked the UGCs contained in these program time slots "must-play" and delete these program time slots.
+                
                 //generate program time slot documents (in programTimeSlot collection) according to available intervals and corresponding cycle durations
                 var availableTimeIntervals = result;
                 var iteratorGenerateTimeSlot = function(anAvailableTimeInterval, interationDone_cb){
-                    
                     //add time slots in this available time interval
                     var timeToAddTimeSlot = anAvailableTimeInterval.interval.start;
                     var programPeriod;
@@ -415,87 +402,30 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                     else {
                         programPeriod = DEFAULT_PROGRAM_PERIOD;
                     }
-
                     async.whilst(
                         function () { return timeToAddTimeSlot+anAvailableTimeInterval.cycleDuration <= anAvailableTimeInterval.interval.end; },
                         function (cb_whilst) {
-                            
                             // add time slots of a micro timeslot (of the same genre) to db
                             var inteval = { start: timeToAddTimeSlot, end:timeToAddTimeSlot+programPeriod  };
                             generateTimeSlotsOfMicroInterval(inteval, function(err1){
                                 timeToAddTimeSlot += programPeriod;
                                 cb_whilst(err1);
                             });
-                            
-                            /*
-                            var ProgramTimeSlot = programTimeSlotModel;
-                            var vjson = {
-                                    dooh: dooh,
-                                    timeslot: {
-                                        start: timeToAddTimeSlot, 
-                                        end: timeToAddTimeSlot+programPeriod,
-                                        startHour: (new Date(timeToAddTimeSlot)).getHours()},
-                                    //content: {dir: "content/padding_content", file:"check_in01.jpg", format:"image"}
-                                    content: {ugcId:"12345676", ugcProjcetId:"3142462123"}
-                                    };
-                            
-                            var aProgramTimeSlot = new ProgramTimeSlot(vjson);
-                            aProgramTimeSlot.markModified('content');
-                            aProgramTimeSlot.save(function(err1, _result){     
-                                if (err1) console.log("err1="+err1);
-                                timeToAddTimeSlot += programPeriod;
-                                cb_whilst(err1);
-                            });
-                            */
-                            
-                            
-                            
-                            /*
-                            var genre = programPlanningPattern.getProgramGenreToPlan();
-                            
-                            var vjson = {
-                                    dooh: dooh,
-                                    timeslot: {
-                                        start: timeToAddTimeSlot, 
-                                        end: timeToAddTimeSlot+programPeriod,
-                                        startHour: (new Date(timeToAddTimeSlot)).getHours()}
-                                    };
-                            
-                            if (vjson.content){
-                                delete vjson.content;
-                            }
-                            
-                            //TODO: set vjson.content
-                            
-                            db.createAdoc(programTimeSlotModel, vjson, function(err1, _result){     
-                                if (err1) console.log("err1="+err1);
-                                timeToAddTimeSlot += programPeriod;
-                                callback(err1);
-                            });
-                            */
-                            //console.log("New time slot: %s %s", new Date(vjson.timeslot.start), new Date(vjson.timeslot.end));
-                            //console.dir(vjson);
-
                         },
                         function (err2) {
                             interationDone_cb(err2);
                         }
                     );
-                    
-                    
-                        
                 };
                 
                 async.eachSeries(availableTimeIntervals, iteratorGenerateTimeSlot, function(err0){
                     if (!err0) {
-                        
                         //do the next step.... 
                         _cb1(null);
                     }
                     else{
                         _cb1('Failed to generate time slots in available time intervals: '+err0);
                     }
-                    
                 });
                 
                
@@ -510,7 +440,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
     
     censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
         
-        //TODO: check all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
+        //TODO: check the genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
         
         if (!err_1){
             sortedUgcList = _sortedUgcList;
@@ -543,6 +473,47 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
 };
 
 
+//TODO: elaborate resultProgramList
+/**
+ * Get the programs (of a specific DOOH) of a specific interval.<br>
+ * <br>
+ * @param {Number} dooh The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated
+ * 
+ * @param {Object} interval An object specifying the starting and ending of of the time interval to query 
+ *     <ul>
+ *     <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)
+ *     <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)
+ *     </ul>
+ *     For example, {start: 1371861000000, end: 1371862000000} 
+ * @param {Number} skip
+ * @param {Number} limit
+ * @param {Function} created_cb The callback function called when the result program list is created.<br>
+ *     The function signature is got_cb(err, resultProgramList):
+ *     <ul>
+ *     <li>err: error message if any error happens
+ *     <li>resultProgramList: An array of objects containing program info:
+ *         <ul>
+ *         <li>id: A string (i.e. a hex string representation of its ObjectID in MongoDB) specifying the ID of a program time slot item  
+ *         <li>timeSlot: An object specifying the starting and ending time of program's time slot
+ *             <ul>
+ *             <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)
+ *             <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)
+ *             </ul>
+ *         <li>ugc: A number specifying the ID of the UGC contained in this program. (This is
+ *             actually the id of items store in UGC collection.) 
+ *         </ul>
+ *         For example, <br>
+ *         [{id:43524, timeSlot:{start:1371861000000, end :1371862000000}, ugc:48593},<br>
+ *          {id:43525, timeSlot:{start:1371881000000, end:1371882000000}, ugc:48353},<br>
+ *          {id:43544, timeSlot:{start:1371897000000, end:1371898000000}, ugc:43593}]
+ *         
+ *     </ul>
+ */
+scheduleMgr.getProgramList = function(dooh, interval, skip, limit, got_cb ){
+    
+};
+
+
 /**
  * Update the programs (of a specific DOOH) of a specific interval.<br>
  * <br>
@@ -554,12 +525,12 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
  * @param {Object} intervalToUpdate An object specifying the starting and ending of  
  *     of the time interval in which the scheduled programs will be updated   
  *     <ul>
- *     <li>start: Date()-readable string specifying the start of the interval
- *     <li>end: Date()-readable string specifying the end of the interval
+ *     <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)
+ *     <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)
  *     </ul>
- *     For example, {start: '2013/6/22 8:30', end: '2013/6/22 13:00'} 
+ *     For example, {start: 1371861000000, end: 1371862000000} 
  * @param {Function} updated_cb The callback function called when the program list is updated.<br>
- *     The function signature is updated_cb(listOfProgramsOutOfSchedule, err) :
+ *     The function signature is updated_cb(err, listOfProgramsOutOfSchedule) :
  *     <ul>
  *     <li>listOfProgramsOutOfSchedule: An array of objects containing program info:
  *         <ul>
@@ -580,24 +551,42 @@ scheduleMgr.updateProgramList = function(dooh, intervalToUpdate, updated_cb ){
     
 };
 
+
+
 /**
- * Set a specific UGC to be played in a specific program time slot (of a specific DOOH <br>
+ * Set an UGC of specific No to be played in a specific program time slot (of a specific DOOH <br>
  * <br>
  * @param {Number} dooh The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated
  * 
- * @param {Number} programTimeSlot The ID of the program time slot item
+ * @param {String} programTimeSlot The ID of the program time slot item
  * 
- * @param {Number} ugcToSet The ID of the UGC item to put in the specified program time slot
+ * @param {Number} ugcNo The reference No the UGC item to put in the specified program time slot
  * 
  * @param {Function} set_cb The callback function called when the specified program is set.<br>
  *     The function signature is updated_cb(err) where err is the error message indicating failure: 
  *     if successful, err returns null; if failed, err returns the error message.
  *     
  */
-scheduleMgr.setProgram = function(dooh, programTimeSlot, ugcToSet, set_cb ){
+scheduleMgr.setUgcToProgram = function(dooh, programTimeSlotId, ugcNo, set_cb ){
     
 };
 
+
+/**
+ * Remove the UGC from a specific progrm (of a specific DOOH) and automatically set a new UGC back to this program time slot <br>
+ * <br>
+ * @param {Number} dooh The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated
+ * 
+ * @param {Number} programTimeSlot The ID of the program time slot item
+ * 
+ * @param {Function} removed_cb The callback function called when the specific .<br>
+ *     The function signature is removed_cb(err) where err is the error message indicating failure: 
+ *     if successful, err returns null; if failed, err returns the error message.
+ *     
+ */
+scheduleMgr.removeUgcfromProgramAndAutoSetNewOne = function(dooh, programTimeSlot, removed_cb ){
+    
+};
 
 
 

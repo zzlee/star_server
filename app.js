@@ -172,7 +172,7 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
  */
 
 /**
- * ƒÜ    GET /miix_admin/doohs/{dooh_id}/timeslots?&offset=0&limit=20
+ * ï¿½ï¿½    GET /miix_admin/doohs/{dooh_id}/timeslots?&offset=0&limit=20
  * @param  request  {string}dooh.client(dooh_id)
  * 
  *         query    {number}searchTime start.
@@ -186,7 +186,7 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
  */
 
 /**
- * ƒÜ    PUT /miix_admin/doohs/{dooh_id}/timeslots/{timeslot_id}
+ * ï¿½ï¿½    PUT /miix_admin/doohs/{dooh_id}/timeslots/{timeslot_id}
  * @param  request  {string}timeslot_id.
  *                  
  *         body     json{timeslotnumber(Range 1~20), 
@@ -236,10 +236,19 @@ http.createServer(app).listen(app.get('port'), function(){
 });
 
 
-
-
 /* 
 //test
+var scheduleMgr = require('./schedule_mgr.js');
+setTimeout(function(){
+    //test
+    scheduleMgr.createProgramList("TP_dom", 
+        {start:(new Date("2013/5/4 0:00")).getTime(), end:(new Date("2013/5/4 23:59")).getTime()}, 
+        {start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, function(resultProgramList, err){
+            
+    });
+   
+}, 5000);
+
 var aeServerMgr = require('./ae_server_mgr.js');
 var globalConnectionMgr = require('./global_connection_mgr.js');
 setInterval(function(){
