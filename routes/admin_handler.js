@@ -140,6 +140,11 @@ FM.admin.listSize_get_cb = function(req, res){
             res.send({err: err, size: count});
         });
     }
+    else if (req.query.listType == 'ugcCensorPlayList'){
+        UGC_mgr.getUGCCountWithGenre('miix', function(err, count) {
+            res.send({err: err, size: count});
+        });
+    }
     else {
         res.send(400, {error: "Parameters are not correct"});
     }

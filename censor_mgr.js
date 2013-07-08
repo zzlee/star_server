@@ -24,30 +24,27 @@ var async = require('async');
  *                       rating(Range A~E),
  *                       doohPlayedTimes}
  */
-censorMgr.getUGCList = function(req,res){
+censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
 
-    var condition;
-    var sort;
+//    condition = {
+//            'no':{ $exists: true},
+//            'genre':'miix',
+//            'ownerId':{ $exists: true},
+//            'projectId':{ $exists: true}
+//    };
+//
+//    sort = {
+//            'no':1
+//    };
 
-    condition = {
-            'no':{ $exists: true},
-            'genre':'miix',
-            'ownerId':{ $exists: true},
-            'projectId':{ $exists: true}
-    };
-
-    sort = {
-            'no':1
-    };
-
-    if(req.query.condition) {
-        condition = req.query.condition;
+    if(condition){
+//        condition = req.query.condition;
         //投件時間
-        if(req.query.condition.TimeStart && req.query.condition.TimeEnd){
-            start = new Date(req.query.condition.TimeStart);
+        if(condition.TimeStart && condition.TimeEnd){
+            start = new Date(condition.TimeStart);
             h = start.getHours()-8;
             startutc = start.setHours(h);
-            end = new Date(req.query.condition.TimeEnd);
+            end = new Date(condition.TimeEnd);
             h = end.getHours()-8;
             endutc = end.setHours(h);
             condition ={
@@ -59,7 +56,7 @@ censorMgr.getUGCList = function(req,res){
             };
         }
         //已經審核
-        if(req.query.condition == 'rating') condition ={
+        if(condition == 'rating') condition ={
                 'genre':'miix',
                 'no':{ $exists: true},
                 'ownerId':{ $exists: true},
@@ -67,7 +64,7 @@ censorMgr.getUGCList = function(req,res){
                 'rating':{ $exists: true}
         };
         //尚未審核
-        if(req.query.condition == 'norating') condition ={
+        if(condition == 'norating') condition ={
                 'genre':'miix',
                 'no':{ $exists: true},
                 'ownerId':{ $exists: true},
@@ -84,12 +81,12 @@ censorMgr.getUGCList = function(req,res){
     var next = 0;
     var UGCList = [];
 
-    var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_id, fbPictureUrl, title, description, doohPlayedTimes, rating, genre, arr) {
+    var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, genre, arr) {
         arr.push({
             userPhotoUrl: userPhotoUrl,
             ugcCensorNo: ugcCensorNo,
             userContent: userContent,
-            fb_id: fb_id,
+            fb_userName: fb_userName,
             fbPictureUrl: fbPictureUrl,
             title: title,
             description: description,
@@ -153,23 +150,26 @@ censorMgr.getUGCList = function(req,res){
 
     };
 
-    if ( req.query.limit && req.query.skip ) {
-        FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre', {sort :sort ,limit: req.query.limit ,skip: req.query.skip}, function(err, result){
+    if ( pageLimit && pageSkip ) {
+        FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
             if(err) {logger.error('[censorMgr_db.listOfUGCs]', err);
             res.send(400, {error: "Parameters are not correct"});
             }
             if(result){
 
-                if(req.query.skip < result.length && req.query.limit < result.length)
-                    limit = req.query.limit;
+                if(pageSkip < result.length && pageLimit < result.length)
+                    limit = pageLimit;
                 else 
                     limit = result.length;
 
                 if(limit > 0){ 
                     mappingUGCList(result, function(err,docs){
-                        if(err) console.log('mapping_err'+err);
-                        else{
-                            res.render( 'table_censorUGC', {ugcCensorMovieList: UGCList} );
+//                        if(err) console.log('mapping_err'+err);
+//                        else{
+                            if (cb){
+                                cb(err, UGCList);
+//                            }
+//                            res.render( 'table_censorUGC', {ugcCensorMovieList: UGCList} );
                         }
                     });
                 }
@@ -229,11 +229,11 @@ var getUserContent = function(fb_id,get_cb){
  * @return response {string}status 
  *                       
  */
-censorMgr.setUGCAttribute = function(req,res){
+censorMgr.setUGCAttribute = function(no, vjson, cb){
     var UGC_mgr = require('./UGC.js');
-    console.dir(req.query);
-    var no = req.query.no;
-    var vjson = {rating : req.query.rating};
+//    console.dir(req);
+//    var no = req.query.no;
+//    var vjson = {rating : req.query.rating};
     console.log('setUGCAttribute'+no+vjson);
 
     UGC_mgr.getOwnerIdByNo(no, function(err, result){
@@ -244,9 +244,11 @@ censorMgr.setUGCAttribute = function(req,res){
             FMDB.updateAdoc(UGCs,result,vjson, function(err, result){
                 if(err) {
                     logger.error('[setUGCAttribute_updateAdoc]', err);
-                    res.send(400, {error: "Parameters are not correct"});
+                    cb(err,null);
+//                    res.send(400, {error: "Parameters are not correct"});
                 }
                 if(result){
+                    cb(null,'success');
                     console.log('updateAdoc_result'+result);
                 }
             });

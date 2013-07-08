@@ -128,6 +128,7 @@ $(document).ready(function(){
     FM.miixPlayList = new PageList( 'miixMovieList', 5, '/miix_admin/miix_movies');
     FM.storyPlayList = new PageList( 'storyMovieList', 8, '/miix_admin/story_movies');
     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+    FM.UGCPlayList = new PageList( 'ugcCensorPlayList', 5, '/miix_admin/timeslots');
     
     FM.currentContent = FM.memberList;
 
@@ -191,10 +192,20 @@ $(document).ready(function(){
 
 
     $('#UGCListBtn').click(function(){
+        conditions = {};
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#UGCList').attr("class", "current");
         
         FM.currentContent = FM.UGCList;
+        FM.currentContent.showCurrentPageContent();
+
+    });
+    
+    $('#UGCPlayListBtn').click(function(){
+        $('#main_menu ul[class="current"]').attr("class", "select");
+        $('#UGCPlayList').attr("class", "current");
+        
+        FM.currentContent = FM.UGCPlayList;
         FM.currentContent.showCurrentPageContent();
 
     });
@@ -309,12 +320,18 @@ $(document).ready(function(){
          * checkbox
          */
         $('#ugcCensor.ugcCensorNoa').click(function(){
+            console.log('check_A');
             var url = DOMAIN + "user_content_attribute";
             var no = $(this).attr("name");
             var rating ='a';
-            $.get(url, {no: no, rating: rating}, function(res){
-                if(res.message){
-                    console.log("[Response] message:" + res.message);
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, rating: rating},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
                 }
             });
         });
@@ -322,10 +339,14 @@ $(document).ready(function(){
             var url = DOMAIN + "user_content_attribute";
             var no = $(this).attr("name");
             var rating ='b';
-
-            $.get(url, {no: no, rating: rating}, function(res){
-                if(res.message){
-                    console.log("[Response] message:" + res.message);
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, rating: rating},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
                 }
             });
         });
@@ -334,9 +355,14 @@ $(document).ready(function(){
             var no = $(this).attr("name");
             var rating ='c';
 
-            $.get(url, {no: no, rating: rating}, function(res){
-                if(res.message){
-                    console.log("[Response] message:" + res.message);
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, rating: rating},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
                 }
             });
         });
@@ -345,9 +371,14 @@ $(document).ready(function(){
             var no = $(this).attr("name");
             var rating ='d';
 
-            $.get(url, {no: no, rating: rating}, function(res){
-                if(res.message){
-                    console.log("[Response] message:" + res.message);
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, rating: rating},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
                 }
             });
         });
@@ -356,9 +387,14 @@ $(document).ready(function(){
             var no = $(this).attr("name");
             var rating ='e';
 
-            $.get(url, {no: no, rating: rating}, function(res){
-                if(res.message){
-                    console.log("[Response] message:" + res.message);
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, rating: rating},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
                 }
             });
         });
@@ -367,9 +403,14 @@ $(document).ready(function(){
             var no = $(this).attr("name");
             var rating ='f';
 
-            $.get(url, {no: no, rating: rating}, function(res){
-                if(res.message){
-                    console.log("[Response] message:" + res.message);
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, rating: rating},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
                 }
             });
         });
