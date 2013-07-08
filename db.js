@@ -161,7 +161,7 @@ FM.DB = (function(){
         var ProgramTimeSlotSchema = new Schema({
             content: Schema.Types.Mixed,
             contentType: {type: String, enum: programTimeSlotContnetType}, //file or web_page
-            dooh: {_id: ObjectID},
+            dooh: {type: String},
             timeslot: { 
                 start: Number, 
                 end: Number, 

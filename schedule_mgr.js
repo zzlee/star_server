@@ -207,7 +207,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             //query the time slots (in programTimeSlot collection) belonging to this interval and put UGC to them one by one
             //console.log("aTimeIntervalInADay=");
             //console.dir(aTimeIntervalInADay);
-            programTimeSlotModel.find({ "timeslot.startHour": {$lte:aTimeIntervalInADay.endHour, $gte:aTimeIntervalInADay.startHour}, "type": "UGC" }).sort({timeStamp:1}).exec(function (_err_1, timeSlots) {
+            programTimeSlotModel.find({ "timeslot.startHour": {$lte:aTimeIntervalInADay.endHour, $gte:aTimeIntervalInADay.startHour}, "type": "UGC", "dooh": dooh }).sort({timeStamp:1}).exec(function (_err_1, timeSlots) {
                 
                 if (!_err_1){
                     
@@ -233,7 +233,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                         
                         db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"content": selectedUgc }, function(_err_2, result){
                             counter++;
-                            console.dir(result);
+                            //console.dir(result);
                             interationDone_cb2(_err_2);
                         });
                         
@@ -337,7 +337,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                               timeStampIndex++;
                               aProgramTimeSlot.markModified('content');
                               aProgramTimeSlot.save(function(err1, _result){     
-                                  if (err1) console.log("err1="+err1);
+                                  //if (err1) console.log("err1="+err1);
                                   callback2(err1);
                               });
                           },
@@ -503,7 +503,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
  *     <li>err: error message if any error happens
  *     <li>resultProgramList: An array of objects containing program info:
  *         <ul>
- *         <li>id: A string (i.e. a hex string representation of its ObjectID in MongoDB) specifying the ID of a program time slot item  
+ *         <li>_id: A string (i.e. a hex string representation of its ObjectID in MongoDB) specifying the ID of a program time slot item  
  *         <li>timeSlot: An object specifying the starting and ending time of program's time slot
  *             <ul>
  *             <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)
@@ -513,9 +513,9 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
  *             actually the id of items store in UGC collection.) 
  *         </ul>
  *         For example, <br>
- *         [{id:43524, timeSlot:{start:1371861000000, end :1371862000000}, ugc:48593},<br>
- *          {id:43525, timeSlot:{start:1371881000000, end:1371882000000}, ugc:48353},<br>
- *          {id:43544, timeSlot:{start:1371897000000, end:1371898000000}, ugc:43593}]
+ *         [{_id:43524, timeSlot:{start:1371861000000, end :1371862000000}, ugc:48593},<br>
+ *          {_id:43525, timeSlot:{start:1371881000000, end:1371882000000}, ugc:48353},<br>
+ *          {_id:43544, timeSlot:{start:1371897000000, end:1371898000000}, ugc:43593}]
  *         
  *     </ul>
  */
