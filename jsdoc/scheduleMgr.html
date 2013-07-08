@@ -98,7 +98,7 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="createProgramList"><span class="type-signature">&lt;static> </span>createProgramList<span class="signature">(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, created_cb)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="createProgramList"><span class="type-signature">&lt;static> </span>createProgramList<span class="signature">(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, created_cb)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -209,6 +209,29 @@
 	
         <tr>
             
+                <td class="name"><code>programSequence</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">An array of strings showing the sequence of program genres to use when     when the system is planning the program(s) of a "micro time interval" <br>    Note: the string must be "miix", "cultural_and_creative", "mood", or "check_in"    For example, ["miix", "check_in", "check_in", "mood", "cultural_and_creative" ] <br></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
                 <td class="name"><code>created_cb</code></td>
             
             
@@ -225,7 +248,7 @@
             
             
             
-            <td class="description last">The callback function called when the result program list is created.<br>    The function signature is created_cb(err, numberOfProgramTimeSlots):    <ul>    <li>err: error message if any error happens    <li>numberOfProgramTimeSlots: number of program time slots generated    </ul></td>
+            <td class="description last">The callback function called when the result program list is created.<br>    The function signature is created_cb(err, numberOfProgramTimeSlots):    <ul>    <li>err: error message if any error happens    <li>numberOfProgramTimeSlots: number of UGC program time slots generated    </ul></td>
         </tr>
 	
 	
@@ -256,7 +279,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line113">line 113</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line118">line 118</a>
     </li></ul></dd>
     
     
@@ -284,7 +307,7 @@
         
             
 <dt>
-    <h4 class="name" id="getProgramList"><span class="type-signature">&lt;static> </span>getProgramList<span class="signature">(dooh, interval, skip, limit, created_cb)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getProgramList"><span class="type-signature">&lt;static> </span>getProgramList<span class="signature">(dooh, interval, pageLimit, pageSkip, got_cb)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -292,7 +315,7 @@
     
     
     <div class="description">
-        Get the programs (of a specific DOOH) of a specific interval.<br><br>
+        Get(a.k.a query) the programs (of a specific DOOH) of a specific interval.<br><br>
     </div>
     
 
@@ -372,7 +395,7 @@
 	
         <tr>
             
-                <td class="name"><code>skip</code></td>
+                <td class="name"><code>pageLimit</code></td>
             
             
             <td class="type">
@@ -388,14 +411,14 @@
             
             
             
-            <td class="description last"></td>
+            <td class="description last">The number of program time slot items to return (in got_cb's result).  If null, it returns all items.</td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>limit</code></td>
+                <td class="name"><code>pageSkip</code></td>
             
             
             <td class="type">
@@ -411,14 +434,14 @@
             
             
             
-            <td class="description last"></td>
+            <td class="description last">The number of program time slot items to skip when returning in in got_cb's result. If null, there is no skip.</td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>created_cb</code></td>
+                <td class="name"><code>got_cb</code></td>
             
             
             <td class="type">
@@ -434,7 +457,7 @@
             
             
             
-            <td class="description last">The callback function called when the result program list is created.<br>    The function signature is got_cb(err, resultProgramList):    <ul>    <li>err: error message if any error happens    <li>resultProgramList: An array of objects containing program info:        <ul>        <li>id: A string (i.e. a hex string representation of its ObjectID in MongoDB) specifying the ID of a program time slot item          <li>timeSlot: An object specifying the starting and ending time of program's time slot            <ul>            <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)            <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)            </ul>        <li>ugc: A number specifying the ID of the UGC contained in this program. (This is            actually the id of items store in UGC collection.)         </ul>        For example, <br>        [{id:43524, timeSlot:{start:1371861000000, end :1371862000000}, ugc:48593},<br>         {id:43525, timeSlot:{start:1371881000000, end:1371882000000}, ugc:48353},<br>         {id:43544, timeSlot:{start:1371897000000, end:1371898000000}, ugc:43593}]            </ul></td>
+            <td class="description last">The callback function called when the query is don.<br>    The function signature is got_cb(err, resultProgramList):    <ul>    <li>err: error message if any error happens    <li>resultProgramList: An array of objects containing program info:        <ul>        <li>_id: A string (i.e. a hex string representation of its ObjectID in MongoDB) specifying the ID of a program time slot item          <li>timeSlot: An object specifying the starting and ending time of program's time slot            <ul>            <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)            <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)            </ul>        <li>ugc: A number specifying the ID of the UGC contained in this program. (This is            actually the id of items store in UGC collection.)         </ul>        For example, <br>        [{_id:43524, timeSlot:{start:1371861000000, end :1371862000000}, ugc:48593},<br>         {_id:43525, timeSlot:{start:1371881000000, end:1371882000000}, ugc:48353},<br>         {_id:43544, timeSlot:{start:1371897000000, end:1371898000000}, ugc:43593}]            </ul></td>
         </tr>
 	
 	
@@ -465,7 +488,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line512">line 512</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line520">line 520</a>
     </li></ul></dd>
     
     
@@ -628,7 +651,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line587">line 587</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line611">line 611</a>
     </li></ul></dd>
     
     
@@ -814,7 +837,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line570">line 570</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line594">line 594</a>
     </li></ul></dd>
     
     
@@ -977,7 +1000,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line550">line 550</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line574">line 574</a>
     </li></ul></dd>
     
     
@@ -1018,13 +1041,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Mixins</h3><ul><li><a href="censorMgr.html">censorMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Mixins</h3><ul><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Jul 07 2013 09:09:20 GMT+0800 (TST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Jul 08 2013 19:11:59 GMT+0800 (TST)
 </footer>
 
 <script> prettyPrint(); </script>

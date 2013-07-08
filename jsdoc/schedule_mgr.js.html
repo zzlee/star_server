@@ -130,15 +130,19 @@ var paddingContent =(function(){
  *     &lt;/ul>
  *     For example, {start: 1371861000000, end: 1371862000000} 
  * 
+ * @param {Array} programSequence An array of strings showing the sequence of program genres to use when 
+ *     when the system is planning the program(s) of a "micro time interval" &lt;br>
+ *     Note: the string must be "miix", "cultural_and_creative", "mood", or "check_in"
+ *     For example, ["miix", "check_in", "check_in", "mood", "cultural_and_creative" ] &lt;br>
+ * 
  * @param {Function} created_cb The callback function called when the result program list is created.&lt;br>
  *     The function signature is created_cb(err, numberOfProgramTimeSlots):
  *     &lt;ul>
  *     &lt;li>err: error message if any error happens
- *     &lt;li>numberOfProgramTimeSlots: number of program time slots generated
+ *     &lt;li>numberOfProgramTimeSlots: number of UGC program time slots generated
  *     &lt;/ul>
  */
-scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, created_cb ){
-    var programTimeSlotModel = db.getDocModel("programTimeSlot");
+scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, created_cb ){
     
     var sortedUgcList = null;
     
@@ -222,13 +226,14 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         
         var candidateUgcList = sortedUgcList.slice(0); //clone the full array of sortedUgcList
         var indexOfcandidateToSelect = 0;
+        var counter = 0;
         
         //== PutUgcIntoTimeSlots_eachRankedTimeIntervalInADay
         var iteratorPutUgcIntoTimeSlots_eachRankedTimeIntervalInADay = function(aTimeIntervalInADay, interationDone_cb1){
             //query the time slots (in programTimeSlot collection) belonging to this interval and put UGC to them one by one
             //console.log("aTimeIntervalInADay=");
             //console.dir(aTimeIntervalInADay);
-            programTimeSlotModel.find({ "timeslot.startHour": {$lte:aTimeIntervalInADay.endHour, $gte:aTimeIntervalInADay.startHour}, "type": "UGC" }).sort({timeStamp:1}).exec(function (_err_1, timeSlots) {
+            programTimeSlotModel.find({ "timeslot.startHour": {$lte:aTimeIntervalInADay.endHour, $gte:aTimeIntervalInADay.startHour}, "type": "UGC", "dooh": dooh }).sort({timeStamp:1}).exec(function (_err_1, timeSlots) {
                 
                 if (!_err_1){
                     
@@ -253,7 +258,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                         }
                         
                         db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"content": selectedUgc }, function(_err_2, result){
-                            
+                            counter++;
                             //console.dir(result);
                             interationDone_cb2(_err_2);
                         });
@@ -282,10 +287,9 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         async.eachSeries(TIME_INTERVAL_RANKIGN, iteratorPutUgcIntoTimeSlots_eachRankedTimeIntervalInADay, function(_err_4){
             if (!_err_4) {
                 
-                var resultProgramList;
-                //TODO: get the number of program time slots chreated
+                var numberOfProgramTimeSlots = counter;
                 
-                finishPut_cb(null, resultProgramList);
+                finishPut_cb(null, numberOfProgramTimeSlots);
             }
             else{
                 if (finishPut_cb){
@@ -359,7 +363,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                               timeStampIndex++;
                               aProgramTimeSlot.markModified('content');
                               aProgramTimeSlot.save(function(err1, _result){     
-                                  if (err1) console.log("err1="+err1);
+                                  //if (err1) console.log("err1="+err1);
                                   callback2(err1);
                               });
                           },
@@ -411,7 +415,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             
         };
         
-        
+        //TODO: call the real ScalaMgr
         scalaMgr_listAvailableTimeInterval(intervalOfPlanningDoohProgrames,function(err, result){
             if (!err){
                 
@@ -465,6 +469,11 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         
     };  //end of generateTimeSlot()
     
+    if (programSequence){
+        programPlanningPattern.set(programSequence);
+    }
+    
+    //TODO: call the real censorMgr
     censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
         
         //TODO: check the genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
@@ -500,9 +509,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
 };
 
 
-//TODO: elaborate resultProgramList
 /**
- * Get the programs (of a specific DOOH) of a specific interval.&lt;br>
+ * Get(a.k.a query) the programs (of a specific DOOH) of a specific interval.&lt;br>
  * &lt;br>
  * @param {Number} dooh The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated
  * 
@@ -512,15 +520,15 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
  *     &lt;li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)
  *     &lt;/ul>
  *     For example, {start: 1371861000000, end: 1371862000000} 
- * @param {Number} skip
- * @param {Number} limit
- * @param {Function} created_cb The callback function called when the result program list is created.&lt;br>
+ * @param {Number} pageLimit The number of program time slot items to return (in got_cb's result).  If null, it returns all items.
+ * @param {Number} pageSkip The number of program time slot items to skip when returning in in got_cb's result. If null, there is no skip.
+ * @param {Function} got_cb The callback function called when the query is don.&lt;br>
  *     The function signature is got_cb(err, resultProgramList):
  *     &lt;ul>
  *     &lt;li>err: error message if any error happens
  *     &lt;li>resultProgramList: An array of objects containing program info:
  *         &lt;ul>
- *         &lt;li>id: A string (i.e. a hex string representation of its ObjectID in MongoDB) specifying the ID of a program time slot item  
+ *         &lt;li>_id: A string (i.e. a hex string representation of its ObjectID in MongoDB) specifying the ID of a program time slot item  
  *         &lt;li>timeSlot: An object specifying the starting and ending time of program's time slot
  *             &lt;ul>
  *             &lt;li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)
@@ -530,14 +538,30 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
  *             actually the id of items store in UGC collection.) 
  *         &lt;/ul>
  *         For example, &lt;br>
- *         [{id:43524, timeSlot:{start:1371861000000, end :1371862000000}, ugc:48593},&lt;br>
- *          {id:43525, timeSlot:{start:1371881000000, end:1371882000000}, ugc:48353},&lt;br>
- *          {id:43544, timeSlot:{start:1371897000000, end:1371898000000}, ugc:43593}]
+ *         [{_id:43524, timeSlot:{start:1371861000000, end :1371862000000}, ugc:48593},&lt;br>
+ *          {_id:43525, timeSlot:{start:1371881000000, end:1371882000000}, ugc:48353},&lt;br>
+ *          {_id:43544, timeSlot:{start:1371897000000, end:1371898000000}, ugc:43593}]
  *         
  *     &lt;/ul>
  */
-scheduleMgr.getProgramList = function(dooh, interval, skip, limit, got_cb ){
+scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip, got_cb ){
+    var query = programTimeSlotModel.find({ "timeslot.start": {$gte:interval.start}, "timeslot.end":{$lt:interval.end}, "type": "UGC", "dooh": dooh })
+                        .sort({timeStamp:1});
     
+    if (pageLimit!==null){
+        query = query.limit(pageLimit);
+    }
+    
+    if (pageSkip!==null){
+        query = query.skip(pageSkip);
+    }
+        
+    query.exec(function (_err, result) {
+        if (got_cb){
+            got_cb(_err, result);
+        }
+        
+    });
 };
 
 
@@ -627,13 +651,13 @@ module.exports = scheduleMgr;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Mixins</h3><ul><li><a href="censorMgr.html">censorMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Mixins</h3><ul><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Jul 07 2013 09:09:20 GMT+0800 (TST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Jul 08 2013 19:11:59 GMT+0800 (TST)
 </footer>
 
 <script> prettyPrint(); </script>
