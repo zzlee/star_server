@@ -95,9 +95,9 @@ app.get('/members/:member_id/questions', routes.authorizationHandler.checkAuth, 
     console.log('req.params.member_id=%s',req.params.member_id);
     console.log('req.route.path=%s',req.route.path);
     
-    var result = [{_id: '51d837f6830459c42d000023', ugcReferenceNo: 234, genre: 'acount', issueDate: 1371862000000, question:'我忘記了我FB帳號的密碼', answer:'請至Facebook官網(www.facebook.com)新設定' },
-                  {_id: '51d837f6830459c42d000023', ugcReferenceNo: 256, genre: 'login', issueDate: 1389062000000, question:'我的帳號登不進去', answer:'請確認您有出現faceboo授權頁面嗎' },
-                  {_id: '51d837f6abc459c42d000023', ugcReferenceNo: 314, genre: 'verification', issueDate: 1471862000000, question:'我無法通迥認證', answer:'請確認您有收到認證簡訊' }];
+    var result = [{_id: '51d837f6830459c42d000023', ugcReferenceNo: 234, genre: 'acount', question:{description:'我忘記了我FB帳號的密碼', date: 1371862000000}, answer:{description:'請至Facebook官網(www.facebook.com)新設定', date: 1371962000000} },
+                  {_id: '51d837f6830459c42d000023', ugcReferenceNo: 256, genre: 'login', question:{description:'我的帳號登不進去', date: 1371862000000}, answer:{description:'請確認您有出現faceboo授權頁面嗎', date: 1371892000000} },
+                  {_id: '51d837f6830459c42d000023', ugcReferenceNo: 314, genre: 'verification', question:{description:'我無法通迥認證', date: 1471862000000}, answer:{description:'請確認您有收到認證簡訊', date: 1471962000000} }];
     
     res.send(200, result);
 });
