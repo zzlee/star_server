@@ -255,11 +255,11 @@ http.createServer(app).listen(app.get('port'), function(){
 
 
  
-
+/*
 //test
 var scheduleMgr = require('./schedule_mgr.js');
 setTimeout(function(){
-    //test
+    
     scheduleMgr.createProgramList("TP_dom", 
         {start:(new Date("2013/5/4 0:00")).getTime(), end:(new Date("2013/5/4 23:59")).getTime()}, 
         {start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, 
@@ -270,8 +270,14 @@ setTimeout(function(){
                 console.dir(result2);
             });
     });
+    scheduleMgr.setUgcToProgram( "51da8db6fdf3b7e009000003", 426, function(err, result){
+        console.log('result=');
+        console.dir(result);
+        console.log("err=%s", err);
+    });
    
 },3000);
+*/
 /*
 var aeServerMgr = require('./ae_server_mgr.js');
 var globalConnectionMgr = require('./global_connection_mgr.js');

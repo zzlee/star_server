@@ -6,6 +6,7 @@ var db = require('./db.js');
 var async = require('async');
 
 var programTimeSlotModel = db.getDocModel("programTimeSlot");
+var ugcModel = db.getDocModel("ugc");
 
 /**
  * The manager who handles the scheduling of playing UGC on DOOHs
@@ -127,56 +128,56 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             result[i] = {id: i};
         }
         */
-        var result = [ {id: "1", genre: "miix"},
-                       {id: "2", genre: "cultural_and_creative"},
-                       {id: "3", genre: "check_in"},
-                       {id: "4", genre: "miix"},
-                       {id: "5", genre: "check_in"},
-                       {id: "6", genre: "check_in"},
-                       {id: "7", genre: "miix"},
-                       {id: "8", genre: "check_in"},
-                       {id: "9", genre: "miix"},
-                       {id: "10", genre: "cultural_and_creative"},
-                       {id: "11", genre: "miix"},
-                       {id: "12", genre: "check_in"},
-                       {id: "13", genre: "mood"},
-                       {id: "14", genre: "cultural_and_creative"},
-                       {id: "15", genre: "miix"},
-                       {id: "16", genre: "mood"},
-                       {id: "17", genre: "check_in"},
-                       {id: "18", genre: "check_in"},
-                       {id: "19", genre: "miix"},
-                       {id: "20", genre: "cultural_and_creative"},
-                       {id: "21", genre: "miix"},
-                       {id: "22", genre: "check_in"},
-                       {id: "23", genre: "cultural_and_creative"},
-                       {id: "24", genre: "mood"},
-                       {id: "25", genre: "mood"},
-                       {id: "26", genre: "miix"},
-                       {id: "27", genre: "cultural_and_creative"},
-                       {id: "28", genre: "miix"},
-                       {id: "29", genre: "check_in"},
-                       {id: "30", genre: "miix"},
-                       {id: "31", genre: "miix"},
-                       {id: "32", genre: "check_in"},
-                       {id: "33", genre: "mood"},
-                       {id: "34", genre: "cultural_and_creative"},
-                       {id: "35", genre: "miix"},
-                       {id: "36", genre: "mood"},
-                       {id: "37", genre: "check_in"},
-                       {id: "38", genre: "check_in"},
-                       {id: "39", genre: "mood"},
-                       {id: "40", genre: "mood"},
-                       {id: "41", genre: "miix"},
-                       {id: "42", genre: "check_in"},
-                       {id: "43", genre: "mood"},
-                       {id: "44", genre: "check_in"},
-                       {id: "45", genre: "mood"},
-                       {id: "46", genre: "miix"},
-                       {id: "47", genre: "check_in"},
-                       {id: "48", genre: "miix"},
-                       {id: "49", genre: "check_in"},
-                       {id: "50", genre: "miix"},
+        var result = [ {_id: "1", genre: "miix"},
+                       {_id: "2", genre: "cultural_and_creative"},
+                       {_id: "3", genre: "check_in"},
+                       {_id: "4", genre: "miix"},
+                       {_id: "5", genre: "check_in"},
+                       {_id: "6", genre: "check_in"},
+                       {_id: "7", genre: "miix"},
+                       {_id: "8", genre: "check_in"},
+                       {_id: "9", genre: "miix"},
+                       {_id: "10", genre: "cultural_and_creative"},
+                       {_id: "11", genre: "miix"},
+                       {_id: "12", genre: "check_in"},
+                       {_id: "13", genre: "mood"},
+                       {_id: "14", genre: "cultural_and_creative"},
+                       {_id: "15", genre: "miix"},
+                       {_id: "16", genre: "mood"},
+                       {_id: "17", genre: "check_in"},
+                       {_id: "18", genre: "check_in"},
+                       {_id: "19", genre: "miix"},
+                       {_id: "20", genre: "cultural_and_creative"},
+                       {_id: "21", genre: "miix"},
+                       {_id: "22", genre: "check_in"},
+                       {_id: "23", genre: "cultural_and_creative"},
+                       {_id: "24", genre: "mood"},
+                       {_id: "25", genre: "mood"},
+                       {_id: "26", genre: "miix"},
+                       {_id: "27", genre: "cultural_and_creative"},
+                       {_id: "28", genre: "miix"},
+                       {_id: "29", genre: "check_in"},
+                       {_id: "30", genre: "miix"},
+                       {_id: "31", genre: "miix"},
+                       {_id: "32", genre: "check_in"},
+                       {_id: "33", genre: "mood"},
+                       {_id: "34", genre: "cultural_and_creative"},
+                       {_id: "35", genre: "miix"},
+                       {_id: "36", genre: "mood"},
+                       {_id: "37", genre: "check_in"},
+                       {_id: "38", genre: "check_in"},
+                       {_id: "39", genre: "mood"},
+                       {_id: "40", genre: "mood"},
+                       {_id: "41", genre: "miix"},
+                       {_id: "42", genre: "check_in"},
+                       {_id: "43", genre: "mood"},
+                       {_id: "44", genre: "check_in"},
+                       {_id: "45", genre: "mood"},
+                       {_id: "46", genre: "miix"},
+                       {_id: "47", genre: "check_in"},
+                       {_id: "48", genre: "miix"},
+                       {_id: "49", genre: "check_in"},
+                       {_id: "50", genre: "miix"},
                        
                        ];
         
@@ -580,19 +581,37 @@ scheduleMgr.updateProgramList = function(dooh, intervalToUpdate, updated_cb ){
 /**
  * Set an UGC of specific No to be played in a specific program time slot (of a specific DOOH <br>
  * <br>
- * @param {Number} dooh The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated
- * 
  * @param {String} programTimeSlot The ID of the program time slot item
  * 
- * @param {Number} ugcNo The reference No the UGC item to put in the specified program time slot
+ * @param {Number} ugcReferenceNo The reference No the UGC item to put in the specified program time slot
  * 
  * @param {Function} set_cb The callback function called when the specified program is set.<br>
  *     The function signature is updated_cb(err) where err is the error message indicating failure: 
  *     if successful, err returns null; if failed, err returns the error message.
  *     
  */
-scheduleMgr.setUgcToProgram = function(dooh, programTimeSlotId, ugcNo, set_cb ){
-    
+scheduleMgr.setUgcToProgram = function( programTimeSlotId, ugcReferenceNo, set_cb ){
+    ugcModel.findOne({ 'no': ugcReferenceNo }, '_id genre', function (err1, ugc) {
+        if (!err1){
+            /**/
+            var mongoose = require('mongoose');
+            var _programTimeSlotId = mongoose.Types.ObjectId(programTimeSlotId);
+            var _ugc = JSON.parse(JSON.stringify(ugc)); //clone ugc object due to strange error "RangeError: Maximum call stack size exceeded"
+            
+            db.updateAdoc(programTimeSlotModel, _programTimeSlotId, {"content": _ugc }, function(err2, result){
+                if (set_cb){
+                    set_cb(err2, result);
+                }
+            });
+            
+            //set_cb(err1, ugc);
+        }
+        else {
+            if (set_cb){
+                set_cb("Cannot find the UGC with this referece number: "+err1, null);
+            }
+        }
+    });
 };
 
 
