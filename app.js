@@ -255,7 +255,7 @@ http.createServer(app).listen(app.get('port'), function(){
 
 
  
-/*
+
 //test
 var scheduleMgr = require('./schedule_mgr.js');
 setTimeout(function(){
@@ -265,10 +265,14 @@ setTimeout(function(){
         {start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, 
         ["miix", "check_in", "check_in", "mood", "cultural_and_creative" ], function(err, result){
             console.log("err=%s result=%s", err, result);
+            scheduleMgr.getProgramList("TP_dom",{start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, null, 30, function(err2, result2){
+                console.log('result=');
+                console.dir(result2);
+            });
     });
    
 },3000);
-
+/*
 var aeServerMgr = require('./ae_server_mgr.js');
 var globalConnectionMgr = require('./global_connection_mgr.js');
 setInterval(function(){

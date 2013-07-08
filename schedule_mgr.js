@@ -116,7 +116,6 @@ var paddingContent =(function(){
  *     </ul>
  */
 scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, created_cb ){
-    var programTimeSlotModel = db.getDocModel("programTimeSlot");
     
     var sortedUgcList = null;
     
@@ -483,9 +482,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
 };
 
 
-//TODO: elaborate resultProgramList
 /**
- * Get the programs (of a specific DOOH) of a specific interval.<br>
+ * Get(a.k.a query) the programs (of a specific DOOH) of a specific interval.<br>
  * <br>
  * @param {Number} dooh The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated
  * 
@@ -495,9 +493,9 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
  *     <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)
  *     </ul>
  *     For example, {start: 1371861000000, end: 1371862000000} 
- * @param {Number} skip
- * @param {Number} limit
- * @param {Function} created_cb The callback function called when the result program list is created.<br>
+ * @param {Number} pageLimit The number of program time slot items to return (in got_cb's result).  If null, it returns all items.
+ * @param {Number} pageSkip The number of program time slot items to skip when returning in in got_cb's result. If null, there is no skip.
+ * @param {Function} got_cb The callback function called when the query is don.<br>
  *     The function signature is got_cb(err, resultProgramList):
  *     <ul>
  *     <li>err: error message if any error happens
@@ -519,8 +517,24 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
  *         
  *     </ul>
  */
-scheduleMgr.getProgramList = function(dooh, interval, skip, limit, got_cb ){
+scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip, got_cb ){
+    var query = programTimeSlotModel.find({ "timeslot.start": {$gte:interval.start}, "timeslot.end":{$lt:interval.end}, "type": "UGC", "dooh": dooh })
+                        .sort({timeStamp:1});
     
+    if (pageLimit!==null){
+        query = query.limit(pageLimit);
+    }
+    
+    if (pageSkip!==null){
+        query = query.skip(pageSkip);
+    }
+        
+    query.exec(function (_err, result) {
+        if (got_cb){
+            got_cb(_err, result);
+        }
+        
+    });
 };
 
 
