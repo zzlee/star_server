@@ -8,7 +8,13 @@ FM.facebookMgr = (function(){
     var uInstance = null;
     var request = require("request");
     var fb_url = 'https://graph.facebook.com';
-    
+   /** for postMessage();*/
+    // this token will expire in 1 hour,u should go to graph tool to get new one.  
+    //this is User Token,not app token
+    var test_token = 
+    	"CAABqPdYntP0BAMlhDdqmJloWQvcTmIhKVtJN7kzsVxs0Ymsmo7OCVhZCmINNjcIHrchNbAbItBmRlofaO6605u7GQ9NjV7W9CEQp1CKt7fSHrw93ZBc6tkrQDofAXZBr6qnr5hkAHjxrnhb6YRROUFCZAqoCYnYZD";
+    var my_message="hello!"
+    var s_link="www.google.com"
     
     /**  for miix.tv @ AWS */
     var app_access_token = "116813818475773|d9EXxXNwTt2eCbSkIWYs9dJv-N0", 
@@ -213,6 +219,33 @@ FM.facebookMgr = (function(){
                 });
             },
             
+            //by joy
+            postMessage:function(access_token, message, link, cb ) {
+
+                // Specify the URL and query string parameters needed for the request
+                var url = 'https://graph.facebook.com/me/feed';
+                var params = {
+                    access_token: access_token,
+                    message: message,
+            		//privacy:{'value':'SELF'},
+            		link: link, 
+                };
+            	// Send the request
+                request.post({url: url, qs: params}, function(err, resp, body) {
+                  
+					// Handle any errors that occur
+					
+					if (err) return console.error("Error occured: ", err);
+					body = JSON.parse(body);
+					if (body.error) return console.error("Error returned from facebook: ", body.error);
+					
+					var result = JSON.stringify(body);
+					if (cb){
+					    cb(err, result);
+					}
+                });
+            },
+            
             //TODO: need to verify
             postOnFeed: function(fb_id, message, cb){
                 if(!fb_id || !message){
@@ -253,12 +286,17 @@ FM.facebookMgr = (function(){
             /** TEST */
             _test: function(){
                 
-                var token = "AAABqPdYntP0BADKwGxVqhtQCaWm3dIJtuzPtWZA2KMRVbuzWqP0TmMQlxZAOwYscjwyv4131iWE0CM9UjIO8E6ZAkvMNmblXj18rLi4EAZDZD";
+                      
+                /*
                 this.extendToken( token, function(err, result){
                     if(err)
                         console.log("err: " + JSON.stringify(err));
                     else
                         console.log("result: " + JSON.stringify(result));
+                });*/
+            
+                this.postMessage(test_token,my_message,s_link, function(err, result){
+                	console.log("result=%s", result);
                 });
             },
         };
