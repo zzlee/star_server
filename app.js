@@ -188,7 +188,7 @@ app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_c
  *                  
  * @return response {string}status 
  */
-app.get('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);
+app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);
 /**
  * ��    GET /miix_admin/doohs/{dooh_id}/timeslots?&offset=0&limit=20
  * @param  request  {string}dooh.client(dooh_id)
@@ -202,7 +202,7 @@ app.get('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttrib
  *                       UGC_Url,
  *                       UGC_ID}
  */
-
+app.get('/miix_admin/timeslots', routes.censor_handler.timeslots_get_cb);
 /**
  * ��    PUT /miix_admin/doohs/{dooh_id}/timeslots/{timeslot_id}
  * @param  request  {string}timeslot_id.

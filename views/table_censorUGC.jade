@@ -47,13 +47,20 @@ form#mainform(action='')
                 if i%2
                     tr
                       td 
-                         label.label_design 文創
+                         if(ugcCensor.genre == 'miix')
+                             label.label_video 合成影片
+                         if(ugcCensor.genre == 'cultural_and_creative')
+                             label.label_design 文創
+                         if(ugcCensor.genre == 'mood')
+                             label.label_mood 心情
+                         if(ugcCensor.genre == 'check_in')
+                             label.label_checkin 打卡
                       td #{ugcCensor.ugcCensorNo}
                       td #{ugcCensor.userContent}
                       td #{ugcCensor.userContent}
                       td
                         img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
-                      td #{ugcCensor.fb_id}
+                      td #{ugcCensor.fb_userName}
                       td
                         img(src='#{ugcCensor.fbPictureUrl}', alt='', width='100')
                       td #{ugcCensor.doohPlayedTimes}
@@ -114,14 +121,21 @@ form#mainform(action='')
 
                 else
                     tr.alternate-row
-                      td 
-                         label.label_mood 心情
+                      td
+                         if(ugcCensor.genre == 'miix')
+                             label.label_video 合成影片
+                         if(ugcCensor.genre == 'cultural_and_creative')
+                             label.label_design 文創
+                         if(ugcCensor.genre == 'mood')
+                             label.label_mood 心情
+                         if(ugcCensor.genre == 'check_in')
+                             label.label_checkin 打卡
                       td #{ugcCensor.ugcCensorNo}
                       td #{ugcCensor.userContent}
                       td #{ugcCensor.userContent}
                       td
                         img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
-                      td #{ugcCensor.fb_id}
+                      td #{ugcCensor.fb_userName}
                       td
                         img(src='#{ugcCensor.fbPictureUrl}', alt='', width='100')
                       td #{ugcCensor.doohPlayedTimes}

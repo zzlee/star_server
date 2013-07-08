@@ -128,6 +128,7 @@ $(document).ready(function(){
     FM.miixPlayList = new PageList( 'miixMovieList', 5, '/miix_admin/miix_movies');
     FM.storyPlayList = new PageList( 'storyMovieList', 8, '/miix_admin/story_movies');
     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+    FM.UGCPlayList = new PageList( 'ugcCensorPlayList', 5, '/miix_admin/timeslots');
     
     FM.currentContent = FM.memberList;
 
@@ -191,10 +192,20 @@ $(document).ready(function(){
 
 
     $('#UGCListBtn').click(function(){
+        conditions = {};
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#UGCList').attr("class", "current");
         
         FM.currentContent = FM.UGCList;
+        FM.currentContent.showCurrentPageContent();
+
+    });
+    
+    $('#UGCPlayListBtn').click(function(){
+        $('#main_menu ul[class="current"]').attr("class", "select");
+        $('#UGCPlayList').attr("class", "current");
+        
+        FM.currentContent = FM.UGCPlayList;
         FM.currentContent.showCurrentPageContent();
 
     });
@@ -218,10 +229,8 @@ $(document).ready(function(){
         $('#ugcSearchBtn').click(function(){
             console.log('ugcSearch');
             var inputSearchData = {};
-//          var url = DOMAIN + "ugc_censor";
             $('#condition-inner input[class="ugcSearchBtn"]').each(function(){
                 console.log("item: " + $(this).attr("value"));
-//              inputSearchData[$(this).attr("name")] = $(this).attr("value");
                 inputSearchData = {'no':$(this).attr("value")};
                 conditions = inputSearchData;
             });
@@ -232,7 +241,6 @@ $(document).ready(function(){
                 $('#UGCList').attr("class", "current");
                 FM.currentContent = FM.UGCList;
                 FM.currentContent.showCurrentPageContent();
-                conditions = {};
             }
         });
         /**
@@ -249,7 +257,6 @@ $(document).ready(function(){
                 $('#UGCList').attr("class", "current");
                 FM.currentContent = FM.UGCList;
                 FM.currentContent.showCurrentPageContent();
-                conditions = {};
             }
         });
         /**
@@ -266,7 +273,6 @@ $(document).ready(function(){
                 $('#UGCList').attr("class", "current");
                 FM.currentContent = FM.UGCList;
                 FM.currentContent.showCurrentPageContent();
-                conditions = {};
             }
         });
         /**
@@ -276,12 +282,12 @@ $(document).ready(function(){
             console.log('ugcSearchNoRatingBtn');
 
             console.log("inputSearchData: " + JSON.stringify(conditions) );
+            conditions = {};
             FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
             $('#main_menu ul[class="current"]').attr("class", "select");
             $('#UGCList').attr("class", "current");
             FM.currentContent = FM.UGCList;
             FM.currentContent.showCurrentPageContent();
-            conditions = {};
 
         });
         /**
@@ -308,90 +314,103 @@ $(document).ready(function(){
             $('#UGCList').attr("class", "current");
             FM.currentContent = FM.UGCList;
             FM.currentContent.showCurrentPageContent();
-            conditions = {};
         });
-        //checkbox
         
+        /**
+         * checkbox
+         */
         $('#ugcCensor.ugcCensorNoa').click(function(){
-            console.log('checkboxGroup__A');
+            console.log('check_A');
             var url = DOMAIN + "user_content_attribute";
             var no = $(this).attr("name");
             var rating ='a';
-
-            console.log(no + rating);
-            $.get(url, {no: no, rating: rating}, function(res){
-                if(res.message){
-                    console.log("[Response] message:" + res.message);
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, rating: rating},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
                 }
             });
         });
         $('#ugcCensor.ugcCensorNob').click(function(){
-            console.log('checkboxGroup__B');
-            console.log($(this).attr("name"));
             var url = DOMAIN + "user_content_attribute";
             var no = $(this).attr("name");
             var rating ='b';
-
-            console.log(no + rating);
-            $.get(url, {no: no, rating: rating}, function(res){
-                if(res.message){
-                    console.log("[Response] message:" + res.message);
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, rating: rating},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
                 }
             });
         });
         $('#ugcCensor.ugcCensorNoc').click(function(){
-            console.log('checkboxGroup__C');
-            console.log($(this).attr("name"));
             var url = DOMAIN + "user_content_attribute";
             var no = $(this).attr("name");
             var rating ='c';
 
-            console.log(no + rating);
-            $.get(url, {no: no, rating: rating}, function(res){
-                if(res.message){
-                    console.log("[Response] message:" + res.message);
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, rating: rating},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
                 }
             });
         });
         $('#ugcCensor.ugcCensorNod').click(function(){
-            console.log('checkboxGroup__D');
-            console.log($(this).attr("name"));
             var url = DOMAIN + "user_content_attribute";            
             var no = $(this).attr("name");
             var rating ='d';
 
-            console.log(no + rating);
-            $.get(url, {no: no, rating: rating}, function(res){
-                if(res.message){
-                    console.log("[Response] message:" + res.message);
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, rating: rating},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
                 }
             });
         });
         $('#ugcCensor.ugcCensorNoe').click(function(){
-            console.log('checkboxGroup__E');
-            console.log($(this).attr("name"));
             var url = DOMAIN + "user_content_attribute";
             var no = $(this).attr("name");
             var rating ='e';
 
-            console.log(no + rating);
-            $.get(url, {no: no, rating: rating}, function(res){
-                if(res.message){
-                    console.log("[Response] message:" + res.message);
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, rating: rating},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
                 }
             });
         });
         $('#ugcCensor.ugcCensorNof').click(function(){
-            console.log('checkboxGroup__F');
-            console.log($(this).attr("name"));
             var url = DOMAIN + "user_content_attribute";
             var no = $(this).attr("name");
             var rating ='f';
 
-            console.log(no + rating);
-            $.get(url, {no: no, rating: rating}, function(res){
-                if(res.message){
-                    console.log("[Response] message:" + res.message);
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, rating: rating},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
                 }
             });
         });

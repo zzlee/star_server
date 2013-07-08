@@ -355,13 +355,13 @@ FM.ADMINCACHE = (function(){
                 var memberListInfo = function(fb_id, fb_name, email, mp_number, miixMovieVideo_count, doohPlay_count, movieViewed_count, fbLike_count, fbComment_count, fbShare_count, arr) {
                     arr.push({ 
                         fb: { userID: fb_id, userName: fb_name },
-                        email: email,                        //Email
-                        mobilePhoneNumber: mp_number,        //���
-                        miixMovieVideoCount: miixMovieVideo_count, //�w�s�@�v����
-                        doohPlayCount: doohPlay_count,       //DOOH�Z�n����
-                        movieViewedCount: movieViewed_count, //�v���[���`����
-                        fbLikeCount: fbLike_count,           //FB�g�`��
-                        fbCommentCount: fbComment_count,     //FB�d���`��
+                        email: email,                        
+                        mobilePhoneNumber: mp_number,        
+                        miixMovieVideoCount: miixMovieVideo_count, 
+                        doohPlayCount: doohPlay_count,       
+                        movieViewedCount: movieViewed_count, 
+                        fbLikeCount: fbLike_count,           
+                        fbCommentCount: fbComment_count,     
                         fbShareCount: fbShare_count
                     });
                 };
@@ -427,15 +427,15 @@ FM.ADMINCACHE = (function(){
 
                 var miixPlayListInfo = function(userPhotoUrl, movieNo, movieViewed_count, fbLike_count, fbComment_count, fbShare_count, movieMaker, applyDoohPlay_count, doohPlay_count, timesOfPlaying, arr) {
                     arr.push({ 
-                        userPhotoUrl: userPhotoUrl,          //�����Ӥ�
-                        movieNo: movieNo,                    //�v���s��
-                        movieViewedCount: movieViewed_count, //�[�ݦ���
-                        fbLikeCount: fbLike_count,           //FB�g����
-                        fbCommentCount: fbComment_count,     //FB�d����
-                        fbShareCount: fbShare_count,         //FB���ɦ���
-                        movieMaker: movieMaker,              //�|���W��
-                        applyDoohPlayCount: applyDoohPlay_count, //��Z����
-                        doohPlayCount: doohPlay_count,       //DOOH�Z�n����
+                        userPhotoUrl: userPhotoUrl,          
+                        movieNo: movieNo,                    
+                        movieViewedCount: movieViewed_count, 
+                        fbLikeCount: fbLike_count,           
+                        fbCommentCount: fbComment_count,     
+                        fbShareCount: fbShare_count,         
+                        movieMaker: movieMaker,              
+                        applyDoohPlayCount: applyDoohPlay_count, 
+                        doohPlayCount: doohPlay_count,       
                         timesOfPlaying: timesOfPlaying 
                     });
                 };
@@ -495,12 +495,12 @@ FM.ADMINCACHE = (function(){
 
                 var storyPlayListInfo = function(movieNo, movieViewed_count, fbLike_count, fbComment_count, fbShare_count, movieMaker, arr) {
                     arr.push({ 
-                        movieNo: movieNo,                    //�v���s��
-                        movieViewedCount: movieViewed_count, //�[�ݦ���
-                        fbLikeCount: fbLike_count,           //FB�g����
-                        fbCommentCount: fbComment_count,     //FB�d����
-                        fbShareCount: fbShare_count,         //FB���ɦ���
-                        movieMaker: movieMaker               //�|���W��
+                        movieNo: movieNo,                    
+                        movieViewedCount: movieViewed_count, 
+                        fbLikeCount: fbLike_count,           
+                        fbCommentCount: fbComment_count,     
+                        fbShareCount: fbShare_count,         
+                        movieMaker: movieMaker              
                     });
                 };
 
