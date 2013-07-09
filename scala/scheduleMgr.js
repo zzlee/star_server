@@ -2,11 +2,21 @@
 var schedule = (function() {
     
     var adapter, token;
+    //var weekdays = [ 'SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY' ];
+    var weekdays = {
+        'SUNDAY' : 0, 
+        'MONDAY' : 1, 
+        'TUESDAY' : 2, 
+        'WEDNESDAY' : 3, 
+        'THURSDAY' : 4, 
+        'FRIDAY' : 5, 
+        'SATURDAY' : 6
+    };
     
     Date.prototype.getWeek = function() {
         var onejan = new Date(this.getFullYear(),0,1);
         return Math.ceil((((this - onejan) / 86400000) + onejan.getDay()+1)/7);
-    }
+    };
     
     var _private = {
         list : function( option, list_cb ){
@@ -37,6 +47,16 @@ var schedule = (function() {
             _private.list( option, function( list ){
                 timeslots_cb(list);
             } );
+        },
+        checkWeekday : function( check, weekslots, check_cb ){
+            if(typeof(weekslots) === 'string') {
+                if(check == weekdays[weekslots]) check_cb('OK');
+                else check_cb('FAILED');
+            }
+            else for(var i=0; i < weekslots.length; i++) {
+                if(check == weekdays[weekslots[i]]) { check_cb('OK'); break; }
+                if(i == weekslots.length - 1) check_cb('FAILED');
+            }
         },
     };
 }());
