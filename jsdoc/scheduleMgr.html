@@ -64,7 +64,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line15">line 15</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line18">line 18</a>
     </li></ul></dd>
     
     
@@ -248,7 +248,7 @@
             
             
             
-            <td class="description last">The callback function called when the result program list is created.<br>    The function signature is created_cb(err, numberOfProgramTimeSlots):    <ul>    <li>err: error message if any error happens    <li>numberOfProgramTimeSlots: number of UGC program time slots generated    </ul></td>
+            <td class="description last">The callback function called when the result program list is created.<br>    The function signature is created_cb(err, result):    <ul>    <li>err: error message if any error happens    <li>result: object containing the following information:        <ul>        <li>numberOfProgramTimeSlots: number of program time slots created         <li>sessionId: id indicating this session of creating program time slots (This will be used when           calling scheduleMgr.removeUgcfromProgramAndAutoSetNewOne()        </ul>        For example, <br>        { numberOfProgramTimeSlots: 33, sessionId: '1367596800000-1367683140000-1373332978201' }         </ul></td>
         </tr>
 	
 	
@@ -279,7 +279,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line118">line 118</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line203">line 203</a>
     </li></ul></dd>
     
     
@@ -488,7 +488,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line520">line 520</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line577">line 577</a>
     </li></ul></dd>
     
     
@@ -516,7 +516,7 @@
         
             
 <dt>
-    <h4 class="name" id="removeUgcfromProgramAndAutoSetNewOne"><span class="type-signature">&lt;static> </span>removeUgcfromProgramAndAutoSetNewOne<span class="signature">(dooh, programTimeSlot, removed_cb)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="removeUgcfromProgramAndAutoSetNewOne"><span class="type-signature">&lt;static> </span>removeUgcfromProgramAndAutoSetNewOne<span class="signature">(sessionId, programTimeSlot, removed_cb)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -558,13 +558,13 @@
 	
         <tr>
             
-                <td class="name"><code>dooh</code></td>
+                <td class="name"><code>sessionId</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">String</span>
 
 
             
@@ -574,7 +574,7 @@
             
             
             
-            <td class="description last">The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated</td>
+            <td class="description last">The id indicating the session of creating program time slot (This session id is accquired in the callback     passed to scheduleMgr.createProgramList(). )</td>
         </tr>
 	
 	
@@ -587,7 +587,7 @@
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">String</span>
 
 
             
@@ -651,7 +651,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line611">line 611</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line685">line 685</a>
     </li></ul></dd>
     
     
@@ -679,7 +679,7 @@
         
             
 <dt>
-    <h4 class="name" id="setUgcToProgram"><span class="type-signature">&lt;static> </span>setUgcToProgram<span class="signature">(dooh, programTimeSlot, ugcNo, set_cb)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="setUgcToProgram"><span class="type-signature">&lt;static> </span>setUgcToProgram<span class="signature">(programTimeSlot, ugcReferenceNo, set_cb)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -721,29 +721,6 @@
 	
         <tr>
             
-                <td class="name"><code>dooh</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
                 <td class="name"><code>programTimeSlot</code></td>
             
             
@@ -767,7 +744,7 @@
 	
         <tr>
             
-                <td class="name"><code>ugcNo</code></td>
+                <td class="name"><code>ugcReferenceNo</code></td>
             
             
             <td class="type">
@@ -837,7 +814,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line594">line 594</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line649">line 649</a>
     </li></ul></dd>
     
     
@@ -1000,7 +977,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line574">line 574</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line631">line 631</a>
     </li></ul></dd>
     
     
@@ -1041,13 +1018,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Mixins</h3><ul><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Mixins</h3><ul><li><a href="customerServiceMgr.html">customerServiceMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Jul 08 2013 19:11:59 GMT+0800 (TST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Tue Jul 09 2013 23:17:11 GMT+0800 (TST)
 </footer>
 
 <script> prettyPrint(); </script>

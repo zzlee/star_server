@@ -3,7 +3,7 @@
         "allowUnknownTags": true
     },
     "source": {
-        "include": [ "schedule_mgr.js", "scala/index.js" ],
+        "include": [ "schedule_mgr.js", "scala/index.js", "customer_service_mgr.js" ],
         "includePattern": ".+\\.js(doc)?$",
         "excludePattern": "(^|\\/|\\\\)_"
     },
