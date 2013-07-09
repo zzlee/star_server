@@ -100,7 +100,17 @@ FM.admin.logout_get_cb = function(req, res){
 
 FM.admin.memberList_get_cb = function(req, res){
     
-    admincache_mgr.getMemberListInfo(req, res);
+    FM_LOG("[admin.memberList_get_cb]");
+    var skip =  req.query.skip;
+    var limit = req.query.limit;
+    admincache_mgr.getMemberListInfo(limit, skip, function(err, memberList){
+        if (!err){
+            res.render( 'table_member', {'memberList': memberList} );
+        }
+        else{
+            res.send(400, {error: err});
+        }
+    });
     
 };
 
@@ -132,6 +142,16 @@ FM.admin.listSize_get_cb = function(req, res){
     }
     else if (req.query.listType == 'storyMovieList'){
         UGC_mgr.getUGCCountWithGenre('miix_story', function(err, count) {
+            res.send({err: err, size: count});
+        });
+    }
+    else if (req.query.listType == 'ugcCensorMovieList'){
+        UGC_mgr.getUGCCountWithGenre('miix', function(err, count) {
+            res.send({err: err, size: count});
+        });
+    }
+    else if (req.query.listType == 'ugcCensorPlayList'){
+        UGC_mgr.getUGCCountWithGenre('miix', function(err, count) {
             res.send({err: err, size: count});
         });
     }

@@ -25,6 +25,11 @@ exports.authorizationHandler = authorizationHandler;
 var dooh_handler = require('./dooh_handler.js');
 exports.dooh_handler = dooh_handler;
 
+//Kaiser
+var censor_handler = require('./censor_handler.js');
+exports.censor_handler = censor_handler;
+
+
 //GL
 var member_handler = require("../member.js"),
     scheduleDB = require("../schedule.js"),

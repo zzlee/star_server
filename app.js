@@ -1,4 +1,4 @@
-
+﻿
 /**
  * Module dependencies.
  */
@@ -90,6 +90,23 @@ app.get('/members/fb_token_validity', routes.member.isFBTokenValid);
 app.post('/members/fb_info', routes.api.signupwithFB);
 app.post('/members/device_tokens', routes.api.deviceToken);
 
+app.get('/members/:member_id/questions', routes.authorizationHandler.checkAuth, function(req, res){
+    console.log('[GET %s]', req.path);
+    console.log('req.params.member_id=%s',req.params.member_id);
+    console.log('req.route.path=%s',req.route.path);
+    
+    var result = [{_id: '51d837f6830459c42d000023', ugcReferenceNo: 234, genre: 'acount', question:{description:'我忘記了我FB帳號的密碼', date: 1371862000000}, answer:{description:'請至Facebook官網(www.facebook.com)新設定', date: 1371962000000} },
+                  {_id: '51d837f6830459c42d000023', ugcReferenceNo: 256, genre: 'login', question:{description:'我的帳號登不進去', date: 1371862000000}, answer:{description:'請確認您有出現faceboo授權頁面嗎', date: 1371892000000} },
+                  {_id: '51d837f6830459c42d000023', ugcReferenceNo: 314, genre: 'verification', question:{description:'我無法通迥認證', date: 1471862000000}, answer:{description:'請確認您有收到認證簡訊', date: 1471962000000} }];
+    
+    res.send(200, result);
+});
+
+app.post('/members/:member_id/questions', function(req, res){
+    
+});
+
+
 /**
  *  Miix client 
  */
@@ -111,6 +128,7 @@ app.get('/miix_admin/members', routes.authorizationHandler.checkAuth, routes.adm
 app.get('/miix_admin/miix_movies', routes.authorizationHandler.checkAuth, routes.admin.miixPlayList_get_cb); 
 app.get('/miix_admin/story_movies', routes.authorizationHandler.checkAuth, routes.admin.storyPlayList_get_cb);
 app.get('/miix_admin/list_size', routes.authorizationHandler.checkAuth, routes.admin.listSize_get_cb);
+app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.censor_handler.getUGCList_get_cb);
 
 
 /**
@@ -150,7 +168,7 @@ app.get('/admin/story_play_list', routes.admin.storyPlayList_get_cb);
 app.get('/admin/list_size', routes.admin.listSize_get_cb);
 
 /**
- *       GET/miix_admin/user_content_items?offset=0&limit=20
+ *       GET /miix_admin/user_content_items?offset=0&limit=20
  * @param  request
  * 
  *         query    
@@ -161,7 +179,7 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
  *                       FB_ID,
  *                       doohPlayedTimes}
  */
-
+app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
 /**
  *       PUT /miix_admin/user_content_items/{id}
  * @param  request  {string}projectId.
@@ -170,9 +188,9 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
  *                  
  * @return response {string}status 
  */
-
+app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);
 /**
- * ��    GET /miix_admin/doohs/{dooh_id}/timeslots?&offset=0&limit=20
+ * ��    GET /miix_admin/doohs/{dooh_id}/timeslots?&offset=0&limit=20
  * @param  request  {string}dooh.client(dooh_id)
  * 
  *         query    {number}searchTime start.
@@ -184,9 +202,9 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
  *                       UGC_Url,
  *                       UGC_ID}
  */
-
+app.get('/miix_admin/timeslots', routes.censor_handler.timeslots_get_cb);
 /**
- * ��    PUT /miix_admin/doohs/{dooh_id}/timeslots/{timeslot_id}
+ * ��    PUT /miix_admin/doohs/{dooh_id}/timeslots/{timeslot_id}
  * @param  request  {string}timeslot_id.
  *                  
  *         body     json{timeslotnumber(Range 1~20), 
@@ -237,9 +255,35 @@ http.createServer(app).listen(app.get('port'), function(){
 
 
 
-
-/* 
+/*
 //test
+var scheduleMgr = require('./schedule_mgr.js');
+setTimeout(function(){
+    
+    scheduleMgr.createProgramList("TP_dom", 
+        {start:(new Date("2013/5/4 0:00")).getTime(), end:(new Date("2013/5/4 23:59")).getTime()}, 
+        {start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, 
+        ["miix", "check_in", "check_in", "mood", "cultural_and_creative" ], function(err, result){
+            console.log("err=%s result=", err);
+            console.dir(result);
+            scheduleMgr.getProgramList("TP_dom",{start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, null, 30, function(err2, result2){
+                console.log('result=');
+                console.dir(result2);
+            });
+    });
+    
+    scheduleMgr.setUgcToProgram( "51da8db6fdf3b7e009000003", 426, function(err, result){
+        console.log('result=');
+        console.dir(result);
+        console.log("err=%s", err);
+    });
+    
+    scheduleMgr.removeUgcfromProgramAndAutoSetNewOne('1367596800000-1367683140000-1373357471568', '51dbc59f27c747c80b000003', function(err){
+        console.log('err=%s',err);
+    });
+   
+},3000);
+
 var aeServerMgr = require('./ae_server_mgr.js');
 var globalConnectionMgr = require('./global_connection_mgr.js');
 setInterval(function(){
@@ -249,8 +293,6 @@ setInterval(function(){
         console.log('aeServerWithLowestLoad= %s', aeServerWithLowestLoad);
     });
 }, 5000);
-
-
 
 var aeServerMgr = require('./ae_server_mgr.js');
 var doohMgr = require('./dooh_mgr.js');
