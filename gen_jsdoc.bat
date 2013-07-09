@@ -1,3 +1,3 @@
 @echo off
-del .\jsdoc\*.html
-jsdoc -c .\jsdoc\conf.json -d .\jsdoc
+del .\doc\jsdoc\*.html
+jsdoc -c .\doc\jsdoc\conf.json -d .\doc\jsdoc
