@@ -30,6 +30,7 @@ FM.DB = (function(){
             //cultural_and_creative: a.k.a. 文創
             //mood: a.k.a. 心情
             //check_in: a.k.a. 打卡
+            questionGenre = 'account authorize sign_in '.split(' '),
             
             programTimeSlotType = 'UGC padding'.split(' '),
             programTimeSlotContnetType = 'file web_page'.split(' '),
@@ -231,7 +232,20 @@ FM.DB = (function(){
         }); //  storyPlayListInfo collection
         
          //kaiser end ***************		
-		
+        var CustomerServiceSchema = new Schema({
+            fb_id: {type: String},
+            no: {type: Number},
+            genre: {type: String, enum: questionGenre},
+            reply: { type: Boolean },
+            content: [{
+                question: String,
+                questionTime: Date,
+                answer: String
+                answerTime: Date
+            }],                                  
+            createdOn: {type: Date, default: Date.now},
+            remarks: {type: String}
+        }); //   customerService collection
 		
         /****************** End of DB Schema ******************/
 		
@@ -247,6 +261,7 @@ FM.DB = (function(){
             MiixPlayListInfo = connection.model('MiixPlayListInfo', MiixPlayListInfoSchema, 'miixPlayListInfo'),
             StoryPlayListInfo = connection.model('StoryPlayListInfo', StoryPlayListInfoSchema, 'storyPlayListInfo'),
             UGC = connection.model('UGC', UGCSchema, 'ugc');
+            CustomerService = connection.model('CustomerService', CustomerServiceSchema, 'customerService');
            
             
         var dbModels = [];
@@ -262,6 +277,7 @@ FM.DB = (function(){
         dbModels["miixPlayListInfo"] = MiixPlayListInfo;
         dbModels["storyPlayListInfo"] = StoryPlayListInfo;  
         dbModels["ugc"] = UGC;
+        dbModels["customerService"] = CustomerService;
         
         //???? nobody uses it, so this section can be removed? 
         var dbSchemas = [];
@@ -360,6 +376,9 @@ FM.DB = (function(){
                         break;
                     case 'ugc':
                         return UGC;
+                        break;
+                    case 'customerService':
+                        return CustomerService;
                         break;
                     default:
                         throw new error('DB Cannot find this Collection: ' + collection);
