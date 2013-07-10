@@ -21,6 +21,7 @@ var DEFAULT_PROGRAM_PERIOD = 10*60*1000; //10 min
 var TIME_INTERVAL_RANKIGN = [{startHour: 17, endHour: 23},  //start with the time interval with highest ranking
                              {startHour: 8, endHour: 16},
                              {startHour: 0, endHour: 7}];
+var censorMgr = null;
 
 var programPlanningPattern =(function(){    
     var i = -1;
@@ -154,6 +155,14 @@ var scalaMgr_listAvailableTimeInterval = function(interval, list_cb){
     list_cb(null, result );
 };
 
+/**
+ * Initialize scheduleMgr
+ * 
+ * @param {Object} _censorMgr A reference to object instance of censerMgr
+ */
+scheduleMgr.init = function(_censorMgr){
+    censorMgr = _censorMgr;
+};
 
 /**
  * Automatically selects applied UGC items (based on a predefined rule) and put them
@@ -161,7 +170,7 @@ var scalaMgr_listAvailableTimeInterval = function(interval, list_cb){
  * <br>
  * This method will first ask ScalaMgr about the available time intervals in which Miix system
  * can play its UGC content.  It will then generate time slots base on a specific rule, and then 
- * fill them by pickeing up UGC items from a sorted list generated from censerMgr.
+ * fill them by picking up UGC items from a sorted list generated from censerMgr.
  * 
  * @param {Number} dooh The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH upon which the selected UGCs are played
  * 
@@ -613,6 +622,7 @@ scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip, got_c
  * @param {Function} updated_cb The callback function called when the program list is updated.<br>
  *     The function signature is updated_cb(err, listOfProgramsOutOfSchedule) :
  *     <ul>
+ *     <li>err: error message if any error happens
  *     <li>listOfProgramsOutOfSchedule: An array of objects containing program info:
  *         <ul>
  *         <li>programTimeSlot: A string specifying the ID (the hex string representation of its ObjectID in MongoDB) of the program item which is removed from the schedule 
@@ -625,7 +635,6 @@ scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip, got_c
  *          {programTimeSlot:43525, ugc:48353},<br>
  *          {programTimeSlot:43544, ugc:43593}]
  *         
- *     <li>err: error message if any error happens
  *     </ul>
  */
 scheduleMgr.updateProgramList = function(dooh, intervalToUpdate, updated_cb ){
@@ -678,8 +687,11 @@ scheduleMgr.setUgcToProgram = function( programTimeSlotId, ugcReferenceNo, set_c
  * @param {String} programTimeSlot The ID of the program time slot item
  * 
  * @param {Function} removed_cb The callback function called when the specific .<br>
- *     The function signature is removed_cb(err) where err is the error message indicating failure: 
- *     if successful, err returns null; if failed, err returns the error message.
+ *     The function signature is removed_cb(err, newlySelectedUgc): 
+ *     <ul>
+ *     <li>err: error message if any error happens
+ *     <li>newlySelectedUgc: the id of newly selected UGC (i.e. a hex string representation of its ObjectID in MongoDB)
+ *     </ul>
  *     
  */
 scheduleMgr.removeUgcfromProgramAndAutoSetNewOne = function(sessionId, programTimeSlot, removed_cb ){
@@ -860,9 +872,17 @@ scheduleMgr.removeUgcfromProgramAndAutoSetNewOne = function(sessionId, programTi
                   }
     ],
     function(err){
-        if (removed_cb){
-            removed_cb(err);
+        if (!err) {
+            if (removed_cb){
+                removed_cb(null, selectedUgc._id);
+            }
         }
+        else {
+            if (removed_cb){
+                removed_cb(err, null);
+            }
+        }
+        
     });
     
     

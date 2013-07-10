@@ -5,6 +5,9 @@ var fb_handler = require('./fb_handler.js');
 var FMDB = require('./db.js');
 var UGCs = FMDB.getDocModel("ugc");
 var async = require('async');
+var sheculeMgr = require('./schedule_mgr.js');
+
+sheculeMgr.init(censorMgr);
 
 
 
