@@ -58,7 +58,7 @@ FM.censor_handler.getUGCList_get_cb = function(req,res){
     
     limit = req.query.limit;
     skip = req.query.skip;
-    console.log(condition+sort+limit+skip);
+//    console.log(condition+sort+limit+skip);
     
 
     
@@ -82,7 +82,7 @@ FM.censor_handler.getUGCList_get_cb = function(req,res){
   *                       
   */
  FM.censor_handler.setUGCAttribute_get_cb = function(req,res){
-    console.dir(req);
+//    console.dir(req);
     
     var no = req.body.no;
     var vjson = {rating : req.body.rating};
