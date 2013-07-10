@@ -53,7 +53,7 @@ customerServiceMgr.updateCustomerQuestion = function(fb_id, no, vjson, cb ){
     
 };
 /**
- * get customer question from feltmeng db.<br>
+ * get customer question and answer from feltmeng db.<br>
  * <br>
  * @param {String} fb_id The ID of the FB.
  * 
@@ -62,22 +62,22 @@ customerServiceMgr.updateCustomerQuestion = function(fb_id, no, vjson, cb ){
  * @param {Function} cb The callback function called when get customer question from DB.<br>
  *     The function signature is cb(err, result) :
  *     <ul>
- *     <li>result:customer question from DB
+ *     <li>result:customer question and answser from DB
  *     <li>err: error message if any error happens
  *     </ul>
  */
-customerServiceMgr.getCustomerQuestion = function(fb_id, no, cb ){
+customerServiceMgr.getCustomerService= function(fb_id, no, cb ){
     
 };
 /**
- * get customer question list from feltmeng db.<br>
+ * get customer service list from feltmeng db.<br>
  * <br>
  * @param {String} fb_id The ID of the FB.(null will select all customer question)
  * 
  * @param {Function} cb The callback function called when get customer question list from DB.<br>
  *     The function signature is cb(err, result) :
  *     <ul>
- *     <li>result:customer question list from DB
+ *     <li>result:customer service list from DB
  *     <li>err: error message if any error happens
  *     </ul>
  */

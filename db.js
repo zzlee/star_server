@@ -237,13 +237,13 @@ FM.DB = (function(){
             no: {type: Number},
             genre: {type: String, enum: questionGenre},
             reply: { type: Boolean },
+            version: { type: String },
             content: [{
                 question: String,
                 questionTime: Date,
                 answer: String
                 answerTime: Date
             }],                                  
-            createdOn: {type: Date, default: Date.now},
             remarks: {type: String}
         }); //   customerService collection
 		
