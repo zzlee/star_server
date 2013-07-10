@@ -84,7 +84,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
     var next = 0;
     var UGCList = [];
 
-    var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, genre, arr) {
+    var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, genre, mustPlay, arr) {
         arr.push({
             userPhotoUrl: userPhotoUrl,
             ugcCensorNo: ugcCensorNo,
@@ -95,7 +95,8 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
             description: description,
             doohPlayedTimes:doohPlayedTimes, 
             rating: rating,
-            genre: genre
+            genre: genre,
+            mustPlay: mustPlay
         });
     };
 
@@ -105,12 +106,12 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
         var toDo = function(err, result){
 
             if(next == limit - 1) {
-                UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, UGCList);
+                UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, data[next].mustPlay, UGCList);
                 set_cb(null, 'ok'); 
                 next = 0;
             }
             else{
-                UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, UGCList);
+                UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, data[next].mustPlay, UGCList);
                 next += 1;
                 mappingUGCList(data, set_cb);
             }
@@ -154,7 +155,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
     };
 
     if ( pageLimit && pageSkip ) {
-        FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
+        FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
             if(err) {logger.error('[censorMgr_db.listOfUGCs]', err);
             res.send(400, {error: "Parameters are not correct"});
             }
@@ -237,7 +238,12 @@ censorMgr.setUGCAttribute = function(no, vjson, cb){
 //    console.dir(req);
 //    var no = req.query.no;
 //    var vjson = {rating : req.query.rating};
-    console.log('setUGCAttribute'+no+vjson);
+    if(vjson.mustPlay == 'true')
+        vjson = {mustPlay : true};
+    if(vjson.mustPlay == 'false')
+        vjson = {mustPlay : false};
+    
+    console.dir('setUGCAttribute'+JSON.stringify(no)+JSON.stringify(vjson));
 
     UGC_mgr.getOwnerIdByNo(no, function(err, result){
         if(err) logger.error('[setUGCAttribute_getOwnerIdByNo]', err);

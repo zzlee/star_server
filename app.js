@@ -167,7 +167,9 @@ app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.
 
 app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
 app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);
-app.get('/miix_admin/timeslots', routes.censor_handler.timeslots_get_cb);
+
+app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.timeslots_get_cb);
+app.put('/miix_admin/doohs/:doohId/timeslots/:timeslotId', routes.censor_handler.timeslots_get_cb);
 
 
 

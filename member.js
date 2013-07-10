@@ -165,7 +165,10 @@ FM.MEMBER = (function(){
 												//console.log(JSON.stringify(result));
                                                 for(var i in result){
                                                     //console.log(result[i]);
-                                                    comments_count += result[i].comments.count;
+                                                    if (result[i].comments){
+                                                        comments_count += result[i].comments.count;
+                                                    }
+                                                    
                                                     
                                                     // when count=0, there is no likes object.
                                                     likes_count += (result[i].likes) ? result[i].likes.count : 0;

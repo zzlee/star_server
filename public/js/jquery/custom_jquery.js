@@ -327,7 +327,7 @@ $(document).ready(function(){
             $.ajax({
                 url: url,
                 type: 'PUT',
-                data: {no: no, rating: rating},
+                data: {no: no, vjson:{rating: rating}},
                 success: function(response) {
                     if(response.message){
                         console.log("[Response] message:" + response.message);
@@ -342,7 +342,7 @@ $(document).ready(function(){
             $.ajax({
                 url: url,
                 type: 'PUT',
-                data: {no: no, rating: rating},
+                data: {no: no, vjson:{rating: rating}},
                 success: function(response) {
                     if(response.message){
                         console.log("[Response] message:" + response.message);
@@ -358,7 +358,7 @@ $(document).ready(function(){
             $.ajax({
                 url: url,
                 type: 'PUT',
-                data: {no: no, rating: rating},
+                data: {no: no, vjson:{rating: rating}},
                 success: function(response) {
                     if(response.message){
                         console.log("[Response] message:" + response.message);
@@ -374,7 +374,7 @@ $(document).ready(function(){
             $.ajax({
                 url: url,
                 type: 'PUT',
-                data: {no: no, rating: rating},
+                data: {no: no, vjson:{rating: rating}},
                 success: function(response) {
                     if(response.message){
                         console.log("[Response] message:" + response.message);
@@ -390,7 +390,7 @@ $(document).ready(function(){
             $.ajax({
                 url: url,
                 type: 'PUT',
-                data: {no: no, rating: rating},
+                data: {no: no, vjson:{rating: rating}},
                 success: function(response) {
                     if(response.message){
                         console.log("[Response] message:" + response.message);
@@ -406,7 +406,7 @@ $(document).ready(function(){
             $.ajax({
                 url: url,
                 type: 'PUT',
-                data: {no: no, rating: rating},
+                data: {no: no, vjson:{rating: rating}},
                 success: function(response) {
                     if(response.message){
                         console.log("[Response] message:" + response.message);
@@ -414,7 +414,32 @@ $(document).ready(function(){
                 }
             });
         });
-        }
+        $('#ugcCensor.ugcCensorNoMP').click(function(){
+            
+            var url = DOMAIN + "user_content_attribute";
+            var no = $(this).attr("name");
+            var mustPlay;
+            console.log('value'+$(this).attr("value"));
+            if($(this).attr("value") == 'true')
+                mustPlay = false;
+            if($(this).attr("value") == 'false')
+                mustPlay = true;
+                    
+            console.log('mustplay'+no+mustPlay);
+
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                data: {no: no, vjson:{mustPlay: mustPlay}},
+                success: function(response) {
+                    if(response.message){
+                        console.log("[Response] message:" + response.message);
+                    }
+                }
+            });
+        });
+        
+        }// End of ugc_censor
 
     });
   // Ajax End--------------------------------------------------------------------- 

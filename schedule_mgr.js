@@ -513,7 +513,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
     }
     
     //TODO: call the real censorMgr
-    censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
+//    censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
+    censorMgr.getUGCList(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
         
         //TODO: check the genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
         

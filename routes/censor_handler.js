@@ -85,9 +85,8 @@ FM.censor_handler.getUGCList_get_cb = function(req,res){
 //    console.dir(req);
     
     var no = req.body.no;
-    var vjson = {rating : req.body.rating};
+    var vjson = req.body.vjson;
     
-     
      censor_mgr.setUGCAttribute(no, vjson, function(err, result){
          if (!err){
              res.send(200, {message:result});
