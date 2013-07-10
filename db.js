@@ -250,8 +250,8 @@ FM.DB = (function(){
             content: [{
                 question: String,
                 questionTime: Date,
-                answer: String
-                answerTime: Date
+                answer: String,
+                answerTime: Date,
             }],                                  
             createdOn: {type: Date, default: Date.now},
             remarks: {type: String}
