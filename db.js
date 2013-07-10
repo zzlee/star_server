@@ -30,8 +30,10 @@ FM.DB = (function(){
             //cultural_and_creative: a.k.a. 文創
             //mood: a.k.a. 心情
             //check_in: a.k.a. 打卡
+            questionGenre = 'account authorize sign_in '.split(' '),
             
             programTimeSlotType = 'UGC padding'.split(' '),
+            programTimeSlotContnetType = 'file web_page'.split(' '),
             
             videoStatus = 'good soso bad waiting none'.split(' '), //DEPRECATE, keep for reference
             videoGenre = 'miix miix_street miix_story'.split(' '); //DEPRECATE, keep for reference 
@@ -70,6 +72,7 @@ FM.DB = (function(){
 			doohTimes: {type: Number, min: 0, default: 0}
         }); //  members collection
         
+      //DEPRECATED - keep for now for reference
         var VideoSchema = new Schema({
             fb_id: {type: String},
             title: {type: String},
@@ -100,7 +103,8 @@ FM.DB = (function(){
             fb_id: {type: String}, //ID of the corresponding FB feed 
             title: {type: String},
             description: {type: String},
-            url: { youtube: String, tudou: String },  //  Youtube, Tudou
+            url: { youtube: String, tudou: String, s3: String },  //  Youtube, Tudou
+            userRawContent: { image: String, text: String, video: String }, // the file path or S3 URL of storing user's image, text, or video
             ownerId: { _id:ObjectID, userID: String },
             locationId: {type: ObjectID},
             projectId: {type: String},  // project ID which is unique to each AE rendering
@@ -117,9 +121,12 @@ FM.DB = (function(){
             genre: {type: String, enum: UGCGenre, default: 'miix'},
             no: {type: Number}, //Unique serial number shown to user  
             aeId: {type: String}, //ID of AE Server who renders this UGC
+            mediaType: {type: String},
+            fileExtension: {type: String},
             triedDoohTimes: {type: Number, min: 0, default: 0}, //JF
             doohPlayedTimes: {type: Number, min: 0, default: 0},    //JF
             timesOfPlaying: {type: Number},     //JF
+            mustPlay: {type: Boolean, default: false},
             rating: {type: String} //range A~E      kaiser
         }); //  UGC collection
         
@@ -158,21 +165,25 @@ FM.DB = (function(){
         });
         
         var ProgramTimeSlotSchema = new Schema({
-            ugc: { 
-                _id: ObjectID,
-                projectId: String,
-                url: String
-                },
-            dooh: {_id: ObjectID},
+            content: {type: Mixed},
+            contentType: {type: String, enum: programTimeSlotContnetType}, //file or web_page
+            dooh: {type: String},
             timeslot: { 
                 start: Number, 
                 end: Number, 
                 startHour: Number 
                 },
+            timeStamp: {type: String},
             //status: {type: String, enum: programTimeSlotStatus}
-            type: {type: String, enum: programTimeSlotType}
+            type: {type: String, enum: programTimeSlotType}, //UGC or padding contnet
+            genre: {type: String, enum: UGCGenre} //miix, miix_street, miix_story, cultural_and_creative, mood, or check_in
         }); 
         
+        var CandidateUgcCacheSchema = new Schema({
+            sessionId: {type: String},
+            index: {type: Number},
+            candidateUgc: {type: Mixed}
+        });
         
         var AdminSchema = new Schema({
             id: {type: String},
@@ -195,43 +206,56 @@ FM.DB = (function(){
             fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
             email: {type: String, default: 'xyz@feltmeng.com'},
             mPhone: { number: String, verified: {type: Boolean, default: false}, code: String },
-            miixMovieVideo_count: {type: Number, min: 0, default: 0}, //�w�s�@�v���
-            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH�Z�n����
-            movieViewed_count: {type: Number, min: 0, default: 0},    //�v���[���`����
-            fbLike_count: {type: Number, min: 0, default: 0},         //FB�g�`��
-            fbComment_count: {type: Number, min: 0, default: 0},      //FB�d���`��
-            fbShare_count: {type: Number, min: 0, default: 0}         //FB���ɦ���
+            miixMovieVideo_count: {type: Number, min: 0, default: 0}, //已製作影片數
+            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH刊登次數
+            movieViewed_count: {type: Number, min: 0, default: 0},    //影片觀看總次數
+            fbLike_count: {type: Number, min: 0, default: 0},         //FB讚總數
+            fbComment_count: {type: Number, min: 0, default: 0},      //FB留言總數
+            fbShare_count: {type: Number, min: 0, default: 0}         //FB分享次數
             
         }); //  memberListInfo collection
         
         var MiixPlayListInfoSchema = new Schema({
             projectId: {type: String},                                //  AE project ID
-            userPhotoUrl: {type: String},                             //�����Ӥ�
-            movieNo: {type: Number},                                  //�v��s��
-            movieViewed_count: {type: Number, min: 0, default: 0},    //�v���[���`����
-            fbLike_count: {type: Number, min: 0, default: 0},         //FB�g����
-            fbComment_count: {type: Number, min: 0, default: 0},      //FB�d����
-            fbShare_count: {type: Number, min: 0, default: 0},        //FB���ɦ���
-            movieMaker: {type: String},                               //�|��W��
-            applyDoohPlay_count: {type: Number, min: 0, default: 0},  //��Z����
-            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH�Z�n����
+            userPhotoUrl: {type: String},                             //素材照片
+            movieNo: {type: Number},                                  //影片編號
+            movieViewed_count: {type: Number, min: 0, default: 0},    //影片觀看總次數
+            fbLike_count: {type: Number, min: 0, default: 0},         //FB讚次數
+            fbComment_count: {type: Number, min: 0, default: 0},      //FB留言數
+            fbShare_count: {type: Number, min: 0, default: 0},        //FB分享次數
+            movieMaker: {type: String},                               //會員名稱
+            applyDoohPlay_count: {type: Number, min: 0, default: 0},  //投稿次數
+            doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH刊登次數
             timesOfPlaying: {type: Number}      
             
         }); //  miixPlayListInfo collection
         
         var StoryPlayListInfoSchema = new Schema({
             projectId: {type: String},                                //  AE project ID
-            movieNo: {type: Number},                                  //�v��s��
-            movieViewed_count: {type: Number, min: 0, default: 0},    //�[�ݦ���
-            fbLike_count: {type: Number, min: 0, default: 0},         //FB�g����
-            fbComment_count: {type: Number, min: 0, default: 0},      //FB�d����
-            fbShare_count: {type: Number, min: 0, default: 0},        //FB���ɦ���
-            movieMaker: {type: String}                                //�|��W��
+            movieNo: {type: Number},                                  //影片編號
+            movieViewed_count: {type: Number, min: 0, default: 0},    //觀看次數
+            fbLike_count: {type: Number, min: 0, default: 0},         //FB讚次數
+            fbComment_count: {type: Number, min: 0, default: 0},      //FB留言數
+            fbShare_count: {type: Number, min: 0, default: 0},        //FB分享次數
+            movieMaker: {type: String}                                //會員名稱
             
         }); //  storyPlayListInfo collection
         
          //kaiser end ***************		
-		
+        var CustomerServiceSchema = new Schema({
+            fb_id: {type: String},
+            no: {type: Number},
+            genre: {type: String, enum: questionGenre},
+            reply: { type: Boolean },
+            content: [{
+                question: String,
+                questionTime: Date,
+                answer: String
+                answerTime: Date
+            }],                                  
+            createdOn: {type: Date, default: Date.now},
+            remarks: {type: String}
+        }); //   customerService collection
 		
         /****************** End of DB Schema ******************/
 		
@@ -241,12 +265,14 @@ FM.DB = (function(){
             Event = connection.model('Event', EventSchema, 'event'), //DEPRECATED
             Program = connection.model('Program', ProgramSchema, 'program'), //DEPRECATED
             ProgramTimeSlot = connection.model('ProgramTimeSlot', ProgramTimeSlotSchema, 'programTimeSlot'),
+            CandidateUgcCache = connection.model('CandidateUgcCache', CandidateUgcCacheSchema, 'candidateUgcCache'),
             Admin = connection.model('Admin', AdminSchema, 'admin'),
 			Analysis = connection.model('Analysis', AnalysisSchema, 'analysis'),
             MemberListInfo = connection.model('MemberListInfo', MemberListInfoSchema, 'memberListInfo'),//kaiser
             MiixPlayListInfo = connection.model('MiixPlayListInfo', MiixPlayListInfoSchema, 'miixPlayListInfo'),
             StoryPlayListInfo = connection.model('StoryPlayListInfo', StoryPlayListInfoSchema, 'storyPlayListInfo'),
             UGC = connection.model('UGC', UGCSchema, 'ugc');
+            CustomerService = connection.model('CustomerService', CustomerServiceSchema, 'customerService');
            
             
         var dbModels = [];
@@ -256,12 +282,14 @@ FM.DB = (function(){
         dbModels["event"] = Event;
         dbModels["program"] = Program;
         dbModels["programTimeSlot"] = ProgramTimeSlot;
+        dbModels["candidateUgcCache"] = CandidateUgcCache;
         dbModels["admin"] = Admin;
 		dbModels["analysis"] = Analysis;
         dbModels["memberListInfo"] = MemberListInfo;//kaiser
         dbModels["miixPlayListInfo"] = MiixPlayListInfo;
         dbModels["storyPlayListInfo"] = StoryPlayListInfo;  
         dbModels["ugc"] = UGC;
+        dbModels["customerService"] = CustomerService;
         
         //???? nobody uses it, so this section can be removed? 
         var dbSchemas = [];
@@ -360,6 +388,9 @@ FM.DB = (function(){
                         break;
                     case 'ugc':
                         return UGC;
+                        break;
+                    case 'customerService':
+                        return CustomerService;
                         break;
                     default:
                         throw new error('DB Cannot find this Collection: ' + collection);

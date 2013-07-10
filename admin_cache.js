@@ -346,7 +346,7 @@ FM.ADMINCACHE = (function(){
              *  Public Members
              */
             /**     Member     **/
-            getMemberListInfo : function(req, res){
+            getMemberListInfo : function(_limit, _skip, cb){
 
                 //TODO: need to implement
 
@@ -367,7 +367,7 @@ FM.ADMINCACHE = (function(){
                 };
 
                 var next = 0,
-                limit = 0;
+                    limit = 0;
 
                 var setMemberList = function(data, set_cb){
                     if(next == limit-1 || limit-1 < 0) {
@@ -384,21 +384,24 @@ FM.ADMINCACHE = (function(){
 
                 };
 
-                if ( req.query.limit && req.query.skip ) {
+                if ( (_limit !== null) && (_skip !== null) ) {
                     FM_LOG("[admin.memberList_get_cb]");
-                    FMDB.listOfdocModels( memberListInfos,null,'fb.userName fb.userID _id email mPhone miixMovieVideo_count doohPlay_count movieViewed_count fbLike_count fbComment_count fbShare_count', {sort:'fb.userName',limit: req.query.limit, skip: req.query.skip}, function(err, result){
+                    FMDB.listOfdocModels( memberListInfos,null,'fb.userName fb.userID _id email mPhone miixMovieVideo_count doohPlay_count movieViewed_count fbLike_count fbComment_count fbShare_count', {sort:'fb.userName',limit: _limit, skip: _skip}, function(err, result){
                         if(err) logger.error('[db.listOfMemebers]', err);
                         if(result){
 
-                            if(req.query.skip < result.length)
-                                limit = req.query.limit;
+                            if(_skip < result.length)
+                                limit = _limit;
                             else 
                                 limit = result.length;
 
                             setMemberList(result, function(err, docs){
                                 if(err) console.log(err);
                                 else {
-                                    res.render( 'table_member', {'memberList': memberList} );
+                                    //res.render( 'table_member', {'memberList': memberList} );
+                                    if (cb){
+                                        cb(err, memberList);
+                                    }
                                 }
                             });
 
@@ -406,7 +409,10 @@ FM.ADMINCACHE = (function(){
                     });
                 }
                 else{
-                    res.send(400, {error: "Parameters are not correct"});
+                    //res.send(400, {error: "Parameters are not correct"});
+                    if (cb){
+                        cb("Parameters are not correct", null);
+                    }
                 }
 
             },

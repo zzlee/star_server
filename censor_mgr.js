@@ -39,7 +39,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
 
     if(condition){
 //        condition = req.query.condition;
-        //§ë¥ó®É¶¡
+        //ï¿½ï¿½ï¿½É¶ï¿½
         if(condition.TimeStart && condition.TimeEnd){
             start = new Date(condition.TimeStart);
             h = start.getHours()-8;
@@ -55,7 +55,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
                     'createdOn': {$gte: startutc, $lt: endutc}
             };
         }
-        //¤w¸g¼f®Ö
+        //ï¿½wï¿½gï¿½fï¿½ï¿½
         if(condition == 'rating') condition ={
                 'genre':'miix',
                 'no':{ $exists: true},
@@ -63,7 +63,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
                 'projectId':{ $exists: true},
                 'rating':{ $exists: true}
         };
-        //©|¥¼¼f®Ö
+        //ï¿½|ï¿½ï¿½ï¿½fï¿½ï¿½
         if(condition == 'norating') condition ={
                 'genre':'miix',
                 'no':{ $exists: true},

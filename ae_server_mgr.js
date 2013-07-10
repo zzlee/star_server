@@ -115,7 +115,7 @@ var defaultAeServer = 'AE_Server_feltmeng_art_PC';
 
 
 //use long polling to ask AE Server to create Miix movie
-aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
+aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, mediaType, createMovie_cb) {
 
 	var starAeServerID = defaultAeServer;
 	
@@ -136,7 +136,8 @@ aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, mo
                     ownerStdID: ownerStdID,
                     ownerFbID: ownerFbID,
                     movieTitle: movieTitle,
-                    ytAccessToken: ytAccessToken 
+                    ytAccessToken: ytAccessToken,
+                    mediaType: mediaType
                 };
                             
                 globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "RENDER_MIIX_MOVIE", parameters: commandParameters }, function(responseParameters) {
@@ -159,7 +160,7 @@ aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, mo
 };
 
 //use long polling to ask AE Server to create Story movie
-aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
+aeServerMgr.createStoryMV = function(movieProjectID, miixMovieFileExtension, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
 
 	var starAeServerID = defaultAeServer;
 	
@@ -174,6 +175,7 @@ aeServerMgr.createStoryMV = function(movieProjectID, ownerStdID, ownerFbID, movi
                 var commandParameters = {
                     userFileList: fs.readdirSync(userDataFolder),
                     movieProjectID: movieProjectID,
+                    miixMovieFileExtension: miixMovieFileExtension,
                     ownerStdID: ownerStdID,
                     ownerFbID: ownerFbID,
                     movieTitle: movieTitle,
@@ -285,6 +287,35 @@ aeServerMgr.downloadStoryMovieFromS3 = function(movieProjectID, downloadMovie_cb
     
     });
 
+
+};
+
+aeServerMgr.downloadMiixMovieFromS3 = function(miixMovieProjectID, miixMovieFileExtension, downloadMovie_cb) {
+
+    var starAeServerID;
+    var UGCDB = require('./UGC.js');
+    UGCDB.getAeIdByPid(miixMovieProjectID,function(err, _aeID){
+        
+        if (!err){
+            starAeServerID = _aeID;
+        }
+        else{
+            starAeServerID = defaultAeServer;
+        }
+    
+        var commandParameters = {
+            miixMovieProjectID: miixMovieProjectID,
+            miixMovieFileExtension: miixMovieFileExtension
+        };
+        
+        globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_MIIX_MOVIE_FROM_S3", parameters: commandParameters }, function(responseParameters) {
+            //console.dir(responseParameters);
+            if (downloadMovie_cb )  {
+                downloadMovie_cb(responseParameters);
+            }
+        });
+    });
+    
 
 };
 
