@@ -211,6 +211,7 @@ scheduleMgr.init = function(_censorMgr){
  */
 scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, created_cb ){
     
+    console.log('scheduleMgr');
     var sortedUgcList = null;
     
     var putUgcIntoTimeSlots = function(finishPut_cb){
@@ -513,8 +514,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
     }
     
     //TODO: call the real censorMgr
-//    censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
-    censorMgr.getUGCList(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
+    censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
+//    censorMgr.getUGCList(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
         
         //TODO: check the genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
         
@@ -522,10 +523,10 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             sortedUgcList = _sortedUgcList;
             generateTimeSlot( function(err_2){
                 if (!err_2) {
-                    //console.log('generateTimeSlot() done! ');
+                    console.log('generateTimeSlot() done! ');
                     
                     putUgcIntoTimeSlots(function(err_3, result){
-                        //console.log('putUgcIntoTimeSlots() done! ');
+                        console.log('putUgcIntoTimeSlots() done! ');
                         if (created_cb){
                             created_cb(err_3, result);
                         }                        

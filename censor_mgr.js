@@ -171,6 +171,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
 //                        if(err) console.log('mapping_err'+err);
 //                        else{
                             if (cb){
+//                                console.dir('UGCList'+JSON.stringify(UGCList));
                                 cb(err, UGCList);
 //                            }
 //                            res.render( 'table_censorUGC', {ugcCensorMovieList: UGCList} );
@@ -180,9 +181,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
             }
         });
     }
-    else{
-        res.send(400, {error: "Parameters are not correct"});
-    }
+
 
 };//getUGCList end
 

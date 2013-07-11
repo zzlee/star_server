@@ -128,7 +128,7 @@ $(document).ready(function(){
     FM.miixPlayList = new PageList( 'miixMovieList', 5, '/miix_admin/miix_movies');
     FM.storyPlayList = new PageList( 'storyMovieList', 8, '/miix_admin/story_movies');
     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
-    FM.UGCPlayList = new PageList( 'ugcCensorPlayList', 5, '/miix_admin/timeslots');
+    FM.UGCPlayList = new PageList( 'ugcCensorPlayList', 5, '/miix_admin/doohs/taipeiarena/timeslots');
     
     FM.currentContent = FM.memberList;
 
@@ -220,7 +220,13 @@ $(document).ready(function(){
 //        console.log('request'+JSON.stringify(settings.url));
 //        console.log('request'+JSON.stringify(censorCheck));
         
+        playlistCheck = settings.url.substring(0,17);
         censorCheck = settings.url.substring(0,22);
+        
+//         console.log('playlistCheck'+playlistCheck);
+        /**
+         * UGCList
+         */
         if(censorCheck == '/miix_admin/ugc_censor'){
             console.log('ajax_censor');
         /**
@@ -302,7 +308,7 @@ $(document).ready(function(){
                 console.log("item: " + $(this).attr("value"));
                 inputSearchData[$(this).attr("name")] = $(this).attr("value");
                 if($(this).attr("value") == "" && flag == 0){
-                    alert('you have to enter full date!!');
+                    alert('You have to enter full date!!');
                     flag = 1; 
                 }
                 conditions = inputSearchData;
@@ -418,7 +424,7 @@ $(document).ready(function(){
             
             var url = DOMAIN + "user_content_attribute";
             var no = $(this).attr("name");
-            var mustPlay;
+            var mustPlay = null;
             console.log('value'+$(this).attr("value"));
             if($(this).attr("value") == 'true')
                 mustPlay = false;
@@ -440,6 +446,55 @@ $(document).ready(function(){
         });
         
         }// End of ugc_censor
+        
+        /**
+         * playList
+         */
+        if(playlistCheck == '/miix_admin/doohs'){
+            console.log('dooh');
+            $('#ugcSearchDateBtn').click(function(){
+                var flag = 0;
+                var inputSearchData = {};
+                var url = DOMAIN + "doohs/taipeiarena/timeslots";
+
+                $('#condition-inner input[class="ugcSearchDateBtn"]').each(function(i){
+                    console.log("item: " + $(this).attr("value"));
+
+                    inputSearchData[$(this).attr("name")] = $(this).attr("value");
+
+                    console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
+                    console.log('value'+$(this).attr("value"));
+//                  conditions = inputSearchData;
+                    if($(this).attr("value") == "" && flag == 0){
+                        alert('You have to enter full date and program sequence!!');
+                        flag = 1; 
+                    }
+//                    else{
+                        if(inputSearchData.TimeStart && inputSearchData.TimeEnd && inputSearchData.playtimeStart && inputSearchData.playtimeEnd && inputSearchData.ugcPriorityText){
+                            $.ajax({
+                                url: url,
+                                type: 'POST',
+                                data: {intervalOfSelectingUGC:{start:inputSearchData.TimeStart, end:inputSearchData.TimeEnd}, intervalOfPlanningDoohProgrames:{start:inputSearchData.playtimeStart, end:inputSearchData.playtimeEnd}, programSequence:inputSearchData.ugcPriorityText},
+                                success: function(response) {
+                                    if(response.message){
+                                        console.log("[Response] message:" + response.message);
+                                    }
+                                }
+                            });
+//                        }
+                    }
+                });
+
+            });
+            //test
+//          if($(this).attr("name") == 'ugcPriorityText'){
+//          if($(this).attr("value") != '¥´' && flag == 0){
+//          alert('You have to enter correct  program sequence!!');
+//          flag = 1; 
+
+//          }}
+
+        }// End of doohs
 
     });
   // Ajax End--------------------------------------------------------------------- 

@@ -1,19 +1,22 @@
 ﻿
 form#mainform(action='')
+
+    #condition-inner
       label 截稿時間
       input(class='ugcSearchDateBtn', type='datetime-local', name='TimeStart', onfocus='this.value=\'\'')
       | 到
       input(class='ugcSearchDateBtn', type='datetime-local', name='TimeEnd', onfocus='this.value=\'\'')
       br
       label 播放時間
-      input(class='ugcSearchDateBtn', type='datetime-local', name='TimeStart', onfocus='this.value=\'\'')
+      input(class='ugcSearchDateBtn', type='datetime-local', name='playtimeStart', onfocus='this.value=\'\'')
       | 到
-      input(class='ugcSearchDateBtn', type='datetime-local', name='TimeEnd', onfocus='this.value=\'\'')
+      input(class='ugcSearchDateBtn', type='datetime-local', name='playtimeEnd', onfocus='this.value=\'\'')
       input#ugcSearchDateBtn(type='button', class='ugcSearchDate', value='自動配對')
       br
       br
       label 播放清單順序
-      input(class='ugcPriorityBtn', type='text' ,name='ugcPriorityText' ,onfocus='this.value=\'\'')
+      input(class='ugcSearchDateBtn', type='text' ,name='ugcPriorityText' ,onfocus='this.value=\'\'')
+    .clear
 
     table#product-table(border='0', width='100%', cellpadding='0', cellspacing='0')
         tr
