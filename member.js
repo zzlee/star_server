@@ -165,7 +165,9 @@ FM.MEMBER = (function(){
 												//console.log(JSON.stringify(result));
                                                 for(var i in result){
                                                     //console.log(result[i]);
-                                                    comments_count += result[i].comments.count;
+                                                    if (result[i].comments){
+                                                        comments_count += result[i].comments.count;
+                                                    }
                                                     
                                                     // when count=0, there is no likes object.
                                                     likes_count += (result[i].likes) ? result[i].likes.count : 0;
@@ -215,7 +217,7 @@ FM.MEMBER = (function(){
             
             isFBTokenValid: function( req, res ){
                 FM_LOG("[isFBTokenValid]");
-                if(!req.query && !req.query.fb_id && !req.query._id){
+                if(!req.query || !req.query.fb_id || !req.query._id || ((req.query._id).length!==24)){
                     res.send({error: "Bad Request"});
                     return;
                 }
