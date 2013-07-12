@@ -233,7 +233,7 @@ var getUserContent = function(fb_id,get_cb){
  *                       
  */
 censorMgr.setUGCAttribute = function(no, vjson, cb){
-    var UGC_mgr = require('./UGC.js');
+    var UGC_mgr = require('./ugc.js');
 //    console.dir(req);
 //    var no = req.query.no;
 //    var vjson = {rating : req.query.rating};

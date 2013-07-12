@@ -5,7 +5,7 @@ var workingPath = process.cwd();
 var admin_mgr = require("../admin.js"),
     member_mgr = require("../member.js"),
     schedule_mgr = require("../schedule.js"),
-    UGC_mgr = require("../UGC.js"),
+    UGC_mgr = require("../ugc.js"),
     tokenMgr = require("../token_mgr.js"),
     admincache_mgr = require("../admin_cache.js");
 

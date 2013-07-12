@@ -204,7 +204,7 @@ aeServerMgr.createStoryMV = function(movieProjectID, miixMovieFileExtension, own
 aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
 
     var starAeServerID;
-    var UGCDB = require('./UGC.js');
+    var UGCDB = require('./ugc.js');
     UGCDB.getAeIdByPid(movieProjectID,function(err, _aeID){
         
         if (!err){
@@ -234,7 +234,7 @@ aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, download
 
 
 	var starAeServerID;
-	var UGCDB = require('./UGC.js');
+	var UGCDB = require('./ugc.js');
 	UGCDB.getAeIdByPid(movieProjectID,function(err, _aeID){
         
         if (!err){
@@ -264,7 +264,7 @@ aeServerMgr.downloadStoryMovieFromS3 = function(movieProjectID, downloadMovie_cb
 
 
     var starAeServerID;
-    var UGCDB = require('./UGC.js');
+    var UGCDB = require('./ugc.js');
     UGCDB.getAeIdByPid(movieProjectID,function(err, _aeID){
         
         if (!err){
@@ -293,7 +293,7 @@ aeServerMgr.downloadStoryMovieFromS3 = function(movieProjectID, downloadMovie_cb
 aeServerMgr.downloadMiixMovieFromS3 = function(miixMovieProjectID, miixMovieFileExtension, downloadMovie_cb) {
 
     var starAeServerID;
-    var UGCDB = require('./UGC.js');
+    var UGCDB = require('./ugc.js');
     UGCDB.getAeIdByPid(miixMovieProjectID,function(err, _aeID){
         
         if (!err){
