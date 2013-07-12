@@ -152,6 +152,21 @@ app.get('/miix/videos/new_videos', routes.api.newUGCList);
 app.post('/miix/videos/miix_videos', routes.api.submitAUGC);
 app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh);
 
+app.get('/miix/ugc_hightlights', function(req, res){
+    var db = require('./db.js');
+    
+    var ugcModel = db.getDocModel("ugc");
+    ugcModel.find({ "rating": "A", $or: [ { "genre":"miix" }, { "genre": "check_in"} ] }).sort({"createdOn":-1}).limit(10).exec(function (err, docs) {
+        if (!err){
+            res.send(docs);
+        }
+        else {
+            res.send(400, {error: err} );
+        }
+        
+    });
+    
+});
 
 
 // Miix admin
