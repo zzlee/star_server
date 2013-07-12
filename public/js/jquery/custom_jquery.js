@@ -465,12 +465,11 @@ $(document).ready(function(){
                     console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
                     console.log('value'+$(this).attr("value"));
 //                  conditions = inputSearchData;
-                    if($(this).attr("value") == "" && flag == 0){
-                        alert('You have to enter full date and program sequence!!');
-                        flag = 1; 
-                    }
-//                    else{
-                        if(inputSearchData.TimeStart && inputSearchData.TimeEnd && inputSearchData.playtimeStart && inputSearchData.playtimeEnd && inputSearchData.ugcPriorityText){
+//                    if($(this).attr("value") == "" && flag == 0){
+//                        alert('You have to enter full date and program sequence!!');
+//                        flag = 1; 
+//                    }
+//                        if(inputSearchData.TimeStart && inputSearchData.TimeEnd && inputSearchData.playtimeStart && inputSearchData.playtimeEnd && inputSearchData.ugcPriorityText){
                             $.ajax({
                                 url: url,
                                 type: 'POST',
@@ -481,8 +480,7 @@ $(document).ready(function(){
                                     }
                                 }
                             });
-//                        }
-                    }
+//                    }
                 });
 
             });

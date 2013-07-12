@@ -42,7 +42,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
 
     if(condition){
 //        condition = req.query.condition;
-        //���ɶ�
+        //
         if(condition.TimeStart && condition.TimeEnd){
             start = new Date(condition.TimeStart);
             h = start.getHours()-8;
@@ -51,24 +51,24 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
             h = end.getHours()-8;
             endutc = end.setHours(h);
             condition ={
-                    'genre':'miix',
+//                    'genre':'miix',
                     'no':{ $exists: true},
                     'ownerId':{ $exists: true},
                     'projectId':{ $exists: true},
                     'createdOn': {$gte: startutc, $lt: endutc}
             };
         }
-        //�w�g�f��
+        //
         if(condition == 'rating') condition ={
-                'genre':'miix',
+//                'genre':'miix',
                 'no':{ $exists: true},
                 'ownerId':{ $exists: true},
                 'projectId':{ $exists: true},
                 'rating':{ $exists: true}
         };
-        //�|���f��
+        //
         if(condition == 'norating') condition ={
-                'genre':'miix',
+//                'genre':'miix',
                 'no':{ $exists: true},
                 'ownerId':{ $exists: true},
                 'projectId':{ $exists: true},
@@ -76,7 +76,6 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
         };
     }
 
-    //TODO: need to implement
     var miix_content_mgr = require('./miix_content_mgr.js');
     var member_mgr = require('./member.js');
 
@@ -157,7 +156,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
     if ( pageLimit && pageSkip ) {
         FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
             if(err) {logger.error('[censorMgr_db.listOfUGCs]', err);
-            res.send(400, {error: "Parameters are not correct"});
+//            res.send(400, {error: "Parameters are not correct"});
             }
             if(result){
 
