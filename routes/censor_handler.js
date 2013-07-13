@@ -135,7 +135,7 @@ FM.censor_handler.gettimeslots_get_cb = function(req, res){
     
     schedule_mgr.getProgramList(doohId, interval, limit, skip, function(err, result){
         if (!err){
-//            console.log(result);
+            console.dir(result);
 //          res.render( 'table_censorPlayList', {ugcCensorPlayList: result} );
 //            res.send(200, {message:result});
         }

@@ -516,7 +516,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
     //TODO: call the real censorMgr
     console.log('intervalOfSelectingUGC'+JSON.stringify(intervalOfSelectingUGC));
 //    censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
-    censorMgr.getUGCList(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
+    censorMgr.getUGCListLite(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
         console.log('_sortedUgcList'+_sortedUgcList);
         
         //TODO: check the genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
@@ -600,8 +600,15 @@ scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip, got_c
     }
         
     query.exec(function (_err, result) {
+        if(_err)got_cb(_err, result);
         if (got_cb){
-            got_cb(_err, result);
+            censorMgr.getPlayList(result , function(err, result){
+                if(err)got_cb(err, null)
+                if(result){
+                 got_cb(null, result);
+                }
+            });
+            
         }
         
     });
