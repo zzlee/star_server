@@ -26,8 +26,6 @@ form#mainform(action='')
           th.table-header-repeat.line-left.minwidth-1(width='10')
             a(href='') 影片編號
           th.table-header-repeat.line-left.minwidth-1(width='10')
-            a(href='') 播放時間
-          th.table-header-repeat.line-left.minwidth-1(width='10')
             a(href='') 上傳素材(文)
           th.table-header-repeat.line-left.minwidth-1(width='10')
             a(href='') 上傳素材(圖)
@@ -57,7 +55,6 @@ form#mainform(action='')
                              label.label_checkin 打卡
                       td #{ugcCensor.ugcCensorNo}
                       td #{ugcCensor.userContent}
-                      td #{ugcCensor.userContent}
                       td
                         img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
                       td #{ugcCensor.fb_userName}
@@ -107,16 +104,19 @@ form#mainform(action='')
                              |   E
                              br
                            if(ugcCensor.rating == 'f')
-                             input#ugcCensor.ugcCensorNoa(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             input#ugcCensor.ugcCensorNof(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}' , checked)
                              |   F
                              br
                            else
-                             input#ugcCensor.ugcCensorNoa(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}')
+                             input#ugcCensor.ugcCensorNof(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}')
                              |   F
                              br
                          .clear
-                      td 
-                        input#ugc(type='checkbox')
+                      td
+                        if(ugcCensor.mustPlay == true)					  
+                          input#ugcCensor.ugcCensorNoMP(type='checkbox', value='#{ugcCensor.mustPlay}', name='#{ugcCensor.ugcCensorNo}', checked)
+                        else
+                          input#ugcCensor.ugcCensorNoMP(type='checkbox', value='#{ugcCensor.mustPlay}', name='#{ugcCensor.ugcCensorNo}')
 
 
                 else
@@ -132,7 +132,6 @@ form#mainform(action='')
                              label.label_checkin 打卡
                       td #{ugcCensor.ugcCensorNo}
                       td #{ugcCensor.userContent}
-                      td #{ugcCensor.userContent}
                       td
                         img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
                       td #{ugcCensor.fb_userName}
@@ -182,14 +181,17 @@ form#mainform(action='')
                              |   E
                              br
                            if(ugcCensor.rating == 'f')
-                             input#ugcCensor.ugcCensorNoa(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}' , checked)
+                             input#ugcCensor.ugcCensorNof(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}' , checked)
                              |   F
                              br
                            else
-                             input#ugcCensor.ugcCensorNoa(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}')
+                             input#ugcCensor.ugcCensorNof(type='radio', value='f', name='#{ugcCensor.ugcCensorNo}')
                              |   F
                              br
                          .clear
                       td 
-                        input#ugc(type='checkbox')
+                        if(ugcCensor.mustPlay == true)					  
+                          input#ugcCensor.ugcCensorNoMP(type='checkbox', value='#{ugcCensor.mustPlay}', name='#{ugcCensor.ugcCensorNo}', checked)
+                        else
+                          input#ugcCensor.ugcCensorNoMP(type='checkbox', value='#{ugcCensor.mustPlay}', name='#{ugcCensor.ugcCensorNo}')
 

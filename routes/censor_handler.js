@@ -1,4 +1,4 @@
-
+ï»¿
 var DEBUG = true,
     FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str) ); } : function(str){} ;
  
@@ -6,6 +6,9 @@ var FM = { censor_handler: {} };
 
 var censor_mgr = require("../censor_mgr.js");
 var apis = require("../routes/api.js");
+var schedule_mgr = require("../schedule_mgr.js");
+
+var sessionId = null;
 
 /**
  * @param  request  {json}sort:{?}
@@ -43,7 +46,7 @@ FM.censor_handler.getUGCList_get_cb = function(req,res){
 
     condition = {
             'no':{ $exists: true},
-            'genre':'miix',
+//            'genre':'miix',
             'ownerId':{ $exists: true},
             'projectId':{ $exists: true}
     };
@@ -58,7 +61,7 @@ FM.censor_handler.getUGCList_get_cb = function(req,res){
     
     limit = req.query.limit;
     skip = req.query.skip;
-    console.log(condition+sort+limit+skip);
+//    console.log(condition+sort+limit+skip);
     
 
     
@@ -85,9 +88,8 @@ FM.censor_handler.getUGCList_get_cb = function(req,res){
     console.dir(req);
     
     var no = req.body.no;
-    var vjson = {rating : req.body.rating};
+    var vjson = req.body.vjson;
     
-     
      censor_mgr.setUGCAttribute(no, vjson, function(err, result){
          if (!err){
              res.send(200, {message:result});
@@ -99,21 +101,94 @@ FM.censor_handler.getUGCList_get_cb = function(req,res){
 
 
   };
- 
-FM.censor_handler.timeslots_get_cb = function(req, res){
-    var UGCPlayList = [];
-    var testArray =
-        [ { doohTimes: ['2013/5/3 15:14', '2013/6/5 16:14', '2013/8/3 15:08'], //¯À§÷·Ó¤ù
-            ugcCensorNo: '035', //¼v¤ù½s¸¹
-            genre: 'mood', //Æ[¬Ý¦¸¼Æ
-            userContent: 'yeah', //FBÆg¦¸¼Æ
-            userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //FB¯d¨¥¼Æ
-            fb_userName: 'NO User', //FB¤À¨É¦¸¼Æ
-            fbPictureUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //·|­û¦WºÙ
-            rating: 'a' //§ë½Z¦¸¼Æ
+
+FM.censor_handler.createTimeslots_get_cb = function(req, res){
+//    console.dir(req);
+    var doohId = req.params.doohId;
+//    var intervalOfSelectingUGC = req.body.intervalOfSelectingUGC;
+//    var intervalOfPlanningDoohProgrames = req.body.intervalOfPlanningDoohProgrames;
+//    var programSequence = req.body.programSequence;
+    var _intervalOfSelectingUGCStart =  new Date(req.body.intervalOfSelectingUGC.start).getTime();
+    var _intervalOfSelectingUGCend =  new Date(req.body.intervalOfSelectingUGC.end).getTime();
+    var _intervalOfSelectingUGC = {start:_intervalOfSelectingUGCStart, end:_intervalOfSelectingUGCend};
+    
+    var _intervalOfPlanningDoohProgramesStart = new Date(req.body.intervalOfPlanningDoohProgrames.start).getTime();
+    var _intervalOfPlanningDoohProgramesEnd = new Date(req.body.intervalOfPlanningDoohProgrames.end).getTime();
+    var _intervalOfPlanningDoohProgrames = {start:_intervalOfPlanningDoohProgramesStart, end:_intervalOfPlanningDoohProgramesEnd};
+//    var _programSequence = req.body.programSequence;
+    console.log('3--'+JSON.stringify(req.body.intervalOfPlanningDoohProgrames)+JSON.stringify(_intervalOfPlanningDoohProgramesStart)+JSON.stringify(_intervalOfPlanningDoohProgramesEnd));
+//    console.dir('1--'+req.params.doohId+JSON.stringify(_intervalOfSelectingUGC)+_programSequence);
+    console.dir('1--'+req.params.doohId+JSON.stringify(_intervalOfSelectingUGC)+JSON.stringify(_intervalOfPlanningDoohProgrames));
+    
+//    var intervalOfSelectingUGC = {start: 1367710220000, end: 1371862000000};
+//    var intervalOfPlanningDoohProgrames = {start: 1367710220000, end: 1371862000000};
+    var programSequence = ['miix'];
+//    console.dir('2--'+req.params.doohId+JSON.stringify(intervalOfSelectingUGC)+JSON.stringify(intervalOfPlanningDoohProgrames)+programSequence);
+    
+    schedule_mgr.createProgramList(doohId, _intervalOfSelectingUGC, _intervalOfPlanningDoohProgrames, programSequence, function(err, result){
+        if (!err){
+            sessionId = result.sessionId;
+            console.log('---sessionId---'+sessionId);
+            res.send(200, {message: JSON.stringify(result.sessionId)});
         }
-            ];
-    res.render( 'table_censorPlayList', {ugcCensorPlayList: testArray} );
+        else{
+            res.send(400, {error: err});
+        }
+    });
+    
+};
+  
+  
+FM.censor_handler.gettimeslots_get_cb = function(req, res){
+    
+//    var doohId = req.params.doohId;
+    var doohId = 'taipeiarena';
+    var interval = {start: 1367710220000, end: 1371862000000};
+    var limit = req.query.limit;
+    var skip = req.query.skip;
+    console.log('gettimeslots_get_cb'+doohId+interval+limit+skip);
+    var testArray = [];
+    
+    schedule_mgr.getProgramList(doohId, interval, limit, skip, function(err, result){
+        if (!err){
+//          console.dir('schedule_mgr-----'+result);
+            if(result)
+                res.render( 'table_censorPlayList', {ugcCensorPlayList: result} );
+//          res.send(200, {message:result});
+        }
+        else{
+            res.render( 'table_censorPlayList', {ugcCensorPlayList: testArray} );
+//            res.send(400, {error: err});
+        }
+    });
+    
+//     testArray =
+//        [ { doohTimes: ['2013/5/3 15:14', '2013/6/5 16:14', '2013/8/3 15:08'], //ç´ æç…§ç‰‡
+//            ugcCensorNo: '035', //å½±ç‰‡ç·¨è™Ÿ
+//            genre: 'mood', //è§€çœ‹æ¬¡æ•¸
+//            userContent: 'yeah', //FBè®šæ¬¡æ•¸
+//            userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //FBç•™è¨€æ•¸
+//            fb_userName: 'NO User', //FBåˆ†äº«æ¬¡æ•¸
+//            fbPictureUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //æœƒå“¡åç¨±
+//            rating: 'a' //æŠ•ç¨¿æ¬¡æ•¸
+//        }
+//            ];
+//    res.render( 'table_censorPlayList', {ugcCensorPlayList: testArray} );
  };
+
+FM.censor_handler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
+    console.log('Enter--->censor_handler.pushProgramsTo3rdPartyContent_get_cb');
+    
+    schedule_mgr.pushProgramsTo3rdPartyContentMgr(sessionId, function(err, result){
+        if (!err){
+            //TODO pushProgramsTo3rdPartyContentMgr
+            console.log(result);
+        }
+        else{
+            res.send(400, {error: err});
+        }
+    });
+    
+};
 
 module.exports = FM.censor_handler;

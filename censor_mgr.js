@@ -1,11 +1,14 @@
 
 var censorMgr = {};
 
+var async = require('async');
 var fb_handler = require('./fb_handler.js');
 var FMDB = require('./db.js');
-var UGCs = FMDB.getDocModel("ugc");
-var async = require('async');
 var sheculeMgr = require('./schedule_mgr.js');
+var miix_content_mgr = require('./miix_content_mgr.js');
+var member_mgr = require('./member.js');
+
+var UGCs = FMDB.getDocModel("ugc");
 
 sheculeMgr.init(censorMgr);
 
@@ -29,20 +32,9 @@ sheculeMgr.init(censorMgr);
  */
 censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
 
-//    condition = {
-//            'no':{ $exists: true},
-//            'genre':'miix',
-//            'ownerId':{ $exists: true},
-//            'projectId':{ $exists: true}
-//    };
-//
-//    sort = {
-//            'no':1
-//    };
 
     if(condition){
-//        condition = req.query.condition;
-        //���ɶ�
+        //
         if(condition.TimeStart && condition.TimeEnd){
             start = new Date(condition.TimeStart);
             h = start.getHours()-8;
@@ -51,24 +43,21 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
             h = end.getHours()-8;
             endutc = end.setHours(h);
             condition ={
-                    'genre':'miix',
                     'no':{ $exists: true},
                     'ownerId':{ $exists: true},
                     'projectId':{ $exists: true},
                     'createdOn': {$gte: startutc, $lt: endutc}
             };
         }
-        //�w�g�f��
+        //
         if(condition == 'rating') condition ={
-                'genre':'miix',
                 'no':{ $exists: true},
                 'ownerId':{ $exists: true},
                 'projectId':{ $exists: true},
                 'rating':{ $exists: true}
         };
-        //�|���f��
+        //
         if(condition == 'norating') condition ={
-                'genre':'miix',
                 'no':{ $exists: true},
                 'ownerId':{ $exists: true},
                 'projectId':{ $exists: true},
@@ -76,87 +65,11 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
         };
     }
 
-    //TODO: need to implement
-    var miix_content_mgr = require('./miix_content_mgr.js');
-    var member_mgr = require('./member.js');
-
-    var limit = 0;
-    var next = 0;
-    var UGCList = [];
-
-    var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, genre, arr) {
-        arr.push({
-            userPhotoUrl: userPhotoUrl,
-            ugcCensorNo: ugcCensorNo,
-            userContent: userContent,
-            fb_userName: fb_userName,
-            fbPictureUrl: fbPictureUrl,
-            title: title,
-            description: description,
-            doohPlayedTimes:doohPlayedTimes, 
-            rating: rating,
-            genre: genre
-        });
-    };
-
-
-    var mappingUGCList = function(data, set_cb){
-
-        var toDo = function(err, result){
-
-            if(next == limit - 1) {
-                UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, UGCList);
-                set_cb(null, 'ok'); 
-                next = 0;
-            }
-            else{
-                UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, UGCList);
-                next += 1;
-                mappingUGCList(data, set_cb);
-            }
-
-        };//toDo End ******
-
-        //async
-        if(data[next] !== null){
-            async.parallel([
-                            function(callback){
-                                miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
-                                    if(err) {
-                                        callback(err,null);
-                                    }
-                                    else callback(null, result);
-                                });
-                            },
-                            function(callback){
-                                getUserContent(data[next].ownerId.userID,function(err, result){
-                                    if(err){
-                                        logger.error('[mappingUserProfilePicture_getUserContent]', err);
-                                        callback(err, null);
-                                    }
-                                    if(result){
-                                        callback(null, result);
-                                    }
-                                });
-
-                            },
-                            function(callback){
-                                member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
-                                    if(err) callback(err, null);
-                                    else if(result === null) callback(null, 'No User');
-                                    else callback(null, result.fb.userName);
-                                });
-
-                            }
-                            ], toDo);
-        }
-
-    };
-
     if ( pageLimit && pageSkip ) {
-        FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
-            if(err) {logger.error('[censorMgr_db.listOfUGCs]', err);
-            res.send(400, {error: "Parameters are not correct"});
+        FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
+            if(err) {
+                logger.error('[censorMgr_db.listOfUGCs]', err);
+                cb(err, null);
             }
             if(result){
 
@@ -167,25 +80,107 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
 
                 if(limit > 0){ 
                     mappingUGCList(result, function(err,docs){
-//                        if(err) console.log('mapping_err'+err);
-//                        else{
                             if (cb){
+//                                console.dir('UGCList'+JSON.stringify(UGCList));
                                 cb(err, UGCList);
-//                            }
-//                            res.render( 'table_censorUGC', {ugcCensorMovieList: UGCList} );
                         }
                     });
                 }
             }
         });
     }
-    else{
-        res.send(400, {error: "Parameters are not correct"});
-    }
 
 };//getUGCList end
 
+/**
+ * mapping UGC list
+ */
 
+
+var limit = 0;
+var next = 0;
+var UGCList = [];
+var timeslotStart;
+var timeslotEnd;
+
+var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, genre, mustPlay, timeslotStart, timeslotEnd, timeStamp, arr) {
+    arr.push({
+        userPhotoUrl: userPhotoUrl,
+        ugcCensorNo: ugcCensorNo,
+        userContent: userContent,
+        fb_userName: fb_userName,
+        fbPictureUrl: fbPictureUrl,
+        title: title,
+        description: description,
+        doohPlayedTimes:doohPlayedTimes, 
+        rating: rating,
+        genre: genre,
+        mustPlay: mustPlay,
+        timeslotStart: timeslotStart,
+        timeslotEnd: timeslotEnd,
+        timeStamp: timeStamp
+    });
+};
+var mappingUGCList = function(data, set_cb){
+    limit = data.length;
+
+    var toDo = function(err, result){
+        
+        if(data[next].timeslot){
+        timeslotStart = new Date(data[next].timeslot.start).toISOString();
+        timeslotEnd = new Date(data[next].timeslot.end).toISOString();
+        }
+
+        if(next == limit - 1) {
+            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, UGCList);
+            set_cb(null, 'ok'); 
+            next = 0;
+            UGCList = [];
+        }
+        else{
+            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, UGCList);
+            next += 1;
+            mappingUGCList(data, set_cb);
+        }
+
+    };//toDo End ******
+
+    //async
+    if(data[next] !== null){
+        console.log('next'+next+'---'+limit);
+        async.parallel([
+                        function(callback){
+                            miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
+                                if(err) {
+                                    callback(err,null);
+                                }
+                                else callback(null, result);
+                            });
+                        },
+                        function(callback){
+                            getUserContent(data[next].ownerId.userID,function(err, result){
+                                if(err){
+                                    logger.error('[mappingUserProfilePicture_getUserContent]', err);
+                                    callback(err, null);
+                                }
+                                if(result){
+                                    callback(null, result);
+                                }
+                            });
+
+                        },
+                        function(callback){
+                            member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
+                                if(err) callback(err, null);
+                                else if(result === null) callback(null, 'No User');
+                                else callback(null, result.fb.userName);
+                            });
+
+                        }
+                        ], toDo);
+    }
+
+};
 /**
  * @param  request  {string}dooh_ID
  * 
@@ -233,11 +228,13 @@ var getUserContent = function(fb_id,get_cb){
  *                       
  */
 censorMgr.setUGCAttribute = function(no, vjson, cb){
-    var UGC_mgr = require('./ugc.js');
-//    console.dir(req);
-//    var no = req.query.no;
-//    var vjson = {rating : req.query.rating};
-    console.log('setUGCAttribute'+no+vjson);
+    
+    if(vjson.mustPlay == 'true')
+        vjson = {mustPlay : true};
+    if(vjson.mustPlay == 'false')
+        vjson = {mustPlay : false};
+    
+    console.dir('setUGCAttribute'+JSON.stringify(no)+JSON.stringify(vjson));
 
     UGC_mgr.getOwnerIdByNo(no, function(err, result){
         if(err) logger.error('[setUGCAttribute_getOwnerIdByNo]', err);
@@ -248,7 +245,6 @@ censorMgr.setUGCAttribute = function(no, vjson, cb){
                 if(err) {
                     logger.error('[setUGCAttribute_updateAdoc]', err);
                     cb(err,null);
-//                    res.send(400, {error: "Parameters are not correct"});
                 }
                 if(result){
                     cb(null,'success');
@@ -258,6 +254,100 @@ censorMgr.setUGCAttribute = function(no, vjson, cb){
         }
 
     });
+
+};
+
+/**
+ * for scheduleMgr
+ */
+censorMgr.getUGCListLite = function(condition, cb){
+
+    FMDB.listOfdocModels( UGCs,{'createdOn' : {$gte: condition.start, $lt: condition.end}},'_id genre', {sort :'no'}, function(err, result){
+        if(err) {
+            logger.error('[censorMgr.getUGCListLite]', err);
+            cb(err, null);
+        }
+        if(result){
+            console.dir('result'+JSON.stringify(result));
+            cb(err, result);
+        }
+    });
+
+};
+
+
+
+censorMgr.getPlayList = function(programList, cb){
+
+
+    var limit = 0;
+    var next = 0;
+    var playList = [];
+    console.log('programList.length'+programList.length);
+
+    var playListInfo = function(no, description, title, doohPlayedTimes, rating, genre, mustPlay, timeslot, timeStamp, dooh, _id, projectId, ownerId, arr) {
+        arr.push({
+            no: no,
+            description: description,
+            title: title,
+            doohPlayedTimes:doohPlayedTimes, 
+            rating: rating,
+            genre: genre,
+            mustPlay: mustPlay,
+            timeslot: timeslot,
+            timeStamp: timeStamp,
+            dooh: dooh,
+            _id: _id,
+            projectId: projectId,
+            ownerId:ownerId
+        });
+    };    
+
+    var mappingPlayList = function(data, set_cb){
+//      console.log('data[next]._id'+data[next].content._id);
+
+        limit = data.length;
+
+        FMDB.listOfdocModels( UGCs, {_id: data[next].content._id},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', null, function(err, result){
+//          FMDB.listOfdocModels( UGCs, {_id:'51ac537031f2f25c0a00000d'},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', {sort:'no'}, function(err, result){
+            console.log('mappingPlayList_listOfdocModels'+err+result);
+            console.log('mappingPlayList_listOfdocModels---------'+result[0].no);
+            if(err) {
+                logger.error('[censorMgr_db.listOfUGCs]', err);
+//              cb(err, null);
+            }
+            if(result !== null){
+                if(next == limit - 1) {
+                    playListInfo(result[0].no, result[0].description, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].genre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
+                    set_cb(null, 'ok'); 
+                    next = 0;
+                    playList = [];
+                }
+                else{
+                    playListInfo(result[0].no, result[0].description, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].genre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
+                    next += 1;
+                    mappingPlayList(data, set_cb);
+                }
+            }
+        });
+    };
+
+    if(programList.length > 0){
+        mappingPlayList(programList, function(err,docs){
+            if (cb){
+                console.dir('playList'+JSON.stringify(playList));
+//              cb(err, playList);
+                mappingUGCList(playList, function(err,docs){
+                    if (cb){
+                        console.dir('UGCList'+JSON.stringify(UGCList));
+                        cb(err, UGCList);
+                    }
+                });
+
+            }
+        });
+    }
+    else cb(err, null);
 
 };
 

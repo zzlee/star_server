@@ -514,7 +514,10 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
     }
     
     //TODO: call the real censorMgr
-    censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
+    console.log('intervalOfSelectingUGC'+JSON.stringify(intervalOfSelectingUGC));
+//    censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
+    censorMgr.getUGCListLite(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
+        console.log('_sortedUgcList'+_sortedUgcList);
         
         //TODO: check the content genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
         
@@ -522,10 +525,10 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             sortedUgcList = _sortedUgcList;
             generateTimeSlot( function(err_2){
                 if (!err_2) {
-                    //console.log('generateTimeSlot() done! ');
+                    console.log('generateTimeSlot() done! ');
                     
                     putUgcIntoTimeSlots(function(err_3, result){
-                        //console.log('putUgcIntoTimeSlots() done! ');
+                        console.log('putUgcIntoTimeSlots() done! ');
                         if (created_cb){
                             created_cb(err_3, result);
                         }                        
@@ -597,8 +600,17 @@ scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip, got_c
     }
         
     query.exec(function (_err, result) {
-        if (got_cb){
-            got_cb(_err, result);
+        if(_err) got_cb(_err, result);
+        if(result.length === 0) got_cb('No result', result);
+        if (result.length > 0){
+            console.log('getProgramList'+result);
+            censorMgr.getPlayList(result , function(err, result){
+                if(err) got_cb(err, null);
+                if(result){
+                 got_cb(null, result);
+                }
+            });
+            
         }
         
     });
@@ -647,7 +659,8 @@ scheduleMgr.getProgramListBySession = function(sessionId, pageLimit, pageSkip, g
  *     if successful, err returns null; if failed, err returns the error message.
  */
 scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
-    
+    console.log('Enter-->scheduleMgr.pushProgramsTo3rdPartyContentMgr sessionId='+sessionId);
+
     async.waterfall([
         function(cb1){
             //query the programs of this specific session

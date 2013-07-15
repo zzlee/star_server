@@ -394,6 +394,203 @@ app.post('/members/:member_id/questions', function(req, res){
 
 
 
+<<<<<<< HEAD
+// Miix client 
+
+app.post('/miix/videos/user_content_files', routes.uploadUserContentFile_cb );
+app.post('/miix/videos/user_content_description',routes.uploadUserDataInfo_cb);  //TODO: /miix/videos/user_content_descriptions is better
+app.get('/miix/videos/new_videos', routes.api.newUGCList);
+
+app.post('/miix/videos/miix_videos', routes.api.submitAUGC);
+app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh);
+
+
+
+// Miix admin
+
+app.get('/miix_admin', routes.admin.get_cb); 
+app.get('/miix_admin/login', routes.admin.login_get_cb); //TODO: change to a better resource name of RESTful style
+app.get('/miix_admin/logout', routes.admin.logout_get_cb); //TODO: change to a better resource name of RESTful style
+app.get('/miix_admin/members', routes.authorizationHandler.checkAuth, routes.admin.memberList_get_cb);
+app.get('/miix_admin/miix_movies', routes.authorizationHandler.checkAuth, routes.admin.miixPlayList_get_cb); 
+app.get('/miix_admin/story_movies', routes.authorizationHandler.checkAuth, routes.admin.storyPlayList_get_cb);
+app.get('/miix_admin/list_size', routes.authorizationHandler.checkAuth, routes.admin.listSize_get_cb);
+app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.censor_handler.getUGCList_get_cb);
+
+/**
+ * Get the UGC list&lt;br>
+ * &lt;h5>Path Parameters&lt;/h5>
+ * None
+ * &lt;h5>Query Parameters&lt;/h5>
+ * &lt;ul>
+ * &lt;li>skip: The number decide that first query.
+ * &lt;li>limit: The number decide that limit of query.
+ * &lt;li>token: authorization.
+ * &lt;li>condition: The json decide that query codition.
+ * &lt;/ul>
+ * &lt;h5>Request body&lt;/h5>
+ * None
+ * &lt;h5>Response body&lt;/h5>
+ * An array of objects containing the following members:
+ * &lt;ul>
+ * &lt;li>_id: UGC ID with 24 byte hex string
+ * &lt;li>userPhotoUrl: 
+ * &lt;li>ugcCensorNo: 
+ * &lt;li>userContent: 
+ * &lt;li>fb_userName: 
+ * &lt;li>fbPictureUrl: 
+ * &lt;li>title: 
+ * &lt;li>doohPlayedTimes: 
+ * &lt;li>rating: 
+ * &lt;li>genre: 
+ * &lt;li>mustPlay: 
+ * &lt;/ul>
+ * For example, &lt;br>
+ * [{_id: '51d837f6830459c42d000023',
+ * "userPhotoUrl":["/contents/user_project/greeting-50c99d81064d2b841200000a-20130227T033827565Z/user_data/_cdv_photo_012.jpg"],
+ * "ugcCensorNo":1,
+ * "fb_userName":"No User",
+ * "fbPictureUrl":"http://profile.ak.fbcdn.net/hprofile-ak-frc1/371959_100004619173955_82185728_q.jpg",
+ * "doohPlayedTimes":0,
+ * "rating":"d",
+ * "genre":"miix",
+ * "mustPlay":true}] &lt;br>
+ *
+ * @name GET /miix_admin/user_content_items
+ */
+app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
+
+/**
+ * Update the UGC field to Feltmeng DB&lt;br>
+ * &lt;h5>Path Parameters&lt;/h5>
+ * &lt;ul>
+ * &lt;li>ugcId: UGC ID (_id with hexstring)
+ * &lt;/ul>
+ * &lt;h5>Query Parameters&lt;/h5>
+ * None
+ * &lt;h5>Request body&lt;/h5>
+ * &lt;ul>
+ * &lt;li>vjson: The json that you want to update  UGC field.
+ * &lt;/ul>
+ * &lt;/ul>
+ * For example, &lt;br>
+ * [{ rating: 'a' }] &lt;br>
+ * &lt;h5>Response body&lt;/h5>
+ * A message of status :
+ * &lt;ul>
+ * &lt;li>err: error message if any error happens
+ * &lt;li>success: success
+ * &lt;/ul>
+ *
+ * @name PUT /miix_admin/user_content_attribute/:ugcId
+ */
+app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);//TODO::ugcId
+//app.put('/miix_admin/user_content_attribute/:ugcId', routes.censor_handler.setUGCAttribute_get_cb);
+
+/**
+ * New a timeslots for dooh&lt;br>
+ * &lt;h5>Path Parameters&lt;/h5>
+ * &lt;ul>
+ * &lt;li>doohId: Dooh ID (ex:'taipeiarena')
+ * &lt;/ul>
+ * &lt;h5>Query Parameters&lt;/h5>
+ * &lt;ul>
+ * &lt;li>intervalOfSelectingUGC: An object specifying the starting and ending of of the time interval for scheduleMgr to select the applied UGC items.
+ * &lt;li>intervalOfPlanningDoohProgrames: An object specifying the starting and ending of of the time interval which the generated schedule covers.
+ * &lt;li>programSequence: An array of strings showing the sequence of program genres.
+ * &lt;/ul>
+ * &lt;h5>Request body&lt;/h5>
+ * None
+ * &lt;h5>Response body&lt;/h5>
+ * The callback function called when the result program list is created :
+ *     &lt;ul>
+ *     &lt;li>err: error message if any error happens
+ *     &lt;li>result: object containing the following information:
+ *         &lt;ul>
+ *         &lt;li>numberOfProgramTimeSlots: number of program time slots created. 
+ *         &lt;li>sessionId: id indicating this session of creating program time slots (This will be used when   
+ *         calling scheduleMgr.removeUgcfromProgramAndAutoSetNewOne()
+ *         &lt;/ul>
+ *         For example, &lt;br>
+ *         { numberOfProgramTimeSlots: 33, sessionId: '1367596800000-1367683140000-1373332978201' }     
+ *     &lt;/ul>
+ *
+ * @name POST /miix_admin/doohs/:doohId/timeslots
+ */
+app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTimeslots_get_cb);
+/**
+ * Get the dooh timeslot&lt;br>
+ * &lt;h5>Path Parameters&lt;/h5>
+ * &lt;ul>
+ * &lt;li>doohId: Dooh ID (ex:'taipeiarena')
+ * &lt;/ul>
+ * &lt;h5>Query Parameters&lt;/h5>
+ * &lt;ul>
+ * &lt;li>skip: The number decide that first query.
+ * &lt;li>limit: The number decide that limit of query.
+ * &lt;li>token: authorization.
+ * &lt;li>condition: The json decide that query codition.
+ * &lt;/ul>
+ * &lt;h5>Request body&lt;/h5>
+ * None
+ * &lt;h5>Response body&lt;/h5>
+ * An array of objects containing the following members:
+ * &lt;ul>
+ * &lt;li>_id: Program timeslot ID with 24 byte hex string.
+ * &lt;li>timeSlot: An object specifying the starting and ending time of program's time slot.
+ * &lt;li>ugc_id: UGC ID with 24 byte hex string.
+ * &lt;li>userPhotoUrl: 
+ * &lt;li>ugcCensorNo:
+ * &lt;li>userContent: 
+ * &lt;li>fb_userName: 
+ * &lt;li>fbPictureUrl:  
+ * &lt;li>rating: 
+ * &lt;li>genre: 
+ * &lt;/ul>
+ * For example, &lt;br>
+ * [{_id: '51d837f6830459c42d000023',
+ * "timeSlot":[start:1371861000000, end :1371862000000],
+ * "ugc_id":'51d837f6830459c42d000023',
+ * "userPhotoUrl":["/contents/user_project/greeting-50c99d81064d2b841200000a-20130227T033827565Z/user_data/_cdv_photo_012.jpg"],
+ * "ugcCensorNo":1,
+ * "fb_userName":"No User",
+ * "fbPictureUrl":"http://profile.ak.fbcdn.net/hprofile-ak-frc1/371959_100004619173955_82185728_q.jpg",
+ * "rating":"d",
+ * "genre":"miix"}] &lt;br>
+ *
+ * @name GET /miix_admin/doohs/:doohId/timeslots
+ */
+app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.gettimeslots_get_cb);
+
+/**
+ * Update the ProgramTimeSlot field to Feltmeng DB&lt;br>
+ * &lt;h5>Path Parameters&lt;/h5>
+ * &lt;ul>
+ * &lt;li>timeslotId: ProgramTimeSlot ID (_id with hexstring)
+ * &lt;li>doohId: Dooh ID (ex:'taipeiarena')
+ * &lt;/ul>
+ * &lt;h5>Query Parameters&lt;/h5>
+ * None
+ * &lt;h5>Request body&lt;/h5>
+ * &lt;ul>
+ * &lt;li>sessionId: The id indicating the session of creating program time slot.
+ * &lt;li>programTimeSlot: The ID of the program time slot item.
+ * &lt;/ul>
+ * &lt;h5>Response body&lt;/h5>
+ * an object of newly Selected Ugc or err message:
+ * &lt;ul>
+ * &lt;li>err: error message if any error happens
+ * &lt;li>newlySelectedUgc:  the id of newly selected UGC 
+ * &lt;/ul>
+ *
+ * @name PUT /miix_admin/doohs/:doohId/timeslots/:timeslotId
+ */
+app.put('/miix_admin/doohs/:doohId/timeslots/:timeslotId', routes.censor_handler.timeslots_get_cb);
+
+
+
+=======
+>>>>>>> origin/gz_scheduler
 // Internal
 
 app.get('/internal/oauth2callback', routes.YoutubeOAuth2_cb );
@@ -685,13 +882,21 @@ app.get('/test', function(req, res) {
 </div>
 
 <nav>
+<<<<<<< HEAD
+    <h2><a href="index.html">Index</a></h2><h3>Mixins</h3><ul><li><a href="customerServiceMgr.html">customerServiceMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GET /members/:memberId/questions">GET /members/:memberId/questions</a></li><li><a href="global.html#GET /miix_admin/doohs/:doohId/timeslots">GET /miix_admin/doohs/:doohId/timeslots</a></li><li><a href="global.html#GET /miix_admin/user_content_items">GET /miix_admin/user_content_items</a></li><li><a href="global.html#POST /miix_admin/doohs/:doohId/timeslots">POST /miix_admin/doohs/:doohId/timeslots</a></li><li><a href="global.html#PUT /miix_admin/doohs/:doohId/timeslots/:timeslotId">PUT /miix_admin/doohs/:doohId/timeslots/:timeslotId</a></li><li><a href="global.html#PUT /miix_admin/user_content_attribute/:ugcId">PUT /miix_admin/user_content_attribute/:ugcId</a></li></ul>
+=======
     <h2><a href="index.html">Index</a></h2><h3>Namespaces</h3><ul><li><a href="miix.html">miix</a></li><li><a href="miix_admin.html">miix_admin</a></li></ul><h3>Mixins</h3><ul><li><a href="customerServiceMgr.html">customerServiceMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
+>>>>>>> origin/gz_scheduler
 </nav>
 
 <br clear="both">
 
 <footer>
+<<<<<<< HEAD
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Thu Jul 11 2013 16:33:44 GMT+0800 (TST)
+=======
     Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Jul 14 2013 22:44:54 GMT+0800 (TST)
+>>>>>>> origin/gz_scheduler
 </footer>
 
 <script> prettyPrint(); </script>

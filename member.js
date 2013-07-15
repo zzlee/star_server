@@ -169,6 +169,7 @@ FM.MEMBER = (function(){
                                                         comments_count += result[i].comments.count;
                                                     }
                                                     
+                                                    
                                                     // when count=0, there is no likes object.
                                                     likes_count += (result[i].likes) ? result[i].likes.count : 0;
                                                 }
