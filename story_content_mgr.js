@@ -6,7 +6,7 @@ var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var storyCamControllerMgr = require(workingPath+'/story_cam_controller_mgr.js');
 var memberDB = require(workingPath+'/member.js');
-var UGCDB = require(workingPath+'/UGC.js');
+var UGCDB = require(workingPath+'/ugc.js');
 var fmapi = require(workingPath+'/routes/api.js'); 
 
 var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID, downloaded_cb){

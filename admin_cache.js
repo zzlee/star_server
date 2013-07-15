@@ -1,6 +1,6 @@
 
 var FMDB = require('./db.js'),
-    UGC_mgr = require('./UGC.js'),
+    UGC_mgr = require('./ugc.js'),
     ObjectID = require('mongodb').ObjectID,
     fb_handler = require('./fb_handler.js'),
 	member_mgr = require('./member.js'),
@@ -113,7 +113,7 @@ FM.ADMINCACHE = (function(){
         //TODO: need to implement
 
         var member_mgr = require('./member.js');
-        var UGC_mgr = require('./UGC.js');
+        var UGC_mgr = require('./ugc.js');
         var miix_content_mgr = require('./miix_content_mgr.js');
 
         var UGCs = FMDB.getDocModel("ugc");
@@ -223,7 +223,7 @@ FM.ADMINCACHE = (function(){
         //TODO: need to implement
 
         var member_mgr = require('./member.js');
-        var UGC_mgr = require('./UGC.js');
+        var UGC_mgr = require('./ugc.js');
 
         var UGCs = FMDB.getDocModel("ugc");
         var storyPlayListInfos = FMDB.getDocModel("storyPlayListInfo");

@@ -1,6 +1,5 @@
 var FMDB = require('./db.js'),
     UGCDB = require('./ugc.js'),
-    UGCDB = require('./UGC.js'),
     ObjectID = require('mongodb').ObjectID,
     fb_handler = require('./fb_handler.js'),
     youtubeInfo = require('./youtube_mgr.js');
@@ -169,7 +168,10 @@ FM.MEMBER = (function(){
                                                     if (result[i].comments){
                                                         comments_count += result[i].comments.count;
                                                     }
+<<<<<<< HEAD
                                                     
+=======
+>>>>>>> origin/gz_scheduler
                                                     
                                                     // when count=0, there is no likes object.
                                                     likes_count += (result[i].likes) ? result[i].likes.count : 0;

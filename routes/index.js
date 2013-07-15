@@ -33,7 +33,7 @@ exports.censor_handler = censor_handler;
 //GL
 var member_handler = require("../member.js"),
     scheduleDB = require("../schedule.js"),
-    UGCDB = require("../UGC.js"),
+    UGCDB = require("../ugc.js"),
     api = require("./api.js"),
     admin_handler = require("./admin_handler.js");
     

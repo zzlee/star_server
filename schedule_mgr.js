@@ -172,7 +172,7 @@ scheduleMgr.init = function(_censorMgr){
  * can play its UGC content.  It will then generate time slots base on a specific rule, and then 
  * fill them by picking up UGC items from a sorted list generated from censerMgr.
  * 
- * @param {Number} dooh The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH upon which the selected UGCs are played
+ * @param {String} dooh The ID of the DOOH upon which the selected UGCs are played
  * 
  * @param {Object} intervalOfSelectingUGC An object specifying the starting and ending of  
  *     of the time interval for scheduleMgr to select the applied UGC items <br>
@@ -555,7 +555,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
 /**
  * Get(a.k.a query) the programs (of a specific DOOH) of a specific interval.<br>
  * <br>
- * @param {Number} dooh The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated
+ * @param {String} dooh The ID of the DOOH where the program is to be updated
  * 
  * @param {Object} interval An object specifying the starting and ending of of the time interval to query 
  *     <ul>
@@ -616,6 +616,65 @@ scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip, got_c
     });
 };
 
+/**
+ * Get the programs of a specific planning sessions (a.k.a. calling scheduleMgr.createProgramList() ).<br>
+ * <br>
+ * @param {String} sessionId The id indicating the session of creating program time slot (This session id is accquired in the callback 
+ *     passed to scheduleMgr.createProgramList(). )
+ * @param {Number} pageLimit The number of program time slot items to return (in got_cb's result).  If null, it returns all items.
+ * @param {Number} pageSkip The number of program time slot items to skip when returning in in got_cb's result. If null, there is no skip.
+ * @param {Function} got_cb The callback function called when the query is don.<br>
+ *     The function signature is got_cb(err, resultProgramList):
+ *     <ul>
+ *     <li>err: error message if any error happens
+ *     <li>resultProgramList: An array of objects containing program info:
+ *         <ul>
+ *         <li>_id: A string (i.e. a hex string representation of its ObjectID in MongoDB) specifying the ID of a program time slot item  
+ *         <li>timeSlot: An object specifying the starting and ending time of program's time slot
+ *             <ul>
+ *             <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)
+ *             <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)
+ *             </ul>
+ *         <li>ugc: A number specifying the ID of the UGC contained in this program. (This is
+ *             actually the id of items store in UGC collection.) 
+ *         </ul>
+ *         For example, <br>
+ *         [{_id:43524, timeSlot:{start:1371861000000, end :1371862000000}, ugc:48593},<br>
+ *          {_id:43525, timeSlot:{start:1371881000000, end:1371882000000}, ugc:48353},<br>
+ *          {_id:43544, timeSlot:{start:1371897000000, end:1371898000000}, ugc:43593}]
+ *         
+ *     </ul>
+ */
+scheduleMgr.getProgramListBySession = function(sessionId, pageLimit, pageSkip, got_cb ){
+    
+};
+
+/**
+ * Push programs (of a specific session) to the 3rd-party content manager.<br>
+ * <br>
+ * @param {String} sessionId The id indicating the session of creating program time slot (This session id is accquired in the callback 
+ *     passed to scheduleMgr.createProgramList(). )
+ * @param {Function} pushed_cb The callback function called when the process is done.<br>
+ *     The function signature is updated_cb(err), where err is the error message indicating failure: 
+ *     if successful, err returns null; if failed, err returns the error message.
+ */
+scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
+    
+};
+
+/**
+ * Push programs (of a specific session) to the 3rd-party content manager.<br>
+ * <br>
+ * @param {String} sessionId The id indicating the session of creating program time slot (This session id is accquired in the callback 
+ *     passed to scheduleMgr.createProgramList(). )
+ * @param {Function} pushed_cb The callback function called when the process is done.<br>
+ *     The function signature is updated_cb(err), where err is the error message indicating failure: 
+ *     if successful, err returns null; if failed, err returns the error message.
+ */
+
+scheduleMgr.pullProgramsFrom3rdPartyContentMgr = function(sessionId) {
+    
+};
 
 /**
  * Update the programs (of a specific DOOH) of a specific interval.<br>
@@ -623,7 +682,7 @@ scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip, got_c
  * This method will ask ScalaMgr about the latest available time intervals (in which Miix system
  * can play its UGC content) and then re-schedule the programs accordingly. 
  * 
- * @param {Number} dooh The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH whose programs are to be updated
+ * @param {String} dooh The ID of the DOOH whose programs are to be updated
  * 
  * @param {Object} intervalToUpdate An object specifying the starting and ending of  
  *     of the time interval in which the scheduled programs will be updated   
@@ -663,7 +722,7 @@ scheduleMgr.updateProgramList = function(dooh, intervalToUpdate, updated_cb ){
  * 
  * @param {Number} ugcReferenceNo The reference No the UGC item to put in the specified program time slot
  * 
- * @param {Function} set_cb The callback function called when the specified program is set.<br>
+ * @param {Function} set_cb The callback function called when the process is done.<br>
  *     The function signature is updated_cb(err) where err is the error message indicating failure: 
  *     if successful, err returns null; if failed, err returns the error message.
  *     
@@ -699,7 +758,7 @@ scheduleMgr.setUgcToProgram = function( programTimeSlotId, ugcReferenceNo, set_c
  * 
  * @param {String} programTimeSlot The ID of the program time slot item
  * 
- * @param {Function} removed_cb The callback function called when the specific .<br>
+ * @param {Function} removed_cb The callback function called when this process is done.<br>
  *     The function signature is removed_cb(err, newlySelectedUgc): 
  *     <ul>
  *     <li>err: error message if any error happens
@@ -843,7 +902,7 @@ scheduleMgr.removeUgcfromProgramAndAutoSetNewOne = function(sessionId, programTi
                               if (!err6_1) {
                                   //console.log("_result=");
                                   //console.dir(_result);
-                                  if (_result.length == 0){
+                                  if (_result.length === 0){
                                       //create candidate UGC cache in DB
                                       var CandidateUgcCache = db.getDocModel("candidateUgcCache");
                                       var aCandidateUgcCache = new CandidateUgcCache();
@@ -860,7 +919,7 @@ scheduleMgr.removeUgcfromProgramAndAutoSetNewOne = function(sessionId, programTi
                                               //console.dir(aSavedCandidateUgcCache);
                                           }
                                           else {
-                                              interationDone_cb('Failed to update candidate UGC to DB: '+err6)
+                                              interationDone_cb('Failed to update candidate UGC to DB: '+err6);
                                           }
                                       });   
                                   }
@@ -898,9 +957,53 @@ scheduleMgr.removeUgcfromProgramAndAutoSetNewOne = function(sessionId, programTi
         
     });
     
-    
-    
-    
+};
+
+/**
+ * Get a list showing all the planning sessions (a.k.a. calling scheduleMgr.createProgramList()) done in the past.<br>
+ * <br>
+ * @param {Number} pageLimit The number of program time slot items to return (in got_cb's result).  If null, it returns all items.
+ * @param {Number} pageSkip The number of program time slot items to skip when returning in in got_cb's result. If null, there is no skip.
+ * @param {Function} got_cb The callback function called when the query is don.<br>
+ *     The function signature is got_cb(err, resultSessionList):
+ *     <ul>
+ *     <li>err: error message if any error happens
+ *     <li>resultSessionList: An array of objects containing program info:
+ *         <ul>
+ *         <li>_id: A string (i.e. a hex string representation of its ObjectID in MongoDB) specifying the ID of a session item  
+ *         
+ *         <li>dooh: The ID of the DOOH upon which the selected UGCs are played
+ *         
+ *         <li>intervalOfSelectingUGC: An object specifying the starting and ending of  
+ *             of the time interval for scheduleMgr to select the applied UGC items <br>
+ *             <ul>
+ *             <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)
+ *             <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)
+ *             </ul>
+ *             For example, {start: 1371861000000, end: 1371862000000} 
+ *
+ *         <li>intervalOfPlanningDoohProgrames: An object specifying the starting and ending of  
+ *             of the time interval which the generated schedule covers   
+ *             <ul>
+ *             <li>start: the start of the interval (with the number of milliseconds since midnight Jan 1, 1970)
+ *             <li>end: the end of the interval (with the number of milliseconds since midnight Jan 1, 1970)
+ *             </ul>
+ *             For example, {start: 1371861000000, end: 1371862000000} 
+ * 
+ *         <li>programSequence An array of strings showing the sequence of program genres to use when 
+ *             when the system is planning the program(s) of a "micro time interval" <br>
+ *             Note: the string must be "miix", "cultural_and_creative", "mood", or "check_in"
+ *             For example, ["miix", "check_in", "check_in", "mood", "cultural_and_creative" ] <br>
+            
+ *         </ul>
+ *         For example, <br>
+ *         [{_id:"3g684j435g5226h5648jrk24", dooh:"TP_dom", intervalOfSelectingUGC:{start:1371861000000, end :1371862000000}, intervalOfPlanningDoohProgrames:{start:1371861000000, end :1371862000000}, programSequence:["miix", "check_in", "check_in", "mood", "cultural_and_creative" ]},<br>
+ *          {_id:"3g684j435g5632h5648jrk24", dooh:"TP_dom", intervalOfSelectingUGC:{start:1371881000000, end:1371882000000}, intervalOfPlanningDoohProgrames:{start:1371861000000, end :1371862000000}, programSequence:["miix", "check_in", "check_in", "mood", "cultural_and_creative" ]},<br>
+ *          {_id:"3g684j43e64hf6h5648jrk24", dooh:"TP_dom", intervalOfSelectingUGC:{start:1371897000000, end:1371898000000}, intervalOfPlanningDoohProgrames:{start:1371861000000, end :1371862000000}, programSequence:["miix", "check_in", "check_in", "mood", "cultural_and_creative" ]}]
+ *         
+ *     </ul>
+ */
+scheduleMgr.getSessionList = function(pageLimit, pageSkip, got_cb ){
     
 };
 

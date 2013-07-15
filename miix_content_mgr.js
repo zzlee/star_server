@@ -4,7 +4,7 @@ var workingPath = process.cwd();
 var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var memberDB = require(workingPath+'/member.js');
-var UGCDB = require(workingPath+'/UGC.js');
+var UGCDB = require(workingPath+'/ugc.js');
 var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
 
 var fs = require('fs');

@@ -6,7 +6,7 @@
 
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
-    UGCDB = require("../UGC.js"),
+    UGCDB = require("../ugc.js"),
     fb_handler = require("../fb_handler.js");
     
 
