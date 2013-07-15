@@ -600,10 +600,12 @@ scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip, got_c
     }
         
     query.exec(function (_err, result) {
-        if(_err)got_cb(_err, result);
-        if (got_cb){
+        if(_err) got_cb(_err, result);
+        if(result.length === 0) got_cb('No result', result);
+        if (result.length > 0){
+            console.log('getProgramList'+result);
             censorMgr.getPlayList(result , function(err, result){
-                if(err)got_cb(err, null)
+                if(err) got_cb(err, null);
                 if(result){
                  got_cb(null, result);
                 }

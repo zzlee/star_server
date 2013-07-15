@@ -469,18 +469,23 @@ $(document).ready(function(){
 //                        alert('You have to enter full date and program sequence!!');
 //                        flag = 1; 
 //                    }
-//                        if(inputSearchData.TimeStart && inputSearchData.TimeEnd && inputSearchData.playtimeStart && inputSearchData.playtimeEnd && inputSearchData.ugcPriorityText){
+                        if(inputSearchData.TimeStart && inputSearchData.TimeEnd && inputSearchData.playtimeStart && inputSearchData.playtimeEnd && inputSearchData.ugcPriorityText){
                             $.ajax({
                                 url: url,
                                 type: 'POST',
                                 data: {intervalOfSelectingUGC:{start:inputSearchData.TimeStart, end:inputSearchData.TimeEnd}, intervalOfPlanningDoohProgrames:{start:inputSearchData.playtimeStart, end:inputSearchData.playtimeEnd}, programSequence:inputSearchData.ugcPriorityText},
                                 success: function(response) {
                                     if(response.message){
-                                        console.log("[Response] message:" + response.message);
+//                                        console.log("[Response] message:" + response.message);
+                                        $('#main_menu ul[class="current"]').attr("class", "select");
+                                        $('#UGCPlayList').attr("class", "current");
+                                        
+                                        FM.currentContent = FM.UGCPlayList;
+                                        FM.currentContent.showCurrentPageContent();
                                     }
                                 }
                             });
-//                    }
+                    }
                 });
 
             });

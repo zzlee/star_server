@@ -45,9 +45,12 @@ form#mainform(action='')
             each PlayList, i in ugcCensorPlayList
                 if i%2
                     tr
-                      td
-                        each date in PlayList.doohTimes
-                          p #{date}
+                      td start 
+                        #{PlayList.timeslotStart}
+                        br
+                        br
+                        label end
+                        #{PlayList.timeslotEnd}
                       td 
                         input(class='ugcChangeBtn', type='text' ,name='ugcChangeText' ,onfocus='this.value=\'\'')
                         input#ugcChangeBtn(type='button', class='ugcChange', value='確認')
@@ -73,9 +76,12 @@ form#mainform(action='')
 
                 else
                     tr.alternate-row
-                      td
-                        each date in PlayList.doohTimes
-                          p #{date}
+                      td start 
+                        #{PlayList.timeslotStart}
+                        br
+                        br
+                        label end
+                        #{PlayList.timeslotEnd}
                       td
                         input(class='ugcChangeBtn', type='text' ,name='ugcChangeText' ,onfocus='this.value=\'\'')
                         input#ugcChangeBtn(type='button', class='ugcChange', value='確認')
