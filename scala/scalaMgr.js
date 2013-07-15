@@ -121,15 +121,13 @@ function scalaMgr( url, account ){
     var setItemToPlaylist = function( file, playTime, reportStatus_cb ){
         
         var limit = 0;
-        var play = new Date(playTime);
+        //var play = new Date(playTime);
         
         var itemPlaySetting = {
             playlist: { id: '', name: 'FM_DOOH' },
             item: { id: '', useValidRange: true, playFullscreen: true },
             media: { id: '', duration: '' },
-            //playDate: play.getFullYear() + '-' + play.getMonth() + '-' + play.getDate(),
-            //playTime: play.getHours() + ':' + play.getMinutes()
-            playTime : playTime
+            playTime : { start: playTime.start, end: playTime.end }
         };
         async.waterfall([
             function(callback){
@@ -176,6 +174,89 @@ function scalaMgr( url, account ){
                 //Step.5: find out item id in playlist
                 if(status == 'OK') {
                     contractor.playlist.findPlaylistItemIdByName(itemPlaySetting.playlist.name, file.name, function(err, itemId){
+                        itemPlaySetting.item.id = itemId;
+                        if(!err) callback(null, 'OK');
+                        else callback(err, null);
+                    });
+                }
+            },
+            function(status, callback){
+                if(limit < 1){
+                    //Step.6: update item play info. to playlist
+                    if(status == 'OK') {
+                        contractor.playlist.updatePlaylistItemSchedule(itemPlaySetting, function(err, itemSetting_cb){
+                            if(!err) callback(null, 'OK');
+                            else callback(err, null);
+                        });
+                    }
+                    limit++;
+                }
+            }
+        ], function (err, result) {
+            if(result == 'OK') reportStatus_cb(null, 'OK');
+            else reportStatus_cb(err, null);
+        });
+    };
+    
+    /**
+     * Add web page in timeslot to server.
+     *
+     */
+    var setWebpageToPlaylist = function( webpage, playTime, reportStatus_cb ){
+        
+        var limit = 0;
+        
+        var itemPlaySetting = {
+            playlist: { id: '', name: 'FM_DOOH' },
+            item: { id: '', useValidRange: true, playFullscreen: true },
+            media: { id: '', duration: '' },
+            playTime : { start: playTime.start, end: playTime.end }
+        };
+        async.waterfall([
+            function(callback){
+                //Step.1: upload web page to server
+                contractor.media.createWebPage(webpage, function(err, status){
+                    callback(null, status);
+                });
+            },
+            function(status, callback){
+                //Step.2: find out media(webpage) id
+                if(status == 'OK') {
+                    contractor.media.findMediaIdByName(webpage.name, function(err, mediaInfo){
+                        if(!err) {
+                            itemPlaySetting.media.id = mediaInfo.id;
+                            itemPlaySetting.media.duration = mediaInfo.duration;
+                            callback(null, 'OK');
+                        }
+                        else callback(err, null);
+                    });
+                }
+            },
+            function(status, callback){
+                //Step.3: find out playlist id
+                if(status == 'OK') {
+                    contractor.playlist.findPlaylistIdByName(itemPlaySetting.playlist.name, function(err, playlistId){
+                        if(!err) {
+                            itemPlaySetting.playlist.id = playlistId;
+                            callback(null, 'OK');
+                        }
+                        else callback(err, null);
+                    });
+                }
+            },
+            function(status, callback){
+                //Step.4: add media to playlist
+                if(status == 'OK') {
+                    contractor.item.addItemToPlaylist(itemPlaySetting, function(err, addItem_cb){
+                        if(!err) callback(null, 'OK');
+                        else callback(err, null);
+                    });
+                }
+            },
+            function(status, callback){
+                //Step.5: find out item id in playlist
+                if(status == 'OK') {
+                    contractor.playlist.findPlaylistItemIdByName(itemPlaySetting.playlist.name, webpage.name, function(err, itemId){
                         itemPlaySetting.item.id = itemId;
                         if(!err) callback(null, 'OK');
                         else callback(err, null);
@@ -249,7 +330,8 @@ function scalaMgr( url, account ){
     return {
         listTimeslot : listTimeslot,
         setItemToPlaylist : setItemToPlaylist,
-        pushEvent : pushEvent
+        pushEvent : pushEvent,
+        setWebpageToPlaylist: setWebpageToPlaylist
     };
 }
 
