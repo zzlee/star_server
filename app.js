@@ -444,24 +444,25 @@ http.createServer(app).listen(app.get('port'), function(){
 
 
 
-var test_s3 = require('./aws_s3.js');
-setTimeout(function(){
-	//change the auth to save files on s3
-	console.log("aws_s3 test!");
-//	var key = '/user_project/.jpg';
-	var key = '/user_project/Summer.mp4';
-//	var obj = "C:\\Users\\feltmeng-user\\Desktop\\star_server\\star_server\\public\\images\\logo.jpg";
-	var obj = "C:\\Users\\feltmeng-user\\Desktop\\PopDanthology2012.mp4"
-//	test_s3.uploadToAwsS3(obj, key, 'image/jpeg', function(err, result){
-	test_s3.uploadToAwsS3(obj, key, 'video/mp4', function(err, result){
-		if(err)
-			console.log("test_s3 error");
-		else
-			console.log("test_s3 success");
-	});
-	
-	
-},3000);
+
+//var test_s3 = require('./aws_s3.js');
+//setTimeout(function(){
+//	//change the auth to save files on s3
+//	console.log("aws_s3 test!");
+////	var key = '/user_project/.jpg';
+//	var key = '/user_project/Summer.mp4';
+////	var obj = "C:\\Users\\feltmeng-user\\Desktop\\star_server\\star_server\\public\\images\\logo.jpg";
+//	var obj = "C:\\Users\\feltmeng-user\\Desktop\\PopDanthology2012.mp4"
+////	test_s3.uploadToAwsS3(obj, key, 'image/jpeg', function(err, result){
+//	test_s3.uploadToAwsS3(obj, key, 'video/mp4', function(err, result){
+//		if(err)
+//			console.log("test_s3 error");
+//		else
+//			console.log("test_s3 success");
+//	});
+//	
+//	
+//},3000);
 /*
 //test
 var scheduleMgr = require('./schedule_mgr.js');
