@@ -5,6 +5,7 @@
 var db = require('./db.js');
 var async = require('async');
 var mongoose = require('mongoose');
+var scalaMgr = require('./scala/scalaMgr.js');
 
 var programTimeSlotModel = db.getDocModel("programTimeSlot");
 var ugcModel = db.getDocModel("ugc");
@@ -647,6 +648,58 @@ scheduleMgr.getProgramListBySession = function(sessionId, pageLimit, pageSkip, g
  */
 scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
     
+    async.waterfall([
+        function(cb1){
+            //query the programs of this specific session
+            programTimeSlotModel.find({ "session": sessionId }).exec(function (err1, _programs) {
+                if (!err1) {
+                    cb1(null, _programs);
+                }
+                else {
+                    cb1('Failed to query the programs of a specific session: '+err1, _programs);
+                }                             
+            });
+        },
+        function(programs, cb2){
+            //push each programs to Scala
+            var iteratorPushAProgram = function(aProgram, callback){
+                
+                async.waterfall([
+                    function(callback){
+                        //download the content file from S3
+                        
+                        callback(null, 'one', 'two');
+                    },
+                    function(arg1, arg2, callback){
+                        //push content to Scala
+                        
+                        callback(null, 'three');
+                    },
+                    function(arg1, callback){
+                        //delete the downloaded file
+                        
+                        
+                        callback(null, 'done');
+                    }
+                ], function (err, result) {
+                    // result now equals 'done'    
+                });
+                
+        
+                
+                callback(null);
+            };
+            async.eachSeries(programs, iteratorPushAProgram, function(err){
+                // if any of the saves produced an error, err would equal that error
+            });
+            
+            
+            cb2(null, 'three');
+        }
+    ], function (err, result) {
+       // result now equals 'done'    
+    });
+                                                
 };
 
 /**
