@@ -10,6 +10,7 @@ FM.AWSS3 = (function(){
     S3_BUCKET = 'miix_content';//default
 
     var s3Client = require('knox').createClient({
+    	
         key: S3_KEY,
         secret: S3_SECRET,
         bucket: S3_BUCKET
@@ -43,18 +44,35 @@ FM.AWSS3 = (function(){
              *  Upload Photo To Aws S3.
              */
             uploadToAwsS3 : function(obj, awsKey, contentType, cb){
+            	console.log("[AWS] uploadToAwsS3");
                 if (!contentType){
                     contentType = 'image/jpeg';
+//                	contentType = 'video/mp4';
                 }
-                s3Client.putFile(obj, awsKey, {'Content-Type': contentType}, function(err, result) {
+                
+                /**
+                 * Save file to S3 and make public link 
+                 * x-amz-acl : public-read
+                 * by Jean
+                 * 
+                 * header testing in app.js(line 447: test_s3)
+                 */
+                var header = {
+                		'Content-Type' : contentType,
+                		'x-amz-acl' : "public-read"
+                };
+//                s3Client.putFile(obj, awsKey, {'Content-Type': contentType}, function(err, result) {
+                s3Client.putFile(obj, awsKey, header, function(err, result){
                     if (err) {
                         if (cb) {
                             cb(err, null);
+                            console.log("[AWS] uploadToAwsS3 error");
                         }
                     }
                     else {
                         if (cb) {
                             cb(null, "Uploaded Successful");
+                            console.log("[AWS] uploadToAwsS3 success");
                         }
                     }
                 });
