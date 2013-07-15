@@ -990,7 +990,7 @@ FM.api.newUGCList = function(req, res){
     }
 };
 
-//  GET
+//  GET  //DEPRECATED
 FM.api.newStreetUGCList = function(req, res){
     FM_LOG("[api.newStreetUGCList]: ");
     

@@ -102,10 +102,12 @@ FM.UGC = (function(){
 				query.where("ownerId.userID", userID).where("genre", genre).where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(cb);
             },
             
+            //DEPRECATED
             getNewStreetUGCListByFB : function(userID, after, cb){
                 var query = UGCs.find();
 				query.where("ownerId.userID", userID).where("genre", "miix_street").ne("fb_id", null).where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(cb);
             },
+            
             //kaiser            
             getOwnerIdByNo: function(no, cb){
                 UGCs.findOne({no: no}, '_id', function(err, result){

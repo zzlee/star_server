@@ -72,10 +72,10 @@ var paddingContent =(function(){
     return {
         get: function(id, cb){
             var idArray = id.split('-');
-            var genre = idArray[0]; 
+            var contentGenre = idArray[0]; 
             var index = idArray[1];
             if (cb){
-                cb(null, PADDING_CONTENT_TABLE[genre][index]);
+                cb(null, PADDING_CONTENT_TABLE[contentGenre][index]);
             } 
         }
     };
@@ -89,56 +89,56 @@ var censorMgr_getUGCList_fake = function(interval, get_cb){
         result[i] = {id: i};
     }
     */
-    var result = [ {_id: "1", genre: "miix"},
-                   {_id: "2", genre: "cultural_and_creative"},
-                   {_id: "3", genre: "check_in"},
-                   {_id: "4", genre: "miix"},
-                   {_id: "5", genre: "check_in"},
-                   {_id: "6", genre: "check_in"},
-                   {_id: "7", genre: "miix"},
-                   {_id: "8", genre: "check_in"},
-                   {_id: "9", genre: "miix"},
-                   {_id: "10", genre: "cultural_and_creative"},
-                   {_id: "11", genre: "miix"},
-                   {_id: "12", genre: "check_in"},
-                   {_id: "13", genre: "mood"},
-                   {_id: "14", genre: "cultural_and_creative"},
-                   {_id: "15", genre: "miix"},
-                   {_id: "16", genre: "mood"},
-                   {_id: "17", genre: "check_in"},
-                   {_id: "18", genre: "check_in"},
-                   {_id: "19", genre: "miix"},
-                   {_id: "20", genre: "cultural_and_creative"},
-                   {_id: "21", genre: "miix"},
-                   {_id: "22", genre: "check_in"},
-                   {_id: "23", genre: "cultural_and_creative"},
-                   {_id: "24", genre: "mood"},
-                   {_id: "25", genre: "mood"},
-                   {_id: "26", genre: "miix"},
-                   {_id: "27", genre: "cultural_and_creative"},
-                   {_id: "28", genre: "miix"},
-                   {_id: "29", genre: "check_in"},
-                   {_id: "30", genre: "miix"},
-                   {_id: "31", genre: "miix"},
-                   {_id: "32", genre: "check_in"},
-                   {_id: "33", genre: "mood"},
-                   {_id: "34", genre: "cultural_and_creative"},
-                   {_id: "35", genre: "miix"},
-                   {_id: "36", genre: "mood"},
-                   {_id: "37", genre: "check_in"},
-                   {_id: "38", genre: "check_in"},
-                   {_id: "39", genre: "mood"},
-                   {_id: "40", genre: "mood"},
-                   {_id: "41", genre: "miix"},
-                   {_id: "42", genre: "check_in"},
-                   {_id: "43", genre: "mood"},
-                   {_id: "44", genre: "check_in"},
-                   {_id: "45", genre: "mood"},
-                   {_id: "46", genre: "miix"},
-                   {_id: "47", genre: "check_in"},
-                   {_id: "48", genre: "miix"},
-                   {_id: "49", genre: "check_in"},
-                   {_id: "50", genre: "miix"},
+    var result = [ {_id: "1", contentGenre: "miix"},
+                   {_id: "2", contentGenre: "cultural_and_creative"},
+                   {_id: "3", contentGenre: "check_in"},
+                   {_id: "4", contentGenre: "miix"},
+                   {_id: "5", contentGenre: "check_in"},
+                   {_id: "6", contentGenre: "check_in"},
+                   {_id: "7", contentGenre: "miix"},
+                   {_id: "8", contentGenre: "check_in"},
+                   {_id: "9", contentGenre: "miix"},
+                   {_id: "10", contentGenre: "cultural_and_creative"},
+                   {_id: "11", contentGenre: "miix"},
+                   {_id: "12", contentGenre: "check_in"},
+                   {_id: "13", contentGenre: "mood"},
+                   {_id: "14", contentGenre: "cultural_and_creative"},
+                   {_id: "15", contentGenre: "miix"},
+                   {_id: "16", contentGenre: "mood"},
+                   {_id: "17", contentGenre: "check_in"},
+                   {_id: "18", contentGenre: "check_in"},
+                   {_id: "19", contentGenre: "miix"},
+                   {_id: "20", contentGenre: "cultural_and_creative"},
+                   {_id: "21", contentGenre: "miix"},
+                   {_id: "22", contentGenre: "check_in"},
+                   {_id: "23", contentGenre: "cultural_and_creative"},
+                   {_id: "24", contentGenre: "mood"},
+                   {_id: "25", contentGenre: "mood"},
+                   {_id: "26", contentGenre: "miix"},
+                   {_id: "27", contentGenre: "cultural_and_creative"},
+                   {_id: "28", contentGenre: "miix"},
+                   {_id: "29", contentGenre: "check_in"},
+                   {_id: "30", contentGenre: "miix"},
+                   {_id: "31", contentGenre: "miix"},
+                   {_id: "32", contentGenre: "check_in"},
+                   {_id: "33", contentGenre: "mood"},
+                   {_id: "34", contentGenre: "cultural_and_creative"},
+                   {_id: "35", contentGenre: "miix"},
+                   {_id: "36", contentGenre: "mood"},
+                   {_id: "37", contentGenre: "check_in"},
+                   {_id: "38", contentGenre: "check_in"},
+                   {_id: "39", contentGenre: "mood"},
+                   {_id: "40", contentGenre: "mood"},
+                   {_id: "41", contentGenre: "miix"},
+                   {_id: "42", contentGenre: "check_in"},
+                   {_id: "43", contentGenre: "mood"},
+                   {_id: "44", contentGenre: "check_in"},
+                   {_id: "45", contentGenre: "mood"},
+                   {_id: "46", contentGenre: "miix"},
+                   {_id: "47", contentGenre: "check_in"},
+                   {_id: "48", contentGenre: "miix"},
+                   {_id: "49", contentGenre: "check_in"},
+                   {_id: "50", contentGenre: "miix"},
                    
                    ];
     
@@ -269,7 +269,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                                 candidateUgcList = candidateUgcList.concat(sortedUgcList);
                             }
                             
-                            if ( candidateUgcList[indexOfcandidateToSelect].genre == aTimeSlot.genre){
+                            if ( candidateUgcList[indexOfcandidateToSelect].contentGenre == aTimeSlot.contentGenre){
                                 selectedUgc = candidateUgcList.splice(indexOfcandidateToSelect, 1)[0];
                                 break;
                             }
@@ -347,9 +347,9 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
          
         var generateTimeSlotsOfMicroInterval = function(interval, generatedTimeSlotsOfMicroInterval_cb){ //Micro interval means a time slot containing purely our programs
             
-            var genre = programPlanningPattern.getProgramGenreToPlan(); //the genra that will be uesed in this micro interval
+            var contentGenre = programPlanningPattern.getProgramGenreToPlan(); //the genra that will be uesed in this micro interval
             var numberOfUGC;
-            if (genre=="miix"){
+            if (contentGenre=="miix"){
                 numberOfUGC = 1;
             }
             else{
@@ -365,7 +365,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                         end: interval.end,
                         startHour: (new Date(interval.start)).getHours()},
                     //content: {ugcId:"12345676", ugcProjcetId:"3142462123"}
-                    genre: genre
+                    contentGenre: contentGenre
                     };
             
             var timeStampIndex = 0;
@@ -382,7 +382,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                               var indexArrayPaddingContents = []; for (var i = 0; i < numberOfUGC+1; i++) { indexArrayPaddingContents.push(i); }
                               
                               var iteratorGetPaddingContents = function(indexOfPaddingContents, interationDone_getPaddingContents_cb){
-                                  paddingContent.get(genre+'-'+indexOfPaddingContents , function(err_get, paddingContent){
+                                  paddingContent.get(contentGenre+'-'+indexOfPaddingContents , function(err_get, paddingContent){
                                       interationDone_getPaddingContents_cb(err_get, paddingContent);
                                   });
                               };
@@ -475,7 +475,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                     async.whilst(
                         function () { return timeToAddTimeSlot+anAvailableTimeInterval.cycleDuration <= anAvailableTimeInterval.interval.end; },
                         function (cb_whilst) {
-                            // add time slots of a micro timeslot (of the same genre) to db
+                            // add time slots of a micro timeslot (of the same content genre) to db
                             var inteval = { start: timeToAddTimeSlot, end:timeToAddTimeSlot+programPeriod  };
                             generateTimeSlotsOfMicroInterval(inteval, function(err1){
                                 timeToAddTimeSlot += programPeriod;
@@ -515,7 +515,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
     //TODO: call the real censorMgr
     censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
         
-        //TODO: check the genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
+        //TODO: check the content genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
         
         if (!err_1){
             sortedUgcList = _sortedUgcList;
@@ -715,7 +715,7 @@ scheduleMgr.updateProgramList = function(dooh, intervalToUpdate, updated_cb ){
  *     
  */
 scheduleMgr.setUgcToProgram = function( programTimeSlotId, ugcReferenceNo, set_cb ){
-    ugcModel.findOne({ 'no': ugcReferenceNo }, '_id genre', function (err1, ugc) {
+    ugcModel.findOne({ 'no': ugcReferenceNo }, '_id contentGenre', function (err1, ugc) {
         if (!err1){
             var oidOfprogramTimeSlot = mongoose.Types.ObjectId(programTimeSlotId);
             var _ugc = JSON.parse(JSON.stringify(ugc)); //clone ugc object due to strange error "RangeError: Maximum call stack size exceeded"
@@ -846,7 +846,7 @@ scheduleMgr.removeUgcfromProgramAndAutoSetNewOne = function(sessionId, programTi
                               candidateUgcList = candidateUgcList.concat(sortedUgcList);
                           }
                           
-                          if ( candidateUgcList[indexOfcandidateToSelect].genre == originalUgc.genre){
+                          if ( candidateUgcList[indexOfcandidateToSelect].contentGenre == originalUgc.contentGenre){
                               selectedUgc = candidateUgcList.splice(indexOfcandidateToSelect, 1)[0];
                               break;
                           }
