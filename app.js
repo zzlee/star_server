@@ -238,7 +238,7 @@ app.get('/miix/ugc_hightlights', function(req, res){
     var db = require('./db.js');
     
     var ugcModel = db.getDocModel("ugc");
-    ugcModel.find({ "rating": "A", $or: [ { "genre":"miix" }, { "genre": "check_in"} ] }).sort({"createdOn":-1}).limit(10).exec(function (err, docs) {
+    ugcModel.find({ "rating": "A", $or: [ { "contentGenre":"miix_it" }, { "contentGenre": "check_in"} ] }).sort({"createdOn":-1}).limit(10).exec(function (err, docs) {
         if (!err){
             res.send(docs);
         }
@@ -391,6 +391,7 @@ app.post('/members/:member_id/questions', function(req, res){
  * <li>doohPlayedTimes: 
  * <li>rating: 
  * <li>genre: 
+ * <li>contentGenre:
  * <li>mustPlay: 
  * </ul>
  * For example, <br>
@@ -402,6 +403,7 @@ app.post('/members/:member_id/questions', function(req, res){
  * "doohPlayedTimes":0,
  * "rating":"d",
  * "genre":"miix",
+ * "contentGenre":"miit_it"
  * "mustPlay":true}] <br>
  *
  * @name GET /miix_admin/user_content_items
@@ -445,7 +447,7 @@ app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttrib
  * <ul>
  * <li>intervalOfSelectingUGC: An object specifying the starting and ending of of the time interval for scheduleMgr to select the applied UGC items.
  * <li>intervalOfPlanningDoohProgrames: An object specifying the starting and ending of of the time interval which the generated schedule covers.
- * <li>programSequence: An array of strings showing the sequence of program genres.
+ * <li>programSequence: An array of strings showing the sequence of program content genres.
  * </ul>
  * <h5>Request body</h5>
  * None
@@ -494,6 +496,7 @@ app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTime
  * <li>fbPictureUrl:  
  * <li>rating: 
  * <li>genre: 
+ * <li>contentGenre:
  * </ul>
  * For example, <br>
  * [{_id: '51d837f6830459c42d000023',
@@ -504,7 +507,8 @@ app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTime
  * "fb_userName":"No User",
  * "fbPictureUrl":"http://profile.ak.fbcdn.net/hprofile-ak-frc1/371959_100004619173955_82185728_q.jpg",
  * "rating":"d",
- * "genre":"miix"}] <br>
+ * "genre":"miix"}
+ * "contentGenre":"miix_it"] <br>
  *
  * @name GET /miix_admin/doohs/:doohId/timeslots
  */

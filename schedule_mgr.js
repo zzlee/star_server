@@ -191,7 +191,7 @@ scheduleMgr.init = function(_censorMgr){
  *     </ul>
  *     For example, {start: 1371861000000, end: 1371862000000} 
  * 
- * @param {Array} programSequence An array of strings showing the sequence of program genres to use when 
+ * @param {Array} programSequence An array of strings showing the sequence of program content genres to use when 
  *     when the system is planning the program(s) of a "micro time interval" <br>
  *     Note: the string must be "miix", "cultural_and_creative", "mood", or "check_in"
  *     For example, ["miix", "check_in", "check_in", "mood", "cultural_and_creative" ] <br>
@@ -1043,7 +1043,7 @@ scheduleMgr.removeUgcfromProgramAndAutoSetNewOne = function(sessionId, programTi
  *             </ul>
  *             For example, {start: 1371861000000, end: 1371862000000} 
  * 
- *         <li>programSequence An array of strings showing the sequence of program genres to use when 
+ *         <li>programSequence An array of strings showing the sequence of program content genres to use when 
  *             when the system is planning the program(s) of a "micro time interval" <br>
  *             Note: the string must be "miix", "cultural_and_creative", "mood", or "check_in"
  *             For example, ["miix", "check_in", "check_in", "mood", "cultural_and_creative" ] <br>

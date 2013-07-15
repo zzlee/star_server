@@ -66,7 +66,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
     }
 
     if ( pageLimit && pageSkip ) {
-        FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
+        FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no contentGenre mustPlay', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
             if(err) {
                 logger.error('[censorMgr_db.listOfUGCs]', err);
                 cb(err, null);
@@ -103,7 +103,7 @@ var UGCList = [];
 var timeslotStart;
 var timeslotEnd;
 
-var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, genre, mustPlay, timeslotStart, timeslotEnd, timeStamp, arr) {
+var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, contentGenre, mustPlay, timeslotStart, timeslotEnd, timeStamp, arr) {
     arr.push({
         userPhotoUrl: userPhotoUrl,
         ugcCensorNo: ugcCensorNo,
@@ -114,7 +114,7 @@ var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, 
         description: description,
         doohPlayedTimes:doohPlayedTimes, 
         rating: rating,
-        genre: genre,
+        contentGenre: contentGenre,
         mustPlay: mustPlay,
         timeslotStart: timeslotStart,
         timeslotEnd: timeslotEnd,
@@ -132,13 +132,13 @@ var mappingUGCList = function(data, set_cb){
         }
 
         if(next == limit - 1) {
-            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, UGCList);
+            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, UGCList);
             set_cb(null, 'ok'); 
             next = 0;
             UGCList = [];
         }
         else{
-            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, UGCList);
+            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, UGCList);
             next += 1;
             mappingUGCList(data, set_cb);
         }
@@ -262,7 +262,7 @@ censorMgr.setUGCAttribute = function(no, vjson, cb){
  */
 censorMgr.getUGCListLite = function(condition, cb){
 
-    FMDB.listOfdocModels( UGCs,{'createdOn' : {$gte: condition.start, $lt: condition.end}},'_id genre', {sort :'no'}, function(err, result){
+    FMDB.listOfdocModels( UGCs,{'createdOn' : {$gte: condition.start, $lt: condition.end}},'_id contentGenre', {sort :'no'}, function(err, result){
         if(err) {
             logger.error('[censorMgr.getUGCListLite]', err);
             cb(err, null);
@@ -285,14 +285,14 @@ censorMgr.getPlayList = function(programList, cb){
     var playList = [];
     console.log('programList.length'+programList.length);
 
-    var playListInfo = function(no, description, title, doohPlayedTimes, rating, genre, mustPlay, timeslot, timeStamp, dooh, _id, projectId, ownerId, arr) {
+    var playListInfo = function(no, description, title, doohPlayedTimes, rating, contentGenre, mustPlay, timeslot, timeStamp, dooh, _id, projectId, ownerId, arr) {
         arr.push({
             no: no,
             description: description,
             title: title,
             doohPlayedTimes:doohPlayedTimes, 
             rating: rating,
-            genre: genre,
+            contentGenre: contentGenre,
             mustPlay: mustPlay,
             timeslot: timeslot,
             timeStamp: timeStamp,
@@ -308,8 +308,8 @@ censorMgr.getPlayList = function(programList, cb){
 
         limit = data.length;
 
-        FMDB.listOfdocModels( UGCs, {_id: data[next].content._id},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', null, function(err, result){
-//          FMDB.listOfdocModels( UGCs, {_id:'51ac537031f2f25c0a00000d'},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', {sort:'no'}, function(err, result){
+        FMDB.listOfdocModels( UGCs, {_id: data[next].content._id},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no contentGenre mustPlay', null, function(err, result){
+//          FMDB.listOfdocModels( UGCs, {_id:'51ac537031f2f25c0a00000d'},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no contentGenre mustPlay', {sort:'no'}, function(err, result){
             console.log('mappingPlayList_listOfdocModels'+err+result);
             console.log('mappingPlayList_listOfdocModels---------'+result[0].no);
             if(err) {
@@ -318,13 +318,13 @@ censorMgr.getPlayList = function(programList, cb){
             }
             if(result !== null){
                 if(next == limit - 1) {
-                    playListInfo(result[0].no, result[0].description, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].genre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
+                    playListInfo(result[0].no, result[0].description, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].contentGenre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
                     set_cb(null, 'ok'); 
                     next = 0;
                     playList = [];
                 }
                 else{
-                    playListInfo(result[0].no, result[0].description, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].genre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
+                    playListInfo(result[0].no, result[0].description, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].contentGenre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
                     next += 1;
                     mappingPlayList(data, set_cb);
                 }
