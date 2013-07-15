@@ -1,6 +1,5 @@
 var FMDB = require('./db.js'),
     UGCDB = require('./ugc.js'),
-    UGCDB = require('./UGC.js'),
     ObjectID = require('mongodb').ObjectID,
     fb_handler = require('./fb_handler.js'),
     youtubeInfo = require('./youtube_mgr.js');

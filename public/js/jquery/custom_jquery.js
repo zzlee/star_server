@@ -10,7 +10,7 @@ var DOMAIN = "/miix_admin/",
 var FM = {};    
 
 var conditions = {};
-
+var sessionId = null;
 
 // PageList object implementation
 function PageList( listType, rowsPerPage, urlToGetListContent){
@@ -450,6 +450,7 @@ $(document).ready(function(){
         /**
          * playList
          */
+
         if(playlistCheck == '/miix_admin/doohs'){
             console.log('dooh');
             $('#ugcSearchDateBtn').click(function(){
@@ -464,11 +465,10 @@ $(document).ready(function(){
 
                     console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
                     console.log('value'+$(this).attr("value"));
-//                  conditions = inputSearchData;
-//                    if($(this).attr("value") == "" && flag == 0){
-//                        alert('You have to enter full date and program sequence!!');
-//                        flag = 1; 
-//                    }
+                    if($(this).attr("value") == "" && flag == 0){
+                        alert('You have to enter full date and program sequence!!');
+                        flag = 1; 
+                    }
                         if(inputSearchData.TimeStart && inputSearchData.TimeEnd && inputSearchData.playtimeStart && inputSearchData.playtimeEnd && inputSearchData.ugcPriorityText){
                             $.ajax({
                                 url: url,
@@ -476,7 +476,8 @@ $(document).ready(function(){
                                 data: {intervalOfSelectingUGC:{start:inputSearchData.TimeStart, end:inputSearchData.TimeEnd}, intervalOfPlanningDoohProgrames:{start:inputSearchData.playtimeStart, end:inputSearchData.playtimeEnd}, programSequence:inputSearchData.ugcPriorityText},
                                 success: function(response) {
                                     if(response.message){
-//                                        console.log("[Response] message:" + response.message);
+                                        console.log("[Response] message:" + JSON.stringify(response.message.sessionId));
+                                        sessionId = response.message
                                         $('#main_menu ul[class="current"]').attr("class", "select");
                                         $('#UGCPlayList').attr("class", "current");
                                         
@@ -489,12 +490,27 @@ $(document).ready(function(){
                 });
 
             });
+            
+            $('#pushProgramsBtn').click(function(){
+                console.log("sessionId:" + sessionId);
+                console.log('push');
+                var url = DOMAIN + "doohs/taipeiarena/ProgramsTo3rdPartyContentMgr/sessionId";
+                $.ajax({
+                    url: url,
+                    type: 'PUT',
+                    data: {},
+                    success: function(response) {
+                        if(response.message){
+                            console.log("[Response] message:" + response.message);
+                        }
+                    }
+                });
+            });            
             //test
 //          if($(this).attr("name") == 'ugcPriorityText'){
 //          if($(this).attr("value") != '¥´' && flag == 0){
 //          alert('You have to enter correct  program sequence!!');
 //          flag = 1; 
-
 //          }}
 
         }// End of doohs

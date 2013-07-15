@@ -659,7 +659,8 @@ scheduleMgr.getProgramListBySession = function(sessionId, pageLimit, pageSkip, g
  *     if successful, err returns null; if failed, err returns the error message.
  */
 scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
-    
+    console.log('Enter-->scheduleMgr.pushProgramsTo3rdPartyContentMgr sessionId='+sessionId);
+    pushed_cb(null,'pushProgramsTo3rdPartyContentMgr ok!!');
 };
 
 /**

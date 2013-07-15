@@ -8,6 +8,8 @@ var censor_mgr = require("../censor_mgr.js");
 var apis = require("../routes/api.js");
 var schedule_mgr = require("../schedule_mgr.js");
 
+var sessionId = null;
+
 /**
  * @param  request  {json}sort:{?}
  *                        ex:{
@@ -125,8 +127,9 @@ FM.censor_handler.createTimeslots_get_cb = function(req, res){
     
     schedule_mgr.createProgramList(doohId, _intervalOfSelectingUGC, _intervalOfPlanningDoohProgrames, programSequence, function(err, result){
         if (!err){
-            console.log(result);
-            res.send(200, {message:result});
+            sessionId = result.sessionId;
+            console.log('---sessionId---'+sessionId);
+            res.send(200, {message: JSON.stringify(result.sessionId)});
         }
         else{
             res.send(400, {error: err});
@@ -172,5 +175,20 @@ FM.censor_handler.gettimeslots_get_cb = function(req, res){
 //            ];
 //    res.render( 'table_censorPlayList', {ugcCensorPlayList: testArray} );
  };
+
+FM.censor_handler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
+    console.log('Enter--->censor_handler.pushProgramsTo3rdPartyContent_get_cb');
+    
+    schedule_mgr.pushProgramsTo3rdPartyContentMgr(sessionId, function(err, result){
+        if (!err){
+            //TODO pushProgramsTo3rdPartyContentMgr
+            console.log(result);
+        }
+        else{
+            res.send(400, {error: err});
+        }
+    });
+    
+};
 
 module.exports = FM.censor_handler;

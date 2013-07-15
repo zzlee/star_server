@@ -365,8 +365,6 @@ app.post('/members/:member_id/questions', function(req, res){
     
 });
 
-
-
 /**
  * Get the UGC list<br>
  * <h5>Path Parameters</h5>
@@ -536,6 +534,31 @@ app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.gettimeslot
  * @name PUT /miix_admin/doohs/:doohId/timeslots/:timeslotId
  */
 app.put('/miix_admin/doohs/:doohId/timeslots/:timeslotId', routes.censor_handler.timeslots_get_cb);
+
+//TODO: pushProgramsTo3rdPartyContentMgr RESTful
+/**
+ *  Push programs (of a specific session) to the 3rd-party content manager.<br>
+ * <h5>Path Parameters</h5>
+ * <ul>
+ * <li>doohId: Dooh ID (ex:'taipeiarena')
+ * </ul>
+ * <h5>Query Parameters</h5>
+ * None
+ * <h5>Request body</h5>
+ * <ul>
+ * <li>sessionId: The id indicating the session of creating program time slot.
+ * </ul>
+ * <h5>Response body</h5>
+ * if successful, err returns null; if failed, err returns the error message.
+ * <ul>
+ * <li>err: error message if any error happens
+ * <li>result: null 
+ * </ul>
+ *
+ * @name PUT /miix_admin/doohs/:doohId/ProgramsTo3rdPartyContent
+ */
+app.put('/miix_admin/doohs/:doohId/ProgramsTo3rdPartyContentMgr/:sessionId', routes.censor_handler.pushProgramsTo3rdPartyContentMgr_get_cb);
+
 // Internal
 
 app.get('/internal/oauth2callback', routes.YoutubeOAuth2_cb );
