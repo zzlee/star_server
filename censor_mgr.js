@@ -66,6 +66,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
     }
 
     if ( pageLimit && pageSkip ) {
+
         FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
             if(err) {
                 logger.error('[censorMgr_db.listOfUGCs]', err);
@@ -88,6 +89,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
                 }
             }
         });
+
     }
 
 };//getUGCList end
@@ -103,7 +105,7 @@ var UGCList = [];
 var timeslotStart;
 var timeslotEnd;
 
-var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, genre, mustPlay, timeslotStart, timeslotEnd, timeStamp, arr) {
+var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, genre, mustPlay, timeslotStart, timeslotEnd, timeStamp, programTimeSlotId, arr) {
     arr.push({
         userPhotoUrl: userPhotoUrl,
         ugcCensorNo: ugcCensorNo,
@@ -118,7 +120,8 @@ var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, 
         mustPlay: mustPlay,
         timeslotStart: timeslotStart,
         timeslotEnd: timeslotEnd,
-        timeStamp: timeStamp
+        timeStamp: timeStamp,
+        programTimeSlotId: programTimeSlotId
     });
 };
 var mappingUGCList = function(data, set_cb){
@@ -132,13 +135,13 @@ var mappingUGCList = function(data, set_cb){
         }
 
         if(next == limit - 1) {
-            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, UGCList);
+            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, data[next].programTimeSlotId, UGCList);
             set_cb(null, 'ok'); 
             next = 0;
             UGCList = [];
         }
         else{
-            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, UGCList);
+            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].genre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, data[next].programTimeSlotId, UGCList);
             next += 1;
             mappingUGCList(data, set_cb);
         }
@@ -277,7 +280,7 @@ censorMgr.getUGCListLite = function(condition, cb){
 
 
 
-censorMgr.getPlayList = function(programList, cb){
+censorMgr.getPlayList = function(programList, updateUGC, cb){
 
 
     var limit = 0;
@@ -285,7 +288,7 @@ censorMgr.getPlayList = function(programList, cb){
     var playList = [];
     console.log('programList.length'+programList.length);
 
-    var playListInfo = function(no, description, title, doohPlayedTimes, rating, genre, mustPlay, timeslot, timeStamp, dooh, _id, projectId, ownerId, arr) {
+    var playListInfo = function(no, description, title, doohPlayedTimes, rating, genre, mustPlay, timeslot, timeStamp, dooh, programTimeSlotId, projectId, ownerId, arr) {
         arr.push({
             no: no,
             description: description,
@@ -297,21 +300,25 @@ censorMgr.getPlayList = function(programList, cb){
             timeslot: timeslot,
             timeStamp: timeStamp,
             dooh: dooh,
-            _id: _id,
+            programTimeSlotId: programTimeSlotId,
             projectId: projectId,
             ownerId:ownerId
         });
     };    
 
-    var mappingPlayList = function(data, set_cb){
+    var mappingPlayList = function(data, updateUGC, set_cb){
 //      console.log('data[next]._id'+data[next].content._id);
 
         limit = data.length;
+        if(updateUGC){
+        if(data[next].content._id == updateUGC.oldUGCId)
+            data[next].content._id = updateUGC.newUGCId;
+        }
 
         FMDB.listOfdocModels( UGCs, {_id: data[next].content._id},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', null, function(err, result){
 //          FMDB.listOfdocModels( UGCs, {_id:'51ac537031f2f25c0a00000d'},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', {sort:'no'}, function(err, result){
-            console.log('mappingPlayList_listOfdocModels'+err+result);
-            console.log('mappingPlayList_listOfdocModels---------'+result[0].no);
+//            console.log('mappingPlayList_listOfdocModels'+err+result);
+//            console.log('mappingPlayList_listOfdocModels---------'+result[0].no);
             if(err) {
                 logger.error('[censorMgr_db.listOfUGCs]', err);
 //              cb(err, null);
@@ -326,14 +333,14 @@ censorMgr.getPlayList = function(programList, cb){
                 else{
                     playListInfo(result[0].no, result[0].description, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].genre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
                     next += 1;
-                    mappingPlayList(data, set_cb);
+                    mappingPlayList(data, updateUGC, set_cb);
                 }
             }
         });
     };
 
     if(programList.length > 0){
-        mappingPlayList(programList, function(err,docs){
+        mappingPlayList(programList, updateUGC, function(err,docs){
             if (cb){
                 console.dir('playList'+JSON.stringify(playList));
 //              cb(err, playList);
