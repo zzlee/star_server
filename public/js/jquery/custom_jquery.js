@@ -453,7 +453,6 @@ $(document).ready(function(){
          */
 
         if(playlistCheck == '/miix_admin/doohs'){
-            console.log('dooh');
             $('#createProgramListBtn').click(function(){
                 var flag = 0;
                 var inputSearchData = {};
@@ -461,14 +460,10 @@ $(document).ready(function(){
 
 
                 $('#condition-inner input[class="createProgramListBtn"]').each(function(i){
-                    console.log("item: " + $(this).attr("value"));
 
                     inputSearchData[$(this).attr("name")] = $(this).attr("value");
 
-                    console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
-                    console.log('value'+$(this).attr("value"));
                     if($(this).attr("name") == 'ugcSequenceText'){
-                        console.log('char'+$(this).attr("name")+$(this).attr("value"));
 
                         var sequence = encodeURIComponent($(this).attr("value"));
                         
@@ -510,15 +505,15 @@ $(document).ready(function(){
             });
             
             $('#ugcCensor.ugcCensorNoSetBtn').click(function(){
-                console.log('Set');
+                
                 var url = DOMAIN + "doohs/taipeiarena/timeslots/sessionId";
                 var programTimeSlotId = $(this).attr("name");
                 var ugcReferenceNo;
 
                 $('input[class="#ugcCensor.ugcCensorNoSetBtn"]').each(function(){
-                    console.log("item: " + $(this).attr("value"));
+                    
                     ugcReferenceNo = $(this).attr("value");
-                    console.log("Set:" + ugcReferenceNo +','+programTimeSlotId);
+                    
                     if(ugcReferenceNo && programTimeSlotId){
                         $.ajax({
                             url: url,
@@ -545,8 +540,6 @@ $(document).ready(function(){
             });
 
             $('#ugcCensor.ugcCensorNoRemoveBtn').click(function(){
-                console.log("sessionId:" + sessionId+$(this).attr("name"));
-                console.log('Auto');
                 var flag = 0;
                 var url = DOMAIN + "doohs/taipeiarena/timeslots/sessionId";
                 var programTimeSlotId = $(this).attr("name");
@@ -579,8 +572,6 @@ $(document).ready(function(){
             });
 
             $('#pushProgramsBtn').click(function(){
-                console.log("sessionId:" + sessionId);
-                console.log('push');
                 var flag = 0;
                 var url = DOMAIN + "doohs/taipeiarena/ProgramsTo3rdPartyContentMgr/sessionId";
                 if(sessionId === null && flag == 0){

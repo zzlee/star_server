@@ -82,9 +82,8 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
 
                 if(limit > 0){ 
                     mappingUGCList(result, function(err,docs){
-                            if (cb){
-//                                console.dir('UGCList'+JSON.stringify(UGCList));
-                                cb(err, UGCList);
+                        if (cb){
+                            cb(err, UGCList);
                         }
                     });
                 }
@@ -129,10 +128,10 @@ var mappingUGCList = function(data, set_cb){
     limit = data.length;
 
     var toDo = function(err, result){
-        
+
         if(data[next].timeslot){
-        timeslotStart = new Date(data[next].timeslot.start).toISOString();
-        timeslotEnd = new Date(data[next].timeslot.end).toISOString();
+            timeslotStart = new Date(data[next].timeslot.start).toISOString();
+            timeslotEnd = new Date(data[next].timeslot.end).toISOString();
         }
 
         if(next == limit - 1) {
@@ -151,7 +150,6 @@ var mappingUGCList = function(data, set_cb){
 
     //async
     if(data[next] !== null){
-        console.log('next'+next+'---'+limit);
         async.parallel([
                         function(callback){
                             miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
@@ -232,19 +230,17 @@ var getUserContent = function(fb_id,get_cb){
  *                       
  */
 censorMgr.setUGCAttribute = function(no, vjson, cb){
-    
+
     if(vjson.mustPlay == 'true')
         vjson = {mustPlay : true};
     if(vjson.mustPlay == 'false')
         vjson = {mustPlay : false};
-    
-    console.dir('setUGCAttribute'+JSON.stringify(no)+JSON.stringify(vjson));
+
 
     UGC_mgr.getOwnerIdByNo(no, function(err, result){
         if(err) logger.error('[setUGCAttribute_getOwnerIdByNo]', err);
 
         if(result){
-            console.log('getOwnerIdByNo_result'+result);
             FMDB.updateAdoc(UGCs,result,vjson, function(err, result){
                 if(err) {
                     logger.error('[setUGCAttribute_updateAdoc]', err);
@@ -252,7 +248,7 @@ censorMgr.setUGCAttribute = function(no, vjson, cb){
                 }
                 if(result){
                     cb(null,'success');
-                    console.log('updateAdoc_result'+result);
+//                  console.log('updateAdoc_result'+result);
                 }
             });
         }
@@ -272,7 +268,6 @@ censorMgr.getUGCListLite = function(condition, cb){
             cb(err, null);
         }
         if(result){
-            console.dir('result'+JSON.stringify(result));
             cb(err, result);
         }
     });
@@ -283,11 +278,9 @@ censorMgr.getUGCListLite = function(condition, cb){
 
 censorMgr.getPlayList = function(programList, updateUGC, cb){
 
-
     var limit = 0;
     var next = 0;
     var playList = [];
-    console.log('programList.length'+programList.length);
 
     var playListInfo = function(no, description, title, doohPlayedTimes, rating, genre, mustPlay, timeslot, timeStamp, dooh, programTimeSlotId, projectId, ownerId, arr) {
         arr.push({
@@ -308,21 +301,16 @@ censorMgr.getPlayList = function(programList, updateUGC, cb){
     };    
 
     var mappingPlayList = function(data, updateUGC, set_cb){
-//      console.log('data[next]._id'+data[next].content._id);
 
         limit = data.length;
         if(updateUGC){
-        if(data[next].content._id == updateUGC.oldUGCId)
-            data[next].content._id = updateUGC.newUGCId;
+            if(data[next].content._id == updateUGC.oldUGCId)
+                data[next].content._id = updateUGC.newUGCId;
         }
 
         FMDB.listOfdocModels( UGCs, {_id: data[next].content._id},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', null, function(err, result){
-//          FMDB.listOfdocModels( UGCs, {_id:'51ac537031f2f25c0a00000d'},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no genre mustPlay', {sort:'no'}, function(err, result){
-//            console.log('mappingPlayList_listOfdocModels'+err+result);
-//            console.log('mappingPlayList_listOfdocModels---------'+result[0].no);
             if(err) {
                 logger.error('[censorMgr_db.listOfUGCs]', err);
-//              cb(err, null);
             }
             if(result !== null){
                 if(next == limit - 1) {
@@ -343,11 +331,8 @@ censorMgr.getPlayList = function(programList, updateUGC, cb){
     if(programList.length > 0){
         mappingPlayList(programList, updateUGC, function(err,docs){
             if (cb){
-                console.dir('playList'+JSON.stringify(playList));
-//              cb(err, playList);
                 mappingUGCList(playList, function(err,docs){
                     if (cb){
-                        console.dir('UGCList'+JSON.stringify(UGCList));
                         cb(err, UGCList);
                     }
                 });

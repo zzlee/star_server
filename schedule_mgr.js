@@ -211,7 +211,6 @@ scheduleMgr.init = function(_censorMgr){
  */
 scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, created_cb ){
     
-    console.log('scheduleMgr');
     var sortedUgcList = null;
     
     var putUgcIntoTimeSlots = function(finishPut_cb){
@@ -514,10 +513,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
     }
     
     //TODO: call the real censorMgr
-    console.log('intervalOfSelectingUGC'+JSON.stringify(intervalOfSelectingUGC));
 //    censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
     censorMgr.getUGCListLite(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
-        console.log('_sortedUgcList'+_sortedUgcList);
         
         //TODO: check the genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
         
@@ -525,10 +522,10 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             sortedUgcList = _sortedUgcList;
             generateTimeSlot( function(err_2){
                 if (!err_2) {
-                    console.log('generateTimeSlot() done! ');
+//                    console.log('generateTimeSlot() done! ');
                     
                     putUgcIntoTimeSlots(function(err_3, result){
-                        console.log('putUgcIntoTimeSlots() done! ');
+//                        console.log('putUgcIntoTimeSlots() done! ');
                         if (created_cb){
                             created_cb(err_3, result);
                         }                        
@@ -603,7 +600,6 @@ scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip , upda
         if(_err) got_cb(_err, result);
         if(result.length === 0) got_cb('No result', result);
         if (result.length > 0){
-//            console.log('getProgramList'+result);
             censorMgr.getPlayList(result , updateUGC, function(err, result){
                 if(err) got_cb(err, null);
                 if(result){
@@ -659,7 +655,6 @@ scheduleMgr.getProgramListBySession = function(sessionId, pageLimit, pageSkip, g
  *     if successful, err returns null; if failed, err returns the error message.
  */
 scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
-    console.log('Enter-->scheduleMgr.pushProgramsTo3rdPartyContentMgr sessionId='+sessionId);
     pushed_cb(null,'pushProgramsTo3rdPartyContentMgr ok!!');
 };
 
