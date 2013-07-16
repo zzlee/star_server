@@ -461,11 +461,69 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             
         };
         
-        //TODO: call the real ScalaMgr many times to get the whole available intervals for planning 
-        //scalaMgr_listAvailableTimeInterval(intervalOfPlanningDoohProgrames,function(err, result){
-        scalaMgr.listTimeslot('2013/7/16',function(err, result){
+        var getAvailableTimeIntervals = function( intervalToPlan, got_cb) {
             
-            debugger;
+            async.waterfall([
+                function(callback){
+                    
+                    //call scalaMgr.listTimeslot() to get the days that intervalToPlan covers
+                    var rawIntervals = [];
+                    var aDay = 24*60*60*1000;
+                    var endDate = new Date(intervalToPlan.end);
+                    var upperBound = (new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()+1, 0, 0, 0, 0 )).getTime();
+                    var day = intervalToPlan.start;
+                    
+                    async.whilst(
+                        function () { return day < upperBound; },
+                        function (callback) {
+                            scalaMgr.listTimeslot(day,function(errScala, intervalsInThisDay){
+                                if (!errScala) {
+                                    rawIntervals = rawIntervals.concat(intervalsInThisDay);
+                                    day += aDay;
+                                    callback(null);
+                                }
+                                else {
+                                    callback("Fail to execute scalaMgr.listTimeslot(): "+errScala);
+                                }
+                            });
+                        },
+                        function (err1) {
+                            callback(err1, rawIntervals);
+                        }
+                    );
+                    
+                },
+                function(rawIntervals, callback){
+                    //Trim the "raw intervals" to meet the coverage of intervalToPlan
+                    var resultIntervals = [];
+                    for (var i=0; i<rawIntervals.length; i++){
+                        var aRawInterval = rawIntervals[i];
+                        if ( (aRawInterval.interval.start >= intervalToPlan.start) && (aRawInterval.interval.end <= intervalToPlan.end) ){
+                            resultIntervals.push(aRawInterval);
+                        }
+                        else if ( (aRawInterval.interval.start < intervalToPlan.start) && (aRawInterval.interval.end <= intervalToPlan.end) ){
+                            resultIntervals.push({interval:{start: intervalToPlan.start, end: aRawInterval.interval.end}, cycleDuration: aRawInterval.cycleDuration });
+                        }
+                        else if ( (aRawInterval.interval.start >= intervalToPlan.start) && (aRawInterval.interval.end > intervalToPlan.end) ){
+                            resultIntervals.push({interval:{start: aRawInterval.interval.start, end: intervalToPlan.end}, cycleDuration: aRawInterval.cycleDuration });
+                        }
+                        else if ( (aRawInterval.interval.start < intervalToPlan.start) && (aRawInterval.interval.end > intervalToPlan.end) ){
+                            resultIntervals.push({interval:{start: intervalToPlan.start, end: intervalToPlan.end}, cycleDuration: aRawInterval.cycleDuration });
+                        }                    }
+                    callback(null, resultIntervals);
+                }
+            ],
+            function(err, result){
+                if (got_cb){
+                    got_cb(err, result);
+                } 
+            });
+            
+        };
+        
+        //scalaMgr_listAvailableTimeInterval(intervalOfPlanningDoohProgrames,function(err, result){
+        getAvailableTimeIntervals(intervalOfPlanningDoohProgrames,function(err, result){
+            //debugger;
             if (!err){
                 
                 //TODO: check if these available time intervals cover existing planned program time slots. If yes, maked the UGCs contained in these program time slots "must-play" and delete these program time slots.
@@ -558,19 +616,18 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             putUgcIntoTimeSlots(function(err_3, result){
                 if (!err_3) {
                     console.log('putUgcIntoTimeSlots() done! ');
-                    callback(null);
+                    callback(null, result);
                 }
                 else {
-                    callback("Fail to put UGCs into time slots: "+err_3);
+                    callback("Fail to put UGCs into time slots: "+err_3, null);
                 }
                 
             });
         }
     ],
-    // optional callback
     function(err, results){
         if (created_cb){
-            created_cb(err, result);
+            created_cb(err, results[results.length-1]);
         } 
     });
 

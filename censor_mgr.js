@@ -268,7 +268,7 @@ censorMgr.getUGCListLite = function(condition, cb){
             cb(err, null);
         }
         if(result){
-            console.dir('result'+JSON.stringify(result));
+            //console.dir('result'+JSON.stringify(result));
             cb(err, result);
         }
     });
