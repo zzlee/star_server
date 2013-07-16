@@ -293,7 +293,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                     };
                     
                     async.eachSeries(timeSlots, iteratorPutUgcIntoTimeSlots_eachTimeSlot, function(_err_3){
-                        debugger;
+                        //debugger;
                         interationDone_cb1(_err_3);
                     });
                     // -- end of PutUgcIntoTimeSlots_eachTimeSlot
@@ -522,7 +522,61 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         programPlanningPattern.set(programSequence);
     }
     
-    //censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
+    
+    async.series([
+        function(callback){
+            //censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
+            censorMgr.getUGCListLite(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
+                //console.log('_sortedUgcList=');
+                //console.dir(_sortedUgcList);
+                if (!err_1){
+                    sortedUgcList = _sortedUgcList;
+                    callback(null);
+                }
+                else {
+                    callback("Fail to get UGC list from Censor manager: "+err_1);
+                }
+            });
+        },
+        function(callback){
+            //TODO: check the content genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
+
+            callback(null);
+        },
+        function(callback){
+            generateTimeSlot( function(err_2){
+                if (!err_2) {
+                    console.log('generateTimeSlot() done! ');
+                    callback(null);
+                }
+                else {
+                    callback("Fail to generate time slots: "+err_2);
+                }
+            });
+        },
+        function(callback){
+            putUgcIntoTimeSlots(function(err_3, result){
+                if (!err_3) {
+                    console.log('putUgcIntoTimeSlots() done! ');
+                    callback(null);
+                }
+                else {
+                    callback("Fail to put UGCs into time slots: "+err_3);
+                }
+                
+            });
+        }
+    ],
+    // optional callback
+    function(err, results){
+        if (created_cb){
+            created_cb(err, result);
+        } 
+    });
+
+    
+    
+    /*
     censorMgr.getUGCListLite(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
         //console.log('_sortedUgcList=');
         //console.dir(_sortedUgcList);
@@ -555,6 +609,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             }
         }
     });
+    */
     
     
 };
