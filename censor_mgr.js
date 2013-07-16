@@ -262,7 +262,7 @@ censorMgr.setUGCAttribute = function(no, vjson, cb){
  */
 censorMgr.getUGCListLite = function(condition, cb){
 
-    FMDB.listOfdocModels( UGCs,{'createdOn' : {$gte: condition.start, $lt: condition.end}},'_id contentGenre', {sort :'no'}, function(err, result){
+    FMDB.listOfdocModels( UGCs,{'createdOn' : {$gte: condition.start, $lt: condition.end}},'_id contentGenre projectId fileExtension no', {sort :'no'}, function(err, result){
         if(err) {
             logger.error('[censorMgr.getUGCListLite]', err);
             cb(err, null);

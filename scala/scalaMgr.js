@@ -62,9 +62,11 @@ function scalaMgr( url, account ){
         var duration = time[0].split(':');
         return (Number(duration[0]) * 60 + Number(duration[1])) * 1000;
     };
-    var timeToInt = function( time ){
+    var timeToInt = function( dateData, time ){
         time = time.split(':');
-        return new Date(1970, 01, 01, time[0], time[1], time[2]).getTime();
+        var date = new Date(dateData);
+        
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time[0], time[1], time[2]).getTime();
     };
     
     /**
@@ -80,7 +82,7 @@ function scalaMgr( url, account ){
      *     @param {boolean} valid The valid show this timeslot is valid.
      */
     var listTimeslot = function(oneday, timeslot_cb){
-        var interval = [];
+        var result = [];
     
         var option = {
             channel : { id: 1, frames: 1 }, //hardcode
@@ -94,16 +96,18 @@ function scalaMgr( url, account ){
                         if(list.timeslots[i].endTime == '24:00:00') timeslotDeadline = new Date(list.timeslots[i].endDate + ' 23:59:59');
                         else timeslotDeadline = new Date(list.timeslots[i].endDate + ' ' + list.timeslots[i].endTime);
                         if((option.date.getTime() <= timeslotDeadline.getTime()) && (status == 'OK')){
-                            interval.push({
+                            result.push({
                                 //playlist: list.timeslots[i].playlist.name,
-                                start: timeToInt(list.timeslots[i].startTime),
-                                end: timeToInt(list.timeslots[i].endTime),
-                                duration: durationToNumber(list.timeslots[i].playlist.prettifyDuration.replace('(','').replace(')','').split(' - '))
+                                interval: {
+                                    start: timeToInt(oneday, list.timeslots[i].startTime),
+                                    end: timeToInt(oneday, list.timeslots[i].endTime)
+                                },
+                                cycleDuration: durationToNumber(list.timeslots[i].playlist.prettifyDuration.replace('(','').replace(')','').split(' - '))
                             });
                         }
                     });
                 }
-                if(i == list.timeslots.length-1) timeslot_cb(null, interval);
+                if(i == list.timeslots.length-1) timeslot_cb(null, result);
             }
         });
         
