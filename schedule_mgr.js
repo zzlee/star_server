@@ -217,6 +217,7 @@ scheduleMgr.init = function(_censorMgr){
 scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, created_cb ){
     
     var sortedUgcList = null;
+    var sessionId = intervalOfSelectingUGC.start.toString() + '-' + intervalOfSelectingUGC.end.toString() + '-' + intervalOfPlanningDoohProgrames.start.toString() + '-' + intervalOfPlanningDoohProgrames.end.toString() + '-' + Number((new Date()).getTime().toString());
     
     var putUgcIntoTimeSlots = function(finishPut_cb){
         
@@ -224,7 +225,6 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         var counter = 0;
         
         var saveCandidateUgcList = function(_candidateUgcList, _intervalOfSelectingUGC, saved_cb){
-            var sessionId = _intervalOfSelectingUGC.start.toString() + '-' + _intervalOfSelectingUGC.end.toString() + '-' + Number((new Date()).getTime().toString());
             var indexArrayCandidateUgcCache = []; for (var i = 0; i < _candidateUgcList.length; i++) { indexArrayCandidateUgcCache.push(i); }
             
             var iteratorCreateCandidateUgcCache = function(indexOfCandidateUgcCache, interationDone_createCandidateUgcCache_cb){
@@ -372,7 +372,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                         end: interval.end,
                         startHour: (new Date(interval.start)).getHours()},
                     //content: {ugcId:"12345676", ugcProjcetId:"3142462123"}
-                    contentGenre: contentGenre
+                    contentGenre: contentGenre,
+                    session: sessionId
                     };
             
             var timeStampIndex = 0;
@@ -779,7 +780,6 @@ scheduleMgr.getProgramListBySession = function(sessionId, pageLimit, pageSkip, g
  *     if successful, err returns null; if failed, err returns the error message.
  */
 scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
-    //console.log('Enter-->scheduleMgr.pushProgramsTo3rdPartyContentMgr sessionId='+sessionId);
 
     async.waterfall([
         function(cb1){
@@ -794,16 +794,25 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
             });
         },
         function(programs, cb2){
+            debugger;
             //push each programs to Scala
             var iteratorPushAProgram = function(aProgram, callback){
                 
                 async.waterfall([
+                    function(callback){
+                        //download contents from S3
+
+                    }, 
                     function(arg1, arg2, callback){
                         //push content to Scala
                         scalaMgr.setItemToPlaylist(arg1, arg2, result);
                         
                         callback(null, result);
-                    }
+                    },
+                    function(arg1, arg2, callback){
+                        //delete downloaded contents from local drive
+
+                    }, 
                 ], function (err, result) {
                     // result now equals 'done'    
                 });
@@ -818,6 +827,11 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
             
             
             cb2(null, 'three');
+        },
+        function(cb3){
+            //TODO: modify the counter in UGC collection; change the status of this programTimeslot doc
+            
+            cb3(null, 'three');
         }
     ], function (err, result) {
        // result now equals 'done'    
