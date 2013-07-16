@@ -4,6 +4,7 @@ var censorMgr = {};
 var async = require('async');
 var fb_handler = require('./fb_handler.js');
 var FMDB = require('./db.js');
+var UGC_mgr = require('./UGC.js');
 var sheculeMgr = require('./schedule_mgr.js');
 var miix_content_mgr = require('./miix_content_mgr.js');
 var member_mgr = require('./member.js');
