@@ -28,12 +28,30 @@ setTimeout(function(){
         savepath : ''
     };
     */
-    var webpage = {
-        name: 'FM_scala',
-        uri: 'www.feltmeng.com'
+    
+    var file1 = {
+        name : 'IMG_001.mov',
+        path : 'C:\\tmp\\',
+        savepath : ''
     };
-    scalaMgr.setWebpageToPlaylist(webpage, { start: '2013-07-15 10:00:00', end: '2013-07-15 11:00:00' },  function(err, status){
-        console.log(status);
+    var file2 = {
+        name : 'IMG_002.mov',
+        path : 'C:\\tmp\\',
+        savepath : ''
+    };
+    var file3 = {
+        name : 'IMG_003.mp4',
+        path : 'C:\\tmp\\',
+        savepath : ''
+    };
+    scalaMgr.setItemToPlaylist(file1, { start: '2013-07-17 18:30:00', end: '2013-07-17 20:00:00' },  function(err, status){
+        console.log('file_1: ' + status);
+        scalaMgr.setItemToPlaylist(file2, { start: '2013-07-17 18:30:00', end: '2013-07-17 20:00:00' },  function(err, status){
+            console.log('file_2: ' + status);
+            scalaMgr.setItemToPlaylist(file3, { start: '2013-07-17 18:30:00', end: '2013-07-17 20:00:00' },  function(err, status){
+                console.log('file_3: ' + status);
+            });
+        });
     });
     
-}, 1000);
+}, 1500);

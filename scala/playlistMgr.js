@@ -6,15 +6,17 @@ var playlist = (function() {
     var itemSchema = {
         "id": '', //*// playlist_id
         "name": '',    //*// playlist_name
+        "controlledByAdManager":false,
+        "enableSmartPlaylist":false,
         "playlistItems" : [{
             "endValidDate": '',
             "id": '',    //*// playlistItem_id, if this change, it need reset.
             "playFullscreen": false,
             "playlistItemType": "MEDIA_ITEM",
-            "sortOrder": 1,
+            //"sortOrder": 1,
             "startValidDate": '',
-            //"duration": 0,
-            //"durationHoursSeconds": "00:00:00",
+            "duration": 100,
+            "durationHoursSeconds": "00:01:40",
             "timeSchedules":[{
                 "days":[
                     "SUNDAY",
@@ -27,7 +29,7 @@ var playlist = (function() {
                 ],
                 "startTime": '',
                 "endTime": '',
-                "sortOrder":1
+                //"sortOrder":1
             }],
             "useValidRange": true
         }]
@@ -94,11 +96,16 @@ var playlist = (function() {
                 list_cb(err, obj);
             });
         },
+        /*listAllAvailablePlaylistItems : function( option, upadte_cb ) {
+            adapter.put('/ContentManager/api/rest/playlists/' + option.playlist.id + '?token=' + token, option.playlist.content, function(err, req, res, obj) {
+            });
+        },*/
         update : function( option, upadte_cb ) {
             adapter.put('/ContentManager/api/rest/playlists/' + option.playlist.id + '?token=' + token, option.playlist.content, function(err, req, res, obj) {
                 //assert.ifError(err);
-                //console.log('%d -> %j', res.statusCode, res.headers);
-                //console.log('%j', obj);
+                console.log('%d -> %j', res.statusCode, res.headers);
+                console.log('%j', obj);
+                upadte_cb(obj);
             });
         },
         settingPlaylistItem : function( option, settingPlaylistItem_cb ) {

@@ -124,7 +124,9 @@ function scalaMgr( url, account ){
      */
     var setItemToPlaylist = function( file, playTime, reportStatus_cb ){
         
-        var limit = 0;
+        var limit = 0,
+            addlimit = 0;
+            updatelimit = 0;
         //var play = new Date(playTime);
         
         var itemPlaySetting = {
@@ -135,10 +137,13 @@ function scalaMgr( url, account ){
         };
         async.waterfall([
             function(callback){
-                //Step.1: upload file to server
-                contractor.media.fileupload(file, function(err, status){
-                    callback(null, status);
-                });
+                if(limit < 1){
+                    //Step.1: upload file to server
+                    contractor.media.fileupload(file, function(err, status){
+                        callback(null, status);
+                    });
+                    limit++;
+                }
             },
             function(status, callback){
                 //Step.2: find out media(file) id
@@ -166,12 +171,15 @@ function scalaMgr( url, account ){
                 }
             },
             function(status, callback){
-                //Step.4: add media to playlist
-                if(status == 'OK') {
-                    contractor.item.addItemToPlaylist(itemPlaySetting, function(err, addItem_cb){
-                        if(!err) callback(null, 'OK');
-                        else callback(err, null);
-                    });
+                if(addlimit < 1){
+                    //Step.4: add media to playlist
+                    if(status == 'OK') {
+                        contractor.item.addItemToPlaylist(itemPlaySetting, function(err, addItem_cb){
+                            if(!err) callback(null, 'OK');
+                            else callback(err, null);
+                        });
+                    }
+                    addlimit++;
                 }
             },
             function(status, callback){
@@ -185,7 +193,7 @@ function scalaMgr( url, account ){
                 }
             },
             function(status, callback){
-                if(limit < 1){
+                if(updatelimit < 1){
                     //Step.6: update item play info. to playlist
                     if(status == 'OK') {
                         contractor.playlist.updatePlaylistItemSchedule(itemPlaySetting, function(err, itemSetting_cb){
@@ -193,7 +201,7 @@ function scalaMgr( url, account ){
                             else callback(err, null);
                         });
                     }
-                    limit++;
+                    updatelimit++;
                 }
             }
         ], function (err, result) {
@@ -335,7 +343,8 @@ function scalaMgr( url, account ){
         listTimeslot : listTimeslot,
         setItemToPlaylist : setItemToPlaylist,
         pushEvent : pushEvent,
-        setWebpageToPlaylist: setWebpageToPlaylist
+        setWebpageToPlaylist: setWebpageToPlaylist,
+        //contractor: contractor,   //test
     };
 }
 
