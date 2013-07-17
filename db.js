@@ -246,7 +246,7 @@ FM.DB = (function(){
             fb_id: {type: String},
             no: {type: Number},
             genre: {type: String, enum: questionGenre},
-            reply: { type: Boolean },
+            reply: {type: Boolean, default:false },
             version: { type: String },
             content: [{
                 question: String,

@@ -29,6 +29,8 @@ exports.dooh_handler = dooh_handler;
 var censor_handler = require('./censor_handler.js');
 exports.censor_handler = censor_handler;
 
+var service_handler = require('./service_handler.js');
+exports.service = service_handler;
 
 //GL
 var member_handler = require("../member.js"),

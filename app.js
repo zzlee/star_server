@@ -309,6 +309,7 @@ app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_c
 app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);
 app.get('/miix_admin/timeslots', routes.censor_handler.timeslots_get_cb);
 
+
 /**
  * Get the questions of a specific member<br>
  * 
@@ -365,6 +366,7 @@ app.post('/members/:member_id/questions', function(req, res){
     
 });
 
+app.get('/miix_service', routes.service.get_cb);
 /**
  * Get the UGC list<br>
  * <h5>Path Parameters</h5>

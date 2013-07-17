@@ -687,6 +687,12 @@ $(document).ready(function(){
 
 });
 
+//service
+$(document).ready(function(){
+    console.log('service');
+    
+});
+
 /*
 FM.memberList = function(pageToGo, rowsPerPage, cb){
     var url = DOMAIN + "member_list";
