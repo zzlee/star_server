@@ -2,11 +2,14 @@
  * @fileoverview Implementation of scheduleMgr
  */
 
-var db = require('./db.js');
+
 var async = require('async');
 var mongoose = require('mongoose');
-
-//var scala = require('./scala/scalaMgr.js');
+var workingPath = process.cwd();
+var path = require('path');
+var fs = require('fs');
+var awsS3 = require('./aws_s3.js');
+var db = require('./db.js');
 var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://server-pc:8080', { username: 'administrator', password: '53768608' } );
 
 //var scalaMgr = require('./scala/scalaMgr.js')();
@@ -55,22 +58,22 @@ var programPlanningPattern =(function(){
 
 var paddingContent =(function(){ 
     var PADDING_CONTENT_TABLE = {
-            miix_it: [{dir: "content/padding_content", file:"miix01.jpg", format:"image"},
-                   {dir: "content/padding_content", file:"miix02.jpg", format:"image"}],
-            cultural_and_creative: [{dir: "content/padding_content", file:"cc01.jpg", format:"image"},
-                                    {dir: "content/padding_content", file:"cc02.jpg", format:"image"},
-                                    {dir: "content/padding_content", file:"cc03.jpg", format:"image"},
-                                    {dir: "content/padding_content", file:"cc04.jpg", format:"image"}
+            miix_it: [{dir: "contents/padding_content", file:"miix01.jpg", format:"image"},
+                   {dir: "contents/padding_content", file:"miix02.jpg", format:"image"}],
+            cultural_and_creative: [{dir: "contents/padding_content", file:"cc01.jpg", format:"image"},
+                                    {dir: "contents/padding_content", file:"cc02.jpg", format:"image"},
+                                    {dir: "contents/padding_content", file:"cc03.jpg", format:"image"},
+                                    {dir: "contents/padding_content", file:"cc04.jpg", format:"image"}
                                     ],
-            mood: [{dir: "content/padding_content", file:"mood01.jpg", format:"image"},
-                   {dir: "content/padding_content", file:"mood02.jpg", format:"image"},
-                   {dir: "content/padding_content", file:"mood03.jpg", format:"image"},
-                   {dir: "content/padding_content", file:"mood04.jpg", format:"image"}
+            mood: [{dir: "contents/padding_content", file:"mood01.jpg", format:"image"},
+                   {dir: "contents/padding_content", file:"mood02.jpg", format:"image"},
+                   {dir: "contents/padding_content", file:"mood03.jpg", format:"image"},
+                   {dir: "contents/padding_content", file:"mood04.jpg", format:"image"}
                    ],
-            check_in: [{dir: "content/padding_content", file:"check_in01.jpg", format:"image"},
-                       {dir: "content/padding_content", file:"check_in02.jpg", format:"image"},
-                       {dir: "content/padding_content", file:"check_in03.jpg", format:"image"},
-                       {dir: "content/padding_content", file:"check_in04.jpg", format:"image"}
+            check_in: [{dir: "contents/padding_content", file:"check_in01.jpg", format:"image"},
+                       {dir: "contents/padding_content", file:"check_in02.jpg", format:"image"},
+                       {dir: "contents/padding_content", file:"check_in03.jpg", format:"image"},
+                       {dir: "contents/padding_content", file:"check_in04.jpg", format:"image"}
                        ]                                
     };
         
@@ -605,7 +608,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         function(callback){
             generateTimeSlot( function(err_2){
                 if (!err_2) {
-                    console.log('generateTimeSlot() done! ');
+                    //console.log('generateTimeSlot() done! ');
                     callback(null);
                 }
                 else {
@@ -616,7 +619,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         function(callback){
             putUgcIntoTimeSlots(function(err_3, result){
                 if (!err_3) {
-                    console.log('putUgcIntoTimeSlots() done! ');
+                    //console.log('putUgcIntoTimeSlots() done! ');
                     callback(null, result);
                 }
                 else {
@@ -784,57 +787,96 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
     async.waterfall([
         function(cb1){
             //query the programs of this specific session
-            programTimeSlotModel.find({ "session": sessionId }).exec(function (err1, _programs) {
+            programTimeSlotModel.find({ "session": sessionId }).sort({"timeStamp":1}).exec(function (err1, _programs) {
                 if (!err1) {
-                    cb1(null, _programs);
+                    var programs = JSON.parse(JSON.stringify(_programs));
+                    cb1(null, programs);
                 }
                 else {
-                    cb1('Failed to query the programs of a specific session: '+err1, _programs);
+                    cb1('Failed to query the programs of a specific session: '+err1, null);
                 }                             
             });
         },
         function(programs, cb2){
-            debugger;
             //push each programs to Scala
-            var iteratorPushAProgram = function(aProgram, callback){
+            var iteratorPushAProgram = function(aProgram, callbackIterator){
                 
                 async.waterfall([
                     function(callback){
                         //download contents from S3
+                        var fileName;
+                        if (aProgram.type == "UGC"){
+                            var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+aProgram.content.fileExtension; 
+                            //TODO: make sure that target directory exists
+                            var targetLocalPath = path.join(workingPath, 'public/contents/temp', aProgram.content.projectId+aProgram.content.fileExtension);
+                            awsS3.downloadFromAwsS3(targetLocalPath, s3Path, function(errS3,resultS3){
+                                if (!errS3){
+                                    logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully download from S3 ' + s3Path );
+                                    //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully download from S3 ' + s3Path );
+                                    callback(null, targetLocalPath, aProgram.timeslot);
+                                }
+                                else{
+                                    logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Failed to download from S3 ' + s3Path);
+                                    //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Failed to download from S3 ' + s3Path);
+                                    callback('Failed to download from S3 '+s3Path+' :'+errS3, null, null);
+                                }
+                                
+                            });
+
+                        }
+                        else {
+                            var paddingFilePath = path.join(workingPath, 'public', aProgram.content.dir, aProgram.content.file);
+                            callback(null, paddingFilePath, aProgram.timeslot);
+                        }
 
                     }, 
-                    function(arg1, arg2, callback){
+                    function(fileToPlay, timeslot, callback){
+                        debugger;
                         //push content to Scala
-                        scalaMgr.setItemToPlaylist(arg1, arg2, result);
+                        var file = {
+                                name : path.basename(fileToPlay),
+                                path : path.dirname(fileToPlay),
+                                savepath : ''
+                            };
+                        scalaMgr.setItemToPlaylist( file, timeslot, function(errScala, resultScala){
+                            if (!errScala){
+                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + fileToPlay );
+                                //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + fileToPlay );
+                                callback(null, fileToPlay);
+                            }
+                            else{
+                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + fileToPlay );
+                                //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + fileToPlay );
+                                callback('Failed to push content to Scala :'+errScala, null);
+                            }
+                        });
                         
-                        callback(null, result);
+                        //callback(null, fileToPlay);
                     },
-                    function(arg1, arg2, callback){
-                        //delete downloaded contents from local drive
-
+                    function(filePlayed, callback){
+                        //TODO: delete downloaded contents from local drive
+                        callback(null,'done');
                     }, 
-                ], function (err, result) {
-                    // result now equals 'done'    
+                ], function (errWaterfall, resultWaterfall) {
+                    // result now equals 'done' 
+                    callbackIterator(errWaterfall);
                 });
                 
-        
-                
-                callback(null);
             };
-            async.eachSeries(programs, iteratorPushAProgram, function(err){
-                // if any of the saves produced an error, err would equal that error
+            async.eachSeries(programs, iteratorPushAProgram, function(errEachSeries){
+                cb2(errEachSeries);
             });
-            
-            
-            cb2(null, 'three');
+
         },
         function(cb3){
             //TODO: modify the counter in UGC collection; change the status of this programTimeslot doc
             
-            cb3(null, 'three');
+            cb3(null, 'done');
         }
     ], function (err, result) {
-       // result now equals 'done'    
+        if (pushed_cb) {
+            pushed_cb(err);
+        }
     });
                                                 
 };

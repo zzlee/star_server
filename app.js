@@ -664,21 +664,28 @@ http.createServer(app).listen(app.get('port'), function(){
 /*
 //test
 var scheduleMgr = require('./schedule_mgr.js');
-setTimeout(function(){
-    
+    setTimeout(function(){
+   
     scheduleMgr.createProgramList("TP_dom", 
         {start:(new Date("2013/7/2 10:30")).getTime(), end:(new Date("2013/7/2 11:00")).getTime()}, 
-        {start:(new Date("2013/7/16 7:00")).getTime(), end:(new Date("2013/7/16 23:00")).getTime()}, 
+        {start:(new Date("2013/7/17 11:00")).getTime(), end:(new Date("2013/7/17 11:15")).getTime()}, 
         ["miix_it"], function(err, result){
             console.log("err=%s result=", err);
             console.dir(result);
+            if (!err){
+                scheduleMgr.pushProgramsTo3rdPartyContentMgr(result.sessionId, function(err){
+                    console.log("err=%s ", err);
+                });
+            }
             
-            scheduleMgr.getProgramList("TP_dom",{start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, null, 30, function(err2, result2){
-                console.log('result=');
-                console.dir(result2);
-            }); 
     });
     
+     
+    scheduleMgr.getProgramList("TP_dom",{start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, null, 30, function(err2, result2){
+        console.log('result=');
+        console.dir(result2);
+    });
+
     scheduleMgr.setUgcToProgram( "51da8db6fdf3b7e009000003", 426, function(err, result){
         console.log('result=');
         console.dir(result);
@@ -688,8 +695,14 @@ setTimeout(function(){
     scheduleMgr.removeUgcfromProgramAndAutoSetNewOne('1367596800000-1367683140000-1373357471568', '51dbc59f27c747c80b000003', function(err){
         console.log('err=%s',err);
     });
-   
-},3000);
+    
+    
+    scheduleMgr.pushProgramsTo3rdPartyContentMgr('1372732200000-1372734000000-1373972400000-1373973300000-1374026315925', function(err){
+        console.log("err=%s ", err);
+    });
+    
+    
+},1000);
 
 
 var aeServerMgr = require('./ae_server_mgr.js');
