@@ -648,10 +648,10 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             sortedUgcList = _sortedUgcList;
             generateTimeSlot( function(err_2){
                 if (!err_2) {
-                    console.log('generateTimeSlot() done! ');
+//                    console.log('generateTimeSlot() done! ');
                     
                     putUgcIntoTimeSlots(function(err_3, result){
-                        console.log('putUgcIntoTimeSlots() done! ');
+//                        console.log('putUgcIntoTimeSlots() done! ');
                         if (created_cb){
                             created_cb(err_3, result);
                         }                        
@@ -711,7 +711,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
  *         
  *     </ul>
  */
-scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip, got_cb ){
+scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip , updateUGC, got_cb ){
     var query = programTimeSlotModel.find({ "timeslot.start": {$gte:interval.start}, "timeslot.end":{$lt:interval.end}, "type": "UGC", "dooh": dooh })
                         .sort({timeStamp:1});
     
@@ -727,8 +727,7 @@ scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip, got_c
         if(_err) got_cb(_err, result);
         if(result.length === 0) got_cb('No result', result);
         if (result.length > 0){
-            //console.log('getProgramList'+result);
-            censorMgr.getPlayList(result , function(err, result){
+            censorMgr.getPlayList(result , updateUGC, function(err, result){
                 if(err) got_cb(err, null);
                 if(result){
                  got_cb(null, result);
@@ -954,7 +953,7 @@ scheduleMgr.setUgcToProgram = function( programTimeSlotId, ugcReferenceNo, set_c
             
             db.updateAdoc(programTimeSlotModel, oidOfprogramTimeSlot, {"content": _ugc }, function(err2, result){
                 if (set_cb){
-                    set_cb(err2, result);
+                    set_cb(err2, ugc._id);
                 }
             });
             

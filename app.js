@@ -535,9 +535,9 @@ app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.gettimeslot
  * <li>newlySelectedUgc:  the id of newly selected UGC 
  * </ul>
  *
- * @name PUT /miix_admin/doohs/:doohId/timeslots/:timeslotId
+ * @name PUT /miix_admin/doohs/:doohId/timeslots/:sessionId
  */
-app.put('/miix_admin/doohs/:doohId/timeslots/:timeslotId', routes.censor_handler.timeslots_get_cb);
+app.put('/miix_admin/doohs/:doohId/timeslots/:sessionId', routes.censor_handler.updatetimeslots_get_cb);
 
 //TODO: pushProgramsTo3rdPartyContentMgr RESTful
 /**

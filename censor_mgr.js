@@ -4,6 +4,7 @@ var censorMgr = {};
 var async = require('async');
 var fb_handler = require('./fb_handler.js');
 var FMDB = require('./db.js');
+var UGC_mgr = require('./UGC.js');
 var sheculeMgr = require('./schedule_mgr.js');
 var miix_content_mgr = require('./miix_content_mgr.js');
 var member_mgr = require('./member.js');
@@ -80,14 +81,14 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
 
                 if(limit > 0){ 
                     mappingUGCList(result, function(err,docs){
-                            if (cb){
-//                                console.dir('UGCList'+JSON.stringify(UGCList));
-                                cb(err, UGCList);
+                        if (cb){
+                            cb(err, UGCList);
                         }
                     });
                 }
             }
         });
+
     }
 
 };//getUGCList end
@@ -103,7 +104,7 @@ var UGCList = [];
 var timeslotStart;
 var timeslotEnd;
 
-var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, contentGenre, mustPlay, timeslotStart, timeslotEnd, timeStamp, arr) {
+var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, contentGenre, mustPlay, timeslotStart, timeslotEnd, timeStamp, programTimeSlotId, arr) {
     arr.push({
         userPhotoUrl: userPhotoUrl,
         ugcCensorNo: ugcCensorNo,
@@ -118,27 +119,28 @@ var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, 
         mustPlay: mustPlay,
         timeslotStart: timeslotStart,
         timeslotEnd: timeslotEnd,
-        timeStamp: timeStamp
+        timeStamp: timeStamp,
+        programTimeSlotId: programTimeSlotId
     });
 };
 var mappingUGCList = function(data, set_cb){
     limit = data.length;
 
     var toDo = function(err, result){
-        
+
         if(data[next].timeslot){
-        timeslotStart = new Date(data[next].timeslot.start).toISOString();
-        timeslotEnd = new Date(data[next].timeslot.end).toISOString();
+            timeslotStart = new Date(data[next].timeslot.start).toISOString();
+            timeslotEnd = new Date(data[next].timeslot.end).toISOString();
         }
 
         if(next == limit - 1) {
-            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, UGCList);
+            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, data[next].programTimeSlotId, UGCList);
             set_cb(null, 'ok'); 
             next = 0;
             UGCList = [];
         }
         else{
-            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, UGCList);
+            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, data[next].programTimeSlotId, UGCList);
             next += 1;
             mappingUGCList(data, set_cb);
         }
@@ -147,7 +149,6 @@ var mappingUGCList = function(data, set_cb){
 
     //async
     if(data[next] !== null){
-        console.log('next'+next+'---'+limit);
         async.parallel([
                         function(callback){
                             miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
@@ -228,19 +229,17 @@ var getUserContent = function(fb_id,get_cb){
  *                       
  */
 censorMgr.setUGCAttribute = function(no, vjson, cb){
-    
+
     if(vjson.mustPlay == 'true')
         vjson = {mustPlay : true};
     if(vjson.mustPlay == 'false')
         vjson = {mustPlay : false};
-    
-    console.dir('setUGCAttribute'+JSON.stringify(no)+JSON.stringify(vjson));
+
 
     UGC_mgr.getOwnerIdByNo(no, function(err, result){
         if(err) logger.error('[setUGCAttribute_getOwnerIdByNo]', err);
 
         if(result){
-            console.log('getOwnerIdByNo_result'+result);
             FMDB.updateAdoc(UGCs,result,vjson, function(err, result){
                 if(err) {
                     logger.error('[setUGCAttribute_updateAdoc]', err);
@@ -248,7 +247,7 @@ censorMgr.setUGCAttribute = function(no, vjson, cb){
                 }
                 if(result){
                     cb(null,'success');
-                    console.log('updateAdoc_result'+result);
+//                  console.log('updateAdoc_result'+result);
                 }
             });
         }
@@ -268,7 +267,6 @@ censorMgr.getUGCListLite = function(condition, cb){
             cb(err, null);
         }
         if(result){
-            //console.dir('result'+JSON.stringify(result));
             cb(err, result);
         }
     });
@@ -277,15 +275,13 @@ censorMgr.getUGCListLite = function(condition, cb){
 
 
 
-censorMgr.getPlayList = function(programList, cb){
-
+censorMgr.getPlayList = function(programList, updateUGC, cb){
 
     var limit = 0;
     var next = 0;
     var playList = [];
-    console.log('programList.length'+programList.length);
 
-    var playListInfo = function(no, description, title, doohPlayedTimes, rating, contentGenre, mustPlay, timeslot, timeStamp, dooh, _id, projectId, ownerId, arr) {
+    var playListInfo = function(no, description, title, doohPlayedTimes, rating, contentGenre, mustPlay, timeslot, timeStamp, dooh, programTimeSlotId, projectId, ownerId, arr) {
         arr.push({
             no: no,
             description: description,
@@ -297,24 +293,23 @@ censorMgr.getPlayList = function(programList, cb){
             timeslot: timeslot,
             timeStamp: timeStamp,
             dooh: dooh,
-            _id: _id,
+            programTimeSlotId: programTimeSlotId,
             projectId: projectId,
             ownerId:ownerId
         });
     };    
 
-    var mappingPlayList = function(data, set_cb){
-//      console.log('data[next]._id'+data[next].content._id);
+    var mappingPlayList = function(data, updateUGC, set_cb){
 
         limit = data.length;
+        if(updateUGC){
+            if(data[next].content._id == updateUGC.oldUGCId)
+                data[next].content._id = updateUGC.newUGCId;
+        }
 
         FMDB.listOfdocModels( UGCs, {_id: data[next].content._id},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no contentGenre mustPlay', null, function(err, result){
-//          FMDB.listOfdocModels( UGCs, {_id:'51ac537031f2f25c0a00000d'},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no contentGenre mustPlay', {sort:'no'}, function(err, result){
-            console.log('mappingPlayList_listOfdocModels'+err+result);
-            console.log('mappingPlayList_listOfdocModels---------'+result[0].no);
             if(err) {
                 logger.error('[censorMgr_db.listOfUGCs]', err);
-//              cb(err, null);
             }
             if(result !== null){
                 if(next == limit - 1) {
@@ -326,20 +321,17 @@ censorMgr.getPlayList = function(programList, cb){
                 else{
                     playListInfo(result[0].no, result[0].description, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].contentGenre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
                     next += 1;
-                    mappingPlayList(data, set_cb);
+                    mappingPlayList(data, updateUGC, set_cb);
                 }
             }
         });
     };
 
     if(programList.length > 0){
-        mappingPlayList(programList, function(err,docs){
+        mappingPlayList(programList, updateUGC, function(err,docs){
             if (cb){
-                console.dir('playList'+JSON.stringify(playList));
-//              cb(err, playList);
                 mappingUGCList(playList, function(err,docs){
                     if (cb){
-                        console.dir('UGCList'+JSON.stringify(UGCList));
                         cb(err, UGCList);
                     }
                 });
