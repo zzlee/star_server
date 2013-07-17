@@ -1,18 +1,19 @@
 /**
  * FeltMeng.com
  */
- 
+
 //var DOMAIN = "http://www.feltmeng.idv.tw/admin/",
-//     SDOMAIN = "https://www.feltmeng.idv.tw/admin/";
+//SDOMAIN = "https://www.feltmeng.idv.tw/admin/";
 var DOMAIN = "/miix_admin/",
-     SDOMAIN = "/miix_admin/";
+SDOMAIN = "/miix_admin/";
 
 var FM = {};    
 
 var conditions = {};
+var sessionId = null;
 
 
-// PageList object implementation
+//PageList object implementation
 function PageList( listType, rowsPerPage, urlToGetListContent){
     var _this = this;
     this.currentPage = 1;
@@ -41,7 +42,7 @@ PageList.prototype.showPageContent = function(Page,condition){
             $('input#rowsPerPage').attr('value', _this.rowsPerPage);
         }
     });
-    
+
     $.get('/admin/list_size', {listType: this.listType, token: localStorage.token}, function(res){
         if (!res.err){
             var listSize = res.size;
@@ -87,8 +88,8 @@ PageList.prototype.setRowsPerPage = function(newRowsPerPage ){
 };
 
 
- 
-// Login 
+
+//Login 
 $(document).ready(function(){
     $("#login-btn").click(function(){
         var inputData = {};
@@ -109,7 +110,7 @@ $(document).ready(function(){
                 }
             });
         }        
-        
+
     });
 
     $("#logoutBtn").click(function(){
@@ -118,27 +119,27 @@ $(document).ready(function(){
             location.reload();
         });
     });
-    
-    
+
+
 });
 
-// Main Page 
+//Main Page 
 $(document).ready(function(){
     FM.memberList = new PageList( 'memberList', 8, '/miix_admin/members');
     FM.miixPlayList = new PageList( 'miixMovieList', 5, '/miix_admin/miix_movies');
     FM.storyPlayList = new PageList( 'storyMovieList', 8, '/miix_admin/story_movies');
-    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
-    FM.UGCPlayList = new PageList( 'ugcCensorPlayList', 5, '/miix_admin/timeslots');
-    
+    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor', conditions);
+    FM.UGCPlayList = new PageList( 'ugcCensorPlayList', 5, '/miix_admin/doohs/taipeiarena/timeslots', conditions);
+
     FM.currentContent = FM.memberList;
 
     $('#memberListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#memberList').attr("class", "current");
-        
+
         FM.currentContent = FM.memberList;
         FM.currentContent.showCurrentPageContent();
-        
+
         /*
         //FM.memberList(1, 18, function(res){
         FM.memberList.getCurrentPageContent( function(res){
@@ -149,14 +150,14 @@ $(document).ready(function(){
                 $('#table-content').html(res);
             }
         });
-        */
+         */
     });
-    
-    
+
+
     $('#miixPlayListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#miixPlayList').attr("class", "current");
-        
+
         FM.currentContent = FM.miixPlayList;
         FM.currentContent.showCurrentPageContent();
         /*
@@ -168,13 +169,13 @@ $(document).ready(function(){
                 $('#table-content').html(res);
             }
         });
-        */
+         */
     });
 
     $('#storyPlayListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#storyPlayList').attr("class", "current");
-        
+
         FM.currentContent = FM.storyPlayList;
         FM.currentContent.showCurrentPageContent();
         /*
@@ -186,240 +187,453 @@ $(document).ready(function(){
                 $('#table-content').html(res);
             }
         });
-        */
+         */
     });
-    
+
 
 
     $('#UGCListBtn').click(function(){
         conditions = {};
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#UGCList').attr("class", "current");
-        
+
         FM.currentContent = FM.UGCList;
         FM.currentContent.showCurrentPageContent();
 
     });
-    
+
     $('#UGCPlayListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#UGCPlayList').attr("class", "current");
-        
+
         FM.currentContent = FM.UGCPlayList;
         FM.currentContent.showCurrentPageContent();
 
     });
-    
- // Ajax ---------------------------------------------------------------------    
+
+    // Ajax ---------------------------------------------------------------------    
     $(document).ajaxComplete(function(event,request, settings) {
-//        console.dir('settings'+settings);
-//        console.dir('request'+request);
-//        console.log('settings'+JSON.stringify(settings));
-//        console.log('request'+JSON.stringify(request));
-//        console.log('ajax');
-//        console.log('request'+JSON.stringify(settings.url));
-//        console.log('request'+JSON.stringify(censorCheck));
-        
+//      console.dir('settings'+settings);
+//      console.dir('request'+request);
+//      console.log('settings'+JSON.stringify(settings));
+//      console.log('request'+JSON.stringify(request));
+//      console.log('ajax');
+//      console.log('request'+JSON.stringify(settings.url));
+//      console.log('request'+JSON.stringify(censorCheck));
+
+        playlistCheck = settings.url.substring(0,17);
         censorCheck = settings.url.substring(0,22);
+
+//      console.log('playlistCheck'+playlistCheck);
+        /**
+         * UGCList
+         */
         if(censorCheck == '/miix_admin/ugc_censor'){
             console.log('ajax_censor');
-        /**
-         * 查詢影片 搜尋 click
-         */
-        $('#ugcSearchBtn').click(function(){
-            console.log('ugcSearch');
-            var inputSearchData = {};
-            $('#condition-inner input[class="ugcSearchBtn"]').each(function(){
-                console.log("item: " + $(this).attr("value"));
-                inputSearchData = {'no':$(this).attr("value")};
-                conditions = inputSearchData;
+            /**
+             * 查詢影片 搜尋 click
+             */
+            $('#ugcSearchBtn').click(function(){
+                console.log('ugcSearch');
+                var inputSearchData = {};
+                $('#condition-inner input[class="ugcSearchBtn"]').each(function(){
+                    console.log("item: " + $(this).attr("value"));
+                    inputSearchData = {'no':$(this).attr("value")};
+                    conditions = inputSearchData;
+                });
+                console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
+                if(conditions != null){
+                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                    $('#main_menu ul[class="current"]').attr("class", "select");
+                    $('#UGCList').attr("class", "current");
+                    FM.currentContent = FM.UGCList;
+                    FM.currentContent.showCurrentPageContent();
+                }
             });
-            console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
-            if(conditions != null){
+            /**
+             * 篩選條件 尚未審核 click
+             */
+            $('#ugcSearchNoRatingBtn').click(function(){
+                console.log('ugcSearchNoRatingBtn');
+
+                conditions = 'norating';
+                console.log("inputSearchData: " + JSON.stringify(conditions) );
+                if(conditions != null){
+                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                    $('#main_menu ul[class="current"]').attr("class", "select");
+                    $('#UGCList').attr("class", "current");
+                    FM.currentContent = FM.UGCList;
+                    FM.currentContent.showCurrentPageContent();
+                }
+            });
+            /**
+             * 篩選條件 已經審核 click
+             */
+            $('#ugcSearchRatingBtn').click(function(){
+                console.log('ugcSearchNoRatingBtn');
+
+                conditions = 'rating';
+                console.log("inputSearchData: " + JSON.stringify(conditions) );
+                if(conditions != null){
+                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                    $('#main_menu ul[class="current"]').attr("class", "select");
+                    $('#UGCList').attr("class", "current");
+                    FM.currentContent = FM.UGCList;
+                    FM.currentContent.showCurrentPageContent();
+                }
+            });
+            /**
+             * 篩選條件 All click
+             */
+            $('#ugcSearchAllBtn').click(function(){
+                console.log('ugcSearchNoRatingBtn');
+
+                console.log("inputSearchData: " + JSON.stringify(conditions) );
+                conditions = {};
                 FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
                 $('#main_menu ul[class="current"]').attr("class", "select");
                 $('#UGCList').attr("class", "current");
                 FM.currentContent = FM.UGCList;
                 FM.currentContent.showCurrentPageContent();
-            }
-        });
-        /**
-         * 篩選條件 尚未審核 click
-         */
-        $('#ugcSearchNoRatingBtn').click(function(){
-            console.log('ugcSearchNoRatingBtn');
 
-            conditions = 'norating';
-            console.log("inputSearchData: " + JSON.stringify(conditions) );
-            if(conditions != null){
+            });
+            /**
+             * 投件時間 送出 click
+             */
+            $('#ugcSearchDateBtn').click(function(){
+                console.log('ugcSearchDateBtn');
+                var inputSearchData = {};
+                var flag = 0;
+
+                $('#condition-inner input[class="ugcSearchDateBtn"]').each(function(){
+                    console.log("item: " + $(this).attr("value"));
+                    inputSearchData[$(this).attr("name")] = $(this).attr("value");
+                    if($(this).attr("value") == "" && flag == 0){
+                        alert('You have to enter full date!!');
+                        flag = 1; 
+                    }
+                    conditions = inputSearchData;
+                });
+                console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
+
                 FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
                 $('#main_menu ul[class="current"]').attr("class", "select");
                 $('#UGCList').attr("class", "current");
                 FM.currentContent = FM.UGCList;
                 FM.currentContent.showCurrentPageContent();
-            }
-        });
+            });
+
+            /**
+             * checkbox
+             */
+            $('#ugcCensor.ugcCensorNoa').click(function(){
+                console.log('check_A');
+                var url = DOMAIN + "user_content_attribute";
+                var no = $(this).attr("name");
+                var rating ='a';
+                $.ajax({
+                    url: url,
+                    type: 'PUT',
+                    data: {no: no, vjson:{rating: rating}},
+                    success: function(response) {
+                        if(response.message){
+                            console.log("[Response] message:" + response.message);
+                        }
+                    }
+                });
+            });
+            $('#ugcCensor.ugcCensorNob').click(function(){
+                var url = DOMAIN + "user_content_attribute";
+                var no = $(this).attr("name");
+                var rating ='b';
+                $.ajax({
+                    url: url,
+                    type: 'PUT',
+                    data: {no: no, vjson:{rating: rating}},
+                    success: function(response) {
+                        if(response.message){
+                            console.log("[Response] message:" + response.message);
+                        }
+                    }
+                });
+            });
+            $('#ugcCensor.ugcCensorNoc').click(function(){
+                var url = DOMAIN + "user_content_attribute";
+                var no = $(this).attr("name");
+                var rating ='c';
+
+                $.ajax({
+                    url: url,
+                    type: 'PUT',
+                    data: {no: no, vjson:{rating: rating}},
+                    success: function(response) {
+                        if(response.message){
+                            console.log("[Response] message:" + response.message);
+                        }
+                    }
+                });
+            });
+            $('#ugcCensor.ugcCensorNod').click(function(){
+                var url = DOMAIN + "user_content_attribute";            
+                var no = $(this).attr("name");
+                var rating ='d';
+
+                $.ajax({
+                    url: url,
+                    type: 'PUT',
+                    data: {no: no, vjson:{rating: rating}},
+                    success: function(response) {
+                        if(response.message){
+                            console.log("[Response] message:" + response.message);
+                        }
+                    }
+                });
+            });
+            $('#ugcCensor.ugcCensorNoe').click(function(){
+                var url = DOMAIN + "user_content_attribute";
+                var no = $(this).attr("name");
+                var rating ='e';
+
+                $.ajax({
+                    url: url,
+                    type: 'PUT',
+                    data: {no: no, vjson:{rating: rating}},
+                    success: function(response) {
+                        if(response.message){
+                            console.log("[Response] message:" + response.message);
+                        }
+                    }
+                });
+            });
+            $('#ugcCensor.ugcCensorNof').click(function(){
+                var url = DOMAIN + "user_content_attribute";
+                var no = $(this).attr("name");
+                var rating ='f';
+
+                $.ajax({
+                    url: url,
+                    type: 'PUT',
+                    data: {no: no, vjson:{rating: rating}},
+                    success: function(response) {
+                        if(response.message){
+                            console.log("[Response] message:" + response.message);
+                        }
+                    }
+                });
+            });
+            $('#ugcCensor.ugcCensorNoMP').click(function(){
+
+                var url = DOMAIN + "user_content_attribute";
+                var no = $(this).attr("name");
+                var mustPlay = null;
+                console.log('value'+$(this).attr("value"));
+                if($(this).attr("value") == 'true')
+                    mustPlay = false;
+                if($(this).attr("value") == 'false')
+                    mustPlay = true;
+
+                console.log('mustplay'+no+mustPlay);
+
+                $.ajax({
+                    url: url,
+                    type: 'PUT',
+                    data: {no: no, vjson:{mustPlay: mustPlay}},
+                    success: function(response) {
+                        if(response.message){
+                            console.log("[Response] message:" + response.message);
+                        }
+                    }
+                });
+            });
+
+        }// End of ugc_censor
+
         /**
-         * 篩選條件 已經審核 click
+         * playList
          */
-        $('#ugcSearchRatingBtn').click(function(){
-            console.log('ugcSearchNoRatingBtn');
 
-            conditions = 'rating';
-            console.log("inputSearchData: " + JSON.stringify(conditions) );
-            if(conditions != null){
-                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
-                $('#main_menu ul[class="current"]').attr("class", "select");
-                $('#UGCList').attr("class", "current");
-                FM.currentContent = FM.UGCList;
-                FM.currentContent.showCurrentPageContent();
-            }
-        });
-        /**
-         * 篩選條件 All click
-         */
-        $('#ugcSearchAllBtn').click(function(){
-            console.log('ugcSearchNoRatingBtn');
+        if(playlistCheck == '/miix_admin/doohs'){
+            $('#createProgramListBtn').click(function(){
+                var flag = 0;
+                var inputSearchData = {};
+                var url = DOMAIN + "doohs/taipeiarena/timeslots";
 
-            console.log("inputSearchData: " + JSON.stringify(conditions) );
-            conditions = {};
-            FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
-            $('#main_menu ul[class="current"]').attr("class", "select");
-            $('#UGCList').attr("class", "current");
-            FM.currentContent = FM.UGCList;
-            FM.currentContent.showCurrentPageContent();
 
-        });
-        /**
-         * 投件時間 送出 click
-         */
-        $('#ugcSearchDateBtn').click(function(){
-            console.log('ugcSearchDateBtn');
-            var inputSearchData = {};
-            var flag = 0;
+                $('#condition-inner input[class="createProgramListBtn"]').each(function(i){
 
-            $('#condition-inner input[class="ugcSearchDateBtn"]').each(function(){
-                console.log("item: " + $(this).attr("value"));
-                inputSearchData[$(this).attr("name")] = $(this).attr("value");
-                if($(this).attr("value") == "" && flag == 0){
-                    alert('you have to enter full date!!');
+                    inputSearchData[$(this).attr("name")] = $(this).attr("value");
+
+                    if($(this).attr("name") == 'ugcSequenceText'){
+
+                        var sequence = encodeURIComponent($(this).attr("value"));
+                        
+                        programSequenceStringToArr(sequence , function(err ,result){
+                            if(!err){
+                                console.log('programSequenceStringToArr'+result); 
+                            }
+                            else
+                                console.log('programSequenceStringToArr err'+err);
+                        });
+                    }
+                    
+                    if($(this).attr("value") == "" && flag == 0){
+                        alert('You have to enter complete condition!!');
+                        flag = 1; 
+                    }
+                    
+                    if(inputSearchData.TimeStart && inputSearchData.TimeEnd && inputSearchData.playtimeStart && inputSearchData.playtimeEnd && inputSearchData.ugcSequenceText && programSequenceArr){
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: {intervalOfSelectingUGC:{start:inputSearchData.TimeStart, end:inputSearchData.TimeEnd}, intervalOfPlanningDoohProgrames:{start:inputSearchData.playtimeStart, end:inputSearchData.playtimeEnd}, programSequence:programSequenceArr},
+                            success: function(response) {
+                                if(response.message){
+                                    console.log("[Response] message:" + JSON.stringify(response.message.sessionId));
+                                    sessionId = response.message;
+                                    $('#main_menu ul[class="current"]').attr("class", "select");
+                                    $('#UGCPlayList').attr("class", "current");
+
+                                    FM.currentContent = FM.UGCPlayList;
+                                    FM.currentContent.showCurrentPageContent();
+                                    programSequenceArr =[];
+                                }
+                            }
+                        });
+                    }
+                });
+
+            });
+            
+            $('#ugcCensor.ugcCensorNoSetBtn').click(function(){
+                
+                var url = DOMAIN + "doohs/taipeiarena/timeslots/sessionId";
+                var programTimeSlotId = $(this).attr("name");
+                var ugcReferenceNo;
+
+                $('input[class="#ugcCensor.ugcCensorNoSetBtn"]').each(function(){
+                    
+                    ugcReferenceNo = $(this).attr("value");
+                    
+                    if(ugcReferenceNo && programTimeSlotId){
+                        $.ajax({
+                            url: url,
+                            type: 'PUT',
+                            data: { type: 'setUgcToProgram', programTimeSlotId: programTimeSlotId, ugcReferenceNo: ugcReferenceNo},
+                            success: function(response) {
+                                if(response.message){
+                                    response.message;
+                                    console.log("[Response_Set] message:" + response.message);
+                                    conditions = { newUGCId :response.message, oldUGCId: programTimeSlotId};
+
+                                    $('#main_menu ul[class="current"]').attr("class", "select");
+                                    $('#UGCPlayList').attr("class", "current");
+
+                                    FM.currentContent = FM.UGCPlayList;
+                                    FM.currentContent.showCurrentPageContent();
+
+                                }
+                            }
+                        });
+                    }
+                });
+
+            });
+
+            $('#ugcCensor.ugcCensorNoRemoveBtn').click(function(){
+                var flag = 0;
+                var url = DOMAIN + "doohs/taipeiarena/timeslots/sessionId";
+                var programTimeSlotId = $(this).attr("name");
+
+                if(sessionId === null && flag == 0){
+                    alert('Session Id not exist!!');
                     flag = 1; 
                 }
-                conditions = inputSearchData;
-            });
-            console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
+                if(programTimeSlotId && sessionId){
+                    $.ajax({
+                        url: url,
+                        type: 'PUT',
+                        data: { type:'removeUgcfromProgramAndAutoSetNewOne', programTimeSlotId: programTimeSlotId},
+                        success: function(response) {
+                            if(response.message){
+                                response.message;
+                                console.log("[Response] message:" + response.message);
+                                conditions = { newUGCId :response.message, oldUGCId: programTimeSlotId};
 
-            FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
-            $('#main_menu ul[class="current"]').attr("class", "select");
-            $('#UGCList').attr("class", "current");
-            FM.currentContent = FM.UGCList;
-            FM.currentContent.showCurrentPageContent();
-        });
-        
-        /**
-         * checkbox
-         */
-        $('#ugcCensor.ugcCensorNoa').click(function(){
-            console.log('check_A');
-            var url = DOMAIN + "user_content_attribute";
-            var no = $(this).attr("name");
-            var rating ='a';
-            $.ajax({
-                url: url,
-                type: 'PUT',
-                data: {no: no, rating: rating},
-                success: function(response) {
-                    if(response.message){
-                        console.log("[Response] message:" + response.message);
-                    }
-                }
-            });
-        });
-        $('#ugcCensor.ugcCensorNob').click(function(){
-            var url = DOMAIN + "user_content_attribute";
-            var no = $(this).attr("name");
-            var rating ='b';
-            $.ajax({
-                url: url,
-                type: 'PUT',
-                data: {no: no, rating: rating},
-                success: function(response) {
-                    if(response.message){
-                        console.log("[Response] message:" + response.message);
-                    }
-                }
-            });
-        });
-        $('#ugcCensor.ugcCensorNoc').click(function(){
-            var url = DOMAIN + "user_content_attribute";
-            var no = $(this).attr("name");
-            var rating ='c';
+                                $('#main_menu ul[class="current"]').attr("class", "select");
+                                $('#UGCPlayList').attr("class", "current");
 
-            $.ajax({
-                url: url,
-                type: 'PUT',
-                data: {no: no, rating: rating},
-                success: function(response) {
-                    if(response.message){
-                        console.log("[Response] message:" + response.message);
-                    }
-                }
-            });
-        });
-        $('#ugcCensor.ugcCensorNod').click(function(){
-            var url = DOMAIN + "user_content_attribute";            
-            var no = $(this).attr("name");
-            var rating ='d';
+                                FM.currentContent = FM.UGCPlayList;
+                                FM.currentContent.showCurrentPageContent();
 
-            $.ajax({
-                url: url,
-                type: 'PUT',
-                data: {no: no, rating: rating},
-                success: function(response) {
-                    if(response.message){
-                        console.log("[Response] message:" + response.message);
-                    }
+                            }
+                        }
+                    });
                 }
             });
-        });
-        $('#ugcCensor.ugcCensorNoe').click(function(){
-            var url = DOMAIN + "user_content_attribute";
-            var no = $(this).attr("name");
-            var rating ='e';
 
-            $.ajax({
-                url: url,
-                type: 'PUT',
-                data: {no: no, rating: rating},
-                success: function(response) {
-                    if(response.message){
-                        console.log("[Response] message:" + response.message);
-                    }
+            $('#pushProgramsBtn').click(function(){
+                var flag = 0;
+                var url = DOMAIN + "doohs/taipeiarena/ProgramsTo3rdPartyContentMgr/sessionId";
+                if(sessionId === null && flag == 0){
+                    alert('Session Id not exist!!');
+                    flag = 1; 
                 }
-            });
-        });
-        $('#ugcCensor.ugcCensorNof').click(function(){
-            var url = DOMAIN + "user_content_attribute";
-            var no = $(this).attr("name");
-            var rating ='f';
+                if(sessionId){
+                    $.ajax({
+                        url: url,
+                        type: 'PUT',
+                        data: {},
+                        success: function(response) {
+                            if(response.message){
+                                console.log("[Response] message:" + response.message);
+                            }
+                        }
+                    });
+                }
+            });            
 
-            $.ajax({
-                url: url,
-                type: 'PUT',
-                data: {no: no, rating: rating},
-                success: function(response) {
-                    if(response.message){
-                        console.log("[Response] message:" + response.message);
-                    }
-                }
-            });
-        });
-        }
+        }// End of doohs
 
     });
-  // Ajax End--------------------------------------------------------------------- 
+    // Ajax End---------------------------------------------------------------------
+
+    var check_in = "%E6%89%93";
+    var miix = "%E5%90%88";
+    var cultural_and_creative = "%E6%96%87";
+    var moon = "%E5%BF%83";
+    var programSequenceArr = [];
+    var next =0;
     
+    var programSequenceStringToArr = function(string , cb){
+
+        if(next == string.length){
+            cb(null , programSequenceArr);
+            next =0;
+        }
+        else{
+            switch (string.substring(next, next+9))
+            {
+            case check_in:
+                programSequenceArr.push('check_in');
+                break;
+            case miix:
+                programSequenceArr.push('miix');
+                break;
+            case cultural_and_creative:
+                programSequenceArr.push('cultural_and_creative');
+                break;
+            case moon:
+                programSequenceArr.push('moon');
+                break;
+            default:
+
+            }
+            next += 9;
+            programSequenceStringToArr(string , cb);
+        }
+    };
     
+
     $('#goToNextPage').click(function(){
         FM.currentContent.showNextPageContent();
     });
@@ -435,7 +649,7 @@ $(document).ready(function(){
     $('#goToLastPage').click(function(){
         FM.currentContent.showLastPageContent();
     });
-    
+
     $('#pageNoInput').change(function(){
         var pageNo = parseInt($("#pageNoInput").attr('value'));
         if (pageNo){
@@ -451,9 +665,9 @@ $(document).ready(function(){
             $("#pageNoInput").attr('value', FM.currentContent.currentPage);
         }
     });
-    
-    
-    
+
+
+
     $('input#rowsPerPage').change(function(){
         var rowsPerPage = parseInt($('input#rowsPerPage').attr('value'));
         if (rowsPerPage){
@@ -466,11 +680,11 @@ $(document).ready(function(){
             $('input#rowsPerPage').attr('value', FM.currentContent.rowsPerPage);
         }
     });
-    
-    
+
+
     $('#memberListBtn').click();
-    
-    
+
+
 });
 
 /*
@@ -489,10 +703,10 @@ FM.storyPlayList = function(pageToGo, rowsPerPage, cb){
     var url = DOMAIN + "story_play_list";
     $.get(url, {skip: (pageToGo-1)*rowsPerPage, limit: rowsPerPage}, cb);
 };
-*/
+ */
 
 
-// 1 - START DROPDOWN SLIDER SCRIPTS ------------------------------------------------------------------------
+//1 - START DROPDOWN SLIDER SCRIPTS ------------------------------------------------------------------------
 
 $(document).ready(function () {
     $(".showhide-account").click(function () {
@@ -510,53 +724,53 @@ $(document).ready(function () {
     });
 });
 
-//  END ----------------------------- 1
+//END ----------------------------- 1
 
-// 2 - START LOGIN PAGE SHOW HIDE BETWEEN LOGIN AND FORGOT PASSWORD BOXES--------------------------------------
+//2 - START LOGIN PAGE SHOW HIDE BETWEEN LOGIN AND FORGOT PASSWORD BOXES--------------------------------------
 
 $(document).ready(function () {
-	$(".forgot-pwd").click(function () {
-		$("#loginbox").hide();
-		$("#forgotbox").show();
-		return false;
-	});
+    $(".forgot-pwd").click(function () {
+        $("#loginbox").hide();
+        $("#forgotbox").show();
+        return false;
+    });
 
 });
 
 $(document).ready(function () {
-	$(".back-login").click(function () {
-		$("#loginbox").show();
-		$("#forgotbox").hide();
-		return false;
-	});
+    $(".back-login").click(function () {
+        $("#loginbox").show();
+        $("#forgotbox").hide();
+        return false;
+    });
 });
 
-// END ----------------------------- 2
+//END ----------------------------- 2
 
 
 
-// 3 - MESSAGE BOX FADING SCRIPTS ---------------------------------------------------------------------
+//3 - MESSAGE BOX FADING SCRIPTS ---------------------------------------------------------------------
 
 $(document).ready(function() {
-	$(".close-yellow").click(function () {
-		$("#message-yellow").fadeOut("slow");
-	});
-	$(".close-red").click(function () {
-		$("#message-red").fadeOut("slow");
-	});
-	$(".close-blue").click(function () {
-		$("#message-blue").fadeOut("slow");
-	});
-	$(".close-green").click(function () {
-		$("#message-green").fadeOut("slow");
-	});
+    $(".close-yellow").click(function () {
+        $("#message-yellow").fadeOut("slow");
+    });
+    $(".close-red").click(function () {
+        $("#message-red").fadeOut("slow");
+    });
+    $(".close-blue").click(function () {
+        $("#message-blue").fadeOut("slow");
+    });
+    $(".close-green").click(function () {
+        $("#message-green").fadeOut("slow");
+    });
 });
 
-// END ----------------------------- 3
+//END ----------------------------- 3
 
 
 
-// 4 - CLOSE OPEN SLIDERS BY CLICKING ELSEWHERE ON PAGE -------------------------------------------------------------------------
+//4 - CLOSE OPEN SLIDERS BY CLICKING ELSEWHERE ON PAGE -------------------------------------------------------------------------
 
 $(document).bind("click", function (e) {
     if (e.target.id != $(".showhide-account").attr("class")) $(".account-content").slideUp();
@@ -565,11 +779,11 @@ $(document).bind("click", function (e) {
 $(document).bind("click", function (e) {
     if (e.target.id != $(".action-slider").attr("class")) $("#actions-box-slider").slideUp();
 });
-// END ----------------------------- 4
- 
- 
- 
-// 5 - TABLE ROW BACKGROUND COLOR CHANGES ON ROLLOVER -----------------------------------------------------------------------
+//END ----------------------------- 4
+
+
+
+//5 - TABLE ROW BACKGROUND COLOR CHANGES ON ROLLOVER -----------------------------------------------------------------------
 /*
 $(document).ready(function () {
     $('#product-table	tr').hover(function () {
@@ -580,13 +794,13 @@ $(document).ready(function () {
     });
 });
  */
-// END -----------------------------  5
- 
- 
- 
- // 6 - DYNAMIC YEAR STAMP FOR FOOTER -----------------------------------------------------------------------
+//END -----------------------------  5
 
- $('#spanYear').html(new Date().getFullYear()); 
- 
-// END -----------------------------  6 
-  
+
+
+//6 - DYNAMIC YEAR STAMP FOR FOOTER -----------------------------------------------------------------------
+
+$('#spanYear').html(new Date().getFullYear()); 
+
+//END -----------------------------  6 
+

@@ -4,7 +4,7 @@ var workingPath = process.cwd();
 var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var memberDB = require(workingPath+'/member.js');
-var UGCDB = require(workingPath+'/UGC.js');
+var UGCDB = require(workingPath+'/ugc.js');
 var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
 
 var fs = require('fs');
@@ -14,8 +14,10 @@ var xml2js = require('xml2js');
 FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbID, movieTitle) {
     
     //console.log('generateMiixMoive is called.');
+    //var mediaType = "H.264";
+    var mediaType = "FLV";
     
-    aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
+    aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, mediaType, function(responseParameters){
         
         if ( responseParameters.youtube_video_id ) {
             var aeServerID = responseParameters.ae_server_id;
@@ -24,6 +26,7 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
             var ownerStdID = responseParameters.owner_std_id;
             var ownerFbID = responseParameters.owner_fb_id;
             var movieTitle = responseParameters.movie_title;
+            var fileExtension = responseParameters.movie_file_extension;
             
             
             if ( responseParameters.err == 'null' || (!responseParameters.err) ) {
@@ -34,7 +37,10 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
                              "url": url,
                              "genre":"miix",
                              "aeId": aeServerID,
-                             "projectId":movieProjectID};
+                             "projectId": movieProjectID,
+                             "mediaType": mediaType,
+                             "fileExtension": fileExtension
+                             };
                 fmapi._fbPostUGCThenAdd(vjson); //TODO: split these tasks to different rolls
                 
             };
@@ -47,7 +53,7 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
     
 };
 
-FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
+FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, miixMovieProjectID ) {
 
     //deliver Miix movie content to DOOH
     /*
@@ -68,12 +74,22 @@ FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, movieProjectID ) {
     });
     */
     
-    doohMgr.downloadMovieFromS3(movieProjectID, function(resParametes){
-        logger.info('downloading Miix movie from S3.');
-        logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+    UGCDB.getValueByProject(miixMovieProjectID, "fileExtension", function(err3, result){ 
+        if (result){
+            var miixMovieFileExtension = result.fileExtension;
+            doohMgr.downloadMovieFromS3(miixMovieProjectID, miixMovieFileExtension,  function(resParametes){
+                logger.info('downloading Miix movie from S3.');
+                logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+                
+            }); 
+        }                              
+        else {
+            logger.error("UGCDB.getValueByProject() failed: "+err3);
+        }
         
-        //TODO:: check the file size. If not correct, re-download.
-    });                     
+    });
+    
+                        
 
 
                     

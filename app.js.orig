@@ -365,6 +365,31 @@ app.post('/members/:member_id/questions', function(req, res){
     
 });
 
+
+
+<<<<<<< HEAD
+// Miix client 
+
+app.post('/miix/videos/user_content_files', routes.uploadUserContentFile_cb );
+app.post('/miix/videos/user_content_description',routes.uploadUserDataInfo_cb);  //TODO: /miix/videos/user_content_descriptions is better
+app.get('/miix/videos/new_videos', routes.api.newUGCList);
+
+app.post('/miix/videos/miix_videos', routes.api.submitAUGC);
+app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh);
+
+
+
+// Miix admin
+
+app.get('/miix_admin', routes.admin.get_cb); 
+app.get('/miix_admin/login', routes.admin.login_get_cb); //TODO: change to a better resource name of RESTful style
+app.get('/miix_admin/logout', routes.admin.logout_get_cb); //TODO: change to a better resource name of RESTful style
+app.get('/miix_admin/members', routes.authorizationHandler.checkAuth, routes.admin.memberList_get_cb);
+app.get('/miix_admin/miix_movies', routes.authorizationHandler.checkAuth, routes.admin.miixPlayList_get_cb); 
+app.get('/miix_admin/story_movies', routes.authorizationHandler.checkAuth, routes.admin.storyPlayList_get_cb);
+app.get('/miix_admin/list_size', routes.authorizationHandler.checkAuth, routes.admin.listSize_get_cb);
+app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.censor_handler.getUGCList_get_cb);
+
 /**
  * Get the UGC list<br>
  * <h5>Path Parameters</h5>
@@ -531,34 +556,14 @@ app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.gettimeslot
  * <li>newlySelectedUgc:  the id of newly selected UGC 
  * </ul>
  *
- * @name PUT /miix_admin/doohs/:doohId/timeslots/:sessionId
+ * @name PUT /miix_admin/doohs/:doohId/timeslots/:timeslotId
  */
-app.put('/miix_admin/doohs/:doohId/timeslots/:sessionId', routes.censor_handler.updatetimeslots_get_cb);
+app.put('/miix_admin/doohs/:doohId/timeslots/:timeslotId', routes.censor_handler.timeslots_get_cb);
 
-//TODO: pushProgramsTo3rdPartyContentMgr RESTful
-/**
- *  Push programs (of a specific session) to the 3rd-party content manager.<br>
- * <h5>Path Parameters</h5>
- * <ul>
- * <li>doohId: Dooh ID (ex:'taipeiarena')
- * </ul>
- * <h5>Query Parameters</h5>
- * None
- * <h5>Request body</h5>
- * <ul>
- * <li>sessionId: The id indicating the session of creating program time slot.
- * </ul>
- * <h5>Response body</h5>
- * if successful, err returns null; if failed, err returns the error message.
- * <ul>
- * <li>err: error message if any error happens
- * <li>result: null 
- * </ul>
- *
- * @name PUT /miix_admin/doohs/:doohId/ProgramsTo3rdPartyContent
- */
-app.put('/miix_admin/doohs/:doohId/ProgramsTo3rdPartyContentMgr/:sessionId', routes.censor_handler.pushProgramsTo3rdPartyContentMgr_get_cb);
 
+
+=======
+>>>>>>> origin/gz_scheduler
 // Internal
 
 app.get('/internal/oauth2callback', routes.YoutubeOAuth2_cb );

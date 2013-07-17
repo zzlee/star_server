@@ -82,8 +82,8 @@ var media = (function() {
             _private.list( option, list_cb );
         },
         findMediaIdByName : function( mediaName, list_cb ) {
-            _private.list( { fields : 'id', search : mediaName }, function( mediaInfo ){
-                if( mediaInfo.list[0].id ) list_cb( null, mediaInfo.list[0].id );
+            _private.list( { fields : 'id,duration', search : mediaName }, function( mediaInfo ){
+                if( typeof( mediaInfo.list[0].id ) !== 'undefined' ) list_cb( null, { id: mediaInfo.list[0].id, duration: mediaInfo.list[0].duration } );
                 else list_cb( 'NOT_FOUND_MEDIA', null );
             } );
         },

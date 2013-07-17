@@ -13,6 +13,8 @@ var playlist = (function() {
             "playlistItemType": "MEDIA_ITEM",
             "sortOrder": 1,
             "startValidDate": '',
+            //"duration": 0,
+            //"durationHoursSeconds": "00:00:00",
             "timeSchedules":[{
                 "days":[
                     "SUNDAY",
@@ -31,9 +33,50 @@ var playlist = (function() {
         }]
     };
     
+    var subplaylistSchema = {
+        "id": '',   //*// playlist_id
+        "name": '',    //*// playlist_name
+        "playlistItems":[{
+            "subplaylist":{
+                "id": '',   //*// subplaylist_id
+                "name": '', //*// subplaylist_name
+                "playlistType":"MEDIA_PLAYLIST",
+                "detailRoute":"playlists",
+                "newItemData":{},
+                "showPlaylistType":"Media Playlist",
+            },
+            "subPlaylistPickPolicy":0,
+            "mediaType":"SUB_PLAYLIST",
+            "playlistItemType":"SUB_PLAYLIST",
+            "playlistType":"MEDIA_PLAYLIST",
+            "hidePickPolicy":true,
+            "timeSchedules":[{
+                "startTime":"00:00",
+                "endTime":"24:00",
+                "sortOrder":1,
+                "days":[
+                    "SUNDAY",
+                    "MONDAY",
+                    "TUESDAY",
+                    "WEDNESDAY",
+                    "THURSDAY",
+                    "FRIDAY",
+                    "SATURDAY"
+                ]
+            }],
+            "detailRoute":"playlist",
+            "showPlaylistType":"Media Playlist",
+            "name": '', //*// subplaylist_name
+            "prettifyType":"Sub-Playlist",
+            "isTimeScheduleExpired":false,
+            "showEndDate":true,
+            "subPlaylistPickPolicyLabel":"Items to play: all"
+        }],
+    };
+    
     var _private = {
         list : function( option, list_cb ) {
-            if( typeof(option) == 'function') list_cb = option;
+            if( typeof(option) === 'function') list_cb = option;
             var request = '/ContentManager/api/rest/playlists/all?token=' + token;
             
             if(!option.limit) request += '&limit=0';
@@ -48,14 +91,14 @@ var playlist = (function() {
             
             //adapter.get('/ContentManager/api/rest/playlists/all?limit=' + option.limit + '&offset=' + option.offset + '&sort=' + option.sort + '&token=' + token, function(err, req, res, obj) {
             adapter.get(request, function(err, req, res, obj) {
-                list_cb(obj);
+                list_cb(err, obj);
             });
         },
         update : function( option, upadte_cb ) {
             adapter.put('/ContentManager/api/rest/playlists/' + option.playlist.id + '?token=' + token, option.playlist.content, function(err, req, res, obj) {
                 //assert.ifError(err);
-                console.log('%d -> %j', res.statusCode, res.headers);
-                console.log('%j', obj);
+                //console.log('%d -> %j', res.statusCode, res.headers);
+                //console.log('%j', obj);
             });
         },
         settingPlaylistItem : function( option, settingPlaylistItem_cb ) {
@@ -63,10 +106,13 @@ var playlist = (function() {
             var play = new Date(option.playTime);
             var playDate = play.getFullYear() + '-' + (play.getMonth() + 1) + '-' + play.getDate(),
                 playTime = play.getHours() + ':' + play.getMinutes();
+            var duraionTime = new Date(option.media.duration);
             
             itemSchema.id = option.playlist.id;
             itemSchema.name = option.playlist.name;
             itemSchema.playlistItems[0].id = option.item.id;
+            //itemSchema.playlistItems[0].duration = option.media.duration;
+            //itemSchema.playlistItems[0].durationHoursSeconds = duraionTime.getUTCHours() + ':' + duraionTime.getUTCMinutes() + ':' + duraionTime.getUTCSeconds();
             if( option.item.useValidRange == true ) {
                 itemSchema.playlistItems[0].useValidRange = true;
                 itemSchema.playlistItems[0].startValidDate = playDate; //
@@ -75,16 +121,25 @@ var playlist = (function() {
             if(option.playFullscreen == true) itemSchema.playlistItems[0].playFullscreen;
             
             itemSchema.playlistItems[0].timeSchedules[0].startTime = playTime; //
-            if((play.getMinutes() + 2) >= 60) {
-                itemSchema.playlistItems[0].timeSchedules[0].endTime = (play.getHours() + 1) + ':' + (play.getMinutes() + 2 - 60);
-            }
-            else itemSchema.playlistItems[0].timeSchedules[0].endTime = play.getHours() + ':' + (play.getMinutes() + 2);   //
+            play.setMinutes(play.getMinutes() + 2);
+            itemSchema.playlistItems[0].timeSchedules[0].endTime = play.getHours() + ':' + play.getMinutes();   //
             
             adapter.put('/ContentManager/api/rest/playlists/' + option.playlist.id + '?token=' + token, itemSchema, function(err, req, res, obj) {
                 //assert.ifError(err);
                 //console.log('%d -> %j', res.statusCode, res.headers);
                 //console.log('%j', obj);
                 settingPlaylistItem_cb(null, obj);
+            });
+        },
+        settingSubPlaylist : function( option, settingSubPlaylist_cb ){
+            
+            subplaylistSchema.id = option.id;  //*//
+            subplaylistSchema.name = option.name;//*//
+            subplaylistSchema.playlistItems[0].subplaylist.id = option.subplaylist.id;
+            subplaylistSchema.playlistItems[0].subplaylist.name = option.subplaylist.name;
+            
+            adapter.put('/ContentManager/api/rest/playlists/' + subplaylistSchema.id + '?token=' + token, subplaylistSchema, function(err, req, res, obj) {
+                settingSubPlaylist_cb(null, obj);
             });
         },
         register : function( auth ) {
@@ -127,6 +182,9 @@ var playlist = (function() {
         },
         updatePlaylistItemSchedule : function( itemSetting, itemSchedule_cb ){
             _private.settingPlaylistItem( itemSetting, itemSchedule_cb );
+        },
+        pushSubplaylist : function( subplaylistSetting, pushSubplaylist_cb ){
+            _private.settingSubPlaylist( subplaylistSetting, pushSubplaylist_cb );
         },
         update : function( option, upadte_cb ) {
             _private.update( option, upadte_cb );

@@ -2,7 +2,7 @@
  *  UGC Adapter
  */
 
-var UGCDB = require('./UGC.js'),
+var UGCDB = require('./ugc.js'),
     memberDB = require("./member.js");
 
 module.exports = function(userId){

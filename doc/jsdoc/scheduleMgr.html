@@ -64,7 +64,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line15">line 15</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line18">line 18</a>
     </li></ul></dd>
     
     
@@ -106,7 +106,7 @@
     
     
     <div class="description">
-        Automatically selects applied UGC items (based on a predefined rule) and put themin "to-be-played" list for a specific DOOH.<br><br>This method will first ask ScalaMgr about the available time intervals in which Miix systemcan play its UGC content.  It will then generate time slots base on a specific rule, and then fill them by pickeing up UGC items from a sorted list generated from censerMgr.
+        Automatically selects applied UGC items (based on a predefined rule) and put themin "to-be-played" list for a specific DOOH.<br><br>This method will first ask ScalaMgr about the available time intervals in which Miix systemcan play its UGC content.  It will then generate time slots base on a specific rule, and then fill them by picking up UGC items from a sorted list generated from censerMgr.
     </div>
     
 
@@ -248,7 +248,7 @@
             
             
             
-            <td class="description last">The callback function called when the result program list is created.<br>    The function signature is created_cb(err, numberOfProgramTimeSlots):    <ul>    <li>err: error message if any error happens    <li>numberOfProgramTimeSlots: number of UGC program time slots generated    </ul></td>
+            <td class="description last">The callback function called when the result program list is created.<br>    The function signature is created_cb(err, result):    <ul>    <li>err: error message if any error happens    <li>result: object containing the following information:        <ul>        <li>numberOfProgramTimeSlots: number of program time slots created         <li>sessionId: id indicating this session of creating program time slots (This will be used when           calling scheduleMgr.removeUgcfromProgramAndAutoSetNewOne()        </ul>        For example, <br>        { numberOfProgramTimeSlots: 33, sessionId: '1367596800000-1367683140000-1373332978201' }         </ul></td>
         </tr>
 	
 	
@@ -279,7 +279,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line118">line 118</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line212">line 212</a>
     </li></ul></dd>
     
     
@@ -488,7 +488,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line520">line 520</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line587">line 587</a>
     </li></ul></dd>
     
     
@@ -516,7 +516,124 @@
         
             
 <dt>
-    <h4 class="name" id="removeUgcfromProgramAndAutoSetNewOne"><span class="type-signature">&lt;static> </span>removeUgcfromProgramAndAutoSetNewOne<span class="signature">(dooh, programTimeSlot, removed_cb)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="init"><span class="type-signature">&lt;static> </span>init<span class="signature">(_censorMgr)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Initialize scheduleMgr
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>_censorMgr</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">A reference to object instance of censerMgr</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line163">line 163</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="removeUgcfromProgramAndAutoSetNewOne"><span class="type-signature">&lt;static> </span>removeUgcfromProgramAndAutoSetNewOne<span class="signature">(sessionId, programTimeSlot, removed_cb)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -558,13 +675,13 @@
 	
         <tr>
             
-                <td class="name"><code>dooh</code></td>
+                <td class="name"><code>sessionId</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">String</span>
 
 
             
@@ -574,7 +691,7 @@
             
             
             
-            <td class="description last">The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated</td>
+            <td class="description last">The id indicating the session of creating program time slot (This session id is accquired in the callback     passed to scheduleMgr.createProgramList(). )</td>
         </tr>
 	
 	
@@ -587,7 +704,7 @@
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">String</span>
 
 
             
@@ -620,7 +737,7 @@
             
             
             
-            <td class="description last">The callback function called when the specific .<br>    The function signature is removed_cb(err) where err is the error message indicating failure:     if successful, err returns null; if failed, err returns the error message.</td>
+            <td class="description last">The callback function called when the specific .<br>    The function signature is removed_cb(err, newlySelectedUgc):     <ul>    <li>err: error message if any error happens    <li>newlySelectedUgc: the id of newly selected UGC (i.e. a hex string representation of its ObjectID in MongoDB)    </ul></td>
         </tr>
 	
 	
@@ -651,7 +768,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line611">line 611</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line698">line 698</a>
     </li></ul></dd>
     
     
@@ -679,7 +796,7 @@
         
             
 <dt>
-    <h4 class="name" id="setUgcToProgram"><span class="type-signature">&lt;static> </span>setUgcToProgram<span class="signature">(dooh, programTimeSlot, ugcNo, set_cb)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="setUgcToProgram"><span class="type-signature">&lt;static> </span>setUgcToProgram<span class="signature">(programTimeSlot, ugcReferenceNo, set_cb)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -721,29 +838,6 @@
 	
         <tr>
             
-                <td class="name"><code>dooh</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">The ID (the hex string representation of its ObjectID in MongoDB) of the DOOH where the program is to be updated</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
                 <td class="name"><code>programTimeSlot</code></td>
             
             
@@ -767,7 +861,7 @@
 	
         <tr>
             
-                <td class="name"><code>ugcNo</code></td>
+                <td class="name"><code>ugcReferenceNo</code></td>
             
             
             <td class="type">
@@ -837,7 +931,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line594">line 594</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line659">line 659</a>
     </li></ul></dd>
     
     
@@ -969,7 +1063,7 @@
             
             
             
-            <td class="description last">The callback function called when the program list is updated.<br>    The function signature is updated_cb(err, listOfProgramsOutOfSchedule) :    <ul>    <li>listOfProgramsOutOfSchedule: An array of objects containing program info:        <ul>        <li>programTimeSlot: A string specifying the ID (the hex string representation of its ObjectID in MongoDB) of the program item which is removed from the schedule             after updating         <li>ugc: A string specifying the ID (the hex string representation of its ObjectID in MongoDB) of the UGC contained in this removed program. (This is            actually the id of items store in ugc collection.)         </ul>        For example, <br>        [{programTimeSlot:43524, ugc:48593},<br>         {programTimeSlot:43525, ugc:48353},<br>         {programTimeSlot:43544, ugc:43593}]            <li>err: error message if any error happens    </ul></td>
+            <td class="description last">The callback function called when the program list is updated.<br>    The function signature is updated_cb(err, listOfProgramsOutOfSchedule) :    <ul>    <li>err: error message if any error happens    <li>listOfProgramsOutOfSchedule: An array of objects containing program info:        <ul>        <li>programTimeSlot: A string specifying the ID (the hex string representation of its ObjectID in MongoDB) of the program item which is removed from the schedule             after updating         <li>ugc: A string specifying the ID (the hex string representation of its ObjectID in MongoDB) of the UGC contained in this removed program. (This is            actually the id of items store in ugc collection.)         </ul>        For example, <br>        [{programTimeSlot:43524, ugc:48593},<br>         {programTimeSlot:43525, ugc:48353},<br>         {programTimeSlot:43544, ugc:43593}]            </ul></td>
         </tr>
 	
 	
@@ -1000,7 +1094,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line574">line 574</a>
+        <a href="schedule_mgr.js.html">schedule_mgr.js</a>, <a href="schedule_mgr.js.html#line641">line 641</a>
     </li></ul></dd>
     
     
@@ -1041,13 +1135,21 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Mixins</h3><ul><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
+<<<<<<< HEAD
+    <h2><a href="index.html">Index</a></h2><h3>Mixins</h3><ul><li><a href="customerServiceMgr.html">customerServiceMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GET /members/:memberId/questions">GET /members/:memberId/questions</a></li><li><a href="global.html#GET /miix_admin/doohs/:doohId/timeslots">GET /miix_admin/doohs/:doohId/timeslots</a></li><li><a href="global.html#GET /miix_admin/user_content_items">GET /miix_admin/user_content_items</a></li><li><a href="global.html#POST /miix_admin/doohs/:doohId/timeslots">POST /miix_admin/doohs/:doohId/timeslots</a></li><li><a href="global.html#PUT /miix_admin/doohs/:doohId/timeslots/:timeslotId">PUT /miix_admin/doohs/:doohId/timeslots/:timeslotId</a></li><li><a href="global.html#PUT /miix_admin/user_content_attribute/:ugcId">PUT /miix_admin/user_content_attribute/:ugcId</a></li></ul>
+=======
+    <h2><a href="index.html">Index</a></h2><h3>Namespaces</h3><ul><li><a href="miix.html">miix</a></li><li><a href="miix_admin.html">miix_admin</a></li></ul><h3>Mixins</h3><ul><li><a href="customerServiceMgr.html">customerServiceMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
+>>>>>>> origin/gz_scheduler
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Jul 08 2013 19:11:59 GMT+0800 (TST)
+<<<<<<< HEAD
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Thu Jul 11 2013 16:33:44 GMT+0800 (TST)
+=======
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Jul 14 2013 22:44:54 GMT+0800 (TST)
+>>>>>>> origin/gz_scheduler
 </footer>
 
 <script> prettyPrint(); </script>

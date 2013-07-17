@@ -1,15 +1,22 @@
 ﻿
 form#mainform(action='')
+
+    #condition-inner
       label 截稿時間
-      input(class='ugcSearchDateBtn', type='datetime-local', name='TimeStart', onfocus='this.value=\'\'')
+      input(class='createProgramListBtn', type='datetime-local', name='TimeStart', onfocus='this.value=\'\'')
       | 到
-      input(class='ugcSearchDateBtn', type='datetime-local', name='TimeEnd', onfocus='this.value=\'\'')
+      input(class='createProgramListBtn', type='datetime-local', name='TimeEnd', onfocus='this.value=\'\'')
       br
       label 播放時間
-      input(class='ugcSearchDateBtn', type='datetime-local', name='TimeStart', onfocus='this.value=\'\'')
+      input(class='createProgramListBtn', type='datetime-local', name='playtimeStart', onfocus='this.value=\'\'')
       | 到
-      input(class='ugcSearchDateBtn', type='datetime-local', name='TimeEnd', onfocus='this.value=\'\'')
-      input#ugcSearchDateBtn(type='button', class='ugcSearchDate', value='自動配對')
+      input(class='createProgramListBtn', type='datetime-local', name='playtimeEnd', onfocus='this.value=\'\'')
+      input#createProgramListBtn(type='button', class='createProgramList', value='自動配對')
+      br
+      br
+      label 播放清單順序
+      input(class='createProgramListBtn', type='text' ,name='ugcSequenceText' ,onfocus='this.value=\'\'')
+    .clear
 
     table#product-table(border='0', width='100%', cellpadding='0', cellspacing='0')
         tr
@@ -38,10 +45,15 @@ form#mainform(action='')
             each PlayList, i in ugcCensorPlayList
                 if i%2
                     tr
-                      td #{PlayList.doohTimes}
+                      td start 
+                        #{PlayList.timeslotStart}
+                        br
+                        br
+                        label end
+                        #{PlayList.timeslotEnd}
                       td 
-                        input(class='ugcChangeBtn', type='text' ,name='ugcChangeText' ,onfocus='this.value=\'\'')
-                        input#ugcChangeBtn(type='button', class='ugcChange', value='確認')
+                        input(class='#ugcCensor.ugcCensorNoSetBtn', type='text' ,name='ugcChangeText' ,onfocus='this.value=\'\'')
+                        input#ugcCensor.ugcCensorNoSetBtn(type='button', class='ugcChange', value='確認', name='#{PlayList.programTimeSlotId}')
                       td #{PlayList.ugcCensorNo}
                       td 
                          if(PlayList.genre == 'miix')
@@ -60,14 +72,19 @@ form#mainform(action='')
                         img(src='#{PlayList.fbPictureUrl}', alt='', width='100')
                       td #{PlayList.rating}
                       td
-                        input#deleteAndAutoUpdate(type='button', value='刪除且自動替補')
+                        input#ugcCensor.ugcCensorNoRemoveBtn(type='button', value='刪除且自動替補', name='#{PlayList.programTimeSlotId}')
 
                 else
                     tr.alternate-row
-                      td #{PlayList.doohTimes}
+                      td start 
+                        #{PlayList.timeslotStart}
+                        br
+                        br
+                        label end
+                        #{PlayList.timeslotEnd}
                       td
-                        input(class='ugcChangeBtn', type='text' ,name='ugcChangeText' ,onfocus='this.value=\'\'')
-                        input#ugcChangeBtn(type='button', class='ugcChange', value='確認')
+                        input(class='#ugcCensor.ugcCensorNoSetBtn', type='text' ,name='ugcChangeText' ,onfocus='this.value=\'\'')
+                        input#ugcCensor.ugcCensorNoSetBtn(type='button', class='ugcChange', value='確認', name='#{PlayList.programTimeSlotId}')
                       td #{PlayList.ugcCensorNo}
                       td 
                          if(PlayList.genre == 'miix')
@@ -86,4 +103,6 @@ form#mainform(action='')
                         img(src='#{PlayList.fbPictureUrl}', alt='', width='100')
                       td #{PlayList.rating}
                       td
-                        input#deleteAndAutoUpdate(type='button', value='刪除且自動替補')
+                        input#ugcCensor.ugcCensorNoRemoveBtn(type='button', value='刪除且自動替補', name='#{PlayList.programTimeSlotId}')
+
+      input#pushProgramsBtn(type='button', class='Programs', value='送出')

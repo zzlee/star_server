@@ -4,7 +4,7 @@
  
 var FM = { dooh_handler: {} };
 var schedule_handler = require("../schedule.js"),
-    UGC_handler = require("../UGC.js");
+    UGC_handler = require("../ugc.js");
 
 var DEBUG = true,
     FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str)); } : function(str){} ;

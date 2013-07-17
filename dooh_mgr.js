@@ -25,10 +25,11 @@ doohMgr.downloadMovieFromMainServer = function(movieProjectID, downloadMovie_cb)
 
 };
 
-doohMgr.downloadMovieFromS3 = function(movieProjectID, downloadMovie_cb) {
+doohMgr.downloadMovieFromS3 = function(movieProjectID, movieFileExtension, downloadMovie_cb) {
     
     var commandParameters = {
-            movieProjectID: movieProjectID
+            movieProjectID: movieProjectID,
+            movieFileExtension: movieFileExtension
         };
         
         globalConnectionMgr.sendRequestToRemote( doohID, { command: "DOWNLOAD_MOVIE_FROM_S3", parameters: commandParameters }, function(responseParameters) {
