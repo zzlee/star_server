@@ -11,6 +11,7 @@ var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var memberDB = require(workingPath+'/member.js');
 var UGCDB = require(workingPath+'/ugc.js');
+var awsS3 = require('./aws_s3.js');
 var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
 
 /**
@@ -128,10 +129,11 @@ miixContentMgr.preAddMiixMovie = function() {
  *     <li>contentGenre: it is normally the template (id) that this UGC uses
  *     <li>title: title of UGC 
  *     </ul>
- * @param {Function} cbOfAddMiixImage Tile of UGC
+ * @param {Function} cbOfAddMiixImage Callback function called when adding operation is done
  */
 miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAddMiixImage) {
     var imageUgcFile = null;
+    var s3Path;
     
     async.series([
         function(callback){
@@ -152,16 +154,46 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
         },
         function(callback){
             //Upload the PNG file to S3
-            callback(null, 'two');
+            s3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+".png";
+            awsS3.uploadToAwsS3(imageUgcFile, s3Path, 'image/png', function(err,result){
+                if (!err){
+                    logger.info('Miix image is successfully uploaded to S3 '+s3Path);
+                    callback(null, s3Path);
+                }
+                else {
+                    logger.info('Miix image is failed to be uploaded to S3 '+s3Path);
+                    callback('Miix movie is failed to be uploaded to S3 '+s3Path, null);
+                }
+            });
         },
         function(callback){
             //Add UGC info to UGC db
-            callback(null, 'two');
+            var s3Url = "https://s3.amazonaws.com/miix_content"+s3Path;
+            var vjson = {
+                    "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "userID": ugcInfo.ownerId.fbUserId},
+                    "projectId": ugcProjectID,
+                    "genre": "miix_image",
+                    "contentGenre": ugcInfo.contentGenre,
+                    "mediaType": "PNG",
+                    "fileExtension": "png",
+                    "title": ugcInfo.title,
+                    "url": {"s3":s3Url}
+                };
+
+            UGCDB.addUGC(vjson, function(errAddUgc, result){
+                if (!errAddUgc){
+                    logger.info('Miix image info is successfully saved to UGC db: '+ugcProjectID);
+                    callback(null);
+                }
+                else {
+                    logger.info('Miix image info failed to saved to UGC db');
+                    callback('Miix image info failed to saved to UGC db: '+errAddUgc);
+                }
+            });
         }
     ],
-    // optional callback
     function(err, results){
-        // results is now equal to ['one', 'two']
+        cbOfAddMiixImage(err);
     });
 
     

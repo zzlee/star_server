@@ -8,7 +8,7 @@ var miixContentMgr = require('../miix_content_mgr.js');
 
 //PUT /miix/base64_image_ugcs/:ugcProjectId
 miixHandler.putBase64ImageUgcs_cb = function(req, res) {
-    console.log('[PUT /miix/base64_image_ugcs/:ugcProjectId] called');
+    logger.info('[PUT '+req.path+'] is called');
     
     if (req.body.imgBase64 && req.body.ownerId && req.body.ownerFbUserId){
 
@@ -20,7 +20,6 @@ miixHandler.putBase64ImageUgcs_cb = function(req, res) {
         
         miixContentMgr.addMiixImage(req.body.imgBase64, req.params.ugcProjectId, ugcInfo, function(err){
             if (!err){
-                
                 res.send(200);
             }
             else {
