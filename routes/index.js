@@ -21,13 +21,16 @@ exports.storyCamControllerHandler = storyCamControllerHandler;
 var authorizationHandler = require('./authorization_handler.js');
 exports.authorizationHandler = authorizationHandler;
 
+var miixHandler = require('./miix_handler.js');
+exports.miixHandler = miixHandler;
+
 //JF
-var dooh_handler = require('./dooh_handler.js');
-exports.dooh_handler = dooh_handler;
+var doohHandler = require('./dooh_handler.js');
+exports.doohHandler = doohHandler;
 
 //Kaiser
-var censor_handler = require('./censor_handler.js');
-exports.censor_handler = censor_handler;
+var censorHandler = require('./censor_handler.js');
+exports.censorHandler = censorHandler;
 
 
 //GL
@@ -48,6 +51,8 @@ exports.signinFB = function(req, res){
 	logger.log("\n[FM] [signin_fb] ");
     res.render('signinFB', { title: "導向Facebook認證頁！" });
 };
+
+
 
 exports.signin = function(req, res, next) {
     /*

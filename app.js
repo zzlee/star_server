@@ -407,6 +407,7 @@ app.post('/members/:member_id/questions', function(req, res){
  * "mustPlay":true}] <br>
  *
  * @name GET /miix_admin/user_content_items
+ * @memberof miix_admin
  */
 app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
 
@@ -433,6 +434,7 @@ app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_c
  * </ul>
  *
  * @name PUT /miix_admin/user_content_attribute/:ugcId
+ * @memberof miix_admin
  */
 app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);//TODO::ugcId
 //app.put('/miix_admin/user_content_attribute/:ugcId', routes.censor_handler.setUGCAttribute_get_cb);
@@ -466,6 +468,7 @@ app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttrib
  *     </ul>
  *
  * @name POST /miix_admin/doohs/:doohId/timeslots
+ * @memberof miix_admin
  */
 app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTimeslots_get_cb);
 /**
@@ -511,6 +514,7 @@ app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTime
  * "contentGenre":"miix_it"] <br>
  *
  * @name GET /miix_admin/doohs/:doohId/timeslots
+ * @memberof miix_admin
  */
 app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.gettimeslots_get_cb);
 
@@ -536,6 +540,7 @@ app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.gettimeslot
  * </ul>
  *
  * @name PUT /miix_admin/doohs/:doohId/timeslots/:sessionId
+ * @memberof miix_admin
  */
 app.put('/miix_admin/doohs/:doohId/timeslots/:sessionId', routes.censor_handler.updatetimeslots_get_cb);
 
@@ -560,6 +565,7 @@ app.put('/miix_admin/doohs/:doohId/timeslots/:sessionId', routes.censor_handler.
  * </ul>
  *
  * @name PUT /miix_admin/doohs/:doohId/ProgramsTo3rdPartyContent
+ * @memberof miix_admin
  */
 app.put('/miix_admin/doohs/:doohId/ProgramsTo3rdPartyContentMgr/:sessionId', routes.censor_handler.pushProgramsTo3rdPartyContentMgr_get_cb);
 

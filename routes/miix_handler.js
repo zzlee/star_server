@@ -1,3 +1,7 @@
 /**
- * New node file
+ * @fileoverview Implementation of miixHandler
  */
+
+var miixHandler = {};
+
+//
