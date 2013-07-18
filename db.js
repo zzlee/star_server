@@ -109,7 +109,7 @@ FM.DB = (function(){
             description: {type: String},
             url: { youtube: String, tudou: String, s3: String },  //  Youtube, Tudou
             userRawContent: { image: String, text: String, video: String }, // the file path or S3 URL of storing user's image, text, or video
-            ownerId: { _id:ObjectID, userID: String },
+            ownerId: { _id:ObjectID, userID: String, fbUserId: String }, //userID is used to be owner's fb id, and is now DEPRECATED in Miix 2.0
             locationId: {type: ObjectID},
             projectId: {type: String},  // project ID which is unique to each AE rendering
             hitRate: {type: Number, min:0},

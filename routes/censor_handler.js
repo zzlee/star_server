@@ -2,7 +2,7 @@
 var DEBUG = true,
 FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str) ); } : function(str){} ;
 
-var FM = { censor_handler: {} };
+var FM = { censorHandler: {} };
 
 var censor_mgr = require("../censor_mgr.js");
 var apis = require("../routes/api.js");
@@ -36,7 +36,7 @@ var sessionId = null;
  *                       rating(Range A~E),
  *                       doohPlayedTimes}
  */
-FM.censor_handler.getUGCList_get_cb = function(req,res){
+FM.censorHandler.getUGCList_get_cb = function(req,res){
 
     var condition;
     var sort;
@@ -79,7 +79,7 @@ FM.censor_handler.getUGCList_get_cb = function(req,res){
  * @return response {string}status 
  *                       
  */
-FM.censor_handler.setUGCAttribute_get_cb = function(req,res){
+FM.censorHandler.setUGCAttribute_get_cb = function(req,res){
 
     var no = req.body.no;
     var vjson = req.body.vjson;
@@ -96,7 +96,7 @@ FM.censor_handler.setUGCAttribute_get_cb = function(req,res){
 
 };
 
-FM.censor_handler.createTimeslots_get_cb = function(req, res){
+FM.censorHandler.createTimeslots_get_cb = function(req, res){
     
     var doohId = req.params.doohId;
     var intervalOfSelectingUGCStart =  new Date(req.body.intervalOfSelectingUGC.start).getTime();
@@ -123,7 +123,7 @@ FM.censor_handler.createTimeslots_get_cb = function(req, res){
 };
 
 
-FM.censor_handler.gettimeslots_get_cb = function(req, res){
+FM.censorHandler.gettimeslots_get_cb = function(req, res){
 
 //  var doohId = req.params.doohId;
     var doohId = 'taipeiarena';
@@ -163,7 +163,7 @@ FM.censor_handler.gettimeslots_get_cb = function(req, res){
 //  res.render( 'table_censorPlayList', {ugcCensorPlayList: testArray} );
 };
 
-FM.censor_handler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
+FM.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
 
     schedule_mgr.pushProgramsTo3rdPartyContentMgr(sessionId, function(err, result){
         if (!err){
@@ -176,7 +176,7 @@ FM.censor_handler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
 
 };
 
-FM.censor_handler.updatetimeslots_get_cb = function(req, res){
+FM.censorHandler.updatetimeslots_get_cb = function(req, res){
 
     var programTimeSlot =  req.body.programTimeSlotId;
     var ugcReferenceNo = req.body.ugcReferenceNo;
@@ -207,4 +207,4 @@ FM.censor_handler.updatetimeslots_get_cb = function(req, res){
 
 };
 
-module.exports = FM.censor_handler;
+module.exports = FM.censorHandler;

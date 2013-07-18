@@ -1,6 +1,10 @@
 /**
  * @fileoverview Implementation of miixContentMgr
  */
+var fs = require('fs');
+var path = require('path');
+var xml2js = require('xml2js');
+var async = require('async');
 
 var workingPath = process.cwd();
 var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
@@ -8,10 +12,6 @@ var doohMgr = require(workingPath+'/dooh_mgr.js');
 var memberDB = require(workingPath+'/member.js');
 var UGCDB = require(workingPath+'/ugc.js');
 var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
-
-var fs = require('fs');
-var path = require('path');
-var xml2js = require('xml2js');
 
 /**
  * The manager who coordinates the operations for Miix contents
@@ -118,14 +118,57 @@ miixContentMgr.preAddMiixMovie = function() {
  * 
  * @param {String} imgBase64 image date with base64 format
  * @param {String} ugcProjectID Project ID of this UGC
- * @param {Object} ownerId An object containing owner's id info:
+ * @param {Object} ugcInfo An object containing UGC info:
  *     <ul>
- *     <li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)
- *     <li>fbId: owner's Facebook ID
+ *     <li>ownerId: ownerId An object containing owner's id info:
+ *         <ul>                                                                             
+ *         <li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)
+ *         <li>fbUserId: owner's Facebook user ID                                                    
+ *         </ul>                                                                            
+ *     <li>contentGenre: it is normally the template (id) that this UGC uses
+ *     <li>title: title of UGC 
  *     </ul>
- * @param {String} title Tile of UGC
+ * @param {Function} cbOfAddMiixImage Tile of UGC
  */
-miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ownerId, title) {
+miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAddMiixImage) {
+    var imageUgcFile = null;
+    
+    async.series([
+        function(callback){
+            //Save base64 image to a PNG file
+            var base64Data = imgBase64.replace(/^data:image\/png;base64,/,"");
+            imageUgcFile = path.join(workingPath,"public/contents/temp", ugcProjectID+".png");
+
+            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
+                if (!errOfWriteFile){
+                    callback(null);
+                }
+                else {
+                    callback("Fail to save base64 image to a PNG file: "+errOfWriteFile);
+                }
+                
+            });
+            
+        },
+        function(callback){
+            //Upload the PNG file to S3
+            callback(null, 'two');
+        },
+        function(callback){
+            //Add UGC info to UGC db
+            callback(null, 'two');
+        }
+    ],
+    // optional callback
+    function(err, results){
+        // results is now equal to ['one', 'two']
+    });
+
+    
+    
+    
+    
+    
     
 };
 
