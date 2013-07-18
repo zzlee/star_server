@@ -19,11 +19,18 @@ miixHandler.putBase64ImageUgcs_cb = function(req, res) {
         };
         
         miixContentMgr.addMiixImage(req.body.imgBase64, req.params.ugcProjectId, ugcInfo, function(err){
-            if (err){
+            if (!err){
+                
+                res.send(200);
+            }
+            else {
                 logger.error('[PUT /miix/base64_image_ugcs/:ugcProjectId]: '+ err);
+                res.send(400, {error: err});
             }
         });
     }
     
     
 };
+
+module.exports = miixHandler;
