@@ -234,6 +234,8 @@ app.put('/miix/base64_image_ugcs/:ugcProjectId', routes.miixHandler.putBase64Ima
  * @name GET /miix/ugc_hightlights
  * @memberof miix
  */
+app.get('/miix/ugc_hightlights', routes.miixHandler.getUgcHighlights_cb);
+/*
 app.get('/miix/ugc_hightlights', function(req, res){
     var db = require('./db.js');
     
@@ -248,7 +250,7 @@ app.get('/miix/ugc_hightlights', function(req, res){
         
     });
     
-});
+});*/
 
 /**
  * Get a list of latest UGCs of a specific member , sorted by creating time (the newest at beginning)<br>
@@ -269,6 +271,8 @@ app.get('/miix/ugc_hightlights', function(req, res){
  * @name GET /miix/members/:memberId/ugcs
  * @memberof miix
  */
+app.get('/miix/members/:memberId/ugcs', routes.miixHandler.getUgcs_cb);
+
 
 /**
  * Get a list of latest live content items (a.k.a. "Miix Story" or "Story MV") of a specific member , sorted by creating time (the newest at beginning)<br>
@@ -289,6 +293,8 @@ app.get('/miix/ugc_hightlights', function(req, res){
  * @name GET /miix/members/:memberId/live_contents
  * @memberof miix
  */
+app.get('/miix/members/:memberId/live_contents', routes.miixHandler.getLiveContents_cb);
+
 
 
 /**
@@ -612,8 +618,6 @@ app.post('/internal/dooh_timeslot_rawdata', routes.timeDataGet);
 //FM.API
 app.get('/api/eventsOfWaiting', routes.api.eventsOfWaiting); //not used in MiixCard v1.0 or later
 app.get('/api/schedule', routes.api.eventsOfPeriod); //not used in MiixCard v1.0 or later
-app.get('/api/userProfile', routes.api.userProfile); //not used in MiixCard v1.0 or later
-app.get('/api/profile', routes.api.profile); //not used in MiixCard v1.0 or later
 app.get('/api/fbGetComment', routes.api.fbGetCommentReq); 
 app.get('/api/fbGetThumbnail', routes.api.fbGetThumbnail);
 app.get('/api/newVideoList', routes.api.newUGCList);

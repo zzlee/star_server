@@ -5,6 +5,7 @@
 var miixHandler = {};
 
 var miixContentMgr = require('../miix_content_mgr.js');
+var ugc = require('../UGC.js');
 
 //PUT /miix/base64_image_ugcs/:ugcProjectId
 miixHandler.putBase64ImageUgcs_cb = function(req, res) {
@@ -29,7 +30,67 @@ miixHandler.putBase64ImageUgcs_cb = function(req, res) {
         });
     }
     
+};
+
+//GET /miix/ugc_hightlights
+miixHandler.getUgcHighlights_cb = function(req, res) {
+    logger.info('[GET '+req.path+'] is called');
+    console.log('[GET '+req.path+'] is called');
+    
+    var limit = 0;
+    if (req.query.limit){
+        limit = req.query.limit;
+    }
+    else {
+        limit = 10;
+    }
+    
+    miixContentMgr.getUgcHighlights(req.query.limit, function(err, ugcHightlights){
+        if (!err) {
+            res.send(ugcHightlights);
+        }
+        else {
+            res.send(500, {error: err});
+        }
+    });
+};
+
+
+//GET /miix/members/:memberId/ugcs
+miixHandler.getUgcs_cb = function(req, res) {
+    logger.info('[GET '+req.path+'] is called');
+    console.log('[GET '+req.path+'] is called');
+    
+    var limit = 0;
+    if (req.query.limit){
+        limit = req.query.limit;
+    }
+    else {
+        limit = 10;
+    }
+    
+    ugc.getUGCListByOwnerId(req.params.memberId, limit, 0, function(err, ugcList){
+        if (!err) {
+            res.send(ugcList);
+        }
+        else {
+            res.send(500, {error: err});
+        }
+    });
+};
+
+//GET /miix/members/:memberId/live_contents
+miixHandler.getLiveContents_cb = function(req, res) {
+    var limit = 0;
+    if (req.query.limit){
+        limit = req.query.limit;
+    }
+    else {
+        limit = 10;
+    }
+    
     
 };
+
 
 module.exports = miixHandler;

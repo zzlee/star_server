@@ -13,6 +13,7 @@ var memberDB = require(workingPath+'/member.js');
 var UGCDB = require(workingPath+'/ugc.js');
 var awsS3 = require('./aws_s3.js');
 var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
+var db = require('./db.js');
 
 /**
  * The manager who coordinates the operations for Miix contents
@@ -133,7 +134,7 @@ miixContentMgr.preAddMiixMovie = function() {
  */
 miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAddMiixImage) {
     var imageUgcFile = null;
-    var s3Path;
+    var s3Path = null;
     
     async.series([
         function(callback){
@@ -170,7 +171,7 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
             //Add UGC info to UGC db
             var s3Url = "https://s3.amazonaws.com/miix_content"+s3Path;
             var vjson = {
-                    "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "userID": ugcInfo.ownerId.fbUserId},
+                    "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
                     "projectId": ugcProjectID,
                     "genre": "miix_image",
                     "contentGenre": ugcInfo.contentGenre,
@@ -195,14 +196,8 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
     function(err, results){
         cbOfAddMiixImage(err);
     });
-
-    
-    
-    
-    
-    
-    
 };
+
 
 /**
  * Get the url of user-uploaded image <br>  
@@ -247,6 +242,30 @@ miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUrls_
                 gotUrls_cb(null, err);
             }		
         }
+    });
+};
+
+/**
+ * Retrieve the latest highlights of UGCs.<br>
+ * 
+ * @param {Number} limit The number of UGC highlights to retrieve
+ * @param {Function} cbOfGetUgcHighlights The callback function called when finishing retrieving. It has the following signature:<br>
+ *     cbOfGetUgcHighlights(err, ugcHighlightList)
+ */
+miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
+    
+    var ugcModel = db.getDocModel("ugc");
+    //TODO: change to query to meet the requirements
+    ugcModel.find({ "rating": "A", $or: [ { "contentGenre":"miix_it" }, { "contentGenre": "mood"} ] }).sort({"createdOn":-1}).limit(limit).exec(function (err, ugcHighlights) {
+        //TODO: get UGC owner's FB user name 
+        
+        if (!err){
+            cbOfGetUgcHighlights(null, ugcHighlights);
+        }
+        else {
+            cbOfGetUgcHighlights("Fail to retrieve UGC highlights from DB: "+err, ugcHighlights);
+        }
+        
     });
 };
 

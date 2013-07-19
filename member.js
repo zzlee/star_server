@@ -114,17 +114,6 @@ FM.MEMBER = (function(){
                 FMDB.getValueOf(members, {"memberID" : memberID}, field, cb);
             },
             
-            getUGCsByOID: function(oid, cb){
-                UGCDB.getUGCListById(oid, cb);
-                /*
-                FMDB.getValueOfById(members, oid, field, function(err, result){
-                    var length = result["video_ids"].length;
-                    videoDB.getVideoById(vid, function(err, vdoc){
-                        vUrls.push(vdoc.url.youtube);
-                    });
-                });*/
-            },
-            
             getTotalCommentsLikesSharesOnFB: function(userID, cb){
                 var likes_count = 0,
                     comments_count = 0,
