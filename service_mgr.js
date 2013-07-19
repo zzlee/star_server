@@ -122,24 +122,28 @@ var vjson = {
  *     <li>err: error message if any error happens
  *     </ul>
  */
-serviceMgr.getCustomerService= function(_id, condition, field, cb ){
+serviceMgr.getCustomerService= function(_id, condition, field, pageLimit, pageSkip, cb ){
     
     
+//    db.listOfdocModels( customerServiceSlotModel, condition, field, {sort :'no', limit: pageLimit , skip: pageSkip}, function(err, result){
     db.listOfdocModels( customerServiceSlotModel, condition, field, {sort :'no'}, function(err, result){
         cb(err, result); 
     });
     
 };
-var condition = {'no':1};
-var field = 'content';
+var condition = { 'ownerId._id': '51d38ca086fa21440a000002'};
+//var field = 'content';
+var field;
 var field2 = 'fb_id no genre reply version';
+var pageLimit;
+var pageSkip;
 
-//serviceMgr.getCustomerService(_id, condition, field2, function(err, result){
-//if(!err)
-//  console.log(result);
-//else
-//  console.log(err);
-//});
+serviceMgr.getCustomerService(_id, condition, field, pageLimit, pageSkip, function(err, result){
+if(!err)
+  console.log('------------'+result);
+else
+  console.log(err);
+});
 /**
  * get customer service list from feltmeng db.<br>
  * <br>

@@ -360,6 +360,7 @@ app.get('/members/:member_id/questions', routes.authorizationHandler.checkAuth, 
     
     res.send(200, result);
 });
+app.get('/miix_service/:member_id/questions', routes.authorizationHandler.checkAuth, routes.service.getCustomerServiceItems_get_cb);
 
 /**
  * Create the questions of a specific member<br>

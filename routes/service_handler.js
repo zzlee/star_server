@@ -35,9 +35,13 @@ FM.service.getCustomerServiceItems_get_cb = function(req, res){
     var condition;
     var field;
     var type = req.query.type;
-    console.log('type'+type);
+    console.log('----type'+type+req.params.member_id);
+    var pageLimit=9;
+    var pageSkip=0;
+    if(req.params.member_id)
+        condition = { 'ownerId._id' :req.params.member_id};
     
-    service_mgr.getCustomerService(_id, condition, field, function(err, result){
+    service_mgr.getCustomerService(_id, condition, field, pageLimit, pageSkip, function(err, result){
         if(!err){
           console.log(result);
 //          res.send(200, {message: type});
@@ -62,10 +66,10 @@ FM.service.getCustomerServiceItems_get_cb = function(req, res){
 
 FM.service.createCustomerServiceItems_get_cb = function(req, res){
     var vjson = {
-            ownerId : {_id : memberId},
-            genre : req.query.phoneVersion,
-            phoneVersion : req.query.phoneVersion,
-            content: { question : req.query.question}
+            ownerId : {_id : req.params.member_id},
+            genre : req.body.genre,
+            phoneVersion : req.body.phoneVersion,
+            content: { question : req.body.question},
             };
     console.log('createCustomerServiceItems_get_cb');
     service_mgr.createCustomerServiceItem(vjson, function(err, result){

@@ -987,3 +987,8 @@ font-size: 14px;}
 	border-bottom: 1px dotted #cccccc;
 	background-color: #eaeaea;
 }
+
+.tab_container{
+	overflow-y: scroll;
+	height:500px;
+}

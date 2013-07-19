@@ -30,7 +30,7 @@ FM.DB = (function(){
             //cultural_and_creative: a.k.a. 文創
             //mood: a.k.a. 心情
             //check_in: a.k.a. 打卡
-            questionGenre = 'account authorize sign_in '.split(' '),
+            questionGenre = 'account publish sign_in others'.split(' '),
             
             programTimeSlotType = 'UGC padding'.split(' '),
             programTimeSlotContnetType = 'file web_page'.split(' '),
