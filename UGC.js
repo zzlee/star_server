@@ -78,8 +78,8 @@ FM.UGC = (function(){
                 FMDB.getValueOf(UGCs, {"projectId":projectId}, fields, cb);
             },
             
-            getUGCListById: function(oid, cb){
-                UGCs.find({"ownerId._id":oid}, cb );
+            getUGCListByOwnerId: function(ownerId, limit, skip, cb){
+                UGCs.find({"ownerId._id":ownerId, $or:[ { "genre":"miix" }, { "genre": "miix_image"} ]}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(cb);
             },
             
             getUGCListByFB: function(userID, cb){

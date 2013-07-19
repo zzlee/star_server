@@ -1,19 +1,44 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: miix_content_mgr.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: miix_content_mgr.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>/**
  * @fileoverview Implementation of miixContentMgr
  */
-var fs = require('fs');
-var path = require('path');
-var xml2js = require('xml2js');
-var async = require('async');
 
 var workingPath = process.cwd();
 var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var memberDB = require(workingPath+'/member.js');
 var UGCDB = require(workingPath+'/ugc.js');
-var awsS3 = require('./aws_s3.js');
 var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
-var db = require('./db.js');
+
+var fs = require('fs');
+var path = require('path');
+var xml2js = require('xml2js');
 
 /**
  * The manager who coordinates the operations for Miix contents
@@ -101,8 +126,8 @@ miixContentMgr.submitMiixMovieToDooh = function( doohID, miixMovieProjectID ) {
 
 
 /**
- * Add some info some preliminary info of Miix movie to UGC db while AE is rending its concrete content.<br>  
- * <br>
+ * Add some info some preliminary info of Miix movie to UGC db while AE is rending its concrete content.&lt;br>  
+ * &lt;br>
  * These info are for clinet side to show some dummy icon for Miix movie which is under rendering
  * 
  * @param {String} doohID
@@ -113,94 +138,26 @@ miixContentMgr.preAddMiixMovie = function() {
 };
 
 /**
- * Add a Miix image to system. <br>  
- * <br>
+ * Add a Miix image to system. &lt;br>  
+ * &lt;br>
  * Miix image content body (in base64 format) is saved as a PNG and put onto AWS S3; the complete set of  
  * content info is save to UGC db
  * 
  * @param {String} imgBase64 image date with base64 format
  * @param {String} ugcProjectID Project ID of this UGC
- * @param {Object} ugcInfo An object containing UGC info:
- *     <ul>
- *     <li>ownerId: ownerId An object containing owner's id info:
- *         <ul>                                                                             
- *         <li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)
- *         <li>fbUserId: owner's Facebook user ID                                                    
- *         </ul>                                                                            
- *     <li>contentGenre: it is normally the template (id) that this UGC uses
- *     <li>title: title of UGC 
- *     </ul>
- * @param {Function} cbOfAddMiixImage Callback function called when adding operation is done
+ * @param {Object} ownerId An object containing owner's id info:
+ *     &lt;ul>
+ *     &lt;li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)
+ *     &lt;li>fbId: owner's Facebook ID
+ *     &lt;/ul>
+ * @param {String} title Tile of UGC
  */
-miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAddMiixImage) {
-    var imageUgcFile = null;
-    var s3Path = null;
+miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ownerId, title) {
     
-    async.series([
-        function(callback){
-            //Save base64 image to a PNG file
-            var base64Data = imgBase64.replace(/^data:image\/png;base64,/,"");
-            imageUgcFile = path.join(workingPath,"public/contents/temp", ugcProjectID+".png");
-
-            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
-                if (!errOfWriteFile){
-                    callback(null);
-                }
-                else {
-                    callback("Fail to save base64 image to a PNG file: "+errOfWriteFile);
-                }
-                
-            });
-            
-        },
-        function(callback){
-            //Upload the PNG file to S3
-            s3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+".png";
-            awsS3.uploadToAwsS3(imageUgcFile, s3Path, 'image/png', function(err,result){
-                if (!err){
-                    logger.info('Miix image is successfully uploaded to S3 '+s3Path);
-                    callback(null, s3Path);
-                }
-                else {
-                    logger.info('Miix image is failed to be uploaded to S3 '+s3Path);
-                    callback('Miix movie is failed to be uploaded to S3 '+s3Path, null);
-                }
-            });
-        },
-        function(callback){
-            //Add UGC info to UGC db
-            var s3Url = "https://s3.amazonaws.com/miix_content"+s3Path;
-            var vjson = {
-                    "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
-                    "projectId": ugcProjectID,
-                    "genre": "miix_image",
-                    "contentGenre": ugcInfo.contentGenre,
-                    "mediaType": "PNG",
-                    "fileExtension": "png",
-                    "title": ugcInfo.title,
-                    "url": {"s3":s3Url}
-                };
-
-            UGCDB.addUGC(vjson, function(errAddUgc, result){
-                if (!errAddUgc){
-                    logger.info('Miix image info is successfully saved to UGC db: '+ugcProjectID);
-                    callback(null);
-                }
-                else {
-                    logger.info('Miix image info failed to saved to UGC db');
-                    callback('Miix image info failed to saved to UGC db: '+errAddUgc);
-                }
-            });
-        }
-    ],
-    function(err, results){
-        cbOfAddMiixImage(err);
-    });
 };
 
-
 /**
- * Get the url of user-uploaded image <br>  
+ * Get the url of user-uploaded image &lt;br>  
  * 
  * @param {String} miixMovieProjectID
  * @param {Function} gotUrls_cb
@@ -217,7 +174,7 @@ miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUrls_
                     var customizable_objects = result.customized_content.customizable_object_list.customizable_object;
                     
                     if( Object.prototype.toString.call( customizable_objects ) === '[object Array]' ){
-                        for (var i=0;i<customizable_objects.length;i++) {
+                        for (var i=0;i&lt;customizable_objects.length;i++) {
                             anUserUploadedImageUrl = '/contents/user_project/'+miixMovieProjectID+'/user_data/'+customizable_objects[i].content;
                             userUploadedImageUrls.push( anUserUploadedImageUrl );
                         }
@@ -245,30 +202,6 @@ miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUrls_
     });
 };
 
-/**
- * Retrieve the latest highlights of UGCs.<br>
- * 
- * @param {Number} limit The number of UGC highlights to retrieve
- * @param {Function} cbOfGetUgcHighlights The callback function called when finishing retrieving. It has the following signature:<br>
- *     cbOfGetUgcHighlights(err, ugcHighlightList)
- */
-miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
-    
-    var ugcModel = db.getDocModel("ugc");
-    //TODO: change to query to meet the requirements
-    ugcModel.find({ "rating": "A", $or: [ { "contentGenre":"miix_it" }, { "contentGenre": "mood"} ] }).sort({"createdOn":-1}).limit(limit).exec(function (err, ugcHighlights) {
-        //TODO: get UGC owner's FB user name 
-        
-        if (!err){
-            cbOfGetUgcHighlights(null, ugcHighlights);
-        }
-        else {
-            cbOfGetUgcHighlights("Fail to retrieve UGC highlights from DB: "+err, ugcHighlights);
-        }
-        
-    });
-};
-
 
 
 module.exports = miixContentMgr;
@@ -279,4 +212,26 @@ miixContentMgr.getUserUploadedImageUrls('greeting-50c99d81064d2b841200000a-20130
     console.log('userUploadedImageUrls=');
     console.dir(userUploadedImageUrls);
 });
-*/
+*/</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Namespaces</h3><ul><li><a href="miix.html">miix</a></li><li><a href="miix_admin.html">miix_admin</a></li></ul><h3>Mixins</h3><ul><li><a href="customerServiceMgr.html">customerServiceMgr</a></li><li><a href="miixContentMgr.html">miixContentMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Thu Jul 18 2013 16:38:19 GMT+0800 (TST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

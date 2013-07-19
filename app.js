@@ -212,7 +212,7 @@ app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh); //v1.2 only.  In
  * @name PUT /miix/base64_image_ugcs/:ugcProjectId
  * @memberof miix
  */
-app.post('/miix/videos/miix_videos', routes.api.submitAUGC); //v1.2
+app.put('/miix/base64_image_ugcs/:ugcProjectId', routes.miixHandler.putBase64ImageUgcs_cb); 
 
 
 /**
@@ -234,6 +234,8 @@ app.post('/miix/videos/miix_videos', routes.api.submitAUGC); //v1.2
  * @name GET /miix/ugc_hightlights
  * @memberof miix
  */
+app.get('/miix/ugc_hightlights', routes.miixHandler.getUgcHighlights_cb);
+/*
 app.get('/miix/ugc_hightlights', function(req, res){
     var db = require('./db.js');
     
@@ -248,7 +250,7 @@ app.get('/miix/ugc_hightlights', function(req, res){
         
     });
     
-});
+});*/
 
 /**
  * Get a list of latest UGCs of a specific member , sorted by creating time (the newest at beginning)<br>
@@ -269,6 +271,8 @@ app.get('/miix/ugc_hightlights', function(req, res){
  * @name GET /miix/members/:memberId/ugcs
  * @memberof miix
  */
+app.get('/miix/members/:memberId/ugcs', routes.miixHandler.getUgcs_cb);
+
 
 /**
  * Get a list of latest live content items (a.k.a. "Miix Story" or "Story MV") of a specific member , sorted by creating time (the newest at beginning)<br>
@@ -289,6 +293,8 @@ app.get('/miix/ugc_hightlights', function(req, res){
  * @name GET /miix/members/:memberId/live_contents
  * @memberof miix
  */
+app.get('/miix/members/:memberId/live_contents', routes.miixHandler.getLiveContents_cb);
+
 
 
 /**
@@ -303,11 +309,11 @@ app.get('/miix_admin/members', routes.authorizationHandler.checkAuth, routes.adm
 app.get('/miix_admin/miix_movies', routes.authorizationHandler.checkAuth, routes.admin.miixPlayList_get_cb); 
 app.get('/miix_admin/story_movies', routes.authorizationHandler.checkAuth, routes.admin.storyPlayList_get_cb);
 app.get('/miix_admin/list_size', routes.authorizationHandler.checkAuth, routes.admin.listSize_get_cb);
-app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.censor_handler.getUGCList_get_cb);
+app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.censorHandler.getUGCList_get_cb);
 
-app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
-app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);
-app.get('/miix_admin/timeslots', routes.censor_handler.timeslots_get_cb);
+app.get('/miix_admin/user_content_items', routes.censorHandler.getUGCList_get_cb);
+app.put('/miix_admin/user_content_attribute', routes.censorHandler.setUGCAttribute_get_cb);
+app.get('/miix_admin/timeslots', routes.censorHandler.timeslots_get_cb);
 
 /**
  * Get the questions of a specific member<br>
@@ -407,8 +413,9 @@ app.post('/members/:member_id/questions', function(req, res){
  * "mustPlay":true}] <br>
  *
  * @name GET /miix_admin/user_content_items
+ * @memberof miix_admin
  */
-app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
+app.get('/miix_admin/user_content_items', routes.censorHandler.getUGCList_get_cb);
 
 /**
  * Update the UGC field to Feltmeng DB<br>
@@ -433,9 +440,10 @@ app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_c
  * </ul>
  *
  * @name PUT /miix_admin/user_content_attribute/:ugcId
+ * @memberof miix_admin
  */
-app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);//TODO::ugcId
-//app.put('/miix_admin/user_content_attribute/:ugcId', routes.censor_handler.setUGCAttribute_get_cb);
+app.put('/miix_admin/user_content_attribute', routes.censorHandler.setUGCAttribute_get_cb);//TODO::ugcId
+//app.put('/miix_admin/user_content_attribute/:ugcId', routes.censorHandler.setUGCAttribute_get_cb);
 
 /**
  * New a timeslots for dooh<br>
@@ -466,8 +474,10 @@ app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttrib
  *     </ul>
  *
  * @name POST /miix_admin/doohs/:doohId/timeslots
+ * @memberof miix_admin
  */
-app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTimeslots_get_cb);
+app.post('/miix_admin/doohs/:doohId/timeslots', routes.censorHandler.createTimeslots_get_cb);
+
 /**
  * Get the dooh timeslot<br>
  * <h5>Path Parameters</h5>
@@ -511,8 +521,9 @@ app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTime
  * "contentGenre":"miix_it"] <br>
  *
  * @name GET /miix_admin/doohs/:doohId/timeslots
+ * @memberof miix_admin
  */
-app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.gettimeslots_get_cb);
+app.get('/miix_admin/doohs/:doohId/timeslots', routes.censorHandler.gettimeslots_get_cb);
 
 /**
  * Update the ProgramTimeSlot field to Feltmeng DB<br>
@@ -536,8 +547,9 @@ app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.gettimeslot
  * </ul>
  *
  * @name PUT /miix_admin/doohs/:doohId/timeslots/:sessionId
+ * @memberof miix_admin
  */
-app.put('/miix_admin/doohs/:doohId/timeslots/:sessionId', routes.censor_handler.updatetimeslots_get_cb);
+app.put('/miix_admin/doohs/:doohId/timeslots/:sessionId', routes.censorHandler.updatetimeslots_get_cb);
 
 //TODO: pushProgramsTo3rdPartyContentMgr RESTful
 /**
@@ -560,8 +572,9 @@ app.put('/miix_admin/doohs/:doohId/timeslots/:sessionId', routes.censor_handler.
  * </ul>
  *
  * @name PUT /miix_admin/doohs/:doohId/ProgramsTo3rdPartyContent
+ * @memberof miix_admin
  */
-app.put('/miix_admin/doohs/:doohId/ProgramsTo3rdPartyContentMgr/:sessionId', routes.censor_handler.pushProgramsTo3rdPartyContentMgr_get_cb);
+app.put('/miix_admin/doohs/:doohId/ProgramsTo3rdPartyContentMgr/:sessionId', routes.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb);
 
 // Internal
 
@@ -569,9 +582,9 @@ app.get('/internal/oauth2callback', routes.YoutubeOAuth2_cb );
 app.get('/internal/commands', routes.command_get_cb);
 app.post('/internal/command_responses', routes.commandResponse_post_cb); 
 
-app.post('/internal/dooh/movie_playing_state', routes.dooh_handler.doohMoviePlayingState_post_cb);  //TODO: PUT /internal/dooh/movie_playing_state is better
-app.post('/internal/dooh/dooh_periodic_data', routes.dooh_handler.importPeriodicData);  //TODO: POST /internal/adapter/schedule_periodic_data is better
-app.get('/internal/dooh/dooh_current_video', routes.dooh_handler.dooh_current_UGC);  
+app.post('/internal/dooh/movie_playing_state', routes.doohHandler.doohMoviePlayingState_post_cb);  //TODO: PUT /internal/dooh/movie_playing_state is better
+app.post('/internal/dooh/dooh_periodic_data', routes.doohHandler.importPeriodicData);  //TODO: POST /internal/adapter/schedule_periodic_data is better
+app.get('/internal/dooh/dooh_current_video', routes.doohHandler.dooh_current_UGC);  
 
 app.post('/internal/story_cam_controller/available_story_movie', routes.storyCamControllerHandler.availableStoryMovie_post_cb);
 
@@ -586,9 +599,6 @@ app.get('/get_template_customizable_object_list', routes.getTemplateCustomizable
 
 app.get('/oauth2callback', routes.YoutubeOAuth2_cb );
 
-app.post('/upload', routes.upload_cb );
-app.post('/upload_user_data_info',routes.uploadUserDataInfo_cb);
-
 //admin
 app.get('/admin', routes.admin.get_cb); 
 app.get('/admin/login', routes.admin.login_get_cb);
@@ -600,16 +610,14 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
 
 
 //internal
-app.post('/internal/dooh_periodic_data', routes.dooh_handler.importPeriodicData);
-app.get('/internal/dooh_current_video', routes.dooh_handler.dooh_current_UGC);
+app.post('/internal/dooh_periodic_data', routes.doohHandler.importPeriodicData);
+app.get('/internal/dooh_current_video', routes.doohHandler.dooh_current_UGC);
 app.post('/internal/dooh_timeslot_rawdata', routes.timeDataGet);
 
 
 //FM.API
 app.get('/api/eventsOfWaiting', routes.api.eventsOfWaiting); //not used in MiixCard v1.0 or later
 app.get('/api/schedule', routes.api.eventsOfPeriod); //not used in MiixCard v1.0 or later
-app.get('/api/userProfile', routes.api.userProfile); //not used in MiixCard v1.0 or later
-app.get('/api/profile', routes.api.profile); //not used in MiixCard v1.0 or later
 app.get('/api/fbGetComment', routes.api.fbGetCommentReq); 
 app.get('/api/fbGetThumbnail', routes.api.fbGetThumbnail);
 app.get('/api/newVideoList', routes.api.newUGCList);
