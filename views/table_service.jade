@@ -1,0 +1,24 @@
+﻿
+form#mainform(action='')
+    table#product-table.tablesorter(cellspacing='0')
+      thead
+        tr
+           th(width='29%') facebook帳號!
+           th(width='13%') 問題類型!
+           th(width='14%') 手機版本!
+           th(width='18%') 時間!
+           th(width='14%') 狀態
+           th(width='12%') 備註
+      tbody
+            if(serviceQuestionList)
+                 each service, i in serviceQuestionList
+                      tr
+                        td #{service.fb_id}
+                        td
+                             span.label.label-account 帳號
+                        td #{service.version}
+                        td #{service.createdOn}
+                        td
+                             span.label.label-unreply 未回覆
+                        td
+                          textarea(name='', cols='', rows='')

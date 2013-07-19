@@ -1,0 +1,15 @@
+﻿
+form#messageform(action='')
+        .module_content
+            if(serviceQuestionList)
+                each service, i in serviceQuestionList
+                    .message
+                      td #{service.content.question}
+                      p
+                        strong John Doe
+                        em  20130205 14:30
+                    .reply
+                      td #{service.content.answer}
+                      p
+                        strong Dora Su
+                        em  20130205 14:30

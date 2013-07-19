@@ -361,12 +361,36 @@ app.get('/members/:member_id/questions', routes.authorizationHandler.checkAuth, 
     res.send(200, result);
 });
 
-
-app.post('/members/:member_id/questions', function(req, res){
-    
-});
+/**
+ * Create the questions of a specific member<br>
+ * <h5>Path Parameters</h5>
+ * <ul>
+ * <li>memberId: Member ID (_id with hex string)
+ * </ul>
+ * <h5>Query Parameters</h5>
+ * <ul>
+ * <li>phoneVersion:
+ * <li>question:
+ * <li>genre:
+ * </ul>
+ * <h5>Request body</h5>
+ * None
+ * <h5>Response body</h5>
+ * The callback function called when the result program list is created :
+ *     <ul>
+ *     <li>err: error message if any error happens
+ *     <li>result: null    
+ *     </ul>
+ *
+ * @name POST /miix_service/:member_id/questions
+ */
+//app.post('/members/:member_id/questions', function(req, res){
+//    
+//});
+app.post('/miix_service/:member_id/questions', routes.service.createCustomerServiceItems_get_cb);
 
 app.get('/miix_service', routes.service.get_cb);
+app.get('/miix_service/customer_service_items', routes.service.getCustomerServiceItems_get_cb);
 /**
  * Get the UGC list<br>
  * <h5>Path Parameters</h5>
@@ -438,7 +462,7 @@ app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttrib
 //app.put('/miix_admin/user_content_attribute/:ugcId', routes.censor_handler.setUGCAttribute_get_cb);
 
 /**
- * New a timeslots for dooh<br>
+ * Create a timeslots for dooh<br>
  * <h5>Path Parameters</h5>
  * <ul>
  * <li>doohId: Dooh ID (ex:'taipeiarena')

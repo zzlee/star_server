@@ -593,7 +593,8 @@ $(document).ready(function(){
             });            
 
         }// End of doohs
-
+          
+        
     });
     // Ajax End---------------------------------------------------------------------
 
@@ -687,11 +688,6 @@ $(document).ready(function(){
 
 });
 
-//service
-$(document).ready(function(){
-    console.log('service');
-    
-});
 
 /*
 FM.memberList = function(pageToGo, rowsPerPage, cb){

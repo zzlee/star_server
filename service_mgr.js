@@ -5,7 +5,7 @@
 var db = require('./db.js');
 var async = require('async');
 
-var customerServiceSlotModel = db.getDocModel("customerService");
+var customerServiceSlotModel = db.getDocModel("customerServiceItem");
 
 /**
  * The manager who handles the customer service
@@ -29,19 +29,12 @@ var serviceMgr = {};
  *     <li>err: error message if any error happens
  *     </ul>
  */
-serviceMgr.addCustomerQuestion = function(fb_id, question, cb ){
+serviceMgr.createCustomerServiceItem = function(vjson, cb ){
 
 //    var arr = [question];
 //    arr.push(question);
 //    var questiona = [{question :'I cannot sign in the app What can I do?'}];
-    var vjson = {
-            fb_id : fb_id,
-            no : 2,
-            genre : {type:'account'},
-            reply : {type: false},
-            version : 'iPhone 6.0.1',
-            content: question
-            };
+
 
     db.createAdoc(customerServiceSlotModel , vjson, function(err,result){
         cb(err, result); 
@@ -49,11 +42,19 @@ serviceMgr.addCustomerQuestion = function(fb_id, question, cb ){
     
 };
 //test
-var fb_id = '33456';
-var question_1 = {question:'no respond'};
-var question_2 = {question:'bug'};
-var question = [question_1, question_2];
-//serviceMgr.addCustomerQuestion(fb_id, question, function(err, result){
+//var fb_id = '33456';
+//var question_1 = {question:'no respond'};
+//var question_2 = {question:'bug'};
+//var question = [question_1, question_2];
+//var vjson = {
+//        fb_id : fb_id,
+//        no : 2,
+//        genre : {type:'account'},
+//        reply : {type: false},
+//        version : 'iPhone 6.0.1',
+//        content: question
+//        };
+//serviceMgr.addCustomerQuestion(fb_id, vjson, function(err, result){
 //    if(!err)
 //        console.log(result);
 //    else
@@ -133,12 +134,12 @@ var condition = {'no':1};
 var field = 'content';
 var field2 = 'fb_id no genre reply version';
 
-serviceMgr.getCustomerService(_id, condition, field2, function(err, result){
-if(!err)
-  console.log(result);
-else
-  console.log(err);
-});
+//serviceMgr.getCustomerService(_id, condition, field2, function(err, result){
+//if(!err)
+//  console.log(result);
+//else
+//  console.log(err);
+//});
 /**
  * get customer service list from feltmeng db.<br>
  * <br>
