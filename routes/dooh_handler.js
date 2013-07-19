@@ -10,7 +10,9 @@ var DEBUG = true,
     FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str)); } : function(str){} ;
 
 var storyCamControllerMgr = require("../story_cam_controller_mgr.js");
-    
+
+var fs = require('fs');
+
 FM.dooh_handler.lastMoviePlayed = null;
 FM.dooh_handler.lastMovieStopped = null;
 
@@ -125,6 +127,21 @@ FM.dooh_handler.doohMoviePlayingState_post_cb = function(req, res) {
 	else {
 		res.send(400, {error: "Bad Request!"} );
 	}
+}
+
+//GET /internal/dooh/dooh_playing_html
+FM.doohHandler.streamVideoTrigger = function(req, res){
+    fs.readFile(__dirname + '/fm.html', 'utf8', function(err, text){
+        res.send(text);
+        FM.dooh_handler.lastMoviePlayed = req.headers.miix_movie_project_id;
+        storyCamControllerMgr.startRecording( '', function(resParametes){
+            logger.info('story cam started recording.');
+            logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+            res.send(200);
+            resIsSent = true;
+            res.end();
+        });
+    });
 }
 
 module.exports = FM.dooh_handler;

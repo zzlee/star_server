@@ -586,6 +586,9 @@ app.post('/internal/dooh/movie_playing_state', routes.doohHandler.doohMoviePlayi
 app.post('/internal/dooh/dooh_periodic_data', routes.doohHandler.importPeriodicData);  //TODO: POST /internal/adapter/schedule_periodic_data is better
 app.get('/internal/dooh/dooh_current_video', routes.doohHandler.dooh_current_UGC);  
 
+//GET push html to dooh player and trigger story camera.
+app.get('/internal/dooh/dooh_playing_html', routes.doohHandler.streamVideoTrigger);
+
 app.post('/internal/story_cam_controller/available_story_movie', routes.storyCamControllerHandler.availableStoryMovie_post_cb);
 
 
