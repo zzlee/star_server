@@ -13,7 +13,7 @@ var miixContentMgr = require(workingPath+'/miix_content_mgr.js');
 userContentHandler.uploadUserContentFile_cb = function(req, res){
     var awsS3 = require('../aws_s3.js');
 
-    var processFile = function( _userDataDir, _imageFileToProcess, _areaToCrop, _resizeTo, _osVersion, _callback1 ) {
+    var processFile = function( _userDataDir, _imageFileToProcess, _areaToCrop, _resizeTo, _callback1 ) {
         //var fileNameBody = _imageFileToProcess.substring(0, _imageFileToProcess.lastIndexOf(".") )
         var fileNameExt = _imageFileToProcess.substr( _imageFileToProcess.lastIndexOf('.')+1 );
         var fileToProcess = path.join( _userDataDir, _imageFileToProcess);
@@ -86,39 +86,6 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
             
         };
         
-        //Client side can correctly preview the image with EXIF tags now
-        /*
-        if ( _osVersion == "iOS_6.0" || _osVersion == "iOS_6.0.1" ) { //for subsampling issue of iOS 6.0 & 6.0.1
-            var fileRemovedProfile = path.join( _userDataDir, "temp_profile_removed."+fileNameExt );
-            
-            gm(fileToProcess)
-            .noProfile()
-            .write( fileRemovedProfile, function (err) {
-                if (!err) {
-                    cropAndResize( fileRemovedProfile, function() {
-                        fs.unlink(fileRemovedProfile);
-                        if (_callback1) {
-                            _callback1();
-                        }
-                    });
-                }
-                else  {
-                    logger.info(err);
-                    res.send( {err:'Fail to remove EXIF in image file: '+err } );
-                }
-            });
-        
-        
-        }
-        else {
-            cropAndResize( fileToProcess, function() {
-                if (_callback1) {
-                    _callback1();
-                }
-            });
-        
-        }
-        */
         
         cropAndResize( fileToProcess, function() {
             if (_callback1) {
@@ -210,7 +177,7 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
             resizeTo = { width: req.body.obj_OriginalWidth, height: req.body.obj_OriginalHeight};
             
             moveFile( tmp_path, target_path, function() { 
-                processFile( userDataDir, req.files.file.name, areaToCrop, resizeTo, req.body.osVersion, function() {
+                processFile( userDataDir, req.files.file.name, areaToCrop, resizeTo, function() {
                     //save to S3
                     var localPath = path.join( userDataDir, "_"+req.files.file.name);
                     var s3Path =  '/user_project/' + req.body.projectID + '/user_data/_'+ req.files.file.name;
