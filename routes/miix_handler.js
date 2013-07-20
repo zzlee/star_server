@@ -32,6 +32,32 @@ miixHandler.putBase64ImageUgcs_cb = function(req, res) {
     
 };
 
+//PUT /miix/video_ugcs/:ugcProjectId
+miixHandler.putVideoUgcs_cb = function(req, res) {
+    logger.info('[PUT '+req.path+'] is called');
+    
+    if (req.body.customizableObjects && req.body.ownerId && req.body.ownerFbUserId){
+
+        var ugcInfo = {
+                ownerId:{_id:req.body.ownerId, fbUserId: req.body.ownerFbUserId },
+                contentGenre: req.body.contentGenre,
+                customizableObjects: req.body.customizableObjects,
+                title: req.body.title
+        };
+        
+        miixContentMgr.preAddMiixMovie( req.params.ugcProjectId, ugcInfo, function(err){
+            if (!err){
+                res.send(200);
+            }
+            else {
+                logger.error('[PUT /miix/base64_image_ugcs/:ugcProjectId]: '+ err);
+                res.send(400, {error: err});
+            }
+        });
+    }
+    
+};
+
 //GET /miix/ugc_hightlights
 miixHandler.getUgcHighlights_cb = function(req, res) {
     logger.info('[GET '+req.path+'] is called');

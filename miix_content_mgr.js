@@ -34,8 +34,8 @@ var miixContentMgr = {};
 miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbID, movieTitle) {
     
     //console.log('generateMiixMoive is called.');
-    //var mediaType = "H.264";
-    var mediaType = "FLV";
+    var mediaType = "H.264";
+    //var mediaType = "FLV";
     
     aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, mediaType, function(responseParameters){
         
@@ -101,15 +101,136 @@ miixContentMgr.submitMiixMovieToDooh = function( doohID, miixMovieProjectID ) {
 
 
 /**
- * Add some info some preliminary info of Miix movie to UGC db while AE is rending its concrete content.<br>  
+ * Add some info some preliminary info of Miix movie to UGC db and ask AE Server to render Miix video.<br>  
  * <br>
  * These info are for clinet side to show some dummy icon for Miix movie which is under rendering
  * 
- * @param {String} doohID
- * @param {String} miixMovieProjectID
+ * @param {String} ugcProjectID Project ID of this UGC
+ * @param {Object} ugcInfo An object containing UGC info:
+ *     <ul>
+ *     <li>ownerId: ownerId An object containing owner's id info:
+ *         <ul>                                                                             
+ *         <li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)
+ *         <li>fbUserId: owner's Facebook user ID                                                    
+ *         </ul>                                                                            
+ *     <li>contentGenre: it is normally the template (id) that this UGC uses
+ *     <li>customizableObjects: a json string describing the customizable objects
+ *     <li>title: title of UGC. This title will be used when it is posted on YouTube
+ *     </ul>
+ * @param {Function} cbOfPreAddMiixMovie Callback function called when adding operation is done
  */
-miixContentMgr.preAddMiixMovie = function() {
+miixContentMgr.preAddMiixMovie = function(ugcProjectID, ugcInfo, cbOfPreAddMiixMovie) {
+    var movieProjectDir = path.join( workingPath, 'public/contents/user_project', ugcProjectID);
+    var userDataDir = path.join( movieProjectDir, 'user_data');
+    var userContentDescriptionFilePath = path.join( userDataDir, 'customized_content.xml');
+    var customizableObjects = JSON.parse(ugcInfo.customizableObjects);
+
+    async.series([
+        function(callback){
+            //generate user content description file customized_content.xml
+            var builder = require('xmlbuilder');
+            var userDataXml = builder.create('customized_content',{'version': '1.0', 'encoding': 'UTF-8', 'standalone': true});
+            userDataXml.ele('template_ID', ugcInfo.contentGenre);
+            var customizableObjectListXml = userDataXml.ele('customizable_object_list');
+            var customizableObjectXml = "";
+            
+
+            if( Object.prototype.toString.call( customizableObjects ) === '[object Array]' ) {
+                for (var i in customizableObjects) {
+                    //append the content in customized_content.xml
+                    customizableObjectXml = customizableObjectListXml.ele('customizable_object');
+                    customizableObjectXml.ele('ID', customizableObjects[i].ID );
+                    customizableObjectXml.ele('format', customizableObjects[i].format);
+                    customizableObjectXml.ele('content', "_"+customizableObjects[i].content);
+                }
+            }
+            else {
+                //append the content in customized_content.xml
+                customizableObjectXml = customizableObjectListXml.ele('customizable_object');
+                customizableObjectXml.ele('ID', customizableObjects.ID );
+                customizableObjectXml.ele('format', customizableObjects.format);
+                customizableObjectXml.ele('content', "_"+customizableObjects.content);
+            }
+            
+            //finalize customized_content.xml 
+            var xmlString = userDataXml.end({ 'pretty': true, 'indent': '  ', 'newline': '\n' });
+            //logger.info(userDataXml);
+            //TODO: create userDataDir if it does not exist 
+            if ( fs.existsSync(userDataDir) ) {
+                fs.writeFile(userContentDescriptionFilePath, xmlString, function(errOfWriteFile){
+                    if (!errOfWriteFile){
+                        callback(null);
+                    }
+                    else {
+                        callback("Failed to write to customized_content.xml: "+errOfWriteFile);
+                    }
+                }); 
+            }
+
+        },
+        function(callback){
+            //save customized_content.xml to S3 
+            var s3Path =  '/user_project/' + ugcProjectID + '/user_data/'+ "customized_content.xml";
+            awsS3.uploadToAwsS3(userContentDescriptionFilePath, s3Path, 'text/xml', function(errOfUploadToAwsS3, result){
+                if (!errOfUploadToAwsS3){
+                    callback(null);
+                }
+                else {
+                    callback("Failed to save customized_content.xml to S3: "+errOfUploadToAwsS3);
+                }
+            });
+        },
+        function(callback){
+            //Add UGC info to UGC db 
+            var vjson = {
+                    "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
+                    "projectId": ugcProjectID,
+                    "genre": "miix",
+                    "contentGenre": ugcInfo.contentGenre,
+                    "title": ugcInfo.title,
+                };
+
+            UGCDB.addUGC(vjson, function(errOfAddUGC, result){
+                if (!errOfAddUGC){
+                    callback(null);
+                }
+                else {
+                    callback("Failed to add UGC info to UGC db: "+errOfAddUGC);
+                }
+            });
+        },
+        function(callback){
+            //check if all the user data exist. If yes, start generating the movie in miixContentMgr.generateMiixMoive
+            //TODO: use async to better check file existance
+            var allUserContentExist = true;
+            if( Object.prototype.toString.call( customizableObjects ) === '[object Array]' ) {
+                for (var i in customizableObjects) {
+                    allUserContentExist = allUserContentExist && fs.existsSync( path.join( userDataDir, "_"+customizableObjects[i].content) );
+                }
+            }
+            else {
+                allUserContentExist = fs.existsSync( path.join( userDataDir, "_"+customizableObjects.content) );
+            }
+
+            if ( allUserContentExist ) {
+                logger.info('Start generating movie '+ ugcProjectID +'!');
+                miixContentMgr.generateMiixMoive(ugcProjectID, ugcInfo.ownerId._id, ugcInfo.ownerId.fbUserId, ugcInfo.title);
+                callback(null);
+            }
+            else {
+                callback("Cannot generate UGC because some or all user contents are missing.");
+            }
+        }
+    ],
+    function(err, results){
+        if (cbOfPreAddMiixMovie){
+            cbOfPreAddMiixMovie(err);
+        }
+    });
     
+    
+    
+
 };
 
 /**
@@ -194,7 +315,9 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
         }
     ],
     function(err, results){
-        cbOfAddMiixImage(err);
+        if (cbOfAddMiixImage){
+            cbOfAddMiixImage(err);
+        }
     });
 };
 
