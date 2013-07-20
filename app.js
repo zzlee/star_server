@@ -185,6 +185,8 @@ app.get('/miix/videos/new_videos', routes.api.newUGCList); //v1.2 only, to be DE
  * @name PUT /miix/video_ugcs/:ugcProjectId
  * @memberof miix
  */
+app.put('/miix/video_ugcs/:ugcProjectId', routes.miixHandler.putVideoUgcs_cb);
+
 app.post('/miix/videos/miix_videos', routes.api.submitAUGC); //v1.2
 
 app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh); //v1.2 only.  In v2.0, all UGCs are to be played on a DOOH
