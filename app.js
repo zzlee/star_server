@@ -614,6 +614,9 @@ app.post('/internal/dooh_periodic_data', routes.doohHandler.importPeriodicData);
 app.get('/internal/dooh_current_video', routes.doohHandler.dooh_current_UGC);
 app.post('/internal/dooh_timeslot_rawdata', routes.timeDataGet);
 
+//GET push html to dooh player and trigger story camera.
+app.get('/internal/dooh/stream_video_trigger', routes.doohHandler.streamVideoTrigger);
+
 
 //FM.API
 app.get('/api/eventsOfWaiting', routes.api.eventsOfWaiting); //not used in MiixCard v1.0 or later
