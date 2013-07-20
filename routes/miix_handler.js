@@ -61,7 +61,7 @@ miixHandler.putVideoUgcs_cb = function(req, res) {
 //GET /miix/ugc_hightlights
 miixHandler.getUgcHighlights_cb = function(req, res) {
     logger.info('[GET '+req.path+'] is called');
-    console.log('[GET '+req.path+'] is called');
+    //console.log('[GET '+req.path+'] is called');
     
     var limit = 0;
     if (req.query.limit){
@@ -85,7 +85,7 @@ miixHandler.getUgcHighlights_cb = function(req, res) {
 //GET /miix/members/:memberId/ugcs
 miixHandler.getUgcs_cb = function(req, res) {
     logger.info('[GET '+req.path+'] is called');
-    console.log('[GET '+req.path+'] is called');
+    //console.log('[GET '+req.path+'] is called');
     
     var limit = 0;
     if (req.query.limit){
