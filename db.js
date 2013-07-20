@@ -171,12 +171,13 @@ FM.DB = (function(){
         
         var ProgramTimeSlotSchema = new Schema({
             content: {type: Mixed},
-            contentType: {type: String, enum: programTimeSlotContnetType}, //file or web_page
+            contentType: {type: String, enum: programTimeSlotContnetType, default: 'file'}, //file or web_page
             dooh: {type: String},
             timeslot: { 
-                start: Number, 
-                end: Number, 
-                startHour: Number 
+                start: Number,  //milliseconds since midnight Jan 1, 1970
+                end: Number, //milliseconds since midnight Jan 1, 1970
+                playDuration: Number,  //milliseconds.  This value is normally used by image or web content
+                startHour: Number //0~23
                 },
             timeStamp: {type: String},
             //status: {type: String, enum: programTimeSlotStatus}

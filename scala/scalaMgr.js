@@ -116,11 +116,13 @@ function scalaMgr( url, account ){
     /**
      * Add item in timeslot to server.
      * 
-     * @param {object} item The item upload to scala server.
-     *     @param {string} path The path is file path.
-     *     @param {string} filename The filename is file title.
-     * @param {string} playTime The playTime is program play to DOOH in specific time.
-     * @param {function} reportStatus_cb Report media id and playlistItem id in playlist.
+     * @param {Object} item The item upload to scala server.
+     *     <ul>
+     *     <li> path: The path is file path.
+     *     <li> filename: The filename is file title.
+     *     </ul>
+     * @param {Object} playTime The playTime is program play to DOOH in specific time.
+     * @param {Function} reportStatus_cb Report media id and playlistItem id in playlist.
      */
     var setItemToPlaylist = function( file, playTime, reportStatus_cb ){
         

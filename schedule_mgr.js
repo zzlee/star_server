@@ -24,8 +24,10 @@ var candidateUgcCacheModel = db.getDocModel("candidateUgcCache");
  * @mixin
  */
 var scheduleMgr = {};
-
+var STAR_SERVER_URL = "http://192.168.5.102";  //TODO: make this configurable? 
 var DEFAULT_PROGRAM_PERIOD = 10*60*1000; //10 min
+var DEFAULT_PLAY_DURATION_FOR_STATIC_UGC = 7*1000; //7 sec.  
+var DEFAULT_PLAY_DURATION_FOR_STATIC_PADDING = 2*1000; //2 sec.   
 var TIME_INTERVAL_RANKIGN = [{startHour: 17, endHour: 23},  //start with the time interval with highest ranking
                              {startHour: 8, endHour: 16},
                              {startHour: 0, endHour: 7}];
@@ -56,21 +58,22 @@ var programPlanningPattern =(function(){
 })();
 
 
+
 var paddingContent =(function(){ 
     var PADDING_CONTENT_TABLE = {
-            miix_it: [{dir: "contents/padding_content", file:"miix01.jpg", format:"image"},
+            miix_it: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/dooh_playing_html", format:"web_page"},
                    {dir: "contents/padding_content", file:"miix02.jpg", format:"image"}],
-            cultural_and_creative: [{dir: "contents/padding_content", file:"cc01.jpg", format:"image"},
+            cultural_and_creative: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/dooh_playing_html", format:"web_page"},
                                     {dir: "contents/padding_content", file:"cc02.jpg", format:"image"},
                                     {dir: "contents/padding_content", file:"cc03.jpg", format:"image"},
                                     {dir: "contents/padding_content", file:"cc04.jpg", format:"image"}
                                     ],
-            mood: [{dir: "contents/padding_content", file:"mood01.jpg", format:"image"},
+            mood: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/dooh_playing_html", format:"web_page"},
                    {dir: "contents/padding_content", file:"mood02.jpg", format:"image"},
                    {dir: "contents/padding_content", file:"mood03.jpg", format:"image"},
                    {dir: "contents/padding_content", file:"mood04.jpg", format:"image"}
                    ],
-            check_in: [{dir: "contents/padding_content", file:"check_in01.jpg", format:"image"},
+            check_in: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/dooh_playing_html", format:"web_page"},
                        {dir: "contents/padding_content", file:"check_in02.jpg", format:"image"},
                        {dir: "contents/padding_content", file:"check_in03.jpg", format:"image"},
                        {dir: "contents/padding_content", file:"check_in04.jpg", format:"image"}
@@ -283,10 +286,12 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                             }
                         }
                         
+                        var playDuration = 0;
+                        if ( selectedUgc.genre == "miix_image"){
+                            playDuration = DEFAULT_PLAY_DURATION_FOR_STATIC_UGC;
+                        }
                         var _selectedUgc = JSON.parse(JSON.stringify(selectedUgc)); //clone selectedUgc object to prevent from a strange error "RangeError: Maximum call stack size exceeded"
-                        
-                        //debugger;
-                        db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"content": _selectedUgc }, function(_err_2, result){
+                        db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"content": _selectedUgc, "timeslot.playDuration": playDuration }, function(_err_2, result){
                             counter++;
                             //console.dir(result);
                             interationDone_cb2(_err_2);
@@ -369,6 +374,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             
             var ProgramTimeSlot = programTimeSlotModel;
             var vjsonDefault = {
+                    contentType: "file",
                     dooh: dooh,
                     timeslot: {
                         start: interval.start, 
@@ -408,7 +414,10 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                           function(callback2){
                               // put padding program 0
                               var aProgramTimeSlot = new ProgramTimeSlot(vjsonDefault);
+                              aProgramTimeSlot.type = 'padding';
+                              aProgramTimeSlot.contentType = web_page;
                               aProgramTimeSlot.content = paddingContents[0];
+                              aProgramTimeSlot.timeslot.playDuration = DEFAULT_PLAY_DURATION_FOR_STATIC_PADDING;
                               aProgramTimeSlot.timeStamp = interval.start + '-' + pad(timeStampIndex, 3);
                               timeStampIndex++;
                               aProgramTimeSlot.markModified('content');
@@ -440,6 +449,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                                                     aProgramTimeSlot.type = 'padding';
                                                     aProgramTimeSlot.content = paddingContents[indexOfUgcContents+1];
                                                     aProgramTimeSlot.markModified('content');
+                                                    aProgramTimeSlot.timeslot.playDuration = DEFAULT_PLAY_DURATION_FOR_STATIC_PADDING;
                                                     aProgramTimeSlot.timeStamp = interval.start + '-' + pad(timeStampIndex, 3);
                                                     timeStampIndex++;
                                                     aProgramTimeSlot.save(function(err3, _result){     
@@ -800,71 +810,105 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
             //push each programs to Scala
             var iteratorPushAProgram = function(aProgram, callbackIterator){
                 
-                async.waterfall([
-                    function(callback){
-                        //download contents from S3
-                        var fileName;
-                        if (aProgram.type == "UGC"){
-                            var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+aProgram.content.fileExtension; 
-                            //TODO: make sure that target directory exists
-                            var targetLocalPath = path.join(workingPath, 'public/contents/temp', aProgram.content.projectId+aProgram.content.fileExtension);
-                            awsS3.downloadFromAwsS3(targetLocalPath, s3Path, function(errS3,resultS3){
-                                if (!errS3){
-                                    logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully download from S3 ' + s3Path );
-                                    //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully download from S3 ' + s3Path );
-                                    callback(null, targetLocalPath, aProgram.timeslot);
+                if (aProgram.contentType == "file" ) {
+                    
+                    async.waterfall([
+                        function(callback){
+                            //download contents from S3 or get from local
+                            var fileName;
+                            if (aProgram.type == "UGC"){
+                                var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+aProgram.content.fileExtension; 
+                                //TODO: make sure that target directory exists
+                                var targetLocalPath = path.join(workingPath, 'public/contents/temp', aProgram.content.projectId+aProgram.content.fileExtension);
+                                awsS3.downloadFromAwsS3(targetLocalPath, s3Path, function(errS3,resultS3){
+                                    if (!errS3){
+                                        logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully download from S3 ' + s3Path );
+                                        //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully download from S3 ' + s3Path );
+                                        callback(null, targetLocalPath, aProgram.timeslot);
+                                    }
+                                    else{
+                                        logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Failed to download from S3 ' + s3Path);
+                                        //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Failed to download from S3 ' + s3Path);
+                                        callback('Failed to download from S3 '+s3Path+' :'+errS3, null, null);
+                                    }
+                                    
+                                });
+    
+                            }
+                            else {
+                                var paddingFilePath = path.join(workingPath, 'public', aProgram.content.dir, aProgram.content.file);
+                                callback(null, paddingFilePath, aProgram.timeslot);
+                            }
+    
+                        }, 
+                        function(fileToPlay, timeslot, callback){
+                            debugger;
+                            //push content to Scala
+                            var file = {
+                                    name : path.basename(fileToPlay),
+                                    path : path.dirname(fileToPlay),
+                                    savepath : ''
+                                };
+                            var playTime = {
+                                    start: timeslot.start,
+                                    end: timeslot.end,
+                                    duration: timeslot.playDuration/1000  //sec    
+                            };
+                            scalaMgr.setItemToPlaylist( file, playTime, function(errScala, resultScala){
+                                if (!errScala){
+                                    logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + fileToPlay );
+                                    //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + fileToPlay );
+                                    callback(null, fileToPlay);
                                 }
                                 else{
-                                    logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Failed to download from S3 ' + s3Path);
-                                    //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Failed to download from S3 ' + s3Path);
-                                    callback('Failed to download from S3 '+s3Path+' :'+errS3, null, null);
+                                    logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + fileToPlay );
+                                    //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + fileToPlay );
+                                    callback('Failed to push content to Scala :'+errScala, null);
                                 }
-                                
                             });
-
-                        }
-                        else {
-                            var paddingFilePath = path.join(workingPath, 'public', aProgram.content.dir, aProgram.content.file);
-                            callback(null, paddingFilePath, aProgram.timeslot);
-                        }
-
-                    }, 
-                    function(fileToPlay, timeslot, callback){
-                        debugger;
-                        //push content to Scala
-                        var file = {
-                                name : path.basename(fileToPlay),
-                                path : path.dirname(fileToPlay),
-                                savepath : ''
-                            };
-                        scalaMgr.setItemToPlaylist( file, timeslot, function(errScala, resultScala){
+                            
+                            //callback(null, fileToPlay);
+                        },
+                        function(filePlayed, callback){
+                            //TODO: delete downloaded contents from local drive
+                            callback(null,'done');
+                        }, 
+                    ], function (errWaterfall, resultWaterfall) {
+                        // result now equals 'done' 
+                        callbackIterator(errWaterfall);
+                    });
+                    
+                }
+                else {
+                    //contentType is "web_page"
+                    if (aProgram.content.uri){
+                        
+                        var web = { name: aProgram.content.name , uri: aProgram.content.uri };
+                        var playTime = {
+                                start: aProgram.timeslot.start,
+                                end: aProgram.timeslot.end,
+                                duration: aProgram.timeslot.playDuration/1000  //sec    
+                        };
+                        scalaMgr.setWebpageToPlaylist( web, playTime, function(errScala, resultScala){
                             if (!errScala){
-                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + fileToPlay );
-                                //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + fileToPlay );
+                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + web.uri );
+                                //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + web.uri );
                                 callback(null, fileToPlay);
                             }
                             else{
-                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + fileToPlay );
-                                //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + fileToPlay );
+                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + web.uri );
+                                //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + web.uri );
                                 callback('Failed to push content to Scala :'+errScala, null);
                             }
                         });
-                        
-                        //callback(null, fileToPlay);
-                    },
-                    function(filePlayed, callback){
-                        //TODO: delete downloaded contents from local drive
-                        callback(null,'done');
-                    }, 
-                ], function (errWaterfall, resultWaterfall) {
-                    // result now equals 'done' 
-                    callbackIterator(errWaterfall);
-                });
+                    }
+                }
                 
             };
             async.eachSeries(programs, iteratorPushAProgram, function(errEachSeries){
                 cb2(errEachSeries);
             });
+            
 
         },
         function(cb3){
@@ -951,6 +995,7 @@ scheduleMgr.setUgcToProgram = function( programTimeSlotId, ugcReferenceNo, set_c
             var oidOfprogramTimeSlot = mongoose.Types.ObjectId(programTimeSlotId);
             var _ugc = JSON.parse(JSON.stringify(ugc)); //clone ugc object due to strange error "RangeError: Maximum call stack size exceeded"
             
+            //TODO: Shall we have some protection here in case the user choose an UGC with different genra (This will normally introduce different paly duration
             db.updateAdoc(programTimeSlotModel, oidOfprogramTimeSlot, {"content": _ugc }, function(err2, result){
                 if (set_cb){
                     set_cb(err2, ugc._id);
