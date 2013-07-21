@@ -53,6 +53,20 @@ var programPlanningPattern =(function(){
         
         set: function(_programSequence){
             programSequence = _programSequence;
+        },
+        
+        getProgramSequence: function(){
+            return programSequence;    
+        },
+        
+        remove: function(contentGenreToRemove){
+            for (var i=0; i<programSequence.length; i++){
+                if (programSequence[i]==contentGenreToRemove){
+                    programSequence.splice(i, 1);
+                    i--;
+                }
+            }
+            
         }
     };
 })();
@@ -664,7 +678,26 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         },
         function(callback){
             //TODO: check the content genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
-
+            var programSequence = programPlanningPattern.getProgramSequence();
+            var found = false;
+            var genresToRemove = [];
+            for (var i=0;i<programSequence.length;i++){
+                found = false;
+                for (var j=0;j<sortedUgcList.length;j++){
+                    if (sortedUgcList[j].contentGenre == programSequence[i]){
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found){
+                    genresToRemove.push(programSequence[i]);
+                }
+            }
+            for (var k=0;k<genresToRemove.length;k++){
+                programPlanningPattern.remove(genresToRemove[k]);
+            }
+            
+            
             callback(null);
         },
         function(callback){
