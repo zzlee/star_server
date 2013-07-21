@@ -244,18 +244,16 @@ FM.DB = (function(){
          //kaiser end ***************		
         var CustomerServiceItemSchema = new Schema({
             fb_id: {type: String},
+            fb_userName: {type: String},
             ownerId: { _id:ObjectID, userID: String },
             no: {type: Number},
-            genre: {type: String, enum: questionGenre},
+            genre: {type: String, enum: questionGenre},//account publish sign_in others
             reply: {type: Boolean, default:false },
             phoneVersion: { type: String },
-            createdOn: {type: Date, default: Date.now},
-            content: {
-                question: String,
-                questionTime: Date,
-                answer: String,
-                answerTime: Date,
-            },                                  
+            question: String,
+            questionTime: {type: Date, default: Date.now},
+            answer: String,
+            answerTime: Date,                                
             remarks: {type: String}
         }); //   customerService collection
 		

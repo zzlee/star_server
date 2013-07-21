@@ -4,12 +4,10 @@ form#messageform(action='')
             if(serviceQuestionList)
                 each service, i in serviceQuestionList
                     .message
-                      td #{service.content.question}
-                      p
-                        strong John Doe
-                        em  20130205 14:30
+                      p #{service.question}
+                      p #{service.fb_userName} #{service.questionTime}
                     .reply
-                      td #{service.content.answer}
-                      p
-                        strong Dora Su
-                        em  20130205 14:30
+                      p #{service.answer}
+                      if(service.answerTime)
+                         p admin #{service.answerTime}
+

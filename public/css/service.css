@@ -698,7 +698,7 @@ float: left;
 }
 
 .message_list {
-height: 250px;
+height: 150px;
 overflow-x:hidden;
 overflow-y: scroll;
 }
@@ -904,7 +904,37 @@ padding: 10px 0;
 text-indent: 40px;
 font-size: 14px;}
 
-#main .module.width_3_quarter .tab_container #tab1 .tablesorter tbody tr td .label.label-account {
+.label-account {
+	background-color: #669533;
+	color: rgba(255,255,255,1);
+	padding: 3px;
+}
+.label-publish {
+	background-color: rgba(153,0,0,1);
+	padding: 3px;
+	color: rgba(255,255,255,1);
+}
+.label-login {
+	color: rgba(255,255,255,1);
+	background-color: rgba(0,102,255,1);
+	padding: 3px;
+}
+.label-others{
+	background-color: #D9DC00;
+	color: rgba(255,255,255,1);
+	padding: 3px;
+}
+.label-unreply{
+	color: rgba(255,255,255,1);
+	background-color: rgba(0,0,0,1);
+	padding: 3px;
+}
+.label-reply{
+	color: rgba(255,255,255,1);
+	background-color: rgba(153,153,153,1);
+	padding: 3px;
+}
+#main .module.width_3_quarter .tab_container #tab1 .tablesorter tbody tr td .label-account {
 	background-color: #669533;
 	color: rgba(255,255,255,1);
 	padding: 3px;

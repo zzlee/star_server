@@ -29,29 +29,40 @@ FM.service.get_cb = function(req, res){
 };
 
 FM.service.getCustomerServiceItems_get_cb = function(req, res){
-    console.log('getCustomerServiceItems_get_cb');
-    
-    var _id;
-    var condition;
-    var field;
+//    console.log('getCustomerServiceItems_get_cb');
+//    console.dir(req);
+//    console.dir(req.query.condition);
+    var _id = null;
+    var condition = req.query.condition;
+    var field = null;
     var type = req.query.type;
-    console.log('----type'+type+req.params.member_id);
+//    console.log('----type'+type+req.params.member_id);
     var pageLimit=9;
     var pageSkip=0;
+    
     if(req.params.member_id)
         condition = { 'ownerId._id' :req.params.member_id};
     
-    service_mgr.getCustomerService(_id, condition, field, pageLimit, pageSkip, function(err, result){
+    service_mgr.getCustomerServiceItem(_id, condition, field, pageLimit, pageSkip, function(err, result){
         if(!err){
-          console.log(result);
-//          res.send(200, {message: type});
-          if(type == 'table')
-          res.render( 'table_service', {serviceQuestionList: result} );
-          if(type == 'list')
-          res.render( 'list_service', {serviceQuestionList: result} );
-          }
-        else
+//            console.log(result);
+            switch (type)
+            {
+            case 'table':
+                res.render( 'table_service', {serviceQuestionList: result} );
+                break;
+            case 'list':
+                res.render( 'list_service', {serviceQuestionList: result} );
+                break;
+            default:
+                res.send(200, {message: result});
+            }
+        }
+        
+        else{
           console.log(err);
+          res.send(400, {error: "Parameters are not correct"});
+        }
         });
 //  var testArray =
 //  [
@@ -65,22 +76,61 @@ FM.service.getCustomerServiceItems_get_cb = function(req, res){
 };
 
 FM.service.createCustomerServiceItems_get_cb = function(req, res){
+    
+    if(req.params.member_id){
     var vjson = {
             ownerId : {_id : req.params.member_id},
             genre : req.body.genre,
             phoneVersion : req.body.phoneVersion,
-            content: { question : req.body.question},
+            question : req.body.question
             };
+    }
     console.log('createCustomerServiceItems_get_cb');
     service_mgr.createCustomerServiceItem(vjson, function(err, result){
         if(!err){
-            console.log('createItems'+result);
+            res.send(200, {message: 'ok'});
+//            console.log('createItems'+result);
             }
-          else
+          else{
             console.log('createItems'+err);
+            res.send(400, {error: "Parameters are not correct"});
+          }
           });
 
 };
 
+FM.service.updateCustomerServiceItems_get_cb = function(req, res){
+    
+    
+     _id = req.body._id;
+     vjson = req.body.vjson;
+    if(req.body.answer){
+        vjson = {
+                  answer: req.body.answer,
+                  answerTime: new Date(),
+                  reply: true
+        };
+    }
+    if(req.body.answer === ''){
+        vjson = {
+                answer: req.body.answer,
+                answerTime: new Date(),
+                reply: false
+        };
+    }
+    
+    console.log('updateCustomerServiceItems_get_cb'+_id+JSON.stringify(vjson));
+    service_mgr.updateCustomerServiceItem(_id, vjson, function(err, result){
+        if(!err){
+            res.send(200, {message: 'ok'});
+//            console.log('updateItems'+result);
+            }
+          else{
+            console.log('updateItems'+err);
+            res.send(400, {error: "Parameters are not correct"});
+          }
+          });
+
+};
 
 module.exports = FM.service;

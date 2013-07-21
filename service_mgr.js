@@ -5,7 +5,8 @@
 var db = require('./db.js');
 var async = require('async');
 
-var customerServiceSlotModel = db.getDocModel("customerServiceItem");
+var customerServiceItemModel = db.getDocModel("customerServiceItem");
+var memberModel = db.getDocModel("member");
 
 /**
  * The manager who handles the customer service
@@ -34,11 +35,27 @@ serviceMgr.createCustomerServiceItem = function(vjson, cb ){
 //    var arr = [question];
 //    arr.push(question);
 //    var questiona = [{question :'I cannot sign in the app What can I do?'}];
-
-
-    db.createAdoc(customerServiceSlotModel , vjson, function(err,result){
-        cb(err, result); 
+    console.log('+++'+JSON.stringify(vjson));
+//    var field = 'fb fb.userName fb.userID';
+    var field;
+    db.listOfdocModels( memberModel, {_id: vjson.ownerId}, field, null, function(err, result){
+        if(!err){
+            console.log('---'+result[0].fb.userID);
+            newVjson = {
+                    ownerId: vjson._id,
+                    genre: vjson.genre,
+                    phoneVersion: vjson.phoneVersion,
+                    question: vjson.question,
+                    fb_userName: result[0].fb.userName,
+                    fb_id: result[0].fb.userID
+            };
+            db.createAdoc(customerServiceItemModel , newVjson, function(err,result){
+                cb(err, result); 
+            });
+        }
+        else cb(err, result); 
     });
+
     
 };
 //test
@@ -46,15 +63,13 @@ serviceMgr.createCustomerServiceItem = function(vjson, cb ){
 //var question_1 = {question:'no respond'};
 //var question_2 = {question:'bug'};
 //var question = [question_1, question_2];
-//var vjson = {
-//        fb_id : fb_id,
-//        no : 2,
-//        genre : {type:'account'},
-//        reply : {type: false},
-//        version : 'iPhone 6.0.1',
-//        content: question
-//        };
-//serviceMgr.addCustomerQuestion(fb_id, vjson, function(err, result){
+var vjson = {
+        ownerId : '51d38ca086fa21440a000002',
+        genre : 'publish',
+        phoneVersion : 'iPhone 6.0.1',
+        question : 'zzz'
+        };
+//serviceMgr.createCustomerServiceItem(vjson, function(err, result){
 //    if(!err)
 //        console.log(result);
 //    else
@@ -78,9 +93,9 @@ serviceMgr.createCustomerServiceItem = function(vjson, cb ){
  *     <li>err: error message if any error happens
  *     </ul>
  */
-serviceMgr.updateCustomerQuestion = function(_id, vjson, cb ){
+serviceMgr.updateCustomerServiceItem = function(_id, vjson, cb ){
     
-    db.updateAdoc(customerServiceSlotModel,_id, vjson, function(err, result){
+    db.updateAdoc(customerServiceItemModel,_id, vjson, function(err, result){
         cb(err, result); 
     });
     
@@ -122,11 +137,11 @@ var vjson = {
  *     <li>err: error message if any error happens
  *     </ul>
  */
-serviceMgr.getCustomerService= function(_id, condition, field, pageLimit, pageSkip, cb ){
+serviceMgr.getCustomerServiceItem= function(_id, condition, field, pageLimit, pageSkip, cb ){
     
     
-//    db.listOfdocModels( customerServiceSlotModel, condition, field, {sort :'no', limit: pageLimit , skip: pageSkip}, function(err, result){
-    db.listOfdocModels( customerServiceSlotModel, condition, field, {sort :'no'}, function(err, result){
+//    db.listOfdocModels( customerServiceItemModel, condition, field, {sort :'no', limit: pageLimit , skip: pageSkip}, function(err, result){
+    db.listOfdocModels( customerServiceItemModel, condition, field, {sort :'no'}, function(err, result){
         cb(err, result); 
     });
     
@@ -138,12 +153,12 @@ var field2 = 'fb_id no genre reply version';
 var pageLimit;
 var pageSkip;
 
-serviceMgr.getCustomerService(_id, condition, field, pageLimit, pageSkip, function(err, result){
-if(!err)
-  console.log('------------'+result);
-else
-  console.log(err);
-});
+//serviceMgr.getCustomerService(_id, condition, field, pageLimit, pageSkip, function(err, result){
+//if(!err)
+//  console.log('------------'+result);
+//else
+//  console.log(err);
+//});
 /**
  * get customer service list from feltmeng db.<br>
  * <br>
@@ -160,7 +175,7 @@ serviceMgr.getCustomerServiceList = function(fb_id, cb ){
     
 };
 
-
+//TODO admin and message count
 
 
 module.exports = serviceMgr;

@@ -389,6 +389,7 @@ app.get('/miix_service/:member_id/questions', routes.authorizationHandler.checkA
 //    
 //});
 app.post('/miix_service/:member_id/questions', routes.service.createCustomerServiceItems_get_cb);
+app.put('/miix_service/questions', routes.service.updateCustomerServiceItems_get_cb);
 
 app.get('/miix_service', routes.service.get_cb);
 app.get('/miix_service/customer_service_items', routes.service.getCustomerServiceItems_get_cb);
