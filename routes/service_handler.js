@@ -30,19 +30,20 @@ FM.service.get_cb = function(req, res){
 
 FM.service.getCustomerServiceItems_get_cb = function(req, res){
 //  console.dir(req);
-//  console.log('----type'+type+req.params.member_id);
     var condition = req.query.condition;
     var field = req.query.field;
     var type = req.query.type;
-    var pageLimit;
-    var pageSkip;
+    
+    //TODO pagination
+    var pageLimit=0;
+    var pageSkip=0;
 
     if(req.params.member_id)
-        condition = { 'ownerId._id' :req.params.member_id};
-
+        condition = { 'ownerId._id': req.params.member_id};
+    
     service_mgr.getCustomerServiceItem(condition, field, pageLimit, pageSkip, function(err, result){
         if(!err){
-//          console.log(result);
+//          console.log('getCustomerServiceItem'+result);
             switch (type)
             {
             case 'table':
@@ -61,15 +62,6 @@ FM.service.getCustomerServiceItems_get_cb = function(req, res){
             res.send(400, {error: "Parameters are not correct"});
         }
     });
-//  var testArray =
-//  [
-//  {
-//  userName: 'kaiser tsai', //影片編號
-//  phoneVersion: '0.0.1', //FB讚次數
-//  createdOn: '2013/07/18' //觀看次數
-//  }
-//  ];
-//  res.render( 'service', {serviceQuestionList: testArray} );
 };
 
 FM.service.createCustomerServiceItems_get_cb = function(req, res){
@@ -82,7 +74,6 @@ FM.service.createCustomerServiceItems_get_cb = function(req, res){
                 question : req.body.question
         };
     }
-    console.log('createCustomerServiceItems_get_cb');
     service_mgr.createCustomerServiceItem(vjson, function(err, result){
         if(!err){
             res.send(200, {message: 'ok'});
@@ -97,7 +88,6 @@ FM.service.createCustomerServiceItems_get_cb = function(req, res){
 };
 
 FM.service.updateCustomerServiceItems_get_cb = function(req, res){
-
 
     _id = req.body._id;
     vjson = req.body.vjson;
@@ -123,7 +113,6 @@ FM.service.updateCustomerServiceItems_get_cb = function(req, res){
 //          console.log('updateItems'+result);
         }
         else{
-//          console.log('updateItems'+err);
             res.send(400, {error: "Parameters are not correct"});
         }
     });

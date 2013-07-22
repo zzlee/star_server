@@ -32,12 +32,10 @@ var serviceMgr = {};
  */
 serviceMgr.createCustomerServiceItem = function(vjson, cb ){
 
-//    console.log('+++'+JSON.stringify(vjson));
-    var field;
-    db.listOfdocModels( memberModel, {_id: vjson.ownerId}, field, null, function(err, result){
+    db.listOfdocModels( memberModel, {_id: vjson.ownerId._id}, null, null, function(err, result){
         if(!err){
             newVjson = {
-                    ownerId: vjson._id,
+                    ownerId: {_id: vjson.ownerId._id},
                     genre: vjson.genre,
                     phoneVersion: vjson.phoneVersion,
                     question: vjson.question,
@@ -53,19 +51,6 @@ serviceMgr.createCustomerServiceItem = function(vjson, cb ){
 
     
 };
-//test
-//var vjson = {
-//        ownerId : '51d38ca086fa21440a000002',
-//        genre : 'publish',
-//        phoneVersion : 'iPhone 6.0.1',
-//        question : 'zzz'
-//        };
-//serviceMgr.createCustomerServiceItem(vjson, function(err, result){
-//    if(!err)
-//        console.log(result);
-//    else
-//        console.log(err);
-//});
 
 /**
  * update field to feltmeng db.<br>
@@ -91,28 +76,6 @@ serviceMgr.updateCustomerServiceItem = function(_id, vjson, cb ){
     });
     
 };
-//test
-//var _id = '51e63c7f8614786018000003';
-//var date = new Date();
-//var question_1 = {question:'I cannot sign in the app What can I do?',
-//                  questionTime:date,
-//                  answer:'ok',
-//                  answerTime:date};
-//var question_2 = {question:'I get error message',
-//                  questionTime:date};
-//var question_3 = {question:'no~~~~~',
-//                  questionTime:date};
-//var answer_1 ={answer:'ok'};
-//var question = [question_1, question_2, question_3];
-//var vjson = {
-//        content: question
-//        };
-//serviceMgr.updateCustomerQuestion(_id, vjson, function(err, result){
-//    if(!err)
-//        console.log(result);
-//    else
-//        console.log(err);
-//});
 
 /**
  * get customer question and answer from feltmeng db.<br>
@@ -130,23 +93,13 @@ serviceMgr.updateCustomerServiceItem = function(_id, vjson, cb ){
  */
 serviceMgr.getCustomerServiceItem= function(condition, field, pageLimit, pageSkip, cb ){
     
-    
+  //TODO pagination
 //    db.listOfdocModels( customerServiceItemModel, condition, field, {sort :'no', limit: pageLimit , skip: pageSkip}, function(err, result){
-    db.listOfdocModels( customerServiceItemModel, condition, field, {sort :'no'}, function(err, result){
+    db.listOfdocModels( customerServiceItemModel, condition, field, {sort :{'questionTime':-1}}, function(err, result){
         cb(err, result); 
     });
     
 };
-var condition = { 'ownerId._id': '51d38ca086fa21440a000002'};
-//var field;
-//var pageLimit;
-//var pageSkip;
-//serviceMgr.getCustomerService(_id, condition, field, pageLimit, pageSkip, function(err, result){
-//if(!err)
-//  console.log('------------'+result);
-//else
-//  console.log(err);
-//});
 
 /**
  * get customer service list from feltmeng db.<br>
