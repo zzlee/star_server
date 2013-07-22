@@ -4,9 +4,9 @@ FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JS
 
 var FM = { censorHandler: {} };
 
-var censor_mgr = require("../censor_mgr.js");
+var censorMgr = require("../censor_mgr.js");
 var apis = require("../routes/api.js");
-var schedule_mgr = require("../schedule_mgr.js");
+var scheduleMgr = require("../schedule_mgr.js");
 
 var sessionId = null;
 
@@ -60,7 +60,7 @@ FM.censorHandler.getUGCList_get_cb = function(req,res){
     limit = req.query.limit;
     skip = req.query.skip;
 
-    censor_mgr.getUGCList(condition, sort, limit, skip, function(err, UGCList){
+    censorMgr.getUGCList(condition, sort, limit, skip, function(err, UGCList){
         if (!err){
             res.render( 'table_censorUGC', {ugcCensorMovieList: UGCList} );
         }
@@ -84,7 +84,7 @@ FM.censorHandler.setUGCAttribute_get_cb = function(req,res){
     var no = req.body.no;
     var vjson = req.body.vjson;
 
-    censor_mgr.setUGCAttribute(no, vjson, function(err, result){
+    censorMgr.setUGCAttribute(no, vjson, function(err, result){
         if (!err){
             res.send(200, {message:result});
         }
@@ -110,7 +110,7 @@ FM.censorHandler.createTimeslots_get_cb = function(req, res){
     var programSequence = req.body.programSequence;
 
 
-    schedule_mgr.createProgramList(doohId, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, function(err, result){
+    scheduleMgr.createProgramList(doohId, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, function(err, result){
         if (!err){
             sessionId = result.sessionId;
             res.send(200, {message: JSON.stringify(result.sessionId)});
@@ -125,9 +125,7 @@ FM.censorHandler.createTimeslots_get_cb = function(req, res){
 
 FM.censorHandler.gettimeslots_get_cb = function(req, res){
 
-//  var doohId = req.params.doohId;
-    var doohId = 'taipeiarena';
-    var interval = {start: 1367710220000, end: 1371862000000};
+    var sessionId = req.query.sessionId;
     var limit = req.query.limit;
     var skip = req.query.skip;
     var testArray = [];
@@ -137,15 +135,27 @@ FM.censorHandler.gettimeslots_get_cb = function(req, res){
     }
 
 
-    schedule_mgr.getProgramList(doohId, interval, limit, skip, updateUGC, function(err, result){
+    scheduleMgr.getProgramList(doohId, interval, limit, skip, updateUGC, function(err, programList){
         if (!err){
-            if(result)
-                res.render( 'table_censorPlayList', {ugcCensorPlayList: result} );
-//          res.send(200, {message:result});
+            
+            if (programList.length > 0){
+                censorMgr.getPlayList(programList , updateUGC, function(errGetPlayList, result){
+                    if (!errGetPlayList){
+                        res.render( 'table_censorPlayList', {ugcCensorPlayList: result} );
+                    }
+                    else 
+                        res.send(400, {error: err});
+                });
+                
+            }
+            else {
+                res.render( 'table_censorPlayList', {ugcCensorPlayList: []} );
+            }
+            
         }
         else{
-            res.render( 'table_censorPlayList', {ugcCensorPlayList: testArray} );
-//          res.send(400, {error: err});
+            //res.render( 'table_censorPlayList', {ugcCensorPlayList: testArray} );
+          res.send(400, {error: err});
         }
     });
 
@@ -165,7 +175,7 @@ FM.censorHandler.gettimeslots_get_cb = function(req, res){
 
 FM.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
 
-    schedule_mgr.pushProgramsTo3rdPartyContentMgr(sessionId, function(err, result){
+    scheduleMgr.pushProgramsTo3rdPartyContentMgr(sessionId, function(err, result){
         if (!err){
             //TODO pushProgramsTo3rdPartyContentMgr
         }
@@ -183,7 +193,7 @@ FM.censorHandler.updatetimeslots_get_cb = function(req, res){
 
 
     if(req.body.type == 'removeUgcfromProgramAndAutoSetNewOne'){
-        schedule_mgr.removeUgcfromProgramAndAutoSetNewOne(sessionId, programTimeSlot, function(err, result){
+        scheduleMgr.removeUgcfromProgramAndAutoSetNewOne(sessionId, programTimeSlot, function(err, result){
             if (!err){
                 res.send(200, {message: result});
             }
@@ -195,7 +205,7 @@ FM.censorHandler.updatetimeslots_get_cb = function(req, res){
 
     if(req.body.type == 'setUgcToProgram'){
         
-        schedule_mgr.setUgcToProgram(programTimeSlot, ugcReferenceNo, function(err, result){
+        scheduleMgr.setUgcToProgram(programTimeSlot, ugcReferenceNo, function(err, result){
             if (!err){
                 res.send(200, {message: result});
             }

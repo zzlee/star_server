@@ -681,18 +681,19 @@ http.createServer(app).listen(app.get('port'), function(){
 //test
 var scheduleMgr = require('./schedule_mgr.js');
     setTimeout(function(){
-   
+    
     scheduleMgr.createProgramList("TP_dom", 
-        {start:(new Date("2013/7/2 10:30")).getTime(), end:(new Date("2013/7/2 11:00")).getTime()}, 
-        {start:(new Date("2013/7/17 11:00")).getTime(), end:(new Date("2013/7/17 11:15")).getTime()}, 
-        ["miix_it"], function(err, result){
+        {start:(new Date("2013/7/21 6:00")).getTime(), end:(new Date("2013/7/21 7:00")).getTime()}, 
+        {start:(new Date("2013/7/21 9:00")).getTime(), end:(new Date("2013/7/21 9:20")).getTime()}, 
+        ["miix_it", "cultural_and_creative", "mood", "check_in" ], function(err, result){
             console.log("err=%s result=", err);
             console.dir(result);
+            
             if (!err){
                 scheduleMgr.pushProgramsTo3rdPartyContentMgr(result.sessionId, function(err){
                     console.log("err=%s ", err);
                 });
-            }
+            } 
             
     });
     
@@ -719,8 +720,9 @@ var scheduleMgr = require('./schedule_mgr.js');
     
     
 },1000);
+*/
 
-
+    /*
 var aeServerMgr = require('./ae_server_mgr.js');
 var globalConnectionMgr = require('./global_connection_mgr.js');
 setInterval(function(){

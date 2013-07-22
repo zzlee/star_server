@@ -826,7 +826,22 @@ scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip , upda
  *         
  *     </ul>
  */
-scheduleMgr.getProgramListBySession = function(sessionId, pageLimit, pageSkip, got_cb ){
+scheduleMgr.getProgramListBySession = function(sessionId, pageLimit, pageSkip, cbOfGetProgramListBySession ){
+    var query = programTimeSlotModel.find({ "session": sessionId, "type": "UGC"}).sort({timeStamp:1});
+
+    if (pageLimit!==null){
+        query = query.limit(pageLimit);
+    }
+    
+    if (pageSkip!==null){
+        query = query.skip(pageSkip);
+    }
+    
+    query.exec(function (_err, result) {
+        if (cbOfGetProgramListBySession) {
+            cbOfGetProgramListBySession(_err, result);
+        }
+    });
     
 };
 

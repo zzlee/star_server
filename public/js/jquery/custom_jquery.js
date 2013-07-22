@@ -600,7 +600,7 @@ $(document).ready(function(){
     var check_in = "%E6%89%93";
     var miix_it = "%E5%90%88";
     var cultural_and_creative = "%E6%96%87";
-    var moon = "%E5%BF%83";
+    var mood = "%E5%BF%83";
     var programSequenceArr = [];
     var next =0;
     
@@ -622,8 +622,8 @@ $(document).ready(function(){
             case cultural_and_creative:
                 programSequenceArr.push('cultural_and_creative');
                 break;
-            case moon:
-                programSequenceArr.push('moon');
+            case mood:
+                programSequenceArr.push('mood');
                 break;
             default:
 

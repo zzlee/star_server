@@ -3,14 +3,14 @@ form#mainform(action='')
 
     #condition-inner
       label 截稿時間
-      input(class='createProgramListBtn', type='datetime-local', name='TimeStart', onfocus='this.value=\'\'')
+      input(class='createProgramListBtn', type='datetime', name='TimeStart', onfocus='this.value=\'\'')
       | 到
-      input(class='createProgramListBtn', type='datetime-local', name='TimeEnd', onfocus='this.value=\'\'')
+      input(class='createProgramListBtn', type='datetime', name='TimeEnd', onfocus='this.value=\'\'')
       br
       label 播放時間
-      input(class='createProgramListBtn', type='datetime-local', name='playtimeStart', onfocus='this.value=\'\'')
+      input(class='createProgramListBtn', type='datetime', name='playtimeStart', onfocus='this.value=\'\'')
       | 到
-      input(class='createProgramListBtn', type='datetime-local', name='playtimeEnd', onfocus='this.value=\'\'')
+      input(class='createProgramListBtn', type='datetime', name='playtimeEnd', onfocus='this.value=\'\'')
       input#createProgramListBtn(type='button', class='createProgramList', value='自動配對')
       br
       br
@@ -56,13 +56,13 @@ form#mainform(action='')
                         input#ugcCensor.ugcCensorNoSetBtn(type='button', class='ugcChange', value='確認', name='#{PlayList.programTimeSlotId}')
                       td #{PlayList.ugcCensorNo}
                       td 
-                         if(PlayList.genre == 'miix')
+                         if(PlayList.contentGenre == 'miix_it')
                              label.label_video 合成影片
-                         if(PlayList.genre == 'cultural_and_creative')
+                         if(PlayList.contentGenre == 'cultural_and_creative')
                              label.label_design 文創
-                         if(PlayList.genre == 'mood')
+                         if(PlayList.contentGenre == 'mood')
                              label.label_mood 心情
-                         if(PlayList.genre == 'check_in')
+                         if(PlayList.contentGenre == 'check_in')
                              label.label_checkin 打卡
                       td #{PlayList.userContent}
                       td
@@ -87,13 +87,13 @@ form#mainform(action='')
                         input#ugcCensor.ugcCensorNoSetBtn(type='button', class='ugcChange', value='確認', name='#{PlayList.programTimeSlotId}')
                       td #{PlayList.ugcCensorNo}
                       td 
-                         if(PlayList.genre == 'miix')
+                         if(PlayList.contentGenre == 'miix_it')
                              label.label_video 合成影片
-                         if(PlayList.genre == 'cultural_and_creative')
+                         if(PlayList.contentGenre == 'cultural_and_creative')
                              label.label_design 文創
-                         if(PlayList.genre == 'mood')
+                         if(PlayList.contentGenre == 'mood')
                              label.label_mood 心情
-                         if(PlayList.genre == 'check_in')
+                         if(PlayList.contentGenre == 'check_in')
                              label.label_checkin 打卡
                       td #{PlayList.userContent}
                       td

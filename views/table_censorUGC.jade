@@ -45,13 +45,13 @@ form#mainform(action='')
                 if i%2
                     tr
                       td 
-                         if(ugcCensor.genre == 'miix')
+                         if(ugcCensor.contentGenre == 'miix_it')
                              label.label_video 合成影片
-                         if(ugcCensor.genre == 'cultural_and_creative')
+                         if(ugcCensor.contentGenre == 'cultural_and_creative')
                              label.label_design 文創
-                         if(ugcCensor.genre == 'mood')
+                         if(ugcCensor.contentGenre == 'mood')
                              label.label_mood 心情
-                         if(ugcCensor.genre == 'check_in')
+                         if(ugcCensor.contentGenre == 'check_in')
                              label.label_checkin 打卡
                       td #{ugcCensor.ugcCensorNo}
                       td #{ugcCensor.userContent}
@@ -122,13 +122,13 @@ form#mainform(action='')
                 else
                     tr.alternate-row
                       td
-                         if(ugcCensor.genre == 'miix')
+                         if(ugcCensor.contentGenre == 'miix_it')
                              label.label_video 合成影片
-                         if(ugcCensor.genre == 'cultural_and_creative')
+                         if(ugcCensor.contentGenre == 'cultural_and_creative')
                              label.label_design 文創
-                         if(ugcCensor.genre == 'mood')
+                         if(ugcCensor.contentGenre == 'mood')
                              label.label_mood 心情
-                         if(ugcCensor.genre == 'check_in')
+                         if(ugcCensor.contentGenre == 'check_in')
                              label.label_checkin 打卡
                       td #{ugcCensor.ugcCensorNo}
                       td #{ugcCensor.userContent}
