@@ -124,8 +124,11 @@ FM.censorHandler.createTimeslots_get_cb = function(req, res){
 
 
 FM.censorHandler.gettimeslots_get_cb = function(req, res){
-
-    var sessionId = req.query.sessionId;
+    if (req.query.extraParameter){
+        var extraParameter = JSON.parse(req.query.extraParameter);
+        var sessionId = extraParameter.sessionId;
+    }
+    debugger;
     var limit = req.query.limit;
     var skip = req.query.skip;
     var testArray = [];
@@ -135,7 +138,7 @@ FM.censorHandler.gettimeslots_get_cb = function(req, res){
     }
 
 
-    scheduleMgr.getProgramList(doohId, interval, limit, skip, updateUGC, function(err, programList){
+    scheduleMgr.getProgramListBySession(sessionId, limit, skip, updateUGC, function(err, programList){
         if (!err){
             
             if (programList.length > 0){
@@ -175,9 +178,10 @@ FM.censorHandler.gettimeslots_get_cb = function(req, res){
 
 FM.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
 
-    scheduleMgr.pushProgramsTo3rdPartyContentMgr(sessionId, function(err, result){
+    scheduleMgr.pushProgramsTo3rdPartyContentMgr(sessionId, function(err){
         if (!err){
             //TODO pushProgramsTo3rdPartyContentMgr
+            res.send(200);
         }
         else{
             res.send(400, {error: err});

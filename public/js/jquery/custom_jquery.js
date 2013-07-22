@@ -21,6 +21,7 @@ function PageList( listType, rowsPerPage, urlToGetListContent){
     this.urlToGetListContent = urlToGetListContent;
     this.totalPageNumber = 1;
     this.listType = listType;
+    this.extraParameters = null;
     $.get('/admin/list_size', {listType: listType, token: localStorage.token}, function(res){
         if (!res.err){
             var listSize = res.size;
@@ -30,9 +31,13 @@ function PageList( listType, rowsPerPage, urlToGetListContent){
     });
 }; 
 
+PageList.prototype.setExtraParameters = function(extraParameters){
+    this.extraParameters = extraParameters;
+};
+
 PageList.prototype.showPageContent = function(Page,condition){
     var _this = this;
-    $.get(this.urlToGetListContent, {skip: (Page-1)*this.rowsPerPage, limit: this.rowsPerPage, token: localStorage.token, condition:conditions}, function(res){
+    $.get(this.urlToGetListContent, {skip: (Page-1)*this.rowsPerPage, limit: this.rowsPerPage, token:localStorage.token, condition:conditions, extraParameters: JSON.stringify(this.extraParameters)}, function(res){
         if(res.message){
             console.log("[Response] message:" + res.message);
         }else{
@@ -128,8 +133,8 @@ $(document).ready(function(){
     FM.memberList = new PageList( 'memberList', 8, '/miix_admin/members');
     FM.miixPlayList = new PageList( 'miixMovieList', 5, '/miix_admin/miix_movies');
     FM.storyPlayList = new PageList( 'storyMovieList', 8, '/miix_admin/story_movies');
-    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor', conditions);
-    FM.UGCPlayList = new PageList( 'ugcCensorPlayList', 5, '/miix_admin/doohs/taipeiarena/timeslots', conditions);
+    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
+    FM.UGCPlayList = new PageList( 'ugcCensorPlayList', 5, '/miix_admin/doohs/taipeiarena/timeslots');
 
     FM.currentContent = FM.memberList;
 
@@ -243,7 +248,7 @@ $(document).ready(function(){
                 });
                 console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
                 if(conditions != null){
-                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
                     $('#UGCList').attr("class", "current");
                     FM.currentContent = FM.UGCList;
@@ -275,7 +280,7 @@ $(document).ready(function(){
                 conditions = 'rating';
                 console.log("inputSearchData: " + JSON.stringify(conditions) );
                 if(conditions != null){
-                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
                     $('#UGCList').attr("class", "current");
                     FM.currentContent = FM.UGCList;
@@ -290,7 +295,7 @@ $(document).ready(function(){
 
                 console.log("inputSearchData: " + JSON.stringify(conditions) );
                 conditions = {};
-                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                 $('#main_menu ul[class="current"]').attr("class", "select");
                 $('#UGCList').attr("class", "current");
                 FM.currentContent = FM.UGCList;
@@ -316,7 +321,7 @@ $(document).ready(function(){
                 });
                 console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
 
-                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                 $('#main_menu ul[class="current"]').attr("class", "select");
                 $('#UGCList').attr("class", "current");
                 FM.currentContent = FM.UGCList;
@@ -494,6 +499,7 @@ $(document).ready(function(){
                                     $('#UGCPlayList').attr("class", "current");
 
                                     FM.currentContent = FM.UGCPlayList;
+                                    FM.currentContent.setExtraParameters({sessionId: response.message.sessionId});
                                     FM.currentContent.showCurrentPageContent();
                                     programSequenceArr =[];
                                 }
