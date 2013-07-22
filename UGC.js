@@ -82,6 +82,10 @@ FM.UGC = (function(){
                 UGCs.find({"ownerId._id":ownerId, $or:[ { "genre":"miix" }, { "genre": "miix_image"} ]}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(cb);
             },
             
+            getLiveUGCListByOwnerId: function(ownerId, limit, skip, cb){
+                UGCs.find({"ownerId._id":ownerId, $or:[ { "genre":"miix_story" }, { "genre": "miix_image_live_photo"} ]}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(cb);
+            },
+            
             getUGCListByFB: function(userID, cb){
                 UGCs.find({"ownerId.userID":userID}, cb );
             },
