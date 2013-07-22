@@ -32,15 +32,10 @@ var serviceMgr = {};
  */
 serviceMgr.createCustomerServiceItem = function(vjson, cb ){
 
-//    var arr = [question];
-//    arr.push(question);
-//    var questiona = [{question :'I cannot sign in the app What can I do?'}];
-    console.log('+++'+JSON.stringify(vjson));
-//    var field = 'fb fb.userName fb.userID';
+//    console.log('+++'+JSON.stringify(vjson));
     var field;
     db.listOfdocModels( memberModel, {_id: vjson.ownerId}, field, null, function(err, result){
         if(!err){
-            console.log('---'+result[0].fb.userID);
             newVjson = {
                     ownerId: vjson._id,
                     genre: vjson.genre,
@@ -59,16 +54,12 @@ serviceMgr.createCustomerServiceItem = function(vjson, cb ){
     
 };
 //test
-//var fb_id = '33456';
-//var question_1 = {question:'no respond'};
-//var question_2 = {question:'bug'};
-//var question = [question_1, question_2];
-var vjson = {
-        ownerId : '51d38ca086fa21440a000002',
-        genre : 'publish',
-        phoneVersion : 'iPhone 6.0.1',
-        question : 'zzz'
-        };
+//var vjson = {
+//        ownerId : '51d38ca086fa21440a000002',
+//        genre : 'publish',
+//        phoneVersion : 'iPhone 6.0.1',
+//        question : 'zzz'
+//        };
 //serviceMgr.createCustomerServiceItem(vjson, function(err, result){
 //    if(!err)
 //        console.log(result);
@@ -101,21 +92,21 @@ serviceMgr.updateCustomerServiceItem = function(_id, vjson, cb ){
     
 };
 //test
-var _id = '51e63c7f8614786018000003';
-var date = new Date();
-var question_1 = {question:'I cannot sign in the app What can I do?',
-                  questionTime:date,
-                  answer:'ok',
-                  answerTime:date};
-var question_2 = {question:'I get error message',
-                  questionTime:date};
-var question_3 = {question:'no~~~~~',
-                  questionTime:date};
-var answer_1 ={answer:'ok'};
-var question = [question_1, question_2, question_3];
-var vjson = {
-        content: question
-        };
+//var _id = '51e63c7f8614786018000003';
+//var date = new Date();
+//var question_1 = {question:'I cannot sign in the app What can I do?',
+//                  questionTime:date,
+//                  answer:'ok',
+//                  answerTime:date};
+//var question_2 = {question:'I get error message',
+//                  questionTime:date};
+//var question_3 = {question:'no~~~~~',
+//                  questionTime:date};
+//var answer_1 ={answer:'ok'};
+//var question = [question_1, question_2, question_3];
+//var vjson = {
+//        content: question
+//        };
 //serviceMgr.updateCustomerQuestion(_id, vjson, function(err, result){
 //    if(!err)
 //        console.log(result);
@@ -137,7 +128,7 @@ var vjson = {
  *     <li>err: error message if any error happens
  *     </ul>
  */
-serviceMgr.getCustomerServiceItem= function(_id, condition, field, pageLimit, pageSkip, cb ){
+serviceMgr.getCustomerServiceItem= function(condition, field, pageLimit, pageSkip, cb ){
     
     
 //    db.listOfdocModels( customerServiceItemModel, condition, field, {sort :'no', limit: pageLimit , skip: pageSkip}, function(err, result){
@@ -147,18 +138,16 @@ serviceMgr.getCustomerServiceItem= function(_id, condition, field, pageLimit, pa
     
 };
 var condition = { 'ownerId._id': '51d38ca086fa21440a000002'};
-//var field = 'content';
-var field;
-var field2 = 'fb_id no genre reply version';
-var pageLimit;
-var pageSkip;
-
+//var field;
+//var pageLimit;
+//var pageSkip;
 //serviceMgr.getCustomerService(_id, condition, field, pageLimit, pageSkip, function(err, result){
 //if(!err)
 //  console.log('------------'+result);
 //else
 //  console.log(err);
 //});
+
 /**
  * get customer service list from feltmeng db.<br>
  * <br>

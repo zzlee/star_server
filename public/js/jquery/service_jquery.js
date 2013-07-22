@@ -11,7 +11,7 @@ var condition = null;
 var DOMAIN = "/miix_service/";
 
 $(document).ready(function(){
-    console.log('service');
+//    console.log('service');
     var url = DOMAIN + "customer_service_items";
     /**
      * load table and init message list
@@ -19,7 +19,7 @@ $(document).ready(function(){
     var type = 'table';
     $.get(url, {type :type}, function(res){
         if (!res.err){
-            console.log('res'+res+res.message);
+//            console.log('res'+res+res.message);
             $('div.tab_container').html(res);
         }
     });
@@ -48,10 +48,10 @@ $(document).ready(function(){
      * answer enter
      */
     $('#answerInput').click( function() {
-        console.log('anwserInput');
+//        console.log('anwserInput');
         var url = DOMAIN + "questions";
         $('#answer textarea[class="answerInput"]').each(function(){
-            console.log("item: " + $(this).attr("value"));
+//            console.log("item: " + $(this).attr("value"));
             $.ajax({
                 url: url,
                 type: 'PUT',
@@ -89,7 +89,7 @@ $(document).keyup(function (e) {
             if(fb_userName != 'Quick Search'){
                 $.get(url, {type :type, condition:condition}, function(res){
                     if (!res.err){
-                        console.log('res'+res+res.message);
+//                        console.log('res'+res+res.message);
                         $('div.tab_container').html(res);
                     }
                 });
@@ -100,7 +100,7 @@ $(document).keyup(function (e) {
      * remark enter
      */
     if ($("tr td .textarea:focus") && (e.keyCode === 13)) {
-        console.log('+++++++++++');
+//        console.log('+++++++++++');
         $('#service._idRemarks').each(function(){
 //          console.log('+++Remarks++++++++'+$(this).attr("value"));
             if($(this).attr("value")){
@@ -181,7 +181,7 @@ function reloadTable(){
     var type = 'table';
     $.get(url, {type :type, condition:condition}, function(res){
         if (!res.err){
-            console.log('res'+res+res.message);
+//            console.log('res'+res+res.message);
             $('div.tab_container').html(res);
         }
     });
@@ -194,7 +194,7 @@ function reloadList(){
     if(customerServiceItemId){
         $.get(url, {type :type, condition:condition}, function(res){
             if (!res.err){
-                console.log('res'+res+res.message);
+//                console.log('res'+res+res.message);
                 $('div.message_list').html(res);
             }
         });
