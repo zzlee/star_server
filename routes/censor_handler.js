@@ -96,7 +96,7 @@ FM.censorHandler.setUGCAttribute_get_cb = function(req,res){
 
 };
 
-FM.censorHandler.createTimeslots_get_cb = function(req, res){
+FM.censorHandler.postProgramTimeSlotSession_cb = function(req, res){
     
     var doohId = req.params.doohId;
     var intervalOfSelectingUGCStart =  new Date(req.body.intervalOfSelectingUGC.start).getTime();
@@ -113,7 +113,7 @@ FM.censorHandler.createTimeslots_get_cb = function(req, res){
     scheduleMgr.createProgramList(doohId, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, function(err, result){
         if (!err){
             sessionId = result.sessionId;
-            res.send(200, {message: JSON.stringify(result.sessionId)});
+            res.send(200, {message: result.sessionId});
         }
         else{
             res.send(400, {error: err});
@@ -124,11 +124,11 @@ FM.censorHandler.createTimeslots_get_cb = function(req, res){
 
 
 FM.censorHandler.gettimeslots_get_cb = function(req, res){
-    if (req.query.extraParameter){
-        var extraParameter = JSON.parse(req.query.extraParameter);
-        var sessionId = extraParameter.sessionId;
+    var sessionId = null;
+    if (req.query.extraParameters){
+        var extraParameters = JSON.parse(req.query.extraParameters);
+        sessionId = extraParameters.sessionId;
     }
-    debugger;
     var limit = req.query.limit;
     var skip = req.query.skip;
     var testArray = [];
@@ -137,10 +137,10 @@ FM.censorHandler.gettimeslots_get_cb = function(req, res){
         var updateUGC = req.query.condition;
     }
 
-
-    scheduleMgr.getProgramListBySession(sessionId, limit, skip, updateUGC, function(err, programList){
+    console.log('[FM.censorHandler.gettimeslots_get_cb()] sessionId=%s', sessionId);
+    scheduleMgr.getProgramListBySession(sessionId, limit, skip, function(err, programList){
+        debugger;
         if (!err){
-            
             if (programList.length > 0){
                 censorMgr.getPlayList(programList , updateUGC, function(errGetPlayList, result){
                     if (!errGetPlayList){

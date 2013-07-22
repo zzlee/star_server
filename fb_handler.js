@@ -52,7 +52,7 @@ FM.FB_HANDLER = (function(){
                 }, function(error, response, body){
                     
                     if(error){
-                        console.logger("[postOnFB] ", error);
+                        logger.error("[postOnFB] ", error);
                         cb(error, null);
                         
                     }else if(body.error){

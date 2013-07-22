@@ -448,7 +448,7 @@ app.put('/miix_admin/user_content_attribute', routes.censorHandler.setUGCAttribu
 //app.put('/miix_admin/user_content_attribute/:ugcId', routes.censorHandler.setUGCAttribute_get_cb);
 
 /**
- * New a timeslots for dooh<br>
+ * New a session of programe timeslots for dooh<br>
  * <h5>Path Parameters</h5>
  * <ul>
  * <li>doohId: Dooh ID (ex:'taipeiarena')
@@ -475,10 +475,10 @@ app.put('/miix_admin/user_content_attribute', routes.censorHandler.setUGCAttribu
  *         { numberOfProgramTimeSlots: 33, sessionId: '1367596800000-1367683140000-1373332978201' }     
  *     </ul>
  *
- * @name POST /miix_admin/doohs/:doohId/timeslots
+ * @name POST /miix_admin/doohs/:doohId/program_timeslot_session
  * @memberof miix_admin
  */
-app.post('/miix_admin/doohs/:doohId/timeslots', routes.censorHandler.createTimeslots_get_cb);
+app.post('/miix_admin/doohs/:doohId/program_timeslot_session', routes.censorHandler.postProgramTimeSlotSession_cb);
 
 /**
  * Get the dooh timeslot<br>
