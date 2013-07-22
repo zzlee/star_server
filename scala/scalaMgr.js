@@ -62,9 +62,11 @@ function scalaMgr( url, account ){
         var duration = time[0].split(':');
         return (Number(duration[0]) * 60 + Number(duration[1])) * 1000;
     };
-    var timeToInt = function( time ){
+    var timeToInt = function( dateData, time ){
         time = time.split(':');
-        return new Date(1970, 01, 01, time[0], time[1], time[2]).getTime();
+        var date = new Date(dateData);
+        
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time[0], time[1], time[2]).getTime();
     };
     
     /**
@@ -80,7 +82,7 @@ function scalaMgr( url, account ){
      *     @param {boolean} valid The valid show this timeslot is valid.
      */
     var listTimeslot = function(oneday, timeslot_cb){
-        var interval = [];
+        var result = [];
     
         var option = {
             channel : { id: 1, frames: 1 }, //hardcode
@@ -94,16 +96,18 @@ function scalaMgr( url, account ){
                         if(list.timeslots[i].endTime == '24:00:00') timeslotDeadline = new Date(list.timeslots[i].endDate + ' 23:59:59');
                         else timeslotDeadline = new Date(list.timeslots[i].endDate + ' ' + list.timeslots[i].endTime);
                         if((option.date.getTime() <= timeslotDeadline.getTime()) && (status == 'OK')){
-                            interval.push({
+                            result.push({
                                 //playlist: list.timeslots[i].playlist.name,
-                                start: timeToInt(list.timeslots[i].startTime),
-                                end: timeToInt(list.timeslots[i].endTime),
-                                duration: durationToNumber(list.timeslots[i].playlist.prettifyDuration.replace('(','').replace(')','').split(' - '))
+                                interval: {
+                                    start: timeToInt(oneday, list.timeslots[i].startTime),
+                                    end: timeToInt(oneday, list.timeslots[i].endTime)
+                                },
+                                cycleDuration: durationToNumber(list.timeslots[i].playlist.prettifyDuration.replace('(','').replace(')','').split(' - '))
                             });
                         }
                     });
                 }
-                if(i == list.timeslots.length-1) timeslot_cb(null, interval);
+                if(i == list.timeslots.length-1) timeslot_cb(null, result);
             }
         });
         
@@ -120,28 +124,117 @@ function scalaMgr( url, account ){
      */
     var setItemToPlaylist = function( file, playTime, reportStatus_cb ){
         
-        var limit = 0;
-        var play = new Date(playTime);
+        var limit = 0,
+            addlimit = 0;
+            updatelimit = 0;
+        //var play = new Date(playTime);
         
         var itemPlaySetting = {
             playlist: { id: '', name: 'FM_DOOH' },
             item: { id: '', useValidRange: true, playFullscreen: true },
             media: { id: '', duration: '' },
-            //playDate: play.getFullYear() + '-' + play.getMonth() + '-' + play.getDate(),
-            //playTime: play.getHours() + ':' + play.getMinutes()
-            playTime : playTime
+            playTime : { start: playTime.start, end: playTime.end }
         };
         async.waterfall([
             function(callback){
-                //Step.1: upload file to server
-                contractor.media.fileupload(file, function(err, status){
-                    callback(null, status);
-                });
+                if(limit < 1){
+                    //Step.1: upload file to server
+                    contractor.media.fileupload(file, function(err, status){
+                        callback(null, status);
+                    });
+                    limit++;
+                }
             },
             function(status, callback){
                 //Step.2: find out media(file) id
                 if(status == 'OK') {
                     contractor.media.findMediaIdByName(file.name, function(err, mediaInfo){
+                        if(!err) {
+                            itemPlaySetting.media.id = mediaInfo.id;
+                            itemPlaySetting.media.duration = mediaInfo.duration;
+                            callback(null, 'OK');
+                        }
+                        else callback(err, null);
+                    });
+                }
+            },
+            function(status, callback){
+                //Step.3: find out playlist id
+                if(status == 'OK') {
+                    contractor.playlist.findPlaylistIdByName(itemPlaySetting.playlist.name, function(err, playlistId){
+                        if(!err) {
+                            itemPlaySetting.playlist.id = playlistId;
+                            callback(null, 'OK');
+                        }
+                        else callback(err, null);
+                    });
+                }
+            },
+            function(status, callback){
+                if(addlimit < 1){
+                    //Step.4: add media to playlist
+                    if(status == 'OK') {
+                        contractor.item.addItemToPlaylist(itemPlaySetting, function(err, addItem_cb){
+                            if(!err) callback(null, 'OK');
+                            else callback(err, null);
+                        });
+                    }
+                    addlimit++;
+                }
+            },
+            function(status, callback){
+                //Step.5: find out item id in playlist
+                if(status == 'OK') {
+                    contractor.playlist.findPlaylistItemIdByName(itemPlaySetting.playlist.name, file.name, function(err, itemId){
+                        itemPlaySetting.item.id = itemId;
+                        if(!err) callback(null, 'OK');
+                        else callback(err, null);
+                    });
+                }
+            },
+            function(status, callback){
+                if(updatelimit < 1){
+                    //Step.6: update item play info. to playlist
+                    if(status == 'OK') {
+                        contractor.playlist.updatePlaylistItemSchedule(itemPlaySetting, function(err, itemSetting_cb){
+                            if(!err) callback(null, 'OK');
+                            else callback(err, null);
+                        });
+                    }
+                    updatelimit++;
+                }
+            }
+        ], function (err, result) {
+            if(result == 'OK') reportStatus_cb(null, 'OK');
+            else reportStatus_cb(err, null);
+        });
+    };
+    
+    /**
+     * Add web page in timeslot to server.
+     *
+     */
+    var setWebpageToPlaylist = function( webpage, playTime, reportStatus_cb ){
+        
+        var limit = 0;
+        
+        var itemPlaySetting = {
+            playlist: { id: '', name: 'FM_DOOH' },
+            item: { id: '', useValidRange: true, playFullscreen: true },
+            media: { id: '', duration: '' },
+            playTime : { start: playTime.start, end: playTime.end }
+        };
+        async.waterfall([
+            function(callback){
+                //Step.1: upload web page to server
+                contractor.media.createWebPage(webpage, function(err, status){
+                    callback(null, status);
+                });
+            },
+            function(status, callback){
+                //Step.2: find out media(webpage) id
+                if(status == 'OK') {
+                    contractor.media.findMediaIdByName(webpage.name, function(err, mediaInfo){
                         if(!err) {
                             itemPlaySetting.media.id = mediaInfo.id;
                             itemPlaySetting.media.duration = mediaInfo.duration;
@@ -175,7 +268,7 @@ function scalaMgr( url, account ){
             function(status, callback){
                 //Step.5: find out item id in playlist
                 if(status == 'OK') {
-                    contractor.playlist.findPlaylistItemIdByName(itemPlaySetting.playlist.name, file.name, function(err, itemId){
+                    contractor.playlist.findPlaylistItemIdByName(itemPlaySetting.playlist.name, webpage.name, function(err, itemId){
                         itemPlaySetting.item.id = itemId;
                         if(!err) callback(null, 'OK');
                         else callback(err, null);
@@ -249,7 +342,9 @@ function scalaMgr( url, account ){
     return {
         listTimeslot : listTimeslot,
         setItemToPlaylist : setItemToPlaylist,
-        pushEvent : pushEvent
+        pushEvent : pushEvent,
+        setWebpageToPlaylist: setWebpageToPlaylist,
+        //contractor: contractor,   //test
     };
 }
 

@@ -6,15 +6,17 @@ var playlist = (function() {
     var itemSchema = {
         "id": '', //*// playlist_id
         "name": '',    //*// playlist_name
+        "controlledByAdManager":false,
+        "enableSmartPlaylist":false,
         "playlistItems" : [{
             "endValidDate": '',
             "id": '',    //*// playlistItem_id, if this change, it need reset.
             "playFullscreen": false,
             "playlistItemType": "MEDIA_ITEM",
-            "sortOrder": 1,
+            //"sortOrder": 1,
             "startValidDate": '',
-            //"duration": 0,
-            //"durationHoursSeconds": "00:00:00",
+            "duration": 100,
+            "durationHoursSeconds": "00:01:40",
             "timeSchedules":[{
                 "days":[
                     "SUNDAY",
@@ -27,7 +29,7 @@ var playlist = (function() {
                 ],
                 "startTime": '',
                 "endTime": '',
-                "sortOrder":1
+                //"sortOrder":1
             }],
             "useValidRange": true
         }]
@@ -94,18 +96,35 @@ var playlist = (function() {
                 list_cb(err, obj);
             });
         },
+        /*listAllAvailablePlaylistItems : function( option, upadte_cb ) {
+            adapter.put('/ContentManager/api/rest/playlists/' + option.playlist.id + '?token=' + token, option.playlist.content, function(err, req, res, obj) {
+            });
+        },*/
         update : function( option, upadte_cb ) {
             adapter.put('/ContentManager/api/rest/playlists/' + option.playlist.id + '?token=' + token, option.playlist.content, function(err, req, res, obj) {
                 //assert.ifError(err);
-                //console.log('%d -> %j', res.statusCode, res.headers);
-                //console.log('%j', obj);
+                console.log('%d -> %j', res.statusCode, res.headers);
+                console.log('%j', obj);
+                upadte_cb(obj);
             });
         },
         settingPlaylistItem : function( option, settingPlaylistItem_cb ) {
+
+            var playStart = new Date(option.playTime.start),
+                playEnd = new Date(option.playTime.end);
+            var playStartDate = playStart.getFullYear() + '-' + (playStart.getMonth() + 1) + '-' + playStart.getDate(),
+                playEndDate = playEnd.getFullYear() + '-' + (playEnd.getMonth() + 1) + '-' + playEnd.getDate();
+            var playStartTime, playEndTime;
+            if(playStart.getMinutes() < 10)
+                playStartTime = playStart.getHours() + ':0' + playStart.getMinutes();
+            else
+                playStartTime = playStart.getHours() + ':' + playStart.getMinutes();
+            if(playEnd.getMinutes() < 10)
+                playEndTime = playEnd.getHours() + ':0' + playEnd.getMinutes();
+            else
+                playEndTime = playEnd.getHours() + ':' + playEnd.getMinutes();
             
-            var play = new Date(option.playTime);
-            var playDate = play.getFullYear() + '-' + (play.getMonth() + 1) + '-' + play.getDate(),
-                playTime = play.getHours() + ':' + play.getMinutes();
+            
             var duraionTime = new Date(option.media.duration);
             
             itemSchema.id = option.playlist.id;
@@ -115,19 +134,14 @@ var playlist = (function() {
             //itemSchema.playlistItems[0].durationHoursSeconds = duraionTime.getUTCHours() + ':' + duraionTime.getUTCMinutes() + ':' + duraionTime.getUTCSeconds();
             if( option.item.useValidRange == true ) {
                 itemSchema.playlistItems[0].useValidRange = true;
-                itemSchema.playlistItems[0].startValidDate = playDate; //
-                itemSchema.playlistItems[0].endValidDate = playDate;   //
+                itemSchema.playlistItems[0].startValidDate = playStartDate; //
+                itemSchema.playlistItems[0].endValidDate = playEndDate;   //
             }
             if(option.playFullscreen == true) itemSchema.playlistItems[0].playFullscreen;
-            
-            itemSchema.playlistItems[0].timeSchedules[0].startTime = playTime; //
-            play.setMinutes(play.getMinutes() + 2);
-            itemSchema.playlistItems[0].timeSchedules[0].endTime = play.getHours() + ':' + play.getMinutes();   //
+            itemSchema.playlistItems[0].timeSchedules[0].startTime = playStartTime;
+            itemSchema.playlistItems[0].timeSchedules[0].endTime = playEndTime;
             
             adapter.put('/ContentManager/api/rest/playlists/' + option.playlist.id + '?token=' + token, itemSchema, function(err, req, res, obj) {
-                //assert.ifError(err);
-                //console.log('%d -> %j', res.statusCode, res.headers);
-                //console.log('%j', obj);
                 settingPlaylistItem_cb(null, obj);
             });
         },
@@ -164,13 +178,15 @@ var playlist = (function() {
             _private.list( option, list_cb );
         },
         findPlaylistIdByName : function( playlistName, list_cb ) {
-            _private.list( { fields : 'id', search : playlistName }, function(playlistInfo){
-                if(playlistInfo.list[0].id) list_cb(null, playlistInfo.list[0].id);
+            _private.list( { fields : 'id', search : playlistName }, function(err, playlistInfo){
+                //console.log(err);
+                //console.log(playlistInfo.list[0].id);
+                if(!err) list_cb(null, playlistInfo.list[0].id);
                 else list_cb('NOT_FOUND_PLAYLIST', null);
             } );
         },
         findPlaylistItemIdByName : function( playlistName, mediaName, list_cb ) {
-            _private.list( { search : playlistName }, function(playlistItemInfo){
+            _private.list( { search : playlistName }, function(err, playlistItemInfo){
                 for(var i=0; i < playlistItemInfo.list[0].playlistItems.length; i++) {
                     if(playlistItemInfo.list[0].playlistItems[i].media.name == mediaName)
                         list_cb(null, playlistItemInfo.list[0].playlistItems[i].id);

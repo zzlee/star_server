@@ -265,7 +265,7 @@ app.get('/miix/ugc_hightlights', function(req, res){
     var db = require('./db.js');
     
     var ugcModel = db.getDocModel("ugc");
-    ugcModel.find({ "rating": "A", $or: [ { "genre":"miix" }, { "genre": "check_in"} ] }).sort({"createdOn":-1}).limit(10).exec(function (err, docs) {
+    ugcModel.find({ "rating": "A", $or: [ { "contentGenre":"miix_it" }, { "contentGenre": "check_in"} ] }).sort({"createdOn":-1}).limit(10).exec(function (err, docs) {
         if (!err){
             res.send(docs);
         }
@@ -392,31 +392,6 @@ app.post('/members/:member_id/questions', function(req, res){
     
 });
 
-
-
-<<<<<<< HEAD
-// Miix client 
-
-app.post('/miix/videos/user_content_files', routes.uploadUserContentFile_cb );
-app.post('/miix/videos/user_content_description',routes.uploadUserDataInfo_cb);  //TODO: /miix/videos/user_content_descriptions is better
-app.get('/miix/videos/new_videos', routes.api.newUGCList);
-
-app.post('/miix/videos/miix_videos', routes.api.submitAUGC);
-app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh);
-
-
-
-// Miix admin
-
-app.get('/miix_admin', routes.admin.get_cb); 
-app.get('/miix_admin/login', routes.admin.login_get_cb); //TODO: change to a better resource name of RESTful style
-app.get('/miix_admin/logout', routes.admin.logout_get_cb); //TODO: change to a better resource name of RESTful style
-app.get('/miix_admin/members', routes.authorizationHandler.checkAuth, routes.admin.memberList_get_cb);
-app.get('/miix_admin/miix_movies', routes.authorizationHandler.checkAuth, routes.admin.miixPlayList_get_cb); 
-app.get('/miix_admin/story_movies', routes.authorizationHandler.checkAuth, routes.admin.storyPlayList_get_cb);
-app.get('/miix_admin/list_size', routes.authorizationHandler.checkAuth, routes.admin.listSize_get_cb);
-app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.censor_handler.getUGCList_get_cb);
-
 /**
  * Get the UGC list&lt;br>
  * &lt;h5>Path Parameters&lt;/h5>
@@ -443,6 +418,7 @@ app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.
  * &lt;li>doohPlayedTimes: 
  * &lt;li>rating: 
  * &lt;li>genre: 
+ * &lt;li>contentGenre:
  * &lt;li>mustPlay: 
  * &lt;/ul>
  * For example, &lt;br>
@@ -454,9 +430,11 @@ app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.
  * "doohPlayedTimes":0,
  * "rating":"d",
  * "genre":"miix",
+ * "contentGenre":"miit_it"
  * "mustPlay":true}] &lt;br>
  *
  * @name GET /miix_admin/user_content_items
+ * @memberof miix_admin
  */
 app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
 
@@ -483,6 +461,7 @@ app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_c
  * &lt;/ul>
  *
  * @name PUT /miix_admin/user_content_attribute/:ugcId
+ * @memberof miix_admin
  */
 app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);//TODO::ugcId
 //app.put('/miix_admin/user_content_attribute/:ugcId', routes.censor_handler.setUGCAttribute_get_cb);
@@ -497,7 +476,7 @@ app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttrib
  * &lt;ul>
  * &lt;li>intervalOfSelectingUGC: An object specifying the starting and ending of of the time interval for scheduleMgr to select the applied UGC items.
  * &lt;li>intervalOfPlanningDoohProgrames: An object specifying the starting and ending of of the time interval which the generated schedule covers.
- * &lt;li>programSequence: An array of strings showing the sequence of program genres.
+ * &lt;li>programSequence: An array of strings showing the sequence of program content genres.
  * &lt;/ul>
  * &lt;h5>Request body&lt;/h5>
  * None
@@ -516,6 +495,7 @@ app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttrib
  *     &lt;/ul>
  *
  * @name POST /miix_admin/doohs/:doohId/timeslots
+ * @memberof miix_admin
  */
 app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTimeslots_get_cb);
 /**
@@ -546,6 +526,7 @@ app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTime
  * &lt;li>fbPictureUrl:  
  * &lt;li>rating: 
  * &lt;li>genre: 
+ * &lt;li>contentGenre:
  * &lt;/ul>
  * For example, &lt;br>
  * [{_id: '51d837f6830459c42d000023',
@@ -556,9 +537,11 @@ app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTime
  * "fb_userName":"No User",
  * "fbPictureUrl":"http://profile.ak.fbcdn.net/hprofile-ak-frc1/371959_100004619173955_82185728_q.jpg",
  * "rating":"d",
- * "genre":"miix"}] &lt;br>
+ * "genre":"miix"}
+ * "contentGenre":"miix_it"] &lt;br>
  *
  * @name GET /miix_admin/doohs/:doohId/timeslots
+ * @memberof miix_admin
  */
 app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.gettimeslots_get_cb);
 
@@ -583,14 +566,36 @@ app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.gettimeslot
  * &lt;li>newlySelectedUgc:  the id of newly selected UGC 
  * &lt;/ul>
  *
- * @name PUT /miix_admin/doohs/:doohId/timeslots/:timeslotId
+ * @name PUT /miix_admin/doohs/:doohId/timeslots/:sessionId
+ * @memberof miix_admin
  */
-app.put('/miix_admin/doohs/:doohId/timeslots/:timeslotId', routes.censor_handler.timeslots_get_cb);
+app.put('/miix_admin/doohs/:doohId/timeslots/:sessionId', routes.censor_handler.updatetimeslots_get_cb);
 
+//TODO: pushProgramsTo3rdPartyContentMgr RESTful
+/**
+ *  Push programs (of a specific session) to the 3rd-party content manager.&lt;br>
+ * &lt;h5>Path Parameters&lt;/h5>
+ * &lt;ul>
+ * &lt;li>doohId: Dooh ID (ex:'taipeiarena')
+ * &lt;/ul>
+ * &lt;h5>Query Parameters&lt;/h5>
+ * None
+ * &lt;h5>Request body&lt;/h5>
+ * &lt;ul>
+ * &lt;li>sessionId: The id indicating the session of creating program time slot.
+ * &lt;/ul>
+ * &lt;h5>Response body&lt;/h5>
+ * if successful, err returns null; if failed, err returns the error message.
+ * &lt;ul>
+ * &lt;li>err: error message if any error happens
+ * &lt;li>result: null 
+ * &lt;/ul>
+ *
+ * @name PUT /miix_admin/doohs/:doohId/ProgramsTo3rdPartyContent
+ * @memberof miix_admin
+ */
+app.put('/miix_admin/doohs/:doohId/ProgramsTo3rdPartyContentMgr/:sessionId', routes.censor_handler.pushProgramsTo3rdPartyContentMgr_get_cb);
 
-
-=======
->>>>>>> origin/gz_scheduler
 // Internal
 
 app.get('/internal/oauth2callback', routes.YoutubeOAuth2_cb );
@@ -668,23 +673,52 @@ http.createServer(app).listen(app.get('port'), function(){
 
 
 
+
+//var test_s3 = require('./aws_s3.js');
+//setTimeout(function(){
+//	//change the auth to save files on s3
+//	console.log("aws_s3 test!");
+////	var key = '/user_project/.jpg';
+//	var key = '/user_project/Summer.mp4';
+////	var obj = "C:\\Users\\feltmeng-user\\Desktop\\star_server\\star_server\\public\\images\\logo.jpg";
+//	var obj = "C:\\Users\\feltmeng-user\\Desktop\\PopDanthology2012.mp4"
+////	test_s3.uploadToAwsS3(obj, key, 'image/jpeg', function(err, result){
+//	test_s3.uploadToAwsS3(obj, key, 'video/mp4', function(err, result){
+//		if(err)
+//			console.log("test_s3 error");
+//		else
+//			console.log("test_s3 success");
+//	});
+//	
+//	
+//},3000);
+
+
 /*
 //test
 var scheduleMgr = require('./schedule_mgr.js');
-setTimeout(function(){
-    
+    setTimeout(function(){
+   
     scheduleMgr.createProgramList("TP_dom", 
-        {start:(new Date("2013/5/4 0:00")).getTime(), end:(new Date("2013/5/4 23:59")).getTime()}, 
-        {start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, 
-        ["miix", "check_in", "check_in", "mood", "cultural_and_creative" ], function(err, result){
+        {start:(new Date("2013/7/2 10:30")).getTime(), end:(new Date("2013/7/2 11:00")).getTime()}, 
+        {start:(new Date("2013/7/17 11:00")).getTime(), end:(new Date("2013/7/17 11:15")).getTime()}, 
+        ["miix_it"], function(err, result){
             console.log("err=%s result=", err);
             console.dir(result);
-            scheduleMgr.getProgramList("TP_dom",{start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, null, 30, function(err2, result2){
-                console.log('result=');
-                console.dir(result2);
-            });
+            if (!err){
+                scheduleMgr.pushProgramsTo3rdPartyContentMgr(result.sessionId, function(err){
+                    console.log("err=%s ", err);
+                });
+            }
+            
     });
     
+     
+    scheduleMgr.getProgramList("TP_dom",{start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, null, 30, function(err2, result2){
+        console.log('result=');
+        console.dir(result2);
+    });
+
     scheduleMgr.setUgcToProgram( "51da8db6fdf3b7e009000003", 426, function(err, result){
         console.log('result=');
         console.dir(result);
@@ -694,8 +728,15 @@ setTimeout(function(){
     scheduleMgr.removeUgcfromProgramAndAutoSetNewOne('1367596800000-1367683140000-1373357471568', '51dbc59f27c747c80b000003', function(err){
         console.log('err=%s',err);
     });
-   
-},3000);
+    
+    
+    scheduleMgr.pushProgramsTo3rdPartyContentMgr('1372732200000-1372734000000-1373972400000-1373973300000-1374026315925', function(err){
+        console.log("err=%s ", err);
+    });
+    
+    
+},1000);
+
 
 var aeServerMgr = require('./ae_server_mgr.js');
 var globalConnectionMgr = require('./global_connection_mgr.js');
@@ -882,21 +923,13 @@ app.get('/test', function(req, res) {
 </div>
 
 <nav>
-<<<<<<< HEAD
-    <h2><a href="index.html">Index</a></h2><h3>Mixins</h3><ul><li><a href="customerServiceMgr.html">customerServiceMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GET /members/:memberId/questions">GET /members/:memberId/questions</a></li><li><a href="global.html#GET /miix_admin/doohs/:doohId/timeslots">GET /miix_admin/doohs/:doohId/timeslots</a></li><li><a href="global.html#GET /miix_admin/user_content_items">GET /miix_admin/user_content_items</a></li><li><a href="global.html#POST /miix_admin/doohs/:doohId/timeslots">POST /miix_admin/doohs/:doohId/timeslots</a></li><li><a href="global.html#PUT /miix_admin/doohs/:doohId/timeslots/:timeslotId">PUT /miix_admin/doohs/:doohId/timeslots/:timeslotId</a></li><li><a href="global.html#PUT /miix_admin/user_content_attribute/:ugcId">PUT /miix_admin/user_content_attribute/:ugcId</a></li></ul>
-=======
-    <h2><a href="index.html">Index</a></h2><h3>Namespaces</h3><ul><li><a href="miix.html">miix</a></li><li><a href="miix_admin.html">miix_admin</a></li></ul><h3>Mixins</h3><ul><li><a href="customerServiceMgr.html">customerServiceMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
->>>>>>> origin/gz_scheduler
+    <h2><a href="index.html">Index</a></h2><h3>Namespaces</h3><ul><li><a href="miix.html">miix</a></li><li><a href="miix_admin.html">miix_admin</a></li></ul><h3>Mixins</h3><ul><li><a href="customerServiceMgr.html">customerServiceMgr</a></li><li><a href="miixContentMgr.html">miixContentMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-<<<<<<< HEAD
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Thu Jul 11 2013 16:33:44 GMT+0800 (TST)
-=======
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Sun Jul 14 2013 22:44:54 GMT+0800 (TST)
->>>>>>> origin/gz_scheduler
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Thu Jul 18 2013 16:38:18 GMT+0800 (TST)
 </footer>
 
 <script> prettyPrint(); </script>

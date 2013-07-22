@@ -231,7 +231,7 @@ $(document).ready(function(){
         if(censorCheck == '/miix_admin/ugc_censor'){
             console.log('ajax_censor');
             /**
-             * ¬d¸ß¼v¤ù ·j´M click
+             * ï¿½dï¿½ß¼vï¿½ï¿½ ï¿½jï¿½M click
              */
             $('#ugcSearchBtn').click(function(){
                 console.log('ugcSearch');
@@ -251,7 +251,7 @@ $(document).ready(function(){
                 }
             });
             /**
-             * ¿z¿ï±ø¥ó ©|¥¼¼f®Ö click
+             * ï¿½zï¿½ï¿½ï¿½ï¿½ ï¿½|ï¿½ï¿½ï¿½fï¿½ï¿½ click
              */
             $('#ugcSearchNoRatingBtn').click(function(){
                 console.log('ugcSearchNoRatingBtn');
@@ -267,7 +267,7 @@ $(document).ready(function(){
                 }
             });
             /**
-             * ¿z¿ï±ø¥ó ¤w¸g¼f®Ö click
+             * ï¿½zï¿½ï¿½ï¿½ï¿½ ï¿½wï¿½gï¿½fï¿½ï¿½ click
              */
             $('#ugcSearchRatingBtn').click(function(){
                 console.log('ugcSearchNoRatingBtn');
@@ -283,7 +283,7 @@ $(document).ready(function(){
                 }
             });
             /**
-             * ¿z¿ï±ø¥ó All click
+             * ï¿½zï¿½ï¿½ï¿½ï¿½ All click
              */
             $('#ugcSearchAllBtn').click(function(){
                 console.log('ugcSearchNoRatingBtn');
@@ -298,7 +298,7 @@ $(document).ready(function(){
 
             });
             /**
-             * §ë¥ó®É¶¡ °e¥X click
+             * ï¿½ï¿½ï¿½É¶ï¿½ ï¿½eï¿½X click
              */
             $('#ugcSearchDateBtn').click(function(){
                 console.log('ugcSearchDateBtn');
@@ -599,7 +599,7 @@ $(document).ready(function(){
     // Ajax End---------------------------------------------------------------------
 
     var check_in = "%E6%89%93";
-    var miix = "%E5%90%88";
+    var miix_it = "%E5%90%88";
     var cultural_and_creative = "%E6%96%87";
     var moon = "%E5%BF%83";
     var programSequenceArr = [];
@@ -617,8 +617,8 @@ $(document).ready(function(){
             case check_in:
                 programSequenceArr.push('check_in');
                 break;
-            case miix:
-                programSequenceArr.push('miix');
+            case miix_it:
+                programSequenceArr.push('miix_it');
                 break;
             case cultural_and_creative:
                 programSequenceArr.push('cultural_and_creative');

@@ -990,7 +990,7 @@ FM.api.newUGCList = function(req, res){
     }
 };
 
-//  GET
+//  GET  //DEPRECATED
 FM.api.newStreetUGCList = function(req, res){
     FM_LOG("[api.newStreetUGCList]: ");
     
@@ -1170,19 +1170,6 @@ FM.api.codeVerify = function(req, res){
 };
 
 
-// GET
-FM.api.userProfile = function(req, res){
-    
-    if(req.query && req.query.user){
-        var user = req.query.user;
-        user._id = ObjectID.createFromHexString(user._id);  // cast String to ObjectID before using.
-       
-        UGCDB.getUGCListById(user._id, function(err, result){
-            if(err) throw err;        
-            res.send(result);
-        });
-    }
-};
 
 // Inter
 FM.api._test = function(){

@@ -185,6 +185,8 @@ app.get('/miix/videos/new_videos', routes.api.newUGCList); //v1.2 only, to be DE
  * @name PUT /miix/video_ugcs/:ugcProjectId
  * @memberof miix
  */
+app.put('/miix/video_ugcs/:ugcProjectId', routes.miixHandler.putVideoUgcs_cb);
+
 app.post('/miix/videos/miix_videos', routes.api.submitAUGC); //v1.2
 
 app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh); //v1.2 only.  In v2.0, all UGCs are to be played on a DOOH
@@ -212,7 +214,7 @@ app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh); //v1.2 only.  In
  * @name PUT /miix/base64_image_ugcs/:ugcProjectId
  * @memberof miix
  */
-app.post('/miix/videos/miix_videos', routes.api.submitAUGC); //v1.2
+app.put('/miix/base64_image_ugcs/:ugcProjectId', routes.miixHandler.putBase64ImageUgcs_cb); 
 
 
 /**
@@ -234,11 +236,13 @@ app.post('/miix/videos/miix_videos', routes.api.submitAUGC); //v1.2
  * @name GET /miix/ugc_hightlights
  * @memberof miix
  */
+app.get('/miix/ugc_hightlights', routes.miixHandler.getUgcHighlights_cb);
+/*
 app.get('/miix/ugc_hightlights', function(req, res){
     var db = require('./db.js');
     
     var ugcModel = db.getDocModel("ugc");
-    ugcModel.find({ "rating": "A", $or: [ { "genre":"miix" }, { "genre": "check_in"} ] }).sort({"createdOn":-1}).limit(10).exec(function (err, docs) {
+    ugcModel.find({ "rating": "A", $or: [ { "contentGenre":"miix_it" }, { "contentGenre": "check_in"} ] }).sort({"createdOn":-1}).limit(10).exec(function (err, docs) {
         if (!err){
             res.send(docs);
         }
@@ -248,7 +252,7 @@ app.get('/miix/ugc_hightlights', function(req, res){
         
     });
     
-});
+});*/
 
 /**
  * Get a list of latest UGCs of a specific member , sorted by creating time (the newest at beginning)<br>
@@ -269,6 +273,8 @@ app.get('/miix/ugc_hightlights', function(req, res){
  * @name GET /miix/members/:memberId/ugcs
  * @memberof miix
  */
+app.get('/miix/members/:memberId/ugcs', routes.miixHandler.getUgcs_cb);
+
 
 /**
  * Get a list of latest live content items (a.k.a. "Miix Story" or "Story MV") of a specific member , sorted by creating time (the newest at beginning)<br>
@@ -289,6 +295,8 @@ app.get('/miix/ugc_hightlights', function(req, res){
  * @name GET /miix/members/:memberId/live_contents
  * @memberof miix
  */
+app.get('/miix/members/:memberId/live_contents', routes.miixHandler.getLiveContents_cb);
+
 
 
 /**
@@ -303,11 +311,11 @@ app.get('/miix_admin/members', routes.authorizationHandler.checkAuth, routes.adm
 app.get('/miix_admin/miix_movies', routes.authorizationHandler.checkAuth, routes.admin.miixPlayList_get_cb); 
 app.get('/miix_admin/story_movies', routes.authorizationHandler.checkAuth, routes.admin.storyPlayList_get_cb);
 app.get('/miix_admin/list_size', routes.authorizationHandler.checkAuth, routes.admin.listSize_get_cb);
-app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.censor_handler.getUGCList_get_cb);
+app.get('/miix_admin/ugc_censor', routes.authorizationHandler.checkAuth, routes.censorHandler.getUGCList_get_cb);
 
-app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
-app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);
-app.get('/miix_admin/timeslots', routes.censor_handler.timeslots_get_cb);
+app.get('/miix_admin/user_content_items', routes.censorHandler.getUGCList_get_cb);
+app.put('/miix_admin/user_content_attribute', routes.censorHandler.setUGCAttribute_get_cb);
+app.get('/miix_admin/timeslots', routes.censorHandler.timeslots_get_cb);
 
 
 /**
@@ -419,6 +427,7 @@ app.get('/miix_service/customer_service_items', routes.service.getCustomerServic
  * <li>doohPlayedTimes: 
  * <li>rating: 
  * <li>genre: 
+ * <li>contentGenre:
  * <li>mustPlay: 
  * </ul>
  * For example, <br>
@@ -430,11 +439,13 @@ app.get('/miix_service/customer_service_items', routes.service.getCustomerServic
  * "doohPlayedTimes":0,
  * "rating":"d",
  * "genre":"miix",
+ * "contentGenre":"miit_it"
  * "mustPlay":true}] <br>
  *
  * @name GET /miix_admin/user_content_items
+ * @memberof miix_admin
  */
-app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_cb);
+app.get('/miix_admin/user_content_items', routes.censorHandler.getUGCList_get_cb);
 
 /**
  * Update the UGC field to Feltmeng DB<br>
@@ -459,9 +470,10 @@ app.get('/miix_admin/user_content_items', routes.censor_handler.getUGCList_get_c
  * </ul>
  *
  * @name PUT /miix_admin/user_content_attribute/:ugcId
+ * @memberof miix_admin
  */
-app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttribute_get_cb);//TODO::ugcId
-//app.put('/miix_admin/user_content_attribute/:ugcId', routes.censor_handler.setUGCAttribute_get_cb);
+app.put('/miix_admin/user_content_attribute', routes.censorHandler.setUGCAttribute_get_cb);//TODO::ugcId
+//app.put('/miix_admin/user_content_attribute/:ugcId', routes.censorHandler.setUGCAttribute_get_cb);
 
 /**
  * Create a timeslots for dooh<br>
@@ -473,7 +485,7 @@ app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttrib
  * <ul>
  * <li>intervalOfSelectingUGC: An object specifying the starting and ending of of the time interval for scheduleMgr to select the applied UGC items.
  * <li>intervalOfPlanningDoohProgrames: An object specifying the starting and ending of of the time interval which the generated schedule covers.
- * <li>programSequence: An array of strings showing the sequence of program genres.
+ * <li>programSequence: An array of strings showing the sequence of program content genres.
  * </ul>
  * <h5>Request body</h5>
  * None
@@ -492,8 +504,10 @@ app.put('/miix_admin/user_content_attribute', routes.censor_handler.setUGCAttrib
  *     </ul>
  *
  * @name POST /miix_admin/doohs/:doohId/timeslots
+ * @memberof miix_admin
  */
-app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTimeslots_get_cb);
+app.post('/miix_admin/doohs/:doohId/timeslots', routes.censorHandler.createTimeslots_get_cb);
+
 /**
  * Get the dooh timeslot<br>
  * <h5>Path Parameters</h5>
@@ -522,6 +536,7 @@ app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTime
  * <li>fbPictureUrl:  
  * <li>rating: 
  * <li>genre: 
+ * <li>contentGenre:
  * </ul>
  * For example, <br>
  * [{_id: '51d837f6830459c42d000023',
@@ -532,11 +547,13 @@ app.post('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.createTime
  * "fb_userName":"No User",
  * "fbPictureUrl":"http://profile.ak.fbcdn.net/hprofile-ak-frc1/371959_100004619173955_82185728_q.jpg",
  * "rating":"d",
- * "genre":"miix"}] <br>
+ * "genre":"miix"}
+ * "contentGenre":"miix_it"] <br>
  *
  * @name GET /miix_admin/doohs/:doohId/timeslots
+ * @memberof miix_admin
  */
-app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.gettimeslots_get_cb);
+app.get('/miix_admin/doohs/:doohId/timeslots', routes.censorHandler.gettimeslots_get_cb);
 
 /**
  * Update the ProgramTimeSlot field to Feltmeng DB<br>
@@ -560,8 +577,9 @@ app.get('/miix_admin/doohs/:doohId/timeslots', routes.censor_handler.gettimeslot
  * </ul>
  *
  * @name PUT /miix_admin/doohs/:doohId/timeslots/:sessionId
+ * @memberof miix_admin
  */
-app.put('/miix_admin/doohs/:doohId/timeslots/:sessionId', routes.censor_handler.updatetimeslots_get_cb);
+app.put('/miix_admin/doohs/:doohId/timeslots/:sessionId', routes.censorHandler.updatetimeslots_get_cb);
 
 //TODO: pushProgramsTo3rdPartyContentMgr RESTful
 /**
@@ -584,8 +602,9 @@ app.put('/miix_admin/doohs/:doohId/timeslots/:sessionId', routes.censor_handler.
  * </ul>
  *
  * @name PUT /miix_admin/doohs/:doohId/ProgramsTo3rdPartyContent
+ * @memberof miix_admin
  */
-app.put('/miix_admin/doohs/:doohId/ProgramsTo3rdPartyContentMgr/:sessionId', routes.censor_handler.pushProgramsTo3rdPartyContentMgr_get_cb);
+app.put('/miix_admin/doohs/:doohId/ProgramsTo3rdPartyContentMgr/:sessionId', routes.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb);
 
 // Internal
 
@@ -593,9 +612,9 @@ app.get('/internal/oauth2callback', routes.YoutubeOAuth2_cb );
 app.get('/internal/commands', routes.command_get_cb);
 app.post('/internal/command_responses', routes.commandResponse_post_cb); 
 
-app.post('/internal/dooh/movie_playing_state', routes.dooh_handler.doohMoviePlayingState_post_cb);  //TODO: PUT /internal/dooh/movie_playing_state is better
-app.post('/internal/dooh/dooh_periodic_data', routes.dooh_handler.importPeriodicData);  //TODO: POST /internal/adapter/schedule_periodic_data is better
-app.get('/internal/dooh/dooh_current_video', routes.dooh_handler.dooh_current_UGC);  
+app.post('/internal/dooh/movie_playing_state', routes.doohHandler.doohMoviePlayingState_post_cb);  //TODO: PUT /internal/dooh/movie_playing_state is better
+app.post('/internal/dooh/dooh_periodic_data', routes.doohHandler.importPeriodicData);  //TODO: POST /internal/adapter/schedule_periodic_data is better
+app.get('/internal/dooh/dooh_current_video', routes.doohHandler.dooh_current_UGC);  
 
 app.post('/internal/story_cam_controller/available_story_movie', routes.storyCamControllerHandler.availableStoryMovie_post_cb);
 
@@ -610,9 +629,6 @@ app.get('/get_template_customizable_object_list', routes.getTemplateCustomizable
 
 app.get('/oauth2callback', routes.YoutubeOAuth2_cb );
 
-app.post('/upload', routes.upload_cb );
-app.post('/upload_user_data_info',routes.uploadUserDataInfo_cb);
-
 //admin
 app.get('/admin', routes.admin.get_cb); 
 app.get('/admin/login', routes.admin.login_get_cb);
@@ -624,16 +640,14 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
 
 
 //internal
-app.post('/internal/dooh_periodic_data', routes.dooh_handler.importPeriodicData);
-app.get('/internal/dooh_current_video', routes.dooh_handler.dooh_current_UGC);
+app.post('/internal/dooh_periodic_data', routes.doohHandler.importPeriodicData);
+app.get('/internal/dooh_current_video', routes.doohHandler.dooh_current_UGC);
 app.post('/internal/dooh_timeslot_rawdata', routes.timeDataGet);
 
 
 //FM.API
 app.get('/api/eventsOfWaiting', routes.api.eventsOfWaiting); //not used in MiixCard v1.0 or later
 app.get('/api/schedule', routes.api.eventsOfPeriod); //not used in MiixCard v1.0 or later
-app.get('/api/userProfile', routes.api.userProfile); //not used in MiixCard v1.0 or later
-app.get('/api/profile', routes.api.profile); //not used in MiixCard v1.0 or later
 app.get('/api/fbGetComment', routes.api.fbGetCommentReq); 
 app.get('/api/fbGetThumbnail', routes.api.fbGetThumbnail);
 app.get('/api/newVideoList', routes.api.newUGCList);
@@ -664,23 +678,52 @@ http.createServer(app).listen(app.get('port'), function(){
 
 
 
+
+//var test_s3 = require('./aws_s3.js');
+//setTimeout(function(){
+//	//change the auth to save files on s3
+//	console.log("aws_s3 test!");
+////	var key = '/user_project/.jpg';
+//	var key = '/user_project/Summer.mp4';
+////	var obj = "C:\\Users\\feltmeng-user\\Desktop\\star_server\\star_server\\public\\images\\logo.jpg";
+//	var obj = "C:\\Users\\feltmeng-user\\Desktop\\PopDanthology2012.mp4"
+////	test_s3.uploadToAwsS3(obj, key, 'image/jpeg', function(err, result){
+//	test_s3.uploadToAwsS3(obj, key, 'video/mp4', function(err, result){
+//		if(err)
+//			console.log("test_s3 error");
+//		else
+//			console.log("test_s3 success");
+//	});
+//	
+//	
+//},3000);
+
+
 /*
 //test
 var scheduleMgr = require('./schedule_mgr.js');
-setTimeout(function(){
-    
+    setTimeout(function(){
+   
     scheduleMgr.createProgramList("TP_dom", 
-        {start:(new Date("2013/5/4 0:00")).getTime(), end:(new Date("2013/5/4 23:59")).getTime()}, 
-        {start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, 
-        ["miix", "check_in", "check_in", "mood", "cultural_and_creative" ], function(err, result){
+        {start:(new Date("2013/7/2 10:30")).getTime(), end:(new Date("2013/7/2 11:00")).getTime()}, 
+        {start:(new Date("2013/7/17 11:00")).getTime(), end:(new Date("2013/7/17 11:15")).getTime()}, 
+        ["miix_it"], function(err, result){
             console.log("err=%s result=", err);
             console.dir(result);
-            scheduleMgr.getProgramList("TP_dom",{start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, null, 30, function(err2, result2){
-                console.log('result=');
-                console.dir(result2);
-            });
+            if (!err){
+                scheduleMgr.pushProgramsTo3rdPartyContentMgr(result.sessionId, function(err){
+                    console.log("err=%s ", err);
+                });
+            }
+            
     });
     
+     
+    scheduleMgr.getProgramList("TP_dom",{start:(new Date("2013/5/5 7:00")).getTime(), end:(new Date("2013/5/5 23:00")).getTime()}, null, 30, function(err2, result2){
+        console.log('result=');
+        console.dir(result2);
+    });
+
     scheduleMgr.setUgcToProgram( "51da8db6fdf3b7e009000003", 426, function(err, result){
         console.log('result=');
         console.dir(result);
@@ -690,8 +733,15 @@ setTimeout(function(){
     scheduleMgr.removeUgcfromProgramAndAutoSetNewOne('1367596800000-1367683140000-1373357471568', '51dbc59f27c747c80b000003', function(err){
         console.log('err=%s',err);
     });
-   
-},3000);
+    
+    
+    scheduleMgr.pushProgramsTo3rdPartyContentMgr('1372732200000-1372734000000-1373972400000-1373973300000-1374026315925', function(err){
+        console.log("err=%s ", err);
+    });
+    
+    
+},1000);
+
 
 var aeServerMgr = require('./ae_server_mgr.js');
 var globalConnectionMgr = require('./global_connection_mgr.js');

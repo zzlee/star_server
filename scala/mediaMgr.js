@@ -22,10 +22,10 @@ var media = (function() {
                     rest.post(connect, {
                         multipart: true,
                         token: token,
-                        'Content-Length': data.length,
+                        'Content-Length': new Buffer(data).length,
                         data: {
                             'token': token,
-                            'video[file]': rest.file( file.path + '\\' + file.name, null, data.lenth, null, '' )
+                            'video[file]': rest.file( file.path + '\\' + file.name, null, data.length, null, '' )
                         }
                     }).on('complete', function(data) {
                         //if(data.value == 'Done') upload_cb(null, 'OK');
@@ -52,6 +52,16 @@ var media = (function() {
             
             adapter.get(request, function(err, req, res, obj) {
                 list_cb(obj);
+            });
+        },
+        create: function( option, create_cb ){
+            var webpage = {
+                name: option.name,
+                uri: option.uri,
+                mediaType: 'HTML'
+            };
+            adapter.post('/ContentManager/api/rest/media?token=' + token, webpage, function(err, req, res, obj) {
+                create_cb(null, 'OK');
             });
         },
         register : function( auth ) {
@@ -85,6 +95,12 @@ var media = (function() {
             _private.list( { fields : 'id,duration', search : mediaName }, function( mediaInfo ){
                 if( typeof( mediaInfo.list[0].id ) !== 'undefined' ) list_cb( null, { id: mediaInfo.list[0].id, duration: mediaInfo.list[0].duration } );
                 else list_cb( 'NOT_FOUND_MEDIA', null );
+            } );
+        },
+        createWebPage : function( option, status_cb ) {
+            _private.create( option, function( err, status ){
+                if(!err) status_cb( null, status );
+                else status_cb(err, null);
             } );
         },
     };

@@ -1,21 +1,41 @@
-var FM = { miixContentMgr: {} };
+/**
+ * @fileoverview Implementation of miixContentMgr
+ */
+var fs = require('fs');
+var path = require('path');
+var xml2js = require('xml2js');
+var async = require('async');
 
 var workingPath = process.cwd();
 var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var memberDB = require(workingPath+'/member.js');
 var UGCDB = require(workingPath+'/ugc.js');
+var awsS3 = require('./aws_s3.js');
 var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
+var db = require('./db.js');
 
-var fs = require('fs');
-var path = require('path');
-var xml2js = require('xml2js');
+/**
+ * The manager who coordinates the operations for Miix contents
+ *
+ * @mixin
+ */
+var miixContentMgr = {};
 
-FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbID, movieTitle) {
+
+/**
+ * Coordinate AE server to render Miix movie and save the content info to UGC db
+ * 
+ * @param {String} movieProjectID
+ * @param {String} ownerStdID
+ * @param {String} ownerFbID
+ * @param {String} movieTitle
+ */
+miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbID, movieTitle) {
     
     //console.log('generateMiixMoive is called.');
-    //var mediaType = "H.264";
-    var mediaType = "FLV";
+    var mediaType = "H.264";
+    //var mediaType = "FLV";
     
     aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, mediaType, function(responseParameters){
         
@@ -53,27 +73,15 @@ FM.miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, owner
     
 };
 
-FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, miixMovieProjectID ) {
-
-    //deliver Miix movie content to DOOH
-    /*
-    aeServerMgr.uploadMovieToMainServer(movieProjectID, function(resParametes){
-        logger.info('uploading Miix movie from AE Server to Main Server finished.');
-        logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
-        
-        //TODO:: check the file size. If not correct, re-upload.
-        
-        if ( (resParametes.err == 'null') || (!resParametes.err) ) {
-            doohMgr.downloadMovieFromMainServer(movieProjectID, function(resParametes){
-                logger.info('downloading Miix movie from Main Server to DOOH. ');
-                logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
-                
-                //TODO:: check the file size. If not correct, re-download.
-            });						
-        }
-    });
-    */
-    
+/**
+ * Coordinate DOOH server to download Miix Content
+ * 
+ * @param {String} doohID
+ * @param {String} miixMovieProjectID
+ * @deprecated since Miix 2.0
+ */
+miixContentMgr.submitMiixMovieToDooh = function( doohID, miixMovieProjectID ) {
+   
     UGCDB.getValueByProject(miixMovieProjectID, "fileExtension", function(err3, result){ 
         if (result){
             var miixMovieFileExtension = result.fileExtension;
@@ -89,17 +97,238 @@ FM.miixContentMgr.submitMiixMovieToDooh = function( doohID, miixMovieProjectID )
         
     });
     
-                        
-
-
-                    
-    //add Miix movie to the nearest time slot in schedule
-                    
-    //submit the playlist to DOOH
-                
 };
 
-FM.miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUrls_cb) {
+
+/**
+ * Add some info some preliminary info of Miix movie to UGC db and ask AE Server to render Miix video.<br>  
+ * <br>
+ * These info are for clinet side to show some dummy icon for Miix movie which is under rendering
+ * 
+ * @param {String} ugcProjectID Project ID of this UGC
+ * @param {Object} ugcInfo An object containing UGC info:
+ *     <ul>
+ *     <li>ownerId: ownerId An object containing owner's id info:
+ *         <ul>                                                                             
+ *         <li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)
+ *         <li>fbUserId: owner's Facebook user ID                                                    
+ *         </ul>                                                                            
+ *     <li>contentGenre: it is normally the template (id) that this UGC uses
+ *     <li>customizableObjects: a json string describing the customizable objects
+ *     <li>title: title of UGC. This title will be used when it is posted on YouTube
+ *     </ul>
+ * @param {Function} cbOfPreAddMiixMovie Callback function called when adding operation is done
+ */
+miixContentMgr.preAddMiixMovie = function(ugcProjectID, ugcInfo, cbOfPreAddMiixMovie) {
+    var movieProjectDir = path.join( workingPath, 'public/contents/user_project', ugcProjectID);
+    var userDataDir = path.join( movieProjectDir, 'user_data');
+    var userContentDescriptionFilePath = path.join( userDataDir, 'customized_content.xml');
+    var customizableObjects = JSON.parse(ugcInfo.customizableObjects);
+
+    async.series([
+        function(callback){
+            //generate user content description file customized_content.xml
+            var builder = require('xmlbuilder');
+            var userDataXml = builder.create('customized_content',{'version': '1.0', 'encoding': 'UTF-8', 'standalone': true});
+            userDataXml.ele('template_ID', ugcInfo.contentGenre);
+            var customizableObjectListXml = userDataXml.ele('customizable_object_list');
+            var customizableObjectXml = "";
+            
+
+            if( Object.prototype.toString.call( customizableObjects ) === '[object Array]' ) {
+                for (var i in customizableObjects) {
+                    //append the content in customized_content.xml
+                    customizableObjectXml = customizableObjectListXml.ele('customizable_object');
+                    customizableObjectXml.ele('ID', customizableObjects[i].ID );
+                    customizableObjectXml.ele('format', customizableObjects[i].format);
+                    customizableObjectXml.ele('content', "_"+customizableObjects[i].content);
+                }
+            }
+            else {
+                //append the content in customized_content.xml
+                customizableObjectXml = customizableObjectListXml.ele('customizable_object');
+                customizableObjectXml.ele('ID', customizableObjects.ID );
+                customizableObjectXml.ele('format', customizableObjects.format);
+                customizableObjectXml.ele('content', "_"+customizableObjects.content);
+            }
+            
+            //finalize customized_content.xml 
+            var xmlString = userDataXml.end({ 'pretty': true, 'indent': '  ', 'newline': '\n' });
+            //logger.info(userDataXml);
+            //TODO: create userDataDir if it does not exist 
+            if ( fs.existsSync(userDataDir) ) {
+                fs.writeFile(userContentDescriptionFilePath, xmlString, function(errOfWriteFile){
+                    if (!errOfWriteFile){
+                        callback(null);
+                    }
+                    else {
+                        callback("Failed to write to customized_content.xml: "+errOfWriteFile);
+                    }
+                }); 
+            }
+
+        },
+        function(callback){
+            //save customized_content.xml to S3 
+            var s3Path =  '/user_project/' + ugcProjectID + '/user_data/'+ "customized_content.xml";
+            awsS3.uploadToAwsS3(userContentDescriptionFilePath, s3Path, 'text/xml', function(errOfUploadToAwsS3, result){
+                if (!errOfUploadToAwsS3){
+                    callback(null);
+                }
+                else {
+                    callback("Failed to save customized_content.xml to S3: "+errOfUploadToAwsS3);
+                }
+            });
+        },
+        function(callback){
+            //Add UGC info to UGC db 
+            var vjson = {
+                    "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
+                    "projectId": ugcProjectID,
+                    "genre": "miix",
+                    "contentGenre": ugcInfo.contentGenre,
+                    "title": ugcInfo.title,
+                };
+
+            UGCDB.addUGC(vjson, function(errOfAddUGC, result){
+                if (!errOfAddUGC){
+                    callback(null);
+                }
+                else {
+                    callback("Failed to add UGC info to UGC db: "+errOfAddUGC);
+                }
+            });
+        },
+        function(callback){
+            //check if all the user data exist. If yes, start generating the movie in miixContentMgr.generateMiixMoive
+            //TODO: use async to better check file existance
+            var allUserContentExist = true;
+            if( Object.prototype.toString.call( customizableObjects ) === '[object Array]' ) {
+                for (var i in customizableObjects) {
+                    allUserContentExist = allUserContentExist && fs.existsSync( path.join( userDataDir, "_"+customizableObjects[i].content) );
+                }
+            }
+            else {
+                allUserContentExist = fs.existsSync( path.join( userDataDir, "_"+customizableObjects.content) );
+            }
+
+            if ( allUserContentExist ) {
+                logger.info('Start generating movie '+ ugcProjectID +'!');
+                miixContentMgr.generateMiixMoive(ugcProjectID, ugcInfo.ownerId._id, ugcInfo.ownerId.fbUserId, ugcInfo.title);
+                callback(null);
+            }
+            else {
+                callback("Cannot generate UGC because some or all user contents are missing.");
+            }
+        }
+    ],
+    function(err, results){
+        if (cbOfPreAddMiixMovie){
+            cbOfPreAddMiixMovie(err);
+        }
+    });
+    
+    
+    
+
+};
+
+/**
+ * Add a Miix image to system. <br>  
+ * <br>
+ * Miix image content body (in base64 format) is saved as a PNG and put onto AWS S3; the complete set of  
+ * content info is save to UGC db
+ * 
+ * @param {String} imgBase64 image date with base64 format
+ * @param {String} ugcProjectID Project ID of this UGC
+ * @param {Object} ugcInfo An object containing UGC info:
+ *     <ul>
+ *     <li>ownerId: ownerId An object containing owner's id info:
+ *         <ul>                                                                             
+ *         <li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)
+ *         <li>fbUserId: owner's Facebook user ID                                                    
+ *         </ul>                                                                            
+ *     <li>contentGenre: it is normally the template (id) that this UGC uses
+ *     <li>title: title of UGC 
+ *     </ul>
+ * @param {Function} cbOfAddMiixImage Callback function called when adding operation is done
+ */
+miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAddMiixImage) {
+    var imageUgcFile = null;
+    var s3Path = null;
+    
+    async.series([
+        function(callback){
+            //Save base64 image to a PNG file
+            var base64Data = imgBase64.replace(/^data:image\/png;base64,/,"");
+            imageUgcFile = path.join(workingPath,"public/contents/temp", ugcProjectID+".png");
+
+            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
+                if (!errOfWriteFile){
+                    callback(null);
+                }
+                else {
+                    callback("Fail to save base64 image to a PNG file: "+errOfWriteFile);
+                }
+                
+            });
+            
+        },
+        function(callback){
+            //Upload the PNG file to S3
+            s3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+".png";
+            awsS3.uploadToAwsS3(imageUgcFile, s3Path, 'image/png', function(err,result){
+                if (!err){
+                    logger.info('Miix image is successfully uploaded to S3 '+s3Path);
+                    callback(null, s3Path);
+                }
+                else {
+                    logger.info('Miix image is failed to be uploaded to S3 '+s3Path);
+                    callback('Miix movie is failed to be uploaded to S3 '+s3Path, null);
+                }
+            });
+        },
+        function(callback){
+            //Add UGC info to UGC db
+            var s3Url = "https://s3.amazonaws.com/miix_content"+s3Path;
+            var vjson = {
+                    "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
+                    "projectId": ugcProjectID,
+                    "genre": "miix_image",
+                    "contentGenre": ugcInfo.contentGenre,
+                    "mediaType": "PNG",
+                    "fileExtension": "png",
+                    "title": ugcInfo.title,
+                    "url": {"s3":s3Url}
+                };
+
+            UGCDB.addUGC(vjson, function(errAddUgc, result){
+                if (!errAddUgc){
+                    logger.info('Miix image info is successfully saved to UGC db: '+ugcProjectID);
+                    callback(null);
+                }
+                else {
+                    logger.info('Miix image info failed to saved to UGC db');
+                    callback('Miix image info failed to saved to UGC db: '+errAddUgc);
+                }
+            });
+        }
+    ],
+    function(err, results){
+        if (cbOfAddMiixImage){
+            cbOfAddMiixImage(err);
+        }
+    });
+};
+
+
+/**
+ * Get the url of user-uploaded image <br>  
+ * 
+ * @param {String} miixMovieProjectID
+ * @param {Function} gotUrls_cb
+ */
+miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUrls_cb) {
     var userUploadedImageUrls = new Array();
     var anUserUploadedImageUrl;
     var userContentXmlFile = path.join( workingPath, 'public/contents/user_project', miixMovieProjectID, 'user_data/customized_content.xml')
@@ -139,13 +368,37 @@ FM.miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUr
     });
 };
 
+/**
+ * Retrieve the latest highlights of UGCs.<br>
+ * 
+ * @param {Number} limit The number of UGC highlights to retrieve
+ * @param {Function} cbOfGetUgcHighlights The callback function called when finishing retrieving. It has the following signature:<br>
+ *     cbOfGetUgcHighlights(err, ugcHighlightList)
+ */
+miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
+    
+    var ugcModel = db.getDocModel("ugc");
+    //TODO: change to query to meet the requirements
+    ugcModel.find({ "rating": "A", $or: [ { "contentGenre":"miix_it" }, { "contentGenre": "mood"} ] }).sort({"createdOn":-1}).limit(limit).exec(function (err, ugcHighlights) {
+        //TODO: get UGC owner's FB user name 
+        
+        if (!err){
+            cbOfGetUgcHighlights(null, ugcHighlights);
+        }
+        else {
+            cbOfGetUgcHighlights("Fail to retrieve UGC highlights from DB: "+err, ugcHighlights);
+        }
+        
+    });
+};
 
 
-module.exports = FM.miixContentMgr;
+
+module.exports = miixContentMgr;
 
 /*
 //test
-FM.miixContentMgr.getUserUploadedImageUrls('greeting-50c99d81064d2b841200000a-20130129T072747490Z', function(userUploadedImageUrls, err){
+miixContentMgr.getUserUploadedImageUrls('greeting-50c99d81064d2b841200000a-20130129T072747490Z', function(userUploadedImageUrls, err){
     console.log('userUploadedImageUrls=');
     console.dir(userUploadedImageUrls);
 });

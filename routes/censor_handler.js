@@ -1,8 +1,8 @@
-
+ï»¿
 var DEBUG = true,
 FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str) ); } : function(str){} ;
 
-var FM = { censor_handler: {} };
+var FM = { censorHandler: {} };
 
 var censor_mgr = require("../censor_mgr.js");
 var apis = require("../routes/api.js");
@@ -36,7 +36,7 @@ var sessionId = null;
  *                       rating(Range A~E),
  *                       doohPlayedTimes}
  */
-FM.censor_handler.getUGCList_get_cb = function(req,res){
+FM.censorHandler.getUGCList_get_cb = function(req,res){
 
     var condition;
     var sort;
@@ -79,7 +79,7 @@ FM.censor_handler.getUGCList_get_cb = function(req,res){
  * @return response {string}status 
  *                       
  */
-FM.censor_handler.setUGCAttribute_get_cb = function(req,res){
+FM.censorHandler.setUGCAttribute_get_cb = function(req,res){
 
     var no = req.body.no;
     var vjson = req.body.vjson;
@@ -96,7 +96,7 @@ FM.censor_handler.setUGCAttribute_get_cb = function(req,res){
 
 };
 
-FM.censor_handler.createTimeslots_get_cb = function(req, res){
+FM.censorHandler.createTimeslots_get_cb = function(req, res){
     
     var doohId = req.params.doohId;
     var intervalOfSelectingUGCStart =  new Date(req.body.intervalOfSelectingUGC.start).getTime();
@@ -123,7 +123,7 @@ FM.censor_handler.createTimeslots_get_cb = function(req, res){
 };
 
 
-FM.censor_handler.gettimeslots_get_cb = function(req, res){
+FM.censorHandler.gettimeslots_get_cb = function(req, res){
 
 //  var doohId = req.params.doohId;
     var doohId = 'taipeiarena';
@@ -150,20 +150,20 @@ FM.censor_handler.gettimeslots_get_cb = function(req, res){
     });
 
 //  testArray =
-//  [ { doohTimes: ['2013/5/3 15:14', '2013/6/5 16:14', '2013/8/3 15:08'], //¯À§÷·Ó¤ù
-//  ugcCensorNo: '035', //¼v¤ù½s¸¹
-//  genre: 'mood', //Æ[¬İ¦¸¼Æ
-//  userContent: 'yeah', //FBÆg¦¸¼Æ
-//  userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //FB¯d¨¥¼Æ
-//  fb_userName: 'NO User', //FB¤À¨É¦¸¼Æ
-//  fbPictureUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //·|­û¦WºÙ
-//  rating: 'a' //§ë½Z¦¸¼Æ
+//  [ { doohTimes: ['2013/5/3 15:14', '2013/6/5 16:14', '2013/8/3 15:08'], //ç´ æç…§ç‰‡
+//  ugcCensorNo: '035', //å½±ç‰‡ç·¨è™Ÿ
+//  contentGenre: 'mood', //è§€çœ‹æ¬¡æ•¸
+//  userContent: 'yeah', //FBè®šæ¬¡æ•¸
+//  userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //FBç•™è¨€æ•¸
+//  fb_userName: 'NO User', //FBåˆ†äº«æ¬¡æ•¸
+//  fbPictureUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //æœƒå“¡åç¨±
+//  rating: 'a' //æŠ•ç¨¿æ¬¡æ•¸
 //  }
 //  ];
 //  res.render( 'table_censorPlayList', {ugcCensorPlayList: testArray} );
 };
 
-FM.censor_handler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
+FM.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
 
     schedule_mgr.pushProgramsTo3rdPartyContentMgr(sessionId, function(err, result){
         if (!err){
@@ -176,7 +176,7 @@ FM.censor_handler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
 
 };
 
-FM.censor_handler.updatetimeslots_get_cb = function(req, res){
+FM.censorHandler.updatetimeslots_get_cb = function(req, res){
 
     var programTimeSlot =  req.body.programTimeSlotId;
     var ugcReferenceNo = req.body.ugcReferenceNo;
@@ -207,4 +207,4 @@ FM.censor_handler.updatetimeslots_get_cb = function(req, res){
 
 };
 
-module.exports = FM.censor_handler;
+module.exports = FM.censorHandler;

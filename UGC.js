@@ -78,8 +78,8 @@ FM.UGC = (function(){
                 FMDB.getValueOf(UGCs, {"projectId":projectId}, fields, cb);
             },
             
-            getUGCListById: function(oid, cb){
-                UGCs.find({"ownerId._id":oid}, cb );
+            getUGCListByOwnerId: function(ownerId, limit, skip, cb){
+                UGCs.find({"ownerId._id":ownerId, $or:[ { "genre":"miix" }, { "genre": "miix_image"} ]}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(cb);
             },
             
             getUGCListByFB: function(userID, cb){
@@ -102,10 +102,12 @@ FM.UGC = (function(){
 				query.where("ownerId.userID", userID).where("genre", genre).where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(cb);
             },
             
+            //DEPRECATED
             getNewStreetUGCListByFB : function(userID, after, cb){
                 var query = UGCs.find();
 				query.where("ownerId.userID", userID).where("genre", "miix_street").ne("fb_id", null).where("createdOn").gte(after).sort({createdOn: -1}).limit(10).exec(cb);
             },
+            
             //kaiser            
             getOwnerIdByNo: function(no, cb){
                 UGCs.findOne({no: no}, '_id', function(err, result){

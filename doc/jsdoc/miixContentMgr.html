@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Mixin: scalaMgr</title>
+    <title>JSDoc: Mixin: miixContentMgr</title>
     
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Mixin: scalaMgr</h1>
+    <h1 class="page-title">Mixin: miixContentMgr</h1>
     
     
 
@@ -27,7 +27,7 @@
     
 <header>
     <h2>
-    scalaMgr
+    miixContentMgr
     </h2>
     
 </header>  
@@ -38,7 +38,7 @@
     
     
         
-            <div class="description">The manager who handles interfacing Scala Enterprise</div>
+            <div class="description">The manager who coordinates the operations for Miix contents</div>
         
         
         
@@ -64,7 +64,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">scala/index.js</a>, <a href="index.js.html#line17">line 17</a>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line21">line 21</a>
     </li></ul></dd>
     
     
@@ -98,7 +98,7 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="addItemToEvent"><span class="type-signature">&lt;static> </span>addItemToEvent<span class="signature">(item, path, filename, playTime, reportStatus_cb)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="addMiixImage"><span class="type-signature">&lt;static> </span>addMiixImage<span class="signature">(imgBase64, ugcProjectID, ownerId, title)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -106,7 +106,7 @@
     
     
     <div class="description">
-        Add item in timeslot to server.
+        Add a Miix image to system. <br>  <br>Miix image content body (in base64 format) is saved as a PNG and put onto AWS S3; the complete set of  content info is save to UGC db
     </div>
     
 
@@ -140,13 +140,13 @@
 	
         <tr>
             
-                <td class="name"><code>item</code></td>
+                <td class="name"><code>imgBase64</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">String</span>
 
 
             
@@ -156,20 +156,20 @@
             
             
             
-            <td class="description last">The item upload to scala server.</td>
+            <td class="description last">image date with base64 format</td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>path</code></td>
+                <td class="name"><code>ugcProjectID</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -179,20 +179,20 @@
             
             
             
-            <td class="description last">The path is file path.</td>
+            <td class="description last">Project ID of this UGC</td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>filename</code></td>
+                <td class="name"><code>ownerId</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">Object</span>
 
 
             
@@ -202,20 +202,20 @@
             
             
             
-            <td class="description last">The filename is file title.</td>
+            <td class="description last">An object containing owner's id info:    <ul>    <li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)    <li>fbId: owner's Facebook ID    </ul></td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>playTime</code></td>
+                <td class="name"><code>title</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -225,30 +225,7 @@
             
             
             
-            <td class="description last">The playTime is program play to DOOH in specific time.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>reportStatus_cb</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">Report media id and playlistItem id in playlist.</td>
+            <td class="description last">Tile of UGC</td>
         </tr>
 	
 	
@@ -279,7 +256,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">scala/index.js</a>, <a href="index.js.html#line50">line 50</a>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line128">line 128</a>
     </li></ul></dd>
     
     
@@ -307,7 +284,7 @@
         
             
 <dt>
-    <h4 class="name" id="listTimeslot"><span class="type-signature">&lt;static> </span>listTimeslot<span class="signature">(name, channel, frame, startDate, endDate, timeslot_cb, playlistInfo, valid)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="generateMiixMoive"><span class="type-signature">&lt;static> </span>generateMiixMoive<span class="signature">(movieProjectID, ownerStdID, ownerFbID, movieTitle)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -315,7 +292,7 @@
     
     
     <div class="description">
-        List timeslots from server.
+        Coordinate AE server to render Miix movie and save the content info to UGC db
     </div>
     
 
@@ -349,13 +326,13 @@
 	
         <tr>
             
-                <td class="name"><code>name</code></td>
+                <td class="name"><code>movieProjectID</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -365,20 +342,20 @@
             
             
             
-            <td class="description last">The name is search condition for timeslot.</td>
+            <td class="description last"></td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>channel</code></td>
+                <td class="name"><code>ownerStdID</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -388,20 +365,20 @@
             
             
             
-            <td class="description last">The channel number for play to DOOH.</td>
+            <td class="description last"></td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>frame</code></td>
+                <td class="name"><code>ownerFbID</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -411,20 +388,20 @@
             
             
             
-            <td class="description last">The frame of channel playing.</td>
+            <td class="description last"></td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>startDate</code></td>
+                <td class="name"><code>movieTitle</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -434,99 +411,7 @@
             
             
             
-            <td class="description last">The start date.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>endDate</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">The end date.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>timeslot_cb</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">Report timeslot list in json.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>playlistInfo</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">The playlistInfo have name, time, duration, mode and more.</td>
-        </tr>
-	
-	
-	
-        <tr>
-            
-                <td class="name"><code>valid</code></td>
-            
-            
-            <td class="type">
-            
-                
-<span class="param-type">boolean</span>
-
-
-            
-            </td>
-            
-            
-            
-            
-            
-            <td class="description last">The valid show this timeslot is valid.</td>
+            <td class="description last"></td>
         </tr>
 	
 	
@@ -557,7 +442,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">scala/index.js</a>, <a href="index.js.html#line37">line 37</a>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line32">line 32</a>
     </li></ul></dd>
     
     
@@ -585,7 +470,7 @@
         
             
 <dt>
-    <h4 class="name" id="pushEvent"><span class="type-signature">&lt;static> </span>pushEvent<span class="signature">(reportStatus_cb)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getUserUploadedImageUrls"><span class="type-signature">&lt;static> </span>getUserUploadedImageUrls<span class="signature">(miixMovieProjectID, gotUrls_cb)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -593,7 +478,7 @@
     
     
     <div class="description">
-        Push event list to all playlist in server.
+        Get the url of user-uploaded image <br>
     </div>
     
 
@@ -627,13 +512,13 @@
 	
         <tr>
             
-                <td class="name"><code>reportStatus_cb</code></td>
+                <td class="name"><code>miixMovieProjectID</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">function</span>
+<span class="param-type">String</span>
 
 
             
@@ -643,7 +528,30 @@
             
             
             
-            <td class="description last">Report status. i.e. { value: success }</td>
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>gotUrls_cb</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
         </tr>
 	
 	
@@ -674,7 +582,289 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">scala/index.js</a>, <a href="index.js.html#line59">line 59</a>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line138">line 138</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="preAddMiixMovie"><span class="type-signature">&lt;static> </span>preAddMiixMovie<span class="signature">(doohID, miixMovieProjectID)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Add some info some preliminary info of Miix movie to UGC db while AE is rending its concrete content.<br>  <br>These info are for clinet side to show some dummy icon for Miix movie which is under rendering
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>doohID</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>miixMovieProjectID</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line109">line 109</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="submitMiixMovieToDooh"><span class="type-signature">&lt;static> </span>submitMiixMovieToDooh<span class="signature">(doohID, miixMovieProjectID)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Coordinate DOOH server to download Miix Content
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>doohID</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>miixMovieProjectID</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last"></td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+        <dt class="important tag-deprecated">Deprecated:</dt><dd><ul class="dummy"><li>since Miix 2.0</li><ul></dd>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line81">line 81</a>
     </li></ul></dd>
     
     
