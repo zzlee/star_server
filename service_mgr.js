@@ -1,18 +1,19 @@
 /**
- * @fileoverview Implementation of customerServiceMgr
+ * @fileoverview Implementation of serviceMgr
  */
 
 var db = require('./db.js');
 var async = require('async');
 
-var programTimeSlotModel = db.getDocModel("programTimeSlot");
+var customerServiceItemModel = db.getDocModel("customerServiceItem");
+var memberModel = db.getDocModel("member");
 
 /**
  * The manager who handles the customer service
  *
  * @mixin
  */
-var customerServiceMgr = {};
+var serviceMgr = {};
 
 /**
  * add new customer question to feltmeng db.<br>
@@ -29,9 +30,28 @@ var customerServiceMgr = {};
  *     <li>err: error message if any error happens
  *     </ul>
  */
-customerServiceMgr.addCustomerQuestion = function(fb_id, question, cb ){
+serviceMgr.createCustomerServiceItem = function(vjson, cb ){
+
+    db.listOfdocModels( memberModel, {_id: vjson.ownerId._id}, null, null, function(err, result){
+        if(!err){
+            newVjson = {
+                    ownerId: {_id: vjson.ownerId._id},
+                    genre: vjson.genre,
+                    phoneVersion: vjson.phoneVersion,
+                    question: vjson.question,
+                    fb_userName: result[0].fb.userName,
+                    fb_id: result[0].fb.userID
+            };
+            db.createAdoc(customerServiceItemModel , newVjson, function(err,result){
+                cb(err, result); 
+            });
+        }
+        else cb(err, result); 
+    });
+
     
 };
+
 /**
  * update field to feltmeng db.<br>
  * <br>
@@ -49,11 +69,16 @@ customerServiceMgr.addCustomerQuestion = function(fb_id, question, cb ){
  *     <li>err: error message if any error happens
  *     </ul>
  */
-customerServiceMgr.updateCustomerQuestion = function(fb_id, no, vjson, cb ){
+serviceMgr.updateCustomerServiceItem = function(_id, vjson, cb ){
+    
+    db.updateAdoc(customerServiceItemModel,_id, vjson, function(err, result){
+        cb(err, result); 
+    });
     
 };
+
 /**
- * get customer question from feltmeng db.<br>
+ * get customer question and answer from feltmeng db.<br>
  * <br>
  * @param {String} fb_id The ID of the FB.
  * 
@@ -62,30 +87,37 @@ customerServiceMgr.updateCustomerQuestion = function(fb_id, no, vjson, cb ){
  * @param {Function} cb The callback function called when get customer question from DB.<br>
  *     The function signature is cb(err, result) :
  *     <ul>
- *     <li>result:customer question from DB
+ *     <li>result:customer question and answser from DB
  *     <li>err: error message if any error happens
  *     </ul>
  */
-customerServiceMgr.getCustomerQuestion = function(fb_id, no, cb ){
+serviceMgr.getCustomerServiceItem= function(condition, field, pageLimit, pageSkip, cb ){
+    
+  //TODO pagination
+//    db.listOfdocModels( customerServiceItemModel, condition, field, {sort :'no', limit: pageLimit , skip: pageSkip}, function(err, result){
+    db.listOfdocModels( customerServiceItemModel, condition, field, {sort :{'questionTime':-1}}, function(err, result){
+        cb(err, result); 
+    });
     
 };
+
 /**
- * get customer question list from feltmeng db.<br>
+ * get customer service list from feltmeng db.<br>
  * <br>
  * @param {String} fb_id The ID of the FB.(null will select all customer question)
  * 
  * @param {Function} cb The callback function called when get customer question list from DB.<br>
  *     The function signature is cb(err, result) :
  *     <ul>
- *     <li>result:customer question list from DB
+ *     <li>result:customer service list from DB
  *     <li>err: error message if any error happens
  *     </ul>
  */
-customerServiceMgr.getCustomerServiceList = function(fb_id, cb ){
+serviceMgr.getCustomerServiceList = function(fb_id, cb ){
     
 };
 
+//TODO admin and message count
 
 
-
-module.exports = customerServiceMgr;
+module.exports = serviceMgr;

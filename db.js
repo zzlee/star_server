@@ -34,7 +34,7 @@ FM.DB = (function(){
                 //cultural_and_creative: a.k.a. 文創
                 //mood: a.k.a. 心情
                 //check_in: a.k.a. 打卡
-            questionGenre = 'account authorize sign_in'.split(' '),
+            questionGenre = 'account publish sign_in others'.split(' '),
             
             programTimeSlotType = 'UGC padding'.split(' '),
             programTimeSlotContnetType = 'file web_page'.split(' '),
@@ -248,18 +248,18 @@ FM.DB = (function(){
         }); //  storyPlayListInfo collection
         
          //kaiser end ***************		
-        var CustomerServiceSchema = new Schema({
+        var CustomerServiceItemSchema = new Schema({
             fb_id: {type: String},
+            fb_userName: {type: String},
+            ownerId: { _id:ObjectID, userID: String },
             no: {type: Number},
-            genre: {type: String, enum: questionGenre},
-            reply: { type: Boolean },
-            content: [{
-                question: String,
-                questionTime: Date,
-                answer: String,
-                answerTime: Date,
-            }],                                  
-            createdOn: {type: Date, default: Date.now},
+            genre: {type: String, enum: questionGenre},//account publish sign_in others
+            reply: {type: Boolean, default:false },
+            phoneVersion: { type: String },
+            question: String,
+            questionTime: {type: Date, default: Date.now},
+            answer: String,
+            answerTime: Date,                                
             remarks: {type: String}
         }); //   customerService collection
 		
@@ -278,7 +278,7 @@ FM.DB = (function(){
             MiixPlayListInfo = connection.model('MiixPlayListInfo', MiixPlayListInfoSchema, 'miixPlayListInfo'),
             StoryPlayListInfo = connection.model('StoryPlayListInfo', StoryPlayListInfoSchema, 'storyPlayListInfo'),
             UGC = connection.model('UGC', UGCSchema, 'ugc');
-            CustomerService = connection.model('CustomerService', CustomerServiceSchema, 'customerService');
+            CustomerServiceItem = connection.model('CustomerServiceItem', CustomerServiceItemSchema, 'customerServiceItem');
            
             
         var dbModels = [];
@@ -295,7 +295,7 @@ FM.DB = (function(){
         dbModels["miixPlayListInfo"] = MiixPlayListInfo;
         dbModels["storyPlayListInfo"] = StoryPlayListInfo;  
         dbModels["ugc"] = UGC;
-        dbModels["customerService"] = CustomerService;
+        dbModels["customerServiceItem"] = CustomerServiceItem;
         
         //???? nobody uses it, so this section can be removed? 
         var dbSchemas = [];
@@ -395,8 +395,8 @@ FM.DB = (function(){
                     case 'ugc':
                         return UGC;
                         break;
-                    case 'customerService':
-                        return CustomerService;
+                    case 'customerServiceItem':
+                        return CustomerServiceItem;
                         break;
                     default:
                         throw new error('DB Cannot find this Collection: ' + collection);
