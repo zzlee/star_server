@@ -211,8 +211,66 @@ $(document).ready(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#UGCPlayList').attr("class", "current");
 
-        FM.currentContent = FM.UGCPlayList;
-        FM.currentContent.showCurrentPageContent();
+        $.get('/miix_admin/table_censorPlayList_head.html', function(res){
+            $('#table-content-header').html(res);
+            $('#table-content').html('');
+            
+            $('#createProgramListBtn').click(function(){
+                var flag = 0;
+                var inputSearchData = {};
+                var url = DOMAIN + "doohs/taipeiarena/timeslots";
+
+
+                $('#condition-inner input[class="createProgramListBtn"]').each(function(i){
+
+                    inputSearchData[$(this).attr("name")] = $(this).attr("value");
+
+                    if($(this).attr("name") == 'ugcSequenceText'){
+
+                        var sequence = encodeURIComponent($(this).attr("value"));
+                        
+                        programSequenceStringToArr(sequence , function(err ,result){
+                            if(!err){
+                                console.log('programSequenceStringToArr'+result); 
+                            }
+                            else
+                                console.log('programSequenceStringToArr err'+err);
+                        });
+                    }
+                    
+                    if($(this).attr("value") == "" && flag == 0){
+                        alert('You have to enter complete condition!!');
+                        flag = 1; 
+                    }
+                    
+                    if(inputSearchData.TimeStart && inputSearchData.TimeEnd && inputSearchData.playtimeStart && inputSearchData.playtimeEnd && inputSearchData.ugcSequenceText && programSequenceArr){
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: {intervalOfSelectingUGC:{start:inputSearchData.TimeStart, end:inputSearchData.TimeEnd}, intervalOfPlanningDoohProgrames:{start:inputSearchData.playtimeStart, end:inputSearchData.playtimeEnd}, programSequence:programSequenceArr},
+                            success: function(response) {
+                                if(response.message){
+                                    console.log("[Response] message:" + JSON.stringify(response.message.sessionId));
+                                    sessionId = response.message;
+                                    $('#main_menu ul[class="current"]').attr("class", "select");
+                                    $('#UGCPlayList').attr("class", "current");
+
+                                    FM.currentContent = FM.UGCPlayList;
+                                    FM.currentContent.setExtraParameters({sessionId: response.message.sessionId});
+                                    FM.currentContent.showCurrentPageContent();
+                                    programSequenceArr =[];
+                                }
+                            }
+                        });
+                    }
+                });
+
+            });
+
+        });
+
+        //FM.currentContent = FM.UGCPlayList;
+        //FM.currentContent.showCurrentPageContent();
 
     });
 
@@ -458,57 +516,6 @@ $(document).ready(function(){
          */
 
         if(playlistCheck == '/miix_admin/doohs'){
-            $('#createProgramListBtn').click(function(){
-                var flag = 0;
-                var inputSearchData = {};
-                var url = DOMAIN + "doohs/taipeiarena/timeslots";
-
-
-                $('#condition-inner input[class="createProgramListBtn"]').each(function(i){
-
-                    inputSearchData[$(this).attr("name")] = $(this).attr("value");
-
-                    if($(this).attr("name") == 'ugcSequenceText'){
-
-                        var sequence = encodeURIComponent($(this).attr("value"));
-                        
-                        programSequenceStringToArr(sequence , function(err ,result){
-                            if(!err){
-                                console.log('programSequenceStringToArr'+result); 
-                            }
-                            else
-                                console.log('programSequenceStringToArr err'+err);
-                        });
-                    }
-                    
-                    if($(this).attr("value") == "" && flag == 0){
-                        alert('You have to enter complete condition!!');
-                        flag = 1; 
-                    }
-                    
-                    if(inputSearchData.TimeStart && inputSearchData.TimeEnd && inputSearchData.playtimeStart && inputSearchData.playtimeEnd && inputSearchData.ugcSequenceText && programSequenceArr){
-                        $.ajax({
-                            url: url,
-                            type: 'POST',
-                            data: {intervalOfSelectingUGC:{start:inputSearchData.TimeStart, end:inputSearchData.TimeEnd}, intervalOfPlanningDoohProgrames:{start:inputSearchData.playtimeStart, end:inputSearchData.playtimeEnd}, programSequence:programSequenceArr},
-                            success: function(response) {
-                                if(response.message){
-                                    console.log("[Response] message:" + JSON.stringify(response.message.sessionId));
-                                    sessionId = response.message;
-                                    $('#main_menu ul[class="current"]').attr("class", "select");
-                                    $('#UGCPlayList').attr("class", "current");
-
-                                    FM.currentContent = FM.UGCPlayList;
-                                    FM.currentContent.setExtraParameters({sessionId: response.message.sessionId});
-                                    FM.currentContent.showCurrentPageContent();
-                                    programSequenceArr =[];
-                                }
-                            }
-                        });
-                    }
-                });
-
-            });
             
             $('#ugcCensor.ugcCensorNoSetBtn').click(function(){
                 
