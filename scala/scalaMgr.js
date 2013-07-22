@@ -219,7 +219,7 @@ function scalaMgr( url, account ){
             updatelimit = 0;
         
         var itemPlaySetting = {
-            playlist: { id: '', name: 'tt01' },
+            playlist: { id: '', name: 'FM_DOOH' },
             item: { id: '', useValidRange: true, playFullscreen: true },
             media: { id: '', duration: '' },
             playTime : { start: playTime.start, end: playTime.end }
@@ -227,7 +227,7 @@ function scalaMgr( url, account ){
         
         var option = {
             media: { name: webpage.name },
-            playlist: { name: 'tt01' },
+            playlist: { name: 'FM_DOOH' },
             playTime: { start: playTime.start, end: playTime.end, duration: playTime.duration },
         };
         
