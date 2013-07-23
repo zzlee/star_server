@@ -604,8 +604,14 @@ $(document).ready(function(){
                             if(response.message){
                                 console.log("[Response] message:" + response.message);
                             }
+                            $('#underPushingText').html('上傳成功!!');
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            $('#underPushingText').html('上傳失敗： '+textStatus+" "+errorThrown);
                         }
                     });
+                    $('#pushProgramsBtn').hide();
+                    $('#table-content').append($('<p>').attr("id","underPushingText").html('上傳至播放系統中，請稍候....'));
                 }
             });            
 

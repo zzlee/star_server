@@ -131,7 +131,7 @@ function scalaMgr( url, account ){
             updatelimit = 0;
         
         var itemPlaySetting = {
-            playlist: { id: '', name: 'FM_DOOH' },
+            playlist: { id: '', name: 'OnDaScreen' },
             item: { id: '', useValidRange: true, playFullscreen: true },
             media: { id: '', duration: '' },
             playTime : { start: playTime.start, end: playTime.end }
@@ -139,7 +139,7 @@ function scalaMgr( url, account ){
         
         var option = {
             media: { name: file.name },
-            playlist: { name: 'FM_DOOH' },
+            playlist: { name: 'OnDaScreen' },
             playTime: { start: playTime.start, end: playTime.end, duration: playTime.duration },
         };
         
@@ -219,7 +219,7 @@ function scalaMgr( url, account ){
             updatelimit = 0;
         
         var itemPlaySetting = {
-            playlist: { id: '', name: 'FM_DOOH' },
+            playlist: { id: '', name: 'OnDaScreen' },
             item: { id: '', useValidRange: true, playFullscreen: true },
             media: { id: '', duration: '' },
             playTime : { start: playTime.start, end: playTime.end }
@@ -227,7 +227,7 @@ function scalaMgr( url, account ){
         
         var option = {
             media: { name: webpage.name },
-            playlist: { name: 'FM_DOOH' },
+            playlist: { name: 'OnDaScreen' },
             playTime: { start: playTime.start, end: playTime.end, duration: playTime.duration },
         };
         
@@ -329,7 +329,7 @@ function scalaMgr( url, account ){
                 
                 contractor.playlist.pushSubplaylist(pushSubplaylist, function(err, res){});
                 if(i == result[0].count-1) {
-                    if(!option.player.name) playerName = 'feltmeng';
+                    if(!option.player) playerName = 'feltmeng';
                     else playerName = option.player.name;
                     contractor.player.findPlayerIdByName(playerName, function(err, playerId){
                         contractor.player.pushProgram({"ids": [playerId]}, function(res){

@@ -361,8 +361,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                         //for debugging
                         programTimeSlotModel.find({ "session": sessionId }, "timeStamp timeslot contentGenre type content" ).sort({timeStamp:1}).exec(function (_err, programs) {
                             if (!_err){
-                                console.log("programs generated:");
-                                console.dir(programs);
+                                //console.log("programs generated:");
+                                //console.dir(programs);
                                 logger.info('[scheduleMgr] programs generated:' );
                                 for (var i in programs){
                                     logger.info(JSON.stringify(programs[i]));
@@ -586,8 +586,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                 
                 //generate program time slot documents (in programTimeSlot collection) according to available intervals and corresponding cycle durations
                 var availableTimeIntervals = result;
-                console.log("availableTimeIntervals=");
-                console.dir(availableTimeIntervals);
+                //console.log("availableTimeIntervals=");
+                //console.dir(availableTimeIntervals);
                 logger.info('availableTimeIntervals='+JSON.stringify(availableTimeIntervals));
                 var iteratorGenerateTimeSlot = function(anAvailableTimeInterval, interationDone_cb){
                     //add time slots in this available time interval
@@ -703,7 +703,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         function(callback){
             generateTimeSlot( function(err_2){
                 if (!err_2) {
-                    console.log('generateTimeSlot() done! ');
+                    //console.log('generateTimeSlot() done! ');
                     callback(null);
                 }
                 else {
@@ -980,7 +980,13 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
         function(cb3){
             //TODO: modify the counter in UGC collection; change the status of this programTimeslot doc
             
-            cb3(null, 'done');
+            cb3(null);
+        },
+        function(cb4){
+            //Ask ScalaMgr to push content to player
+            scalaMgr.pushEvent( {playlist: {search:'FM', play:'OnDaScreen'}}, function(res){
+                cb4(null, res);
+            });
         }
     ], function (err, result) {
         if (pushed_cb) {
