@@ -24,8 +24,10 @@ var candidateUgcCacheModel = db.getDocModel("candidateUgcCache");
  * @mixin
  */
 var scheduleMgr = {};
-
+var STAR_SERVER_URL = "http://192.168.5.102";  //TODO: make this configurable? 
 var DEFAULT_PROGRAM_PERIOD = 10*60*1000; //10 min
+var DEFAULT_PLAY_DURATION_FOR_STATIC_UGC = 7*1000; //7 sec.  
+var DEFAULT_PLAY_DURATION_FOR_STATIC_PADDING = 2*1000; //2 sec.   
 var TIME_INTERVAL_RANKIGN = [{startHour: 17, endHour: 23},  //start with the time interval with highest ranking
                              {startHour: 8, endHour: 16},
                              {startHour: 0, endHour: 7}];
@@ -51,29 +53,44 @@ var programPlanningPattern =(function(){
         
         set: function(_programSequence){
             programSequence = _programSequence;
+        },
+        
+        getProgramSequence: function(){
+            return programSequence;    
+        },
+        
+        remove: function(contentGenreToRemove){
+            for (var i=0; i<programSequence.length; i++){
+                if (programSequence[i]==contentGenreToRemove){
+                    programSequence.splice(i, 1);
+                    i--;
+                }
+            }
+            
         }
     };
 })();
 
 
+
 var paddingContent =(function(){ 
     var PADDING_CONTENT_TABLE = {
-            miix_it: [{dir: "contents/padding_content", file:"miix01.jpg", format:"image"},
+            miix_it: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/dooh_playing_html", format:"web_page"},
                    {dir: "contents/padding_content", file:"miix02.jpg", format:"image"}],
-            cultural_and_creative: [{dir: "contents/padding_content", file:"cc01.jpg", format:"image"},
-                                    {dir: "contents/padding_content", file:"cc02.jpg", format:"image"},
-                                    {dir: "contents/padding_content", file:"cc03.jpg", format:"image"},
-                                    {dir: "contents/padding_content", file:"cc04.jpg", format:"image"}
+            cultural_and_creative: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/dooh_playing_html", format:"web_page"},
+                                    {dir: "contents/padding_content", file:"miix02.jpg", format:"image"},
+                                    {dir: "contents/padding_content", file:"miix03.jpg", format:"image"},
+                                    {dir: "contents/padding_content", file:"miix04.jpg", format:"image"}
                                     ],
-            mood: [{dir: "contents/padding_content", file:"mood01.jpg", format:"image"},
-                   {dir: "contents/padding_content", file:"mood02.jpg", format:"image"},
-                   {dir: "contents/padding_content", file:"mood03.jpg", format:"image"},
-                   {dir: "contents/padding_content", file:"mood04.jpg", format:"image"}
+            mood: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/dooh_playing_html", format:"web_page"},
+                   {dir: "contents/padding_content", file:"miix02.jpg", format:"image"},
+                   {dir: "contents/padding_content", file:"miix03.jpg", format:"image"},
+                   {dir: "contents/padding_content", file:"miix04.jpg", format:"image"}
                    ],
-            check_in: [{dir: "contents/padding_content", file:"check_in01.jpg", format:"image"},
-                       {dir: "contents/padding_content", file:"check_in02.jpg", format:"image"},
-                       {dir: "contents/padding_content", file:"check_in03.jpg", format:"image"},
-                       {dir: "contents/padding_content", file:"check_in04.jpg", format:"image"}
+            check_in: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/dooh_playing_html", format:"web_page"},
+                       {dir: "contents/padding_content", file:"miix02.jpg", format:"image"},
+                       {dir: "contents/padding_content", file:"miix03.jpg", format:"image"},
+                       {dir: "contents/padding_content", file:"miix04.jpg", format:"image"}
                        ]                                
     };
         
@@ -219,15 +236,18 @@ scheduleMgr.init = function(_censorMgr){
  */
 scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, created_cb ){
     
+    logger.info('[scheduleMgr.createProgramList()]: intervalOfSelectingUGC={start:'+(new Date(intervalOfSelectingUGC.start))+' end:'+(new Date(intervalOfSelectingUGC.end))+'} ');
+    logger.info('intervalOfPlanningDoohProgrames= {start:'+(new Date(intervalOfPlanningDoohProgrames.start))+' end:'+(new Date(intervalOfPlanningDoohProgrames.end))+'} programSequence='+JSON.stringify(programSequence));
+    
     var sortedUgcList = null;
     var sessionId = intervalOfSelectingUGC.start.toString() + '-' + intervalOfSelectingUGC.end.toString() + '-' + intervalOfPlanningDoohProgrames.start.toString() + '-' + intervalOfPlanningDoohProgrames.end.toString() + '-' + Number((new Date()).getTime().toString());
     
-    var putUgcIntoTimeSlots = function(finishPut_cb){
+    var putUgcIntoTimeSlots = function(cbOfPutUgcIntoTimeSlots){
         
         var candidateUgcList = sortedUgcList.slice(0); //clone the full array of sortedUgcList
         var counter = 0;
         
-        var saveCandidateUgcList = function(_candidateUgcList, _intervalOfSelectingUGC, saved_cb){
+        var saveCandidateUgcList = function(_candidateUgcList, _intervalOfSelectingUGC, cbOfSaveCandidateUgcList){
             var indexArrayCandidateUgcCache = []; for (var i = 0; i < _candidateUgcList.length; i++) { indexArrayCandidateUgcCache.push(i); }
             
             var iteratorCreateCandidateUgcCache = function(indexOfCandidateUgcCache, interationDone_createCandidateUgcCache_cb){
@@ -245,10 +265,10 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             async.mapSeries(indexArrayCandidateUgcCache, iteratorCreateCandidateUgcCache, function(err, savedCandidateUgcCacheList){
                 if (!err){
                     var result = { sessionId: sessionId, candidateUgcCacheList: savedCandidateUgcCacheList };
-                    saved_cb(null, result);
+                    cbOfSaveCandidateUgcList(null, result);
                 }
                 else {
-                    saved_cb("Failed to save candidate UGC cached list: "+err, null);
+                    cbOfSaveCandidateUgcList("Failed to save candidate UGC cached list: "+err, null);
                 }
             });
             
@@ -259,14 +279,16 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             //query the time slots (in programTimeSlot collection) belonging to this interval and put UGC to them one by one
             //console.log("aTimeIntervalInADay=");
             //console.dir(aTimeIntervalInADay);
-            programTimeSlotModel.find({ "timeslot.startHour": {$lte:aTimeIntervalInADay.endHour, $gte:aTimeIntervalInADay.startHour}, "type": "UGC", "dooh": dooh }).sort({timeStamp:1}).exec(function (_err_1, timeSlots) {
-                
+            programTimeSlotModel.find({ "timeslot.startHour": {$lte:aTimeIntervalInADay.endHour, $gte:aTimeIntervalInADay.startHour}, "type": "UGC", "session": sessionId }).sort({timeStamp:1}).exec(function (_err_1, _timeSlots) {
+                //debugger;
                 if (!_err_1){
-                    
+                    //debugger;
                     //console.log("timeSlots=");
                     //console.dir(timeSlots);   
                     //-- PutUgcIntoTimeSlots_eachTimeSlot
+                    var timeSlots = JSON.parse(JSON.stringify(_timeSlots)); 
                     var iteratorPutUgcIntoTimeSlots_eachTimeSlot = function(aTimeSlot, interationDone_cb2){
+                        //debugger;
                         
                         var selectedUgc = null;
                         
@@ -283,11 +305,15 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                             }
                         }
                         
-                        var _selectedUgc = JSON.parse(JSON.stringify(selectedUgc)); //clone selectedUgc object to prevent from a strange error "RangeError: Maximum call stack size exceeded"
-                        
+                        var playDuration = 0;
+                        if ( selectedUgc.genre == "miix_image"){
+                            playDuration = DEFAULT_PLAY_DURATION_FOR_STATIC_UGC;
+                        }
                         //debugger;
-                        db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"content": _selectedUgc }, function(_err_2, result){
+                        var _selectedUgc = JSON.parse(JSON.stringify(selectedUgc)); //clone selectedUgc object to prevent from a strange error "RangeError: Maximum call stack size exceeded"
+                        db.updateAdoc(programTimeSlotModel, aTimeSlot._id, {"content": _selectedUgc, "timeslot.playDuration": playDuration }, function(_err_2, result){
                             counter++;
+                            //debugger;
                             //console.dir(result);
                             interationDone_cb2(_err_2);
                         });
@@ -303,6 +329,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                     
                 }
                 else{
+                    //debugger;
                     interationDone_cb1(_err_1);
                 }
                 
@@ -317,6 +344,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         async.eachSeries(TIME_INTERVAL_RANKIGN, iteratorPutUgcIntoTimeSlots_eachRankedTimeIntervalInADay, function(_err_4){
             if (!_err_4) {
                 
+                //debugger;
                 var numberOfProgramTimeSlots = counter;
                 
                 saveCandidateUgcList(candidateUgcList, intervalOfSelectingUGC, function(_err_5, _result_5){
@@ -325,13 +353,30 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                     //console.log("err=%s", _err_5);
                     if (!_err_5){
                         var result = {numberOfProgramTimeSlots: numberOfProgramTimeSlots, sessionId: _result_5.sessionId };
-                        if (finishPut_cb){
-                            finishPut_cb(null, result);
+                        if (cbOfPutUgcIntoTimeSlots){
+                            cbOfPutUgcIntoTimeSlots(null, result);
                         }
+                        
+                        
+                        //for debugging
+                        programTimeSlotModel.find({ "session": sessionId }, "timeStamp timeslot contentGenre type content" ).sort({timeStamp:1}).exec(function (_err, programs) {
+                            if (!_err){
+                                //console.log("programs generated:");
+                                //console.dir(programs);
+                                logger.info('[scheduleMgr] programs generated:' );
+                                for (var i in programs){
+                                    logger.info(JSON.stringify(programs[i]));
+                                }
+                                //cbOfGenerateTimeSlot(null);
+                            }else {
+                                //cbOfGenerateTimeSlot("Failed to guery the time slots after their generation: "+_err);
+                            }
+                        }); 
+                        
                     }
                     else {
-                        if (finishPut_cb){
-                            finishPut_cb(_err_5, null);
+                        if (cbOfPutUgcIntoTimeSlots){
+                            cbOfPutUgcIntoTimeSlots(_err_5, null);
                         }
                     }
                     
@@ -341,8 +386,8 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                 
             }
             else{
-                if (finishPut_cb){
-                    finishPut_cb('Failed to add empty program time slots into ranked intervals in a day: '+_err_4, null);
+                if (cbOfPutUgcIntoTimeSlots){
+                    cbOfPutUgcIntoTimeSlots('Failed to add empty program time slots into ranked intervals in a day: '+_err_4, null);
                 }
             }
             
@@ -352,7 +397,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         
     };  //end of putUgcIntoTimeSlots()
     
-    var generateTimeSlot = function( _cb1){
+    var generateTimeSlot = function( cbOfGenerateTimeSlot){
         
          
         var generateTimeSlotsOfMicroInterval = function(interval, generatedTimeSlotsOfMicroInterval_cb){ //Micro interval means a time slot containing purely our programs
@@ -369,6 +414,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             
             var ProgramTimeSlot = programTimeSlotModel;
             var vjsonDefault = {
+                    contentType: "file",
                     dooh: dooh,
                     timeslot: {
                         start: interval.start, 
@@ -408,7 +454,10 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                           function(callback2){
                               // put padding program 0
                               var aProgramTimeSlot = new ProgramTimeSlot(vjsonDefault);
+                              aProgramTimeSlot.type = 'padding';
+                              aProgramTimeSlot.contentType = 'web_page';
                               aProgramTimeSlot.content = paddingContents[0];
+                              aProgramTimeSlot.timeslot.playDuration = DEFAULT_PLAY_DURATION_FOR_STATIC_PADDING;
                               aProgramTimeSlot.timeStamp = interval.start + '-' + pad(timeStampIndex, 3);
                               timeStampIndex++;
                               aProgramTimeSlot.markModified('content');
@@ -440,6 +489,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                                                     aProgramTimeSlot.type = 'padding';
                                                     aProgramTimeSlot.content = paddingContents[indexOfUgcContents+1];
                                                     aProgramTimeSlot.markModified('content');
+                                                    aProgramTimeSlot.timeslot.playDuration = DEFAULT_PLAY_DURATION_FOR_STATIC_PADDING;
                                                     aProgramTimeSlot.timeStamp = interval.start + '-' + pad(timeStampIndex, 3);
                                                     timeStampIndex++;
                                                     aProgramTimeSlot.save(function(err3, _result){     
@@ -465,11 +515,13 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             
         };
         
+        /**
+         * Get availalbe time intervals by checking the playlists in Scala schedules
+         */
         var getAvailableTimeIntervals = function( intervalToPlan, got_cb) {
             
             async.waterfall([
                 function(callback){
-                    
                     //call scalaMgr.listTimeslot() to get the days that intervalToPlan covers
                     var rawIntervals = [];
                     var aDay = 24*60*60*1000;
@@ -534,6 +586,9 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                 
                 //generate program time slot documents (in programTimeSlot collection) according to available intervals and corresponding cycle durations
                 var availableTimeIntervals = result;
+                //console.log("availableTimeIntervals=");
+                //console.dir(availableTimeIntervals);
+                logger.info('availableTimeIntervals='+JSON.stringify(availableTimeIntervals));
                 var iteratorGenerateTimeSlot = function(anAvailableTimeInterval, interationDone_cb){
                     //add time slots in this available time interval
                     var timeToAddTimeSlot = anAvailableTimeInterval.interval.start;
@@ -562,18 +617,34 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                 
                 async.eachSeries(availableTimeIntervals, iteratorGenerateTimeSlot, function(err0){
                     if (!err0) {
-                        //do the next step.... 
-                        _cb1(null);
+                        /*
+                        //for debugging
+                        programTimeSlotModel.find({ "session": sessionId }, "timeStamp timeslot contentGenre type" ).sort({timeStamp:1}).exec(function (_err, timeslots) {
+                            if (!_err){
+                                //console.log("time slot generated:");
+                                //console.dir(timeslots);
+                                logger.info('[scheduleMgr] time slots generated:' );
+                                for (var i in timeslots){
+                                    logger.info(JSON.stringify(timeslots[i]));
+                                }
+                                cbOfGenerateTimeSlot(null);
+                            }else {
+                                cbOfGenerateTimeSlot("Failed to guery the time slots after their generation: "+_err);
+                            }
+                        }); */
+                        
+                        cbOfGenerateTimeSlot(null);
+                        
                     }
                     else{
-                        _cb1('Failed to generate time slots in available time intervals: '+err0);
+                        cbOfGenerateTimeSlot('Failed to generate time slots in available time intervals: '+err0);
                     }
                 });
                 
                
             }
             else{
-                _cb1('Failed to read available time interval list.', null);                    
+                cbOfGenerateTimeSlot('Failed to read available time interval list.', null);                    
             }
             
         });
@@ -589,10 +660,15 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         function(callback){
             //censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
             censorMgr.getUGCListLite(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
-                //console.log('_sortedUgcList=');
-                //console.dir(_sortedUgcList);
                 if (!err_1){
                     sortedUgcList = _sortedUgcList;
+                    //console.log('sortedUgcList=');
+                    //console.dir(sortedUgcList);
+                    //TODO: check why the follwoing logs did not appear in winston logs
+                    logger.info('[scheduleMgr] censorMgr.getUGCListLite() returns: sortedUgcList=');
+                    for (var i=0;i<sortedUgcList.length; i++){
+                        logger.info( '{ no:'+sortedUgcList[i].no+', contentGenre:'+sortedUgcList[i].contentGenre+', genre:'+sortedUgcList[i].genre+', fileExtension:'+sortedUgcList[i].fileExtension+' }' );
+                    }
                     callback(null);
                 }
                 else {
@@ -602,7 +678,26 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         },
         function(callback){
             //TODO: check the content genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
-
+            var programSequence = programPlanningPattern.getProgramSequence();
+            var found = false;
+            var genresToRemove = [];
+            for (var i=0;i<programSequence.length;i++){
+                found = false;
+                for (var j=0;j<sortedUgcList.length;j++){
+                    if (sortedUgcList[j].contentGenre == programSequence[i]){
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found){
+                    genresToRemove.push(programSequence[i]);
+                }
+            }
+            for (var k=0;k<genresToRemove.length;k++){
+                programPlanningPattern.remove(genresToRemove[k]);
+            }
+            
+            
             callback(null);
         },
         function(callback){
@@ -615,7 +710,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                     callback("Fail to generate time slots: "+err_2);
                 }
             });
-        },
+        }, /**/
         function(callback){
             putUgcIntoTimeSlots(function(err_3, result){
                 if (!err_3) {
@@ -627,7 +722,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                 }
                 
             });
-        }
+        }  
     ],
     function(err, results){
         if (created_cb){
@@ -635,44 +730,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
         } 
     });
 
-    
-    
-    /*
-    censorMgr.getUGCListLite(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
-        //console.log('_sortedUgcList=');
-        //console.dir(_sortedUgcList);
         
-        //TODO: check the content genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
-        
-        if (!err_1){
-            sortedUgcList = _sortedUgcList;
-            generateTimeSlot( function(err_2){
-                if (!err_2) {
-//                    console.log('generateTimeSlot() done! ');
-                    
-                    putUgcIntoTimeSlots(function(err_3, result){
-//                        console.log('putUgcIntoTimeSlots() done! ');
-                        if (created_cb){
-                            created_cb(err_3, result);
-                        }                        
-                    });
-                }
-                else {
-                    if (created_cb){
-                        created_cb('Failed to read sorted UGC list.', null);
-                    }
-                }
-            });
-        }
-        else{
-            if (created_cb){
-                created_cb('Failed to read sorted UGC list.', null);
-            }
-        }
-    });
-    */
-    
-    
 };
 
 
@@ -768,7 +826,22 @@ scheduleMgr.getProgramList = function(dooh, interval, pageLimit, pageSkip , upda
  *         
  *     </ul>
  */
-scheduleMgr.getProgramListBySession = function(sessionId, pageLimit, pageSkip, got_cb ){
+scheduleMgr.getProgramListBySession = function(sessionId, pageLimit, pageSkip, cbOfGetProgramListBySession ){
+    var query = programTimeSlotModel.find({ "session": sessionId, "type": "UGC"}).sort({timeStamp:1});
+
+    if (pageLimit!==null){
+        query = query.limit(pageLimit);
+    }
+    
+    if (pageSkip!==null){
+        query = query.skip(pageSkip);
+    }
+    
+    query.exec(function (_err, result) {
+        if (cbOfGetProgramListBySession) {
+            cbOfGetProgramListBySession(_err, result);
+        }
+    });
     
 };
 
@@ -800,77 +873,120 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
             //push each programs to Scala
             var iteratorPushAProgram = function(aProgram, callbackIterator){
                 
-                async.waterfall([
-                    function(callback){
-                        //download contents from S3
-                        var fileName;
-                        if (aProgram.type == "UGC"){
-                            var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+aProgram.content.fileExtension; 
-                            //TODO: make sure that target directory exists
-                            var targetLocalPath = path.join(workingPath, 'public/contents/temp', aProgram.content.projectId+aProgram.content.fileExtension);
-                            awsS3.downloadFromAwsS3(targetLocalPath, s3Path, function(errS3,resultS3){
-                                if (!errS3){
-                                    logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully download from S3 ' + s3Path );
-                                    //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully download from S3 ' + s3Path );
-                                    callback(null, targetLocalPath, aProgram.timeslot);
+                if (aProgram.contentType == "file" ) {
+                    
+                    async.waterfall([
+                        function(callback){
+                            //download contents from S3 or get from local
+                            var fileName;
+                            if (aProgram.type == "UGC"){
+                                var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+'.'+aProgram.content.fileExtension; 
+                                //TODO: make sure that target directory exists
+                                var targetLocalPath = path.join(workingPath, 'public/contents/temp', aProgram.content.projectId+'.'+aProgram.content.fileExtension);
+                                awsS3.downloadFromAwsS3(targetLocalPath, s3Path, function(errS3,resultS3){
+                                    if (!errS3){
+                                        logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully download from S3 ' + s3Path );
+                                        //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully download from S3 ' + s3Path );
+                                        callback(null, targetLocalPath, aProgram.timeslot);
+                                    }
+                                    else{
+                                        logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Failed to download from S3 ' + s3Path);
+                                        //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Failed to download from S3 ' + s3Path);
+                                        callback('Failed to download from S3 '+s3Path+' :'+errS3, null, null);
+                                    }
+                                    
+                                });
+    
+                            }
+                            else {
+                                var paddingFilePath = path.join(workingPath, 'public', aProgram.content.dir, aProgram.content.file);
+                                callback(null, paddingFilePath, aProgram.timeslot);
+                            }
+    
+                        }, 
+                        function(fileToPlay, timeslot, callback){
+                            //debugger;
+                            //push content to Scala
+                            var file = {
+                                    name : path.basename(fileToPlay),
+                                    path : path.dirname(fileToPlay),
+                                    savepath : ''
+                                };
+                            var playTime = {
+                                    start: timeslot.start,
+                                    end: timeslot.end,
+                                    duration: timeslot.playDuration/1000  //sec    
+                            };
+                            scalaMgr.setItemToPlaylist( file, playTime, function(errScala, resultScala){
+                                if (!errScala){
+                                    logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + fileToPlay );
+                                    console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + fileToPlay );
+                                    callback(null, fileToPlay);
                                 }
                                 else{
-                                    logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Failed to download from S3 ' + s3Path);
-                                    //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Failed to download from S3 ' + s3Path);
-                                    callback('Failed to download from S3 '+s3Path+' :'+errS3, null, null);
+                                    logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + fileToPlay );
+                                    console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + fileToPlay );
+                                    callback('Failed to push content to Scala :'+errScala, null);
                                 }
-                                
                             });
-
-                        }
-                        else {
-                            var paddingFilePath = path.join(workingPath, 'public', aProgram.content.dir, aProgram.content.file);
-                            callback(null, paddingFilePath, aProgram.timeslot);
-                        }
-
-                    }, 
-                    function(fileToPlay, timeslot, callback){
-                        debugger;
-                        //push content to Scala
-                        var file = {
-                                name : path.basename(fileToPlay),
-                                path : path.dirname(fileToPlay),
-                                savepath : ''
-                            };
-                        scalaMgr.setItemToPlaylist( file, timeslot, function(errScala, resultScala){
+                            
+                            //callback(null, fileToPlay);
+                        },
+                        function(filePlayed, callback){
+                            //TODO: delete downloaded contents from local drive
+                            callback(null,'done');
+                        }, 
+                    ], function (errWaterfall, resultWaterfall) {
+                        // result now equals 'done' 
+                        callbackIterator(errWaterfall);
+                    });
+                    
+                }
+                else {
+                    //contentType is "web_page"
+                    
+                    if (aProgram.content.uri){
+                        
+                        var web = { name: aProgram.content.name , uri: aProgram.content.uri };
+                        var playTime = {
+                                start: aProgram.timeslot.start,
+                                end: aProgram.timeslot.end,
+                                duration: aProgram.timeslot.playDuration/1000  //sec    
+                        };
+                        scalaMgr.setWebpageToPlaylist( web, playTime, function(errScala, resultScala){
                             if (!errScala){
-                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + fileToPlay );
-                                //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + fileToPlay );
-                                callback(null, fileToPlay);
+                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + web.uri );
+                                console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + web.uri );
+                                callbackIterator(null);
                             }
                             else{
-                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + fileToPlay );
-                                //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + fileToPlay );
-                                callback('Failed to push content to Scala :'+errScala, null);
+                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + web.uri );
+                                console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + web.uri );
+                                callbackIterator('Failed to push content to Scala :'+errScala);
                             }
                         });
-                        
-                        //callback(null, fileToPlay);
-                    },
-                    function(filePlayed, callback){
-                        //TODO: delete downloaded contents from local drive
-                        callback(null,'done');
-                    }, 
-                ], function (errWaterfall, resultWaterfall) {
-                    // result now equals 'done' 
-                    callbackIterator(errWaterfall);
-                });
+                    }
+                    
+                    //callbackIterator(null);
+                }
                 
             };
             async.eachSeries(programs, iteratorPushAProgram, function(errEachSeries){
                 cb2(errEachSeries);
             });
+            
 
         },
         function(cb3){
             //TODO: modify the counter in UGC collection; change the status of this programTimeslot doc
             
-            cb3(null, 'done');
+            cb3(null);
+        },
+        function(cb4){
+            //Ask ScalaMgr to push content to player
+            scalaMgr.pushEvent( {playlist: {search:'FM', play:'OnDaScreen'}}, function(res){
+                cb4(null, res);
+            });
         }
     ], function (err, result) {
         if (pushed_cb) {
@@ -951,6 +1067,7 @@ scheduleMgr.setUgcToProgram = function( programTimeSlotId, ugcReferenceNo, set_c
             var oidOfprogramTimeSlot = mongoose.Types.ObjectId(programTimeSlotId);
             var _ugc = JSON.parse(JSON.stringify(ugc)); //clone ugc object due to strange error "RangeError: Maximum call stack size exceeded"
             
+            //TODO: Shall we have some protection here in case the user choose an UGC with different genra (This will normally introduce different paly duration
             db.updateAdoc(programTimeSlotModel, oidOfprogramTimeSlot, {"content": _ugc }, function(err2, result){
                 if (set_cb){
                     set_cb(err2, ugc._id);

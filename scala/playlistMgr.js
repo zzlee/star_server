@@ -103,8 +103,8 @@ var playlist = (function() {
         update : function( option, upadte_cb ) {
             adapter.put('/ContentManager/api/rest/playlists/' + option.playlist.id + '?token=' + token, option.playlist.content, function(err, req, res, obj) {
                 //assert.ifError(err);
-                console.log('%d -> %j', res.statusCode, res.headers);
-                console.log('%j', obj);
+                //console.log('%d -> %j', res.statusCode, res.headers);
+                //console.log('%j', obj);
                 upadte_cb(obj);
             });
         },
@@ -204,7 +204,71 @@ var playlist = (function() {
         },
         update : function( option, upadte_cb ) {
             _private.update( option, upadte_cb );
-        }
+        },
+        updateOneProgram : function( option, report_cb ){
+            
+            var playStart = new Date(option.playTime.start),
+                playEnd = new Date(option.playTime.end);
+                
+            var playStartDate = playStart.getFullYear() + '-' + (playStart.getMonth() + 1) + '-' + playStart.getDate(),
+                playEndDate = playEnd.getFullYear() + '-' + (playEnd.getMonth() + 1) + '-' + playEnd.getDate();
+            
+            var playStartTime = '', playEndTime = '';
+            playStartTime += (playStart.getHours() >= 10)?playStart.getHours():('0'+playStart.getHours());
+            playStartTime += ':'; 
+            playStartTime += (playStart.getMinutes() >= 10)?playStart.getMinutes():('0' + playStart.getMinutes());
+            
+            playEndTime += (playEnd.getHours() >= 10)?playEnd.getHours():('0'+playEnd.getHours());
+            playEndTime += ':'; 
+            playEndTime += (playEnd.getMinutes() >= 10)?playEnd.getMinutes():('0'+playEnd.getMinutes());
+            
+            _private.list({ search : option.playlist.name }, function(err, listInfo){
+                //setting play date to playlist content.
+                for(var i=0; i<listInfo.list[0].playlistItems.length; i++){
+                    if(option.media.name == listInfo.list[0].playlistItems[i].media.name){
+                        listInfo.list[0].playlistItems[i].startValidDate = playStartDate;
+                        listInfo.list[0].playlistItems[i].endValidDate = playEndDate;
+                        
+                        if(!listInfo.list[0].playlistItems[i].timeSchedules){
+                            listInfo.list[0].playlistItems[i]['timeSchedules'] = [{
+                                "days":[
+                                    "SUNDAY",
+                                    "MONDAY",
+                                    "TUESDAY",
+                                    "WEDNESDAY",
+                                    "THURSDAY",
+                                    "FRIDAY",
+                                    "SATURDAY"
+                                ],
+                                "startTime": playStartTime,
+                                "endTime": playEndTime,
+                                "sortOrder":1
+                            }];
+                        }
+                        else {
+                            listInfo.list[0].playlistItems[i].timeSchedules.startTime = playStartTime;
+                            listInfo.list[0].playlistItems[i].timeSchedules.endTime = playEndTime;
+                        }
+                        
+                        if(option.playTime.duration && listInfo.list[0].playlistItems[i].media.prettifyType != 'Video'){
+                            var duraionTime = new Date(-28800000 + (option.playTime.duration * 1000));
+                            listInfo.list[0].playlistItems[i].duration = option.playTime.duration;
+                            listInfo.list[0].playlistItems[i].durationHoursSeconds = duraionTime.getHours() + ':' + duraionTime.getMinutes() + ':' + duraionTime.getSeconds()
+                        }
+                        listInfo.list[0].playlistItems[i].useValidRange = true;
+                        listInfo.list[0].playlistItems[i].playFullscreen = true;
+                    }
+                }
+                //update to scala content manager
+                var updateOption = {
+                    playlist: { id: listInfo.list[0].id, content: listInfo.list[0] },
+                };
+                _private.update(updateOption, function(res){
+                    report_cb(null, res);
+                });
+            });
+            
+        },
     };
 }());
 

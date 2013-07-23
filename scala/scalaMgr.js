@@ -116,25 +116,33 @@ function scalaMgr( url, account ){
     /**
      * Add item in timeslot to server.
      * 
-     * @param {object} item The item upload to scala server.
-     *     @param {string} path The path is file path.
-     *     @param {string} filename The filename is file title.
-     * @param {string} playTime The playTime is program play to DOOH in specific time.
-     * @param {function} reportStatus_cb Report media id and playlistItem id in playlist.
+     * @param {Object} item The item upload to scala server.
+     *     <ul>
+     *     <li> path: The path is file path.
+     *     <li> filename: The filename is file title.
+     *     </ul>
+     * @param {Object} playTime The playTime is program play to DOOH in specific time.
+     * @param {Function} reportStatus_cb Report media id and playlistItem id in playlist.
      */
     var setItemToPlaylist = function( file, playTime, reportStatus_cb ){
         
         var limit = 0,
-            addlimit = 0;
+            addlimit = 0,
             updatelimit = 0;
-        //var play = new Date(playTime);
         
         var itemPlaySetting = {
-            playlist: { id: '', name: 'FM_DOOH' },
+            playlist: { id: '', name: 'OnDaScreen' },
             item: { id: '', useValidRange: true, playFullscreen: true },
             media: { id: '', duration: '' },
             playTime : { start: playTime.start, end: playTime.end }
         };
+        
+        var option = {
+            media: { name: file.name },
+            playlist: { name: 'OnDaScreen' },
+            playTime: { start: playTime.start, end: playTime.end, duration: playTime.duration },
+        };
+        
         async.waterfall([
             function(callback){
                 if(limit < 1){
@@ -183,20 +191,10 @@ function scalaMgr( url, account ){
                 }
             },
             function(status, callback){
-                //Step.5: find out item id in playlist
-                if(status == 'OK') {
-                    contractor.playlist.findPlaylistItemIdByName(itemPlaySetting.playlist.name, file.name, function(err, itemId){
-                        itemPlaySetting.item.id = itemId;
-                        if(!err) callback(null, 'OK');
-                        else callback(err, null);
-                    });
-                }
-            },
-            function(status, callback){
                 if(updatelimit < 1){
-                    //Step.6: update item play info. to playlist
+                    //Step.5: update item play info. to playlist
                     if(status == 'OK') {
-                        contractor.playlist.updatePlaylistItemSchedule(itemPlaySetting, function(err, itemSetting_cb){
+                        contractor.playlist.updateOneProgram(option, function(err, updateOneProgram_cb){
                             if(!err) callback(null, 'OK');
                             else callback(err, null);
                         });
@@ -215,21 +213,33 @@ function scalaMgr( url, account ){
      *
      */
     var setWebpageToPlaylist = function( webpage, playTime, reportStatus_cb ){
-        
-        var limit = 0;
+    
+        var limit = 0,
+            addlimit = 0,
+            updatelimit = 0;
         
         var itemPlaySetting = {
-            playlist: { id: '', name: 'FM_DOOH' },
+            playlist: { id: '', name: 'OnDaScreen' },
             item: { id: '', useValidRange: true, playFullscreen: true },
             media: { id: '', duration: '' },
             playTime : { start: playTime.start, end: playTime.end }
         };
+        
+        var option = {
+            media: { name: webpage.name },
+            playlist: { name: 'OnDaScreen' },
+            playTime: { start: playTime.start, end: playTime.end, duration: playTime.duration },
+        };
+        
         async.waterfall([
             function(callback){
-                //Step.1: upload web page to server
-                contractor.media.createWebPage(webpage, function(err, status){
-                    callback(null, status);
-                });
+                if(limit < 1){
+                    //Step.1: upload file to server
+                    contractor.media.createWebPage(webpage, function(err, status){
+                        callback(null, status);
+                    });
+                    limit++;
+                }
             },
             function(status, callback){
                 //Step.2: find out media(webpage) id
@@ -257,34 +267,27 @@ function scalaMgr( url, account ){
                 }
             },
             function(status, callback){
-                //Step.4: add media to playlist
-                if(status == 'OK') {
-                    contractor.item.addItemToPlaylist(itemPlaySetting, function(err, addItem_cb){
-                        if(!err) callback(null, 'OK');
-                        else callback(err, null);
-                    });
-                }
-            },
-            function(status, callback){
-                //Step.5: find out item id in playlist
-                if(status == 'OK') {
-                    contractor.playlist.findPlaylistItemIdByName(itemPlaySetting.playlist.name, webpage.name, function(err, itemId){
-                        itemPlaySetting.item.id = itemId;
-                        if(!err) callback(null, 'OK');
-                        else callback(err, null);
-                    });
-                }
-            },
-            function(status, callback){
-                if(limit < 1){
-                    //Step.6: update item play info. to playlist
+                if(addlimit < 1){
+                    //Step.4: add media to playlist
                     if(status == 'OK') {
-                        contractor.playlist.updatePlaylistItemSchedule(itemPlaySetting, function(err, itemSetting_cb){
+                        contractor.item.addItemToPlaylist(itemPlaySetting, function(err, addItem_cb){
                             if(!err) callback(null, 'OK');
                             else callback(err, null);
                         });
                     }
-                    limit++;
+                    addlimit++;
+                }
+            },
+            function(status, callback){
+                if(updatelimit < 1){
+                    //Step.5: update item play info. to playlist
+                    if(status == 'OK') {
+                        contractor.playlist.updateOneProgram(option, function(err, updateOneProgram_cb){
+                            if(!err) callback(null, 'OK');
+                            else callback(err, null);
+                        });
+                    }
+                    updatelimit++;
                 }
             }
         ], function (err, result) {
@@ -326,7 +329,7 @@ function scalaMgr( url, account ){
                 
                 contractor.playlist.pushSubplaylist(pushSubplaylist, function(err, res){});
                 if(i == result[0].count-1) {
-                    if(!option.player.name) playerName = 'feltmeng';
+                    if(!option.player) playerName = 'feltmeng';
                     else playerName = option.player.name;
                     contractor.player.findPlayerIdByName(playerName, function(err, playerId){
                         contractor.player.pushProgram({"ids": [playerId]}, function(res){
@@ -344,7 +347,7 @@ function scalaMgr( url, account ){
         setItemToPlaylist : setItemToPlaylist,
         pushEvent : pushEvent,
         setWebpageToPlaylist: setWebpageToPlaylist,
-        //contractor: contractor,   //test
+        contractor: contractor,   //test
     };
 }
 

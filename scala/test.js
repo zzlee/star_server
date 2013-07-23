@@ -4,54 +4,68 @@ var scalaMgr = scala( 'http://server-pc:8080', { username: 'administrator', pass
 
 setTimeout(function(){
     /*
-    var timeInterval = {
-        start : '2013-07-02 00:00:00',
-        end : '2013-07-07 23:59:59.999'
-    };
-    scalaMgr.listTimeslot(timeInterval.start, function(err, res){
-        console.log(res);
-    });
-    */
-    /*
-    var option = { 
-        playlist: { search: 'tt', play: 'FM_DOOH' },
-        player: { name: 'feltmeng' } 
-    };
-    scalaMgr.pushEvent( option, function(res){
-        console.log(res);
-    });
-    */
-    /*
     var file = {
-        name : 'fc2_save_2013-06-27-153828-0000.mp4',
+        name : 'IMG_0431.jpg',
         path : 'C:\\tmp\\',
         savepath : ''
     };
     */
-    
-    var file1 = {
-        name : 'IMG_001.mov',
-        path : 'C:\\tmp\\',
-        savepath : ''
+    //var web = { name: 'test_yahoo', uri: 'tw.yahoo.com' };
+    //var playTime = { start: '2013-07-28 10:00:00', end: '2013-08-01 22:00:00', duration: 55 };
+    /*
+    var option = {
+        media: { name: file.name, type: '' },
+        playlist: { name: 'tt01' },
+        playTime: { start: '2013-07-21 12:30:00', end: '2013-07-22 17:50:00', duration: 35 },
     };
-    var file2 = {
-        name : 'IMG_002.mov',
-        path : 'C:\\tmp\\',
-        savepath : ''
-    };
-    var file3 = {
-        name : 'IMG_003.mp4',
-        path : 'C:\\tmp\\',
-        savepath : ''
-    };
-    scalaMgr.setItemToPlaylist(file1, { start: '2013-07-17 18:30:00', end: '2013-07-17 20:00:00' },  function(err, status){
-        console.log('file_1: ' + status);
-        scalaMgr.setItemToPlaylist(file2, { start: '2013-07-17 18:30:00', end: '2013-07-17 20:00:00' },  function(err, status){
-            console.log('file_2: ' + status);
-            scalaMgr.setItemToPlaylist(file3, { start: '2013-07-17 18:30:00', end: '2013-07-17 20:00:00' },  function(err, status){
-                console.log('file_3: ' + status);
-            });
-        });
+    scalaMgr.setItemToPlaylist( file, playTime, function(err, res){
+        console.log(res);
+    } );
+    */
+    /*
+    scalaMgr.contractor.playlist.updateOneProgram(option, function(err, res){
+        console.log(res);
     });
+    */
+    /*
+    var updateOneProgram = function( option, report_cb ){
+
+        var playStart = new Date(option.playTime.start),
+            playEnd = new Date(option.playTime.end);
+            
+        var playStartDate = playStart.getFullYear() + '-' + (playStart.getMonth() + 1) + '-' + playStart.getDate(),
+            playEndDate = playEnd.getFullYear() + '-' + (playEnd.getMonth() + 1) + '-' + playEnd.getDate();
+        
+        var playStartTime = '', playEndTime = '';
+        playStartTime += (playStart.getHours() >= 10)?playStart.getHours():('0'+playStart.getHours());
+        playStartTime += ':'; 
+        playStartTime += (playStart.getMinutes() >= 10)?playStart.getMinutes():('0' + playStart.getMinutes());
+        
+        playEndTime += (playEnd.getHours() >= 10)?playEnd.getHours():('0'+playEnd.getHours());
+        playEndTime += ':'; 
+        playEndTime += (playEnd.getMinutes() >= 10)?playEnd.getMinutes():('0'+playEnd.getMinutes());
+        
+        scalaMgr.contractor.playlist.list({ search : option.playlist.name }, function(err, listInfo){
+            for(var i=0; i<listInfo.list[0].playlistItems.length; i++){
+                if(option.media.name == listInfo.list[0].playlistItems[i].media.name){
+                    listInfo.list[0].playlistItems[i].startValidDate = playStartDate;
+                    listInfo.list[0].playlistItems[i].endValidDate = playEndDate;
+                    listInfo.list[0].playlistItems[i].timeSchedules.startTime = playStartTime;
+                    listInfo.list[0].playlistItems[i].timeSchedules.endTime = playEndTime;
+                    if(option.playTime.duration && listInfo.list[0].playlistItems[i].media.prettifyType != 'Video'){
+                        var duraionTime = new Date(-28800000 + (option.playTime.duration * 1000));
+                        listInfo.list[0].playlistItems[i].duration = option.playTime.duration;
+                        listInfo.list[0].playlistItems[i].durationHoursSeconds = duraionTime.getHours() + ':' + duraionTime.getMinutes() + ':' + duraionTime.getSeconds()
+                    }
+                }
+                console.log('useValidRange:', listInfo.list[0].playlistItems[i].useValidRange);
+            }
+            //console.log(listInfo.list[0]);
+        });
+        
+    };
     
+    updateOneProgram(option, function(){});
+    */
 }, 1500);
+

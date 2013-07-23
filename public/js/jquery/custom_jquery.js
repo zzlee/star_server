@@ -21,6 +21,7 @@ function PageList( listType, rowsPerPage, urlToGetListContent){
     this.urlToGetListContent = urlToGetListContent;
     this.totalPageNumber = 1;
     this.listType = listType;
+    this.extraParameters = null;
     $.get('/admin/list_size', {listType: listType, token: localStorage.token}, function(res){
         if (!res.err){
             var listSize = res.size;
@@ -30,9 +31,13 @@ function PageList( listType, rowsPerPage, urlToGetListContent){
     });
 }; 
 
+PageList.prototype.setExtraParameters = function(extraParameters){
+    this.extraParameters = extraParameters;
+};
+
 PageList.prototype.showPageContent = function(Page,condition){
     var _this = this;
-    $.get(this.urlToGetListContent, {skip: (Page-1)*this.rowsPerPage, limit: this.rowsPerPage, token: localStorage.token, condition:conditions}, function(res){
+    $.get(this.urlToGetListContent, {skip: (Page-1)*this.rowsPerPage, limit: this.rowsPerPage, token:localStorage.token, condition:conditions, extraParameters: JSON.stringify(this.extraParameters)}, function(res){
         if(res.message){
             console.log("[Response] message:" + res.message);
         }else{
@@ -128,8 +133,8 @@ $(document).ready(function(){
     FM.memberList = new PageList( 'memberList', 8, '/miix_admin/members');
     FM.miixPlayList = new PageList( 'miixMovieList', 5, '/miix_admin/miix_movies');
     FM.storyPlayList = new PageList( 'storyMovieList', 8, '/miix_admin/story_movies');
-    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor', conditions);
-    FM.UGCPlayList = new PageList( 'ugcCensorPlayList', 5, '/miix_admin/doohs/taipeiarena/timeslots', conditions);
+    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
+    FM.UGCPlayList = new PageList( 'ugcCensorPlayList', 5, '/miix_admin/doohs/taipeiarena/timeslots');
 
     FM.currentContent = FM.memberList;
 
@@ -139,6 +144,7 @@ $(document).ready(function(){
 
         FM.currentContent = FM.memberList;
         FM.currentContent.showCurrentPageContent();
+        $('#table-content-header').html('');
 
         /*
         //FM.memberList(1, 18, function(res){
@@ -160,6 +166,7 @@ $(document).ready(function(){
 
         FM.currentContent = FM.miixPlayList;
         FM.currentContent.showCurrentPageContent();
+        $('#table-content-header').html('');
         /*
         FM.miixPlayList(0, 20, function(res){
             if(res.message){
@@ -178,6 +185,7 @@ $(document).ready(function(){
 
         FM.currentContent = FM.storyPlayList;
         FM.currentContent.showCurrentPageContent();
+        $('#table-content-header').html('');
         /*
         FM.storyPlayList(0, 20, function(res){
             if(res.message){
@@ -199,6 +207,7 @@ $(document).ready(function(){
 
         FM.currentContent = FM.UGCList;
         FM.currentContent.showCurrentPageContent();
+        $('#table-content-header').html('');
 
     });
 
@@ -206,8 +215,66 @@ $(document).ready(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#UGCPlayList').attr("class", "current");
 
-        FM.currentContent = FM.UGCPlayList;
-        FM.currentContent.showCurrentPageContent();
+        $.get('/miix_admin/table_censorPlayList_head.html', function(res){
+            $('#table-content-header').html(res);
+            $('#table-content').html('');
+            
+            $('#createProgramListBtn').click(function(){
+                var flag = 0;
+                var inputSearchData = {};
+                var url = DOMAIN + "doohs/taipeiarena/program_timeslot_session";
+
+
+                $('#condition-inner input[class="createProgramListBtn"]').each(function(i){
+
+                    inputSearchData[$(this).attr("name")] = $(this).attr("value");
+
+                    if($(this).attr("name") == 'ugcSequenceText'){
+
+                        var sequence = encodeURIComponent($(this).attr("value"));
+                        
+                        programSequenceStringToArr(sequence , function(err ,result){
+                            if(!err){
+                                console.log('programSequenceStringToArr'+result); 
+                            }
+                            else
+                                console.log('programSequenceStringToArr err'+err);
+                        });
+                    }
+                    
+                    if($(this).attr("value") == "" && flag == 0){
+                        alert('You have to enter complete condition!!');
+                        flag = 1; 
+                    }
+                    
+                    if(inputSearchData.TimeStart && inputSearchData.TimeEnd && inputSearchData.playtimeStart && inputSearchData.playtimeEnd && inputSearchData.ugcSequenceText && programSequenceArr){
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: {intervalOfSelectingUGC:{start:inputSearchData.TimeStart, end:inputSearchData.TimeEnd}, intervalOfPlanningDoohProgrames:{start:inputSearchData.playtimeStart, end:inputSearchData.playtimeEnd}, programSequence:programSequenceArr},
+                            success: function(response) {
+                                if(response.message){
+                                    console.log("[Response] message:" + JSON.stringify(response.message));
+                                    sessionId = response.message;
+                                    $('#main_menu ul[class="current"]').attr("class", "select");
+                                    $('#UGCPlayList').attr("class", "current");
+
+                                    FM.currentContent = FM.UGCPlayList;
+                                    FM.currentContent.setExtraParameters({sessionId: sessionId});
+                                    FM.currentContent.showCurrentPageContent();
+                                    programSequenceArr =[];
+                                }
+                            }
+                        });
+                    }
+                });
+
+            });
+
+        });
+
+        //FM.currentContent = FM.UGCPlayList;
+        //FM.currentContent.showCurrentPageContent();
 
     });
 
@@ -243,7 +310,7 @@ $(document).ready(function(){
                 });
                 console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
                 if(conditions != null){
-                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
                     $('#UGCList').attr("class", "current");
                     FM.currentContent = FM.UGCList;
@@ -259,7 +326,7 @@ $(document).ready(function(){
                 conditions = 'norating';
                 console.log("inputSearchData: " + JSON.stringify(conditions) );
                 if(conditions != null){
-                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
                     $('#UGCList').attr("class", "current");
                     FM.currentContent = FM.UGCList;
@@ -275,7 +342,7 @@ $(document).ready(function(){
                 conditions = 'rating';
                 console.log("inputSearchData: " + JSON.stringify(conditions) );
                 if(conditions != null){
-                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                    FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
                     $('#UGCList').attr("class", "current");
                     FM.currentContent = FM.UGCList;
@@ -290,7 +357,7 @@ $(document).ready(function(){
 
                 console.log("inputSearchData: " + JSON.stringify(conditions) );
                 conditions = {};
-                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                 $('#main_menu ul[class="current"]').attr("class", "select");
                 $('#UGCList').attr("class", "current");
                 FM.currentContent = FM.UGCList;
@@ -316,7 +383,7 @@ $(document).ready(function(){
                 });
                 console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
 
-                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor',conditions);
+                FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                 $('#main_menu ul[class="current"]').attr("class", "select");
                 $('#UGCList').attr("class", "current");
                 FM.currentContent = FM.UGCList;
@@ -453,56 +520,6 @@ $(document).ready(function(){
          */
 
         if(playlistCheck == '/miix_admin/doohs'){
-            $('#createProgramListBtn').click(function(){
-                var flag = 0;
-                var inputSearchData = {};
-                var url = DOMAIN + "doohs/taipeiarena/timeslots";
-
-
-                $('#condition-inner input[class="createProgramListBtn"]').each(function(i){
-
-                    inputSearchData[$(this).attr("name")] = $(this).attr("value");
-
-                    if($(this).attr("name") == 'ugcSequenceText'){
-
-                        var sequence = encodeURIComponent($(this).attr("value"));
-                        
-                        programSequenceStringToArr(sequence , function(err ,result){
-                            if(!err){
-                                console.log('programSequenceStringToArr'+result); 
-                            }
-                            else
-                                console.log('programSequenceStringToArr err'+err);
-                        });
-                    }
-                    
-                    if($(this).attr("value") == "" && flag == 0){
-                        alert('You have to enter complete condition!!');
-                        flag = 1; 
-                    }
-                    
-                    if(inputSearchData.TimeStart && inputSearchData.TimeEnd && inputSearchData.playtimeStart && inputSearchData.playtimeEnd && inputSearchData.ugcSequenceText && programSequenceArr){
-                        $.ajax({
-                            url: url,
-                            type: 'POST',
-                            data: {intervalOfSelectingUGC:{start:inputSearchData.TimeStart, end:inputSearchData.TimeEnd}, intervalOfPlanningDoohProgrames:{start:inputSearchData.playtimeStart, end:inputSearchData.playtimeEnd}, programSequence:programSequenceArr},
-                            success: function(response) {
-                                if(response.message){
-                                    console.log("[Response] message:" + JSON.stringify(response.message.sessionId));
-                                    sessionId = response.message;
-                                    $('#main_menu ul[class="current"]').attr("class", "select");
-                                    $('#UGCPlayList').attr("class", "current");
-
-                                    FM.currentContent = FM.UGCPlayList;
-                                    FM.currentContent.showCurrentPageContent();
-                                    programSequenceArr =[];
-                                }
-                            }
-                        });
-                    }
-                });
-
-            });
             
             $('#ugcCensor.ugcCensorNoSetBtn').click(function(){
                 
@@ -587,8 +604,14 @@ $(document).ready(function(){
                             if(response.message){
                                 console.log("[Response] message:" + response.message);
                             }
+                            $('#underPushingText').html('上傳成功!!');
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            $('#underPushingText').html('上傳失敗： '+textStatus+" "+errorThrown);
                         }
                     });
+                    $('#pushProgramsBtn').hide();
+                    $('#table-content').append($('<p>').attr("id","underPushingText").html('上傳至播放系統中，請稍候....'));
                 }
             });            
 
@@ -601,7 +624,7 @@ $(document).ready(function(){
     var check_in = "%E6%89%93";
     var miix_it = "%E5%90%88";
     var cultural_and_creative = "%E6%96%87";
-    var moon = "%E5%BF%83";
+    var mood = "%E5%BF%83";
     var programSequenceArr = [];
     var next =0;
     
@@ -623,8 +646,8 @@ $(document).ready(function(){
             case cultural_and_creative:
                 programSequenceArr.push('cultural_and_creative');
                 break;
-            case moon:
-                programSequenceArr.push('moon');
+            case mood:
+                programSequenceArr.push('mood');
                 break;
             default:
 

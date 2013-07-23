@@ -476,7 +476,7 @@ app.put('/miix_admin/user_content_attribute', routes.censorHandler.setUGCAttribu
 //app.put('/miix_admin/user_content_attribute/:ugcId', routes.censorHandler.setUGCAttribute_get_cb);
 
 /**
- * Create a timeslots for dooh<br>
+ * New a session of programe timeslots for dooh<br>
  * <h5>Path Parameters</h5>
  * <ul>
  * <li>doohId: Dooh ID (ex:'taipeiarena')
@@ -503,10 +503,10 @@ app.put('/miix_admin/user_content_attribute', routes.censorHandler.setUGCAttribu
  *         { numberOfProgramTimeSlots: 33, sessionId: '1367596800000-1367683140000-1373332978201' }     
  *     </ul>
  *
- * @name POST /miix_admin/doohs/:doohId/timeslots
+ * @name POST /miix_admin/doohs/:doohId/program_timeslot_session
  * @memberof miix_admin
  */
-app.post('/miix_admin/doohs/:doohId/timeslots', routes.censorHandler.createTimeslots_get_cb);
+app.post('/miix_admin/doohs/:doohId/program_timeslot_session', routes.censorHandler.postProgramTimeSlotSession_cb);
 
 /**
  * Get the dooh timeslot<br>
@@ -616,6 +616,9 @@ app.post('/internal/dooh/movie_playing_state', routes.doohHandler.doohMoviePlayi
 app.post('/internal/dooh/dooh_periodic_data', routes.doohHandler.importPeriodicData);  //TODO: POST /internal/adapter/schedule_periodic_data is better
 app.get('/internal/dooh/dooh_current_video', routes.doohHandler.dooh_current_UGC);  
 
+//GET push html to dooh player and trigger story camera.
+app.get('/internal/dooh/dooh_playing_html', routes.doohHandler.streamVideoTrigger);
+
 app.post('/internal/story_cam_controller/available_story_movie', routes.storyCamControllerHandler.availableStoryMovie_post_cb);
 
 
@@ -643,6 +646,9 @@ app.get('/admin/list_size', routes.admin.listSize_get_cb);
 app.post('/internal/dooh_periodic_data', routes.doohHandler.importPeriodicData);
 app.get('/internal/dooh_current_video', routes.doohHandler.dooh_current_UGC);
 app.post('/internal/dooh_timeslot_rawdata', routes.timeDataGet);
+
+//GET push html to dooh player and trigger story camera.
+app.get('/internal/dooh/stream_video_trigger', routes.doohHandler.streamVideoTrigger);
 
 
 //FM.API
@@ -703,18 +709,19 @@ http.createServer(app).listen(app.get('port'), function(){
 //test
 var scheduleMgr = require('./schedule_mgr.js');
     setTimeout(function(){
-   
+    
     scheduleMgr.createProgramList("TP_dom", 
-        {start:(new Date("2013/7/2 10:30")).getTime(), end:(new Date("2013/7/2 11:00")).getTime()}, 
-        {start:(new Date("2013/7/17 11:00")).getTime(), end:(new Date("2013/7/17 11:15")).getTime()}, 
-        ["miix_it"], function(err, result){
+        {start:(new Date("2013/7/21 6:00")).getTime(), end:(new Date("2013/7/21 7:00")).getTime()}, 
+        {start:(new Date("2013/7/21 9:00")).getTime(), end:(new Date("2013/7/21 9:20")).getTime()}, 
+        ["miix_it", "cultural_and_creative", "mood", "check_in" ], function(err, result){
             console.log("err=%s result=", err);
             console.dir(result);
+            
             if (!err){
                 scheduleMgr.pushProgramsTo3rdPartyContentMgr(result.sessionId, function(err){
                     console.log("err=%s ", err);
                 });
-            }
+            } 
             
     });
     
@@ -741,8 +748,9 @@ var scheduleMgr = require('./schedule_mgr.js');
     
     
 },1000);
+*/
 
-
+    /*
 var aeServerMgr = require('./ae_server_mgr.js');
 var globalConnectionMgr = require('./global_connection_mgr.js');
 setInterval(function(){

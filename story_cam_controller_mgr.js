@@ -7,6 +7,8 @@ var correspondingStoryCamController = 'story_cam_server';
 //var correspondingStoryCamController = 'story_cam_gance_Feltmeng_pc';
 
 storyCamControllerMgr.startRecording = function( miixMovieProjectID, startedRecording_cb ){
+    
+    //console.log('start recod.');
 
 	//TODO:: get corresponding storyCamController ID
 	var storyCamControllerID = correspondingStoryCamController;
