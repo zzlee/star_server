@@ -2,7 +2,7 @@
 var FMDB = require('./db.js'),
     UGC_mgr = require('./ugc.js'),
     ObjectID = require('mongodb').ObjectID,
-    fb_handler = require('./fb_handler.js'),
+    fbMgr = require('./facebook_mgr.js'),
 	member_mgr = require('./member.js'),
     youtubeInfo = require('./youtube_mgr.js');
     

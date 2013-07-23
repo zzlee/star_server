@@ -6,8 +6,8 @@
 
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
-    UGCDB = require("../ugc.js"),
-    fb_handler = require("../fb_handler.js");
+    UGCDB = require("../UGC.js"),
+    fbMgr = require("../facebook_mgr.js");
     
 
 
@@ -124,7 +124,7 @@ FM.api._fbStatusAck = function(response){
     delete FM.api.reply[sid];
 };
 
-// Inter - TODO
+//DEPRECATED
 FM.api._fbExtendToken = function(accessToken, callback){
 
     FM_LOG("\n[_fbExtendToken]: ");
@@ -309,7 +309,7 @@ FM.api._fbPostUGC = function(projectID, content){
     });
 };
 
-
+//DEPRECATED
 // POST
 FM.api.fbPostCommentReq = function(req, res){
     FM_LOG("[api.fbPostCommentReq]");
@@ -337,7 +337,8 @@ FM.api.fbPostCommentReq = function(req, res){
     }
 };
 
-// GET
+//TODO: move to facebook_mgr.js
+//GET /fb/comment
 FM.api.fbGetCommentReq = function(req, res){
     FM_LOG("[api.fbGetCommentReq]");
     if(req.query && req.query.fb_id && req.query.accessToken){
@@ -364,6 +365,8 @@ FM.api.fbGetCommentReq = function(req, res){
     }
 };
 
+//TODO: move to facebook_mgr.js
+//GET /fb/thumbnail
 FM.api.fbGetThumbnail = function(req, res){
     FM_LOG("[api.fbGetThumbnail]");
     if(req.query && req.query.fb_id && req.query.accessToken && req.query.commenter){
@@ -394,7 +397,7 @@ FM.api.fbGetThumbnail = function(req, res){
 };
 
 // Inter
-FM.api._fbPost = function( path, cb){
+FM.api._fbPost = function( path, cb){  //is only activily used by FM.api._fbPostUGCThenAdd
 
     var https = require('https'),
         host = "graph.facebook.com",
@@ -419,7 +422,7 @@ FM.api._fbPost = function( path, cb){
 };
 
 // Inter
-FM.api._fbGet = function( path, cb){
+FM.api._fbGet = function( path, cb){ //is only actively used by FM.api.fbGetCommentReq() and FM.api.fbGetThumbnail()
 
     var host = "graph.facebook.com",
         https = require('https'),
@@ -474,7 +477,8 @@ FM.api._fbGetHttp = function( path, cb){
 
 };
 
-// POST
+//TODO:
+//POST
 FM.api.deviceToken =  function(req, res){
     FM_LOG("[Receive deviceToken POST] ");
     
@@ -500,8 +504,8 @@ FM.api.deviceToken =  function(req, res){
     }
 };
 
-
-// POST
+//TODO: move to memeber.js?  
+//POST /members/fb_info
 FM.api.signupwithFB = function(req, res){
     
     var sid = req.sessionID;
@@ -563,11 +567,11 @@ FM.api.signupwithFB = function(req, res){
                     
                 }
                 
-                fb_handler.isTokenValid(userID, function(err, result){
+                fbMgr.isTokenValid(userID, function(err, result){
                     
                     // Extending new/short access_token replaces invalid existed access_token.
                     if(!result.is_valid){
-                        fb_handler.extendToken(accessToken, function(err, response){
+                        fbMgr.extendToken(accessToken, function(err, response){
                             if(err){
                                 res.send( {"data":{"_id": oid.toHexString(), "accessToken": accessToken, "expiresIn": expiresIn, "verified": mPhone_verified  }, "message":"success"} );
                             }else{
@@ -593,7 +597,7 @@ FM.api.signupwithFB = function(req, res){
                         // existed access_token is valid. Check if expire within 20days, then renew it.
                         if( parseInt(fb.auth.expiresIn) - Date.now() < 20*86400*1000 ){
                     
-                            fb_handler.extendToken(authRes.accessToken, function(err, response){
+                            fbMgr.extendToken(authRes.accessToken, function(err, response){
                                 if(err){
                                     res.send( {"data":{"_id": oid.toHexString(), "accessToken": existed_access_token, "verified": mPhone_verified  }, "message":"success"} );
                                     
@@ -687,7 +691,8 @@ FM.api.signupwithFB = function(req, res){
         */
     }
 };           
-            
+    
+//POST /api/signin
 FM.api.signin = function (req, res) {
     /*
      *  Once member sign-in, we should save profile in session to be used in same session.
@@ -720,7 +725,7 @@ FM.api.signin = function (req, res) {
 };
 
 
-// GET
+// GET 
 FM.api.signout = function (req, res) {
     var username = req.session.user.name;
     FM_LOG(username + " Log-Out!");
@@ -789,27 +794,6 @@ FM.api.signup = function(req, res){
 };
 
  
-/*  No Necessary for API, Just for AE
-
-FM.api.addVideo = function(req, res){
-    
-    var ownerId = req.session.user.userId,
-        projectId = "2711";
-        
-    if(req.body && req.body.videoDoc){
-        var vurl = req.body.link;
-        var vjson = {
-                        "ownerId": ownerId,
-                        "url": vurl,
-                        "projectId":projectId,
-                        "title": "From Facebook"
-                    };
-                    
-        videoDB.addVideo(vjson, function(err, vdoc){
-            
-        });
-    }  
-};*/
 
 // POST
 FM.api.addEvent = function(req, res){

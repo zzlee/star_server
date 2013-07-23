@@ -1,7 +1,7 @@
 var FMDB = require('./db.js'),
     UGCDB = require('./ugc.js'),
     ObjectID = require('mongodb').ObjectID,
-    fb_handler = require('./fb_handler.js'),
+    fbMgr = require('./facebook_mgr.js'),
     youtubeInfo = require('./youtube_mgr.js');
     
 var FM = {};
@@ -146,7 +146,7 @@ FM.MEMBER = (function(){
                                             batch.push( {"method": "GET", "relative_url": relative_url} );
                                         }
                                         
-                                        fb_handler.batchRequestToFB(access_token, null, batch, function(err, result){
+                                        fbMgr.batchRequestToFB(access_token, null, batch, function(err, result){
                                             if(err){
                                                 callback(null, {totalLikes: likes_count, totalComments: comments_count});
                                                 
@@ -174,7 +174,7 @@ FM.MEMBER = (function(){
                                             batch.push( {"method": "GET", "relative_url": relative_url} );
                                         }
                                         
-                                        fb_handler.batchRequestToFB(access_token, null, batch, function(err, result){
+                                        fbMgr.batchRequestToFB(access_token, null, batch, function(err, result){
                                             if(err){
                                                 //callback(err, null);
 												callback(null, {totalShares: shares_count} );
@@ -227,7 +227,7 @@ FM.MEMBER = (function(){
                         var is_valid = null;
                         //console.log("getFBAccessTokenByFBId" + JSON.stringify(result));
                         
-                        fb_handler.isTokenValid(user_token, function(err, result){
+                        fbMgr.isTokenValid(user_token, function(err, result){
                             if(err){
                                 res.send({error: err});
                                 
@@ -237,7 +237,7 @@ FM.MEMBER = (function(){
                                 
                                 if(expiresIn*1000 - Date.now() < 15*864000*1000){
                                 
-                                    fb_handler.extendToken(user_token, function(err, result){
+                                    fbMgr.extendToken(user_token, function(err, result){
                                         if(err){
                                             res.send({message: is_valid, });
                                         }else{
