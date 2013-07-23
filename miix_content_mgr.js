@@ -11,9 +11,12 @@ var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
 var doohMgr = require(workingPath+'/dooh_mgr.js');
 var memberDB = require(workingPath+'/member.js');
 var UGCDB = require(workingPath+'/ugc.js');
+var memberDB = require("./member.js");
 var awsS3 = require('./aws_s3.js');
 var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
 var db = require('./db.js');
+var fbMgr = require('./facebook_mgr.js');
+
 
 /**
  * The manager who coordinates the operations for Miix contents
@@ -256,6 +259,7 @@ miixContentMgr.preAddMiixMovie = function(ugcProjectID, ugcInfo, cbOfPreAddMiixM
 miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAddMiixImage) {
     var imageUgcFile = null;
     var s3Path = null;
+    var s3Url = null;
     
     async.series([
         function(callback){
@@ -290,7 +294,7 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
         },
         function(callback){
             //Add UGC info to UGC db
-            var s3Url = "https://s3.amazonaws.com/miix_content"+s3Path;
+            s3Url = "https://s3.amazonaws.com/miix_content"+s3Path;
             var vjson = {
                     "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
                     "projectId": ugcProjectID,
@@ -311,6 +315,32 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                     logger.info('Miix image info failed to saved to UGC db');
                     callback('Miix image info failed to saved to UGC db: '+errAddUgc);
                 }
+            });
+        },
+        function(callback){
+            //post on Facebook
+            debugger;
+            memberDB.getFBAccessTokenById(ugcInfo.ownerId._id, function(errOfGetFBAccessTokenById, result){
+                
+               if (!errOfGetFBAccessTokenById){
+                   var userID = result.fb.userID;
+                   var userName = result.fb.userName;
+                   var can_msg =  "上大螢幕活動初體驗！";
+                   var accessToken = result.fb.auth.accessToken;
+                   fbMgr.postMessage(accessToken, can_msg, s3Url, function(errOfPostMessage, result){
+                       console.log("result=%s", result);
+                       if (!errOfPostMessage) {
+                           callback(null);
+                       }
+                       else {
+                           callback("Failed to post FB: "+errOfPostMessage);
+                       }
+                   });
+               }
+               else {
+                   callback("Failed to get FB access token from member DB: "+errOfGetFBAccessTokenById);
+               }
+                
             });
         }
     ],

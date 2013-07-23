@@ -2,7 +2,7 @@
 var censorMgr = {};
 
 var async = require('async');
-var fb_handler = require('./fb_handler.js');
+var fb_handler = require('./facebook_mgr.js');
 var FMDB = require('./db.js');
 var UGC_mgr = require('./UGC.js');
 var sheculeMgr = require('./schedule_mgr.js');
