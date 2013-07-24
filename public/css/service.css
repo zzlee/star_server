@@ -1022,3 +1022,7 @@ font-size: 14px;}
 	overflow-y: scroll;
 	height:500px;
 }
+.search{
+margin-top:15px;
+float:right;
+margin-right:45px;}

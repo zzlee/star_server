@@ -32,6 +32,15 @@ var serviceMgr = {};
  */
 serviceMgr.createCustomerServiceItem = function(vjson, cb ){
 
+    var condition = { 'ownerId._id': vjson.ownerId._id };
+    var customerServiceItemNO = 1;
+    customerServiceItemModel.count(condition, function(err, result){
+//        console.log('count'+err+result);
+        if(!err){
+            customerServiceItemNO = result + 1;
+        }
+    });
+    
     db.listOfdocModels( memberModel, {_id: vjson.ownerId._id}, null, null, function(err, result){
         if(!err){
             newVjson = {
@@ -40,7 +49,8 @@ serviceMgr.createCustomerServiceItem = function(vjson, cb ){
                     phoneVersion: vjson.phoneVersion,
                     question: vjson.question,
                     fb_userName: result[0].fb.userName,
-                    fb_id: result[0].fb.userID
+                    fb_id: result[0].fb.userID,
+                    no: customerServiceItemNO
             };
             db.createAdoc(customerServiceItemModel , newVjson, function(err,result){
                 cb(err, result); 
