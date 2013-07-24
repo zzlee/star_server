@@ -43,7 +43,7 @@ $(document).ready(function(){
                 data: {_id: customerServiceItemId, answer: $(this).attr("value")},
                 success: function(response) {
                     if(response.message){
-                        console.log("[Response] message:" + response.message);
+//                        console.log("[Response] message:" + response.message);
                     }
                 }
             });
@@ -92,7 +92,7 @@ $(document).keyup(function (e) {
                     data: {_id: $(this).attr("name"), vjson:{remarks: $(this).attr("value")}},
                     success: function(response) {
                         if(response.message){
-                            console.log("[Response] message:" + response.message);
+//                            console.log("[Response] message:" + response.message);
                         }
                     }
                 });
@@ -130,7 +130,7 @@ $(document).ajaxComplete(function(event,request, settings) {
                             data: {_id: $(this).attr("name"), vjson:{remarks: $(this).attr("value")}},
                             success: function(response) {
                                 if(response.message){
-                                    console.log("[Response] message:" + response.message);
+//                                    console.log("[Response] message:" + response.message);
                                 }
                             }
                         });

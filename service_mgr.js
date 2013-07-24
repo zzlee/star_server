@@ -33,9 +33,8 @@ var serviceMgr = {};
 serviceMgr.createCustomerServiceItem = function(vjson, cb ){
 
     var condition = { 'ownerId._id': vjson.ownerId._id };
-    var customerServiceItemNO = 1;
+    var customerServiceItemNO;
     customerServiceItemModel.count(condition, function(err, result){
-//        console.log('count'+err+result);
         if(!err){
             customerServiceItemNO = result + 1;
         }
