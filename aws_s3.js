@@ -7,7 +7,7 @@ FM.AWSS3 = (function(){
 
     var S3_KEY = 'AKIAIGODK62AFWNIHQ6Q',
     S3_SECRET = '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';
-    S3_BUCKET = 'miix_content';//default
+    S3_BUCKET = 'feltmeng_kaiser';//default
 
     var s3Client = require('knox').createClient({
     	
@@ -93,6 +93,27 @@ FM.AWSS3 = (function(){
                     
                 });
             },
+            
+            /**
+             *  Delete Photo From Aws S3.
+             */
+            deleteAwsS3 : function(obj,cb){
+                s3Client.deleteFile(obj, function(err, res){
+                    if (cb) {
+                        cb(null, "Delete Successful");
+                    }
+
+                    if (err) {
+                        if (cb) cb(err, null);
+                    }
+                  });
+            },
+            
+            _test: function(){
+                this.deleteAwsS3('testfolder/test_upload.jpg', function(err, result){
+                    console.log('deleteAwsS3'+err+result);
+                });
+            }
 
 
         };//   End return
@@ -110,5 +131,7 @@ FM.AWSS3 = (function(){
 
 
 })();
+
+//FM.AWSS3.getInstance()._test();
 
 module.exports = FM.AWSS3.getInstance();
