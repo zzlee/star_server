@@ -117,7 +117,7 @@ miixContentMgr.submitMiixMovieToDooh = function( doohID, miixMovieProjectID ) {
  *         <li>fbUserId: owner's Facebook user ID                                                    
  *         </ul>                                                                            
  *     <li>contentGenre: it is normally the template (id) that this UGC uses
- *     <li>customizableObjects: a json string describing the customizable objects
+ *     <li>customizableObjects: an array of objects describing the customizable objects
  *     <li>title: title of UGC. This title will be used when it is posted on YouTube
  *     </ul>
  * @param {Function} cbOfPreAddMiixMovie Callback function called when adding operation is done
@@ -126,7 +126,7 @@ miixContentMgr.preAddMiixMovie = function(ugcProjectID, ugcInfo, cbOfPreAddMiixM
     var movieProjectDir = path.join( workingPath, 'public/contents/user_project', ugcProjectID);
     var userDataDir = path.join( movieProjectDir, 'user_data');
     var userContentDescriptionFilePath = path.join( userDataDir, 'customized_content.xml');
-    var customizableObjects = JSON.parse(ugcInfo.customizableObjects);
+    var customizableObjects = ugcInfo.customizableObjects;
 
     async.series([
         function(callback){
@@ -258,8 +258,8 @@ miixContentMgr.preAddMiixMovie = function(ugcProjectID, ugcInfo, cbOfPreAddMiixM
  */
 miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAddMiixImage) {
     var imageUgcFile = null;
-    var s3Path = null;
-    var s3Url = null;
+    var ugcS3Path = null;
+    var ugcS3Url = null;    
     
     async.series([
         function(callback){
@@ -279,22 +279,31 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
             
         },
         function(callback){
-            //Upload the PNG file to S3
-            s3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+".png";
-            awsS3.uploadToAwsS3(imageUgcFile, s3Path, 'image/png', function(err,result){
+            //Upload the PNG (user content) file to S3
+            ugcS3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+".png";
+            awsS3.uploadToAwsS3(imageUgcFile, ugcS3Path, 'image/png', function(err,result){
                 if (!err){
-                    logger.info('Miix image is successfully uploaded to S3 '+s3Path);
-                    callback(null, s3Path);
+                    logger.info('Miix image is successfully uploaded to S3 '+ugcS3Path);
+                    callback(null, ugcS3Path);
                 }
                 else {
-                    logger.info('Miix image is failed to be uploaded to S3 '+s3Path);
-                    callback('Miix movie is failed to be uploaded to S3 '+s3Path, null);
+                    logger.info('Miix image is failed to be uploaded to S3 '+ugcS3Path);
+                    callback('Miix movie is failed to be uploaded to S3 '+ugcS3Path, null);
                 }
             });
         },
         function(callback){
-            //Add UGC info to UGC db
-            s3Url = "https://s3.amazonaws.com/miix_content"+s3Path;
+            //Add UGC info (including user content info) to UGC db
+            var customizableObjects = ugcInfo.customizableObjects;
+            for (var i=0; i<customizableObjects.length; i++){
+                if (customizableObjects[i].type == "image") {
+                    var imageUserContentS3Path = '/user_project/' + ugcProjectID + '/'+ customizableObjects[i].content;
+                    var imageUserContentS3Url = "https://s3.amazonaws.com/miix_content" + imageUserContentS3Path;
+                    customizableObjects[i].content = imageUserContentS3Url
+                }
+            }
+            
+            ugcS3Url = "https://s3.amazonaws.com/miix_content" + ugcS3Path;
             var vjson = {
                     "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
                     "projectId": ugcProjectID,
@@ -303,16 +312,37 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                     "mediaType": "PNG",
                     "fileExtension": "png",
                     "title": ugcInfo.title,
-                    "url": {"s3":s3Url}
+                    "url": {"s3":ugcS3Url}//, 
+                    //"userRawContent": JSON.stringify(customizableObjects)
                 };
 
-            UGCDB.addUGC(vjson, function(errAddUgc, result){
+            UGCDB.addUGC(vjson, function(errAddUgc, newlyAddedUgc){
+                debugger;
+                var vjsonCustomizableObject = null;
                 if (!errAddUgc){
+                    for (var i=0; i<customizableObjects.length; i++){
+                        vjsonCustomizableObject = {
+                                "id": customizableObjects[i].id,
+                                "type": customizableObjects[i].type,
+                                "content": customizableObjects[i].content
+                        };
+                        newlyAddedUgc.userRawContent.push(vjsonCustomizableObject);
+                    }
+                    newlyAddedUgc.save(function(errPushUserRawContent){
+                        if (!errPushUserRawContent){
+                            callback(null);
+                        }
+                        else {
+                            logger.info('Miix image info failed to saved to UGC db: '+errPushUserRawContent);
+                            callback('Miix image info failed to saved to UGC db: '+errPushUserRawContent);
+                        }
+                    });
                     logger.info('Miix image info is successfully saved to UGC db: '+ugcProjectID);
-                    callback(null);
+                    
+                    
                 }
                 else {
-                    logger.info('Miix image info failed to saved to UGC db');
+                    logger.info('Miix image info failed to saved to UGC db: '+errAddUgc);
                     callback('Miix image info failed to saved to UGC db: '+errAddUgc);
                 }
             });
@@ -327,7 +357,7 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                    var userName = result.fb.userName;
                    var can_msg =  "上大螢幕活動初體驗！";
                    var accessToken = result.fb.auth.accessToken;
-                   fbMgr.postMessage(accessToken, can_msg, s3Url, function(errOfPostMessage, result){
+                   fbMgr.postMessage(accessToken, can_msg, ugcS3Url, function(errOfPostMessage, result){
                        console.log("result=%s", result);
                        if (!errOfPostMessage) {
                            callback(null);

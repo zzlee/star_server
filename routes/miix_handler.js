@@ -11,12 +11,14 @@ var ugc = require('../UGC.js');
 miixHandler.putBase64ImageUgcs_cb = function(req, res) {
     logger.info('[PUT '+req.path+'] is called');
     
+    var customizableObjects = JSON.parse(req.body.customizableObjects);
     if (req.body.imgBase64 && req.body.ownerId && req.body.ownerFbUserId){
 
         var ugcInfo = {
                 ownerId:{_id:req.body.ownerId, fbUserId: req.body.ownerFbUserId },
                 contentGenre: req.body.contentGenre,
-                title: req.body.title
+                title: req.body.title,
+                customizableObjects: customizableObjects
         };
         
         miixContentMgr.addMiixImage(req.body.imgBase64, req.params.ugcProjectId, ugcInfo, function(err){
@@ -29,6 +31,9 @@ miixHandler.putBase64ImageUgcs_cb = function(req, res) {
             }
         });
     }
+    else {
+        res.send(400, {error: "Not all needed data are sent."});
+    }
     
 };
 
@@ -36,12 +41,13 @@ miixHandler.putBase64ImageUgcs_cb = function(req, res) {
 miixHandler.putVideoUgcs_cb = function(req, res) {
     logger.info('[PUT '+req.path+'] is called');
     
+    var customizableObjects = JSON.parse(req.body.customizableObjects);
     if (req.body.customizableObjects && req.body.ownerId && req.body.ownerFbUserId){
 
         var ugcInfo = {
                 ownerId:{_id:req.body.ownerId, fbUserId: req.body.ownerFbUserId },
                 contentGenre: req.body.contentGenre,
-                customizableObjects: req.body.customizableObjects,
+                customizableObjects: customizableObjects,
                 title: req.body.title
         };
         
@@ -54,6 +60,9 @@ miixHandler.putVideoUgcs_cb = function(req, res) {
                 res.send(400, {error: err});
             }
         });
+    }
+    else {
+        res.send(400, {error: "Not all needed data are sent."});
     }
     
 };

@@ -103,12 +103,18 @@ FM.DB = (function(){
 			timesOfPlaying: {type: Number}		//JF
         }); //  videos collection
         
+        var userContentSchema = new Schema({
+            id: {type: String}, 
+            type: {type: String}, 
+            content: {type: String}
+        });
+        
         var UGCSchema = new Schema({
             fb_id: {type: String}, //ID of the corresponding FB feed 
             title: {type: String},
             description: {type: String},
             url: { youtube: String, tudou: String, s3: String },  //  Youtube, Tudou
-            userRawContent: { image: String, text: String, video: String }, // the file path or S3 URL of storing user's image, text, or video
+            userRawContent: [userContentSchema], //content is either the URL of S3 storing user's image/video file or the text content 
             ownerId: { _id:ObjectID, userID: String, fbUserId: String }, //userID is used to be owner's fb id, and is now DEPRECATED in Miix 2.0
             locationId: {type: ObjectID},
             projectId: {type: String},  // project ID which is unique to each AE rendering
@@ -123,7 +129,8 @@ FM.DB = (function(){
             review: {type: Number},
             vip: {type: Boolean, default: false},
             genre: {type: String, enum: UGCGenre, default: 'miix'},
-            contentGenre: {type: String, enum: ugcContentGenre},
+            contentGenre: {type: String, enum: ugcContentGenre}, //Is normally the id of main template that this UGC uses
+            contentSubGenre: {type: String}, //Is normally the id of sub template that this UGC uses
             no: {type: Number}, //Unique serial number shown to user  
             aeId: {type: String}, //ID of AE Server who renders this UGC
             mediaType: {type: String},
