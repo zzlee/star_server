@@ -50,13 +50,12 @@ miixHandler.putVideoUgcs_cb = function(req, res) {
                 customizableObjects: customizableObjects,
                 title: req.body.title
         };
-        
         miixContentMgr.preAddMiixMovie( req.params.ugcProjectId, ugcInfo, function(err){
             if (!err){
                 res.send(200);
             }
             else {
-                logger.error('[PUT /miix/base64_image_ugcs/:ugcProjectId]: '+ err);
+                logger.error('[PUT /miix/video_ugcs/:ugcProjectId] failed: '+ err);
                 res.send(400, {error: err});
             }
         });

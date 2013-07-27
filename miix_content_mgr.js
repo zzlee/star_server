@@ -66,11 +66,11 @@ miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbI
                              };
                 fmapi._fbPostUGCThenAdd(vjson); //TODO: split these tasks to different rolls
                 
-            };
+            }
             
             //for test
             //miixContentMgr.submitMiixMovieToDooh('', movieProjectID);
-        };
+        }
         
     });
     
@@ -190,12 +190,41 @@ miixContentMgr.preAddMiixMovie = function(ugcProjectID, ugcInfo, cbOfPreAddMiixM
                     "projectId": ugcProjectID,
                     "genre": "miix",
                     "contentGenre": ugcInfo.contentGenre,
-                    "title": ugcInfo.title,
+                    "title": ugcInfo.title
                 };
 
-            UGCDB.addUGC(vjson, function(errOfAddUGC, result){
+            UGCDB.addUGC(vjson, function(errOfAddUGC, newlyAddedUgc){
                 if (!errOfAddUGC){
-                    callback(null);
+                    for (var i=0; i<customizableObjects.length; i++){
+                        if (customizableObjects[i].format=="text") {
+                            vjsonCustomizableObject = {
+                                "id": customizableObjects[i].ID,
+                                "type": customizableObjects[i].format,
+                                "content": customizableObjects[i].content
+                            };
+                        }
+                        else { // customizableObjects[i].format=="image" or "video"
+                            var userContentS3Path = '/user_project/' + ugcProjectID + '/user_data/_'+ customizableObjects[i].content;
+                            var userContentS3Url = "https://s3.amazonaws.com/miix_content" + userContentS3Path;
+                            vjsonCustomizableObject = {
+                                "id": customizableObjects[i].ID,
+                                "type": customizableObjects[i].format,
+                                "content": userContentS3Url
+                            };
+                        }
+                        
+                        newlyAddedUgc.userRawContent.push(vjsonCustomizableObject);
+                    }
+                    newlyAddedUgc.save(function(errPushUserRawContent){
+                        if (!errPushUserRawContent){
+                            logger.info('Miix movie info is successfully saved to UGC db: '+ugcProjectID);
+                            callback(null);
+                        }
+                        else {
+                            logger.info('Miix movie info failed to saved to UGC db: '+errPushUserRawContent);
+                            callback('Miix movie info failed to saved to UGC db: '+errPushUserRawContent);
+                        }
+                    });
                 }
                 else {
                     callback("Failed to add UGC info to UGC db: "+errOfAddUGC);
@@ -294,15 +323,6 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
         },
         function(callback){
             //Add UGC info (including user content info) to UGC db
-            var customizableObjects = ugcInfo.customizableObjects;
-            for (var i=0; i<customizableObjects.length; i++){
-                if (customizableObjects[i].type == "image") {
-                    var imageUserContentS3Path = '/user_project/' + ugcProjectID + '/user_data/_'+ customizableObjects[i].content;
-                    var imageUserContentS3Url = "https://s3.amazonaws.com/miix_content" + imageUserContentS3Path;
-                    customizableObjects[i].content = imageUserContentS3Url
-                }
-            }
-            
             ugcS3Url = "https://s3.amazonaws.com/miix_content" + ugcS3Path;
             var vjson = {
                     "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
@@ -317,7 +337,6 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                 };
 
             UGCDB.addUGC(vjson, function(errAddUgc, newlyAddedUgc){
-                debugger;
                 var vjsonCustomizableObject = null;
                 if (!errAddUgc){
                     for (var i=0; i<customizableObjects.length; i++){
@@ -330,6 +349,7 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                     }
                     newlyAddedUgc.save(function(errPushUserRawContent){
                         if (!errPushUserRawContent){
+                            logger.info('Miix image info is successfully saved to UGC db: '+ugcProjectID);
                             callback(null);
                         }
                         else {
@@ -337,7 +357,7 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                             callback('Miix image info failed to saved to UGC db: '+errPushUserRawContent);
                         }
                     });
-                    logger.info('Miix image info is successfully saved to UGC db: '+ugcProjectID);
+                    
                     
                     
                 }
@@ -349,12 +369,11 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
         },
         function(callback){
             //post on Facebook
-            debugger;
             memberDB.getFBAccessTokenById(ugcInfo.ownerId._id, function(errOfGetFBAccessTokenById, result){
                 
                if (!errOfGetFBAccessTokenById){
-                   var userID = result.fb.userID;
-                   var userName = result.fb.userName;
+                   //var userID = result.fb.userID;
+                   //var userName = result.fb.userName;
                    var can_msg =  "上大螢幕活動初體驗！";
                    var accessToken = result.fb.auth.accessToken;
                    fbMgr.postMessage(accessToken, can_msg, ugcS3Url, function(errOfPostMessage, result){
@@ -389,9 +408,9 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
  * @param {Function} gotUrls_cb
  */
 miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUrls_cb) {
-    var userUploadedImageUrls = new Array();
+    var userUploadedImageUrls = [];
     var anUserUploadedImageUrl;
-    var userContentXmlFile = path.join( workingPath, 'public/contents/user_project', miixMovieProjectID, 'user_data/customized_content.xml')
+    var userContentXmlFile = path.join( workingPath, 'public/contents/user_project', miixMovieProjectID, 'user_data/customized_content.xml');
     var parser = new xml2js.Parser({explicitArray: false});
     fs.readFile( userContentXmlFile, function(err, data) {
         if (!err){
