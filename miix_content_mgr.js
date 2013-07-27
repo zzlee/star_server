@@ -265,7 +265,7 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
         function(callback){
             //Save base64 image to a PNG file
             var base64Data = imgBase64.replace(/^data:image\/png;base64,/,"");
-            imageUgcFile = path.join(workingPath,"public/contents/temp", ugcProjectID+".png");
+            imageUgcFile = path.join(workingPath,"public/contents/user_project", ugcProjectID, ugcProjectID+".png");
 
             fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
                 if (!errOfWriteFile){
@@ -297,7 +297,7 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
             var customizableObjects = ugcInfo.customizableObjects;
             for (var i=0; i<customizableObjects.length; i++){
                 if (customizableObjects[i].type == "image") {
-                    var imageUserContentS3Path = '/user_project/' + ugcProjectID + '/'+ customizableObjects[i].content;
+                    var imageUserContentS3Path = '/user_project/' + ugcProjectID + '/user_data/_'+ customizableObjects[i].content;
                     var imageUserContentS3Url = "https://s3.amazonaws.com/miix_content" + imageUserContentS3Path;
                     customizableObjects[i].content = imageUserContentS3Url
                 }
@@ -358,7 +358,7 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                    var can_msg =  "上大螢幕活動初體驗！";
                    var accessToken = result.fb.auth.accessToken;
                    fbMgr.postMessage(accessToken, can_msg, ugcS3Url, function(errOfPostMessage, result){
-                       console.log("result=%s", result);
+                       //console.log("result=%s", result);
                        if (!errOfPostMessage) {
                            callback(null);
                        }
