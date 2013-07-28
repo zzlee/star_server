@@ -343,14 +343,15 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                 if (!errAddUgc){
                     for (var i=0; i<customizableObjects.length; i++){
                         
-                        if (customizableObjects[i].format=="text") {
+                        if (customizableObjects[i].type=="text") {
                             vjsonCustomizableObject = {
                                 "id": customizableObjects[i].id,
                                 "type": customizableObjects[i].type,
                                 "content": customizableObjects[i].content
                             };
+                            newlyAddedUgc.userRawContent.push(vjsonCustomizableObject);
                         }
-                        else { // customizableObjects[i].format=="image" or "video"
+                        else if ((customizableObjects[i].type=="image")||(customizableObjects[i].type=="video")) {  
                             var userContentS3Path = '/user_project/' + ugcProjectID + '/user_data/_'+ customizableObjects[i].content;
                             var userContentS3Url = "https://s3.amazonaws.com/miix_content" + userContentS3Path;
                             vjsonCustomizableObject = {
@@ -358,9 +359,8 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                                 "type": customizableObjects[i].type,
                                 "content": userContentS3Url
                             };
+                            newlyAddedUgc.userRawContent.push(vjsonCustomizableObject);
                         }
-                        
-                        newlyAddedUgc.userRawContent.push(vjsonCustomizableObject);
                     }
                     newlyAddedUgc.save(function(errPushUserRawContent){
                         if (!errPushUserRawContent){
