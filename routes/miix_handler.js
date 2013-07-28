@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @fileoverview Implementation of miixHandler
  */
 

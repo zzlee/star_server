@@ -290,6 +290,7 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
     var ugcS3Path = null;
     var ugcS3Url = null;    
     
+    
     async.series([
         function(callback){
             //Save base64 image to a PNG file
@@ -323,6 +324,7 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
         },
         function(callback){
             //Add UGC info (including user content info) to UGC db
+            var customizableObjects = ugcInfo.customizableObjects;
             ugcS3Url = "https://s3.amazonaws.com/miix_content" + ugcS3Path;
             var vjson = {
                     "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
@@ -340,11 +342,24 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                 var vjsonCustomizableObject = null;
                 if (!errAddUgc){
                     for (var i=0; i<customizableObjects.length; i++){
-                        vjsonCustomizableObject = {
+                        
+                        if (customizableObjects[i].format=="text") {
+                            vjsonCustomizableObject = {
                                 "id": customizableObjects[i].id,
                                 "type": customizableObjects[i].type,
                                 "content": customizableObjects[i].content
-                        };
+                            };
+                        }
+                        else { // customizableObjects[i].format=="image" or "video"
+                            var userContentS3Path = '/user_project/' + ugcProjectID + '/user_data/_'+ customizableObjects[i].content;
+                            var userContentS3Url = "https://s3.amazonaws.com/miix_content" + userContentS3Path;
+                            vjsonCustomizableObject = {
+                                "id": customizableObjects[i].id,
+                                "type": customizableObjects[i].type,
+                                "content": userContentS3Url
+                            };
+                        }
+                        
                         newlyAddedUgc.userRawContent.push(vjsonCustomizableObject);
                     }
                     newlyAddedUgc.save(function(errPushUserRawContent){
