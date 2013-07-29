@@ -66,11 +66,11 @@ miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbI
                              };
                 fmapi._fbPostUGCThenAdd(vjson); //TODO: split these tasks to different rolls
                 
-            };
+            }
             
             //for test
             //miixContentMgr.submitMiixMovieToDooh('', movieProjectID);
-        };
+        }
         
     });
     
@@ -117,7 +117,7 @@ miixContentMgr.submitMiixMovieToDooh = function( doohID, miixMovieProjectID ) {
  *         <li>fbUserId: owner's Facebook user ID                                                    
  *         </ul>                                                                            
  *     <li>contentGenre: it is normally the template (id) that this UGC uses
- *     <li>customizableObjects: a json string describing the customizable objects
+ *     <li>customizableObjects: an array of objects describing the customizable objects
  *     <li>title: title of UGC. This title will be used when it is posted on YouTube
  *     </ul>
  * @param {Function} cbOfPreAddMiixMovie Callback function called when adding operation is done
@@ -126,7 +126,7 @@ miixContentMgr.preAddMiixMovie = function(ugcProjectID, ugcInfo, cbOfPreAddMiixM
     var movieProjectDir = path.join( workingPath, 'public/contents/user_project', ugcProjectID);
     var userDataDir = path.join( movieProjectDir, 'user_data');
     var userContentDescriptionFilePath = path.join( userDataDir, 'customized_content.xml');
-    var customizableObjects = JSON.parse(ugcInfo.customizableObjects);
+    var customizableObjects = ugcInfo.customizableObjects;
 
     async.series([
         function(callback){
@@ -190,12 +190,41 @@ miixContentMgr.preAddMiixMovie = function(ugcProjectID, ugcInfo, cbOfPreAddMiixM
                     "projectId": ugcProjectID,
                     "genre": "miix",
                     "contentGenre": ugcInfo.contentGenre,
-                    "title": ugcInfo.title,
+                    "title": ugcInfo.title
                 };
 
-            UGCDB.addUGC(vjson, function(errOfAddUGC, result){
+            UGCDB.addUGC(vjson, function(errOfAddUGC, newlyAddedUgc){
                 if (!errOfAddUGC){
-                    callback(null);
+                    for (var i=0; i<customizableObjects.length; i++){
+                        if (customizableObjects[i].format=="text") {
+                            vjsonCustomizableObject = {
+                                "id": customizableObjects[i].ID,
+                                "type": customizableObjects[i].format,
+                                "content": customizableObjects[i].content
+                            };
+                        }
+                        else { // customizableObjects[i].format=="image" or "video"
+                            var userContentS3Path = '/user_project/' + ugcProjectID + '/user_data/_'+ customizableObjects[i].content;
+                            var userContentS3Url = "https://s3.amazonaws.com/miix_content" + userContentS3Path;
+                            vjsonCustomizableObject = {
+                                "id": customizableObjects[i].ID,
+                                "type": customizableObjects[i].format,
+                                "content": userContentS3Url
+                            };
+                        }
+                        
+                        newlyAddedUgc.userRawContent.push(vjsonCustomizableObject);
+                    }
+                    newlyAddedUgc.save(function(errPushUserRawContent){
+                        if (!errPushUserRawContent){
+                            logger.info('Miix movie info is successfully saved to UGC db: '+ugcProjectID);
+                            callback(null);
+                        }
+                        else {
+                            logger.info('Miix movie info failed to saved to UGC db: '+errPushUserRawContent);
+                            callback('Miix movie info failed to saved to UGC db: '+errPushUserRawContent);
+                        }
+                    });
                 }
                 else {
                     callback("Failed to add UGC info to UGC db: "+errOfAddUGC);
@@ -258,43 +287,76 @@ miixContentMgr.preAddMiixMovie = function(ugcProjectID, ugcInfo, cbOfPreAddMiixM
  */
 miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAddMiixImage) {
     var imageUgcFile = null;
-    var s3Path = null;
-    var s3Url = null;
+    var ugcS3Path = null;
+    var ugcS3Url = null;    
+    debugger;
     
     async.series([
         function(callback){
             //Save base64 image to a PNG file
-            var base64Data = imgBase64.replace(/^data:image\/png;base64,/,"");
-            imageUgcFile = path.join(workingPath,"public/contents/temp", ugcProjectID+".png");
+            
+            var projectDir = path.join( workingPath, 'public/contents/user_project', ugcProjectID);
+            async.waterfall([
+                function(callbackOfWaterfall){
+                    //check if project dir exists
+                    fs.exists(projectDir, function (exists) {
+                        callbackOfWaterfall(null, exists);
+                    });
+                },
+                function(projectDirExists, callbackOfWaterfall){
+                    //if not exists, create one
+                    if (!projectDirExists) {
+                        fs.mkdir(projectDir, function(errOfMkdir){
+                            if (!errOfMkdir) {
+                                callbackOfWaterfall(null);
+                            }
+                            else {
+                                callbackOfWaterfall("Failed to create the project dir "+projectDir+": "+errOfMkdir);
+                            }
+                        });
+                    }
+                    else {
+                        callbackOfWaterfall(null);
+                    }
+                },
+                function(callbackOfWaterfall){
+                    //now save the base64 image to a PNG file
+                    var base64Data = imgBase64.replace(/^data:image\/png;base64,/,"");
+                    imageUgcFile = path.join(workingPath,"public/contents/user_project", ugcProjectID, ugcProjectID+".png");
 
-            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
-                if (!errOfWriteFile){
-                    callback(null);
+                    fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
+                        if (!errOfWriteFile){
+                            callbackOfWaterfall(null);
+                        }
+                        else {
+                            callbackOfWaterfall("Fail to save base64 image to a PNG file: "+errOfWriteFile);
+                        }
+                        
+                    });
                 }
-                else {
-                    callback("Fail to save base64 image to a PNG file: "+errOfWriteFile);
-                }
-                
+            ], function (err, result) {
+                callback(err);    
             });
             
         },
         function(callback){
-            //Upload the PNG file to S3
-            s3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+".png";
-            awsS3.uploadToAwsS3(imageUgcFile, s3Path, 'image/png', function(err,result){
+            //Upload the PNG (user content) file to S3
+            ugcS3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+".png";
+            awsS3.uploadToAwsS3(imageUgcFile, ugcS3Path, 'image/png', function(err,result){
                 if (!err){
-                    logger.info('Miix image is successfully uploaded to S3 '+s3Path);
-                    callback(null, s3Path);
+                    logger.info('Miix image is successfully uploaded to S3 '+ugcS3Path);
+                    callback(null, ugcS3Path);
                 }
                 else {
-                    logger.info('Miix image is failed to be uploaded to S3 '+s3Path);
-                    callback('Miix movie is failed to be uploaded to S3 '+s3Path, null);
+                    logger.info('Miix image is failed to be uploaded to S3 '+ugcS3Path);
+                    callback('Miix movie is failed to be uploaded to S3 '+ugcS3Path, null);
                 }
             });
         },
         function(callback){
-            //Add UGC info to UGC db
-            s3Url = "https://s3.amazonaws.com/miix_content"+s3Path;
+            //Add UGC info (including user content info) to UGC db
+            var customizableObjects = ugcInfo.customizableObjects;
+            ugcS3Url = "https://s3.amazonaws.com/miix_content" + ugcS3Path;
             var vjson = {
                     "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
                     "projectId": ugcProjectID,
@@ -303,32 +365,65 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                     "mediaType": "PNG",
                     "fileExtension": "png",
                     "title": ugcInfo.title,
-                    "url": {"s3":s3Url}
+                    "url": {"s3":ugcS3Url}//, 
+                    //"userRawContent": JSON.stringify(customizableObjects)
                 };
 
-            UGCDB.addUGC(vjson, function(errAddUgc, result){
+            UGCDB.addUGC(vjson, function(errAddUgc, newlyAddedUgc){
+                var vjsonCustomizableObject = null;
                 if (!errAddUgc){
-                    logger.info('Miix image info is successfully saved to UGC db: '+ugcProjectID);
-                    callback(null);
+                    for (var i=0; i<customizableObjects.length; i++){
+                        
+                        if (customizableObjects[i].type=="text") {
+                            vjsonCustomizableObject = {
+                                "id": customizableObjects[i].id,
+                                "type": customizableObjects[i].type,
+                                "content": customizableObjects[i].content
+                            };
+                            newlyAddedUgc.userRawContent.push(vjsonCustomizableObject);
+                        }
+                        else if ((customizableObjects[i].type=="image")||(customizableObjects[i].type=="video")) {  
+                            var userContentS3Path = '/user_project/' + ugcProjectID + '/user_data/_'+ customizableObjects[i].content;
+                            var userContentS3Url = "https://s3.amazonaws.com/miix_content" + userContentS3Path;
+                            vjsonCustomizableObject = {
+                                "id": customizableObjects[i].id,
+                                "type": customizableObjects[i].type,
+                                "content": userContentS3Url
+                            };
+                            newlyAddedUgc.userRawContent.push(vjsonCustomizableObject);
+                        }
+                    }
+                    newlyAddedUgc.save(function(errPushUserRawContent){
+                        if (!errPushUserRawContent){
+                            logger.info('Miix image info is successfully saved to UGC db: '+ugcProjectID);
+                            callback(null);
+                        }
+                        else {
+                            logger.info('Miix image info failed to saved to UGC db: '+errPushUserRawContent);
+                            callback('Miix image info failed to saved to UGC db: '+errPushUserRawContent);
+                        }
+                    });
+                    
+                    
+                    
                 }
                 else {
-                    logger.info('Miix image info failed to saved to UGC db');
+                    logger.info('Miix image info failed to saved to UGC db: '+errAddUgc);
                     callback('Miix image info failed to saved to UGC db: '+errAddUgc);
                 }
             });
         },
         function(callback){
             //post on Facebook
-            debugger;
             memberDB.getFBAccessTokenById(ugcInfo.ownerId._id, function(errOfGetFBAccessTokenById, result){
                 
                if (!errOfGetFBAccessTokenById){
-                   var userID = result.fb.userID;
-                   var userName = result.fb.userName;
+                   //var userID = result.fb.userID;
+                   //var userName = result.fb.userName;
                    var can_msg =  "上大螢幕活動初體驗！";
                    var accessToken = result.fb.auth.accessToken;
-                   fbMgr.postMessage(accessToken, can_msg, s3Url, function(errOfPostMessage, result){
-                       console.log("result=%s", result);
+                   fbMgr.postMessage(accessToken, can_msg, ugcS3Url, function(errOfPostMessage, result){
+                       //console.log("result=%s", result);
                        if (!errOfPostMessage) {
                            callback(null);
                        }
@@ -359,9 +454,9 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
  * @param {Function} gotUrls_cb
  */
 miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUrls_cb) {
-    var userUploadedImageUrls = new Array();
+    var userUploadedImageUrls = [];
     var anUserUploadedImageUrl;
-    var userContentXmlFile = path.join( workingPath, 'public/contents/user_project', miixMovieProjectID, 'user_data/customized_content.xml')
+    var userContentXmlFile = path.join( workingPath, 'public/contents/user_project', miixMovieProjectID, 'user_data/customized_content.xml');
     var parser = new xml2js.Parser({explicitArray: false});
     fs.readFile( userContentXmlFile, function(err, data) {
         if (!err){
