@@ -125,7 +125,7 @@ FM.youtubeMgr.deleteYoutubeVideo_partb = function(video_ID, ytAccessToken, cb){
     console.log('youtubeMgr'+video_ID+'--'+ytAccessToken);
     var youtube_url = 'https://www.googleapis.com';
 //    var DEVELOPER_KEY = 'AI39si4ESFoS_HSwufFF4CEVYW9sdz4xi2-hAjs2BXJAMuHy1NzwQXB_gulxiS-YSJzWBOAi-anICzfrjFdLxdQgG5SXMRrl8Q';
-    var path = '/youtube/v3/videos?id='+video_ID+'&?key=AI39si4ESFoS_HSwufFF4CEVYW9sdz4xi2-hAjs2BXJAMuHy1NzwQXB_gulxiS-YSJzWBOAi-anICzfrjFdLxdQgG5SXMRrl8Q&?access_token='+ytAccessToken;
+    var path = '/youtube/v3/videos?id='+video_ID+'&?key=AI39si4kwr_nSwmpgwbIvG_5ZOI-ZbwYse_H4Kujthtk4xnh2At3uHfI73PqFY8qieWbQ2uHOzCHTl6xFVh7dPjvGhBlFxbBEA'
     
     if (ytAccessToken) {
     request({
@@ -159,7 +159,7 @@ FM.youtubeMgr.deleteYoutubeVideo_partb = function(video_ID, ytAccessToken, cb){
  * youtube version 2.0 http
  */
 FM.youtubeMgr.deleteYoutubeVideo_http = function(video_ID, ytAccessToken, cb){
-    console.log('youtubeMgr'+video_ID+'--'+ytAccessToken);
+    console.log('youtubeMgr'+video_ID+'--'+ytAccessToken+'--');
     if (ytAccessToken) {
         var header = {  'Authorization': 'Bearer '+ytAccessToken,
                         'GData-Version': 2,
@@ -178,23 +178,21 @@ FM.youtubeMgr.deleteYoutubeVideo_http = function(video_ID, ytAccessToken, cb){
             method: 'DELETE'
         };
         
-        var client_req = http.request(options,  function(error, response, body){
-            if(error){
-                cb(error, null);
-            }
-            else if(body.error){
-                cb(body, null);
-            }
-            else{
-                cb(null, response);
-            }
+        var client_req = http.request(options,  function(response){
+//            console.dir(response);
+//            console.log(response.statusCode);
+            if(response.statusCode == 200)
+                cb(null, 'successful');
+            else
+                cb('fail statusCode='+response.statusCode, null);
+
         });
-//        var body = 'code='+req.query.code+'&';
-//        var body = 'client_id=701982981612-434p006n3vi10ghlk6u9op178msavtu2.apps.googleusercontent.com&';
+//        var body = 'code='+code+'&';
+//        body += 'client_id=701982981612-434p006n3vi10ghlk6u9op178msavtu2.apps.googleusercontent.com&';
 //        body += 'client_secret=NhmRDngvVVHtkLLPnhAN349b&';
 //        body += 'redirect_uri=http://localhost/oauth2callback&';
 //        body += 'grant_type=authorization_code';
-//        client_req.write();
+//        client_req.write(body);
         client_req.end();
     }
 }
@@ -202,8 +200,8 @@ FM.youtubeMgr.deleteYoutubeVideo_http = function(video_ID, ytAccessToken, cb){
 
 
 
-var ytAccessToken = 'ya29.AHES6ZRlQIFxtkF3FZaLynsVIT0zgYvc-BKIrN0FjWLE';
-var video_ID = 'Xnt_KvmclUc';
+//var ytAccessToken = 'ya29.AHES6ZRlQIFxtkF3FZaLynsVIT0zgYvc-BKIrN0FjWLE';
+//var video_ID = 'Xnt_KvmclUc';
 
 //FM.youtubeMgr.deleteYoutubeVideo(video_ID, ytAccessToken, function(err, result){
 //    if(!err)

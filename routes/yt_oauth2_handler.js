@@ -81,13 +81,12 @@ exports.YoutubeOAuth2_cb = function(req, res){
 						if(!err) {
 							logger.log('Successfully save YouTube token ' + ytToken.access_token );
 
-		                        var video_ID = 'Xnt_KvmclUc';
-		                        youtubeMgr.deleteYoutubeVideo(video_ID, ytToken.access_token, function(err, result){
+		                        var video_ID = 'X8PEoZf5qCM';
+		                        youtubeMgr.deleteYoutubeVideo_http(video_ID, ytToken.access_token, function(err, result){
 		                        if(!err)
 		                            console.log('delete Youtube Video successful'+result);
 		                        else{
 		                            console.log('deleteYoutubeVideo'+err);
-		                            console.dir(err);
 		                        }
 		                    });
 						} 
