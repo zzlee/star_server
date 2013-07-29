@@ -289,22 +289,53 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
     var imageUgcFile = null;
     var ugcS3Path = null;
     var ugcS3Url = null;    
-    
+    debugger;
     
     async.series([
         function(callback){
             //Save base64 image to a PNG file
-            var base64Data = imgBase64.replace(/^data:image\/png;base64,/,"");
-            imageUgcFile = path.join(workingPath,"public/contents/user_project", ugcProjectID, ugcProjectID+".png");
+            
+            var projectDir = path.join( workingPath, 'public/contents/user_project', ugcProjectID);
+            async.waterfall([
+                function(callbackOfWaterfall){
+                    //check if project dir exists
+                    fs.exists(projectDir, function (exists) {
+                        callbackOfWaterfall(null, exists);
+                    });
+                },
+                function(projectDirExists, callbackOfWaterfall){
+                    //if not exists, create one
+                    if (!projectDirExists) {
+                        fs.mkdir(projectDir, function(errOfMkdir){
+                            if (!errOfMkdir) {
+                                callbackOfWaterfall(null);
+                            }
+                            else {
+                                callbackOfWaterfall("Failed to create the project dir "+projectDir+": "+errOfMkdir);
+                            }
+                        });
+                    }
+                    else {
+                        callbackOfWaterfall(null);
+                    }
+                },
+                function(callbackOfWaterfall){
+                    //now save the base64 image to a PNG file
+                    var base64Data = imgBase64.replace(/^data:image\/png;base64,/,"");
+                    imageUgcFile = path.join(workingPath,"public/contents/user_project", ugcProjectID, ugcProjectID+".png");
 
-            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
-                if (!errOfWriteFile){
-                    callback(null);
+                    fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
+                        if (!errOfWriteFile){
+                            callbackOfWaterfall(null);
+                        }
+                        else {
+                            callbackOfWaterfall("Fail to save base64 image to a PNG file: "+errOfWriteFile);
+                        }
+                        
+                    });
                 }
-                else {
-                    callback("Fail to save base64 image to a PNG file: "+errOfWriteFile);
-                }
-                
+            ], function (err, result) {
+                callback(err);    
             });
             
         },
