@@ -91,6 +91,11 @@ app.post('/members/fb_info', routes.api.signupwithFB);
 app.post('/members/device_tokens', routes.api.deviceToken);
 
 
+//PUT /members/{_id}/device_tokens 
+app.put('/members/:memberId/device_tokens', routes.authorizationHandler.updateDeviceToken);
+
+
+
 
 /**
  * RESTful APIs for Miix clientss

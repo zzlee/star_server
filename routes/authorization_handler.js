@@ -15,4 +15,20 @@ FM.authorizationHandler.checkAuth = function(req, res, next) {
     
 };
 
+//PUT /members/:memgerId/device_tokens
+FM.authorizationHandler.updateDeviceToken = function(req, res) {
+	//update device token from android devices
+//	logger.info('[PUT ' + req.path + '] is called');
+	console.dir(req.body);
+//	console.log('member Id :' + req.params.memberId);
+//	if(req.body){
+//		
+//	}
+	
+	
+	
+	
+	
+};
+
 module.exports = FM.authorizationHandler;
