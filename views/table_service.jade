@@ -4,6 +4,7 @@ form#mainform(action='')
       thead
         tr
            th(width='29%') facebook帳號
+           th(width='13%') 問題編號
            th(width='13%') 問題類型
            th(width='14%') 手機版本
            th(width='18%') 時間
@@ -14,6 +15,7 @@ form#mainform(action='')
                  each service, i in serviceQuestionList
                       tr(id='#{service._id}')
                           td #{service.fb_userName}
+                          td #{service.no}
                           td
                              if(service.genre == 'account')
                                  label.label-account 帳號
