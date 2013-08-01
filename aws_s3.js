@@ -7,7 +7,7 @@ FM.AWSS3 = (function(){
 
     var S3_KEY = 'AKIAIGODK62AFWNIHQ6Q',
     S3_SECRET = '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';
-    S3_BUCKET = 'feltmeng_kaiser';//default
+    S3_BUCKET = 'miix_content';//default
 
     var s3Client = require('knox').createClient({
     	
@@ -113,6 +113,15 @@ FM.AWSS3 = (function(){
                 this.deleteAwsS3('testfolder/test_upload.jpg', function(err, result){
                     console.log('deleteAwsS3'+err+result);
                 });
+            },
+            _test_list: function(){
+                this.listAwsS3('user_project/test', function(err, result){
+                    console.log('listAwsS3'+err+result);
+                    if(result) {
+//                        console.dir(result);
+                        console.log(result.Contents[0].Key);
+                    }
+                });
             }
 
 
@@ -132,6 +141,6 @@ FM.AWSS3 = (function(){
 
 })();
 
-//FM.AWSS3.getInstance()._test();
+FM.AWSS3.getInstance()._test_list();
 
-module.exports = FM.AWSS3.getInstance();
+//module.exports = FM.AWSS3.getInstance();

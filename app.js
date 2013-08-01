@@ -185,6 +185,7 @@ app.get('/miix/videos/new_videos', routes.api.newUGCList); //v1.2 only, to be DE
  * @name PUT /miix/video_ugcs/:ugcProjectId
  * @memberof miix
  */
+app.post('/miix/video_ugcs/:ugcProjectId', routes.miixHandler.putVideoUgcs_cb);
 app.put('/miix/video_ugcs/:ugcProjectId', routes.miixHandler.putVideoUgcs_cb);
 
 app.post('/miix/videos/miix_videos', routes.api.submitAUGC); //v1.2
