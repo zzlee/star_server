@@ -434,12 +434,11 @@ FM.api.deviceToken =  function(req, res){
 		FM_LOG("\n[Got Device_Token] devicePlatform: " + user.devicePlatform + "; dvc_token: " + user.deviceToken);
 		
 		var oid = ObjectID.createFromHexString(user._id);
-		var deviceToken = {};
-		deviceToken[user.devicePlatform] = user.deviceToken;
+//		var deviceToken = {};
+//		deviceToken[user.devicePlatform] = user.deviceToken;
 		
 		var jsonStr = '{"deviceToken.' + user.devicePlatform +'":"'+ user.deviceToken + '"}';
 		var json = JSON.parse(jsonStr);
-		
 		memberDB.updateMember( oid, json, function(err, result){
             if(err) logger.info(err);
             if(result) logger.info(result);

@@ -43,10 +43,10 @@ FM.api._GCM_PushNotification = function( device_token ){
     var registrationIds = [];
 
     // Optional
-    message.addData('title', 'MiixCard');
-    message.addData('message','Hello Android');
+    message.addData('title', '登大螢幕');
+    message.addData('message','您有一個新影片');
     message.addData('msgcnt','1');
-    message.collapseKey = 'MiixCard';
+    message.collapseKey = 'OnDascreen';
     message.delayWhileIdle = true;
     message.timeToLive = 3;
 
