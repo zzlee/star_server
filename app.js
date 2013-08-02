@@ -618,6 +618,8 @@ app.get('/internal/dooh/dooh_current_video', routes.doohHandler.dooh_current_UGC
 
 //GET push html to dooh player and trigger story camera.
 app.get('/internal/dooh/dooh_playing_html', routes.doohHandler.streamVideoTrigger);
+//PUT get play dooh video play time.
+app.put('/available_street_movies/:playTime', routes.storyCamControllerHandler.availableStreetMovies);
 
 app.post('/internal/story_cam_controller/available_story_movie', routes.storyCamControllerHandler.availableStoryMovie_post_cb);
 
