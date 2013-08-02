@@ -279,6 +279,7 @@ app.get('/miix/ugc_hightlights', function(req, res){
  */
 app.get('/miix/members/:memberId/ugcs', routes.miixHandler.getUgcs_cb);
 
+app.get('/miix/members/:memberId/live_contents', routes.miixHandler.getLiveContents_cb);
 
 /**
  * Get a list of latest live content items (a.k.a. "Miix Story" or "Story MV") of a specific member , sorted by creating time (the newest at beginning)<br>
