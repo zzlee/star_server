@@ -141,6 +141,6 @@ FM.AWSS3 = (function(){
 
 })();
 
-FM.AWSS3.getInstance()._test_list();
+//FM.AWSS3.getInstance()._test_list();
 
-//module.exports = FM.AWSS3.getInstance();
+module.exports = FM.AWSS3.getInstance();
