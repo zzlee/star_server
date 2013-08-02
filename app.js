@@ -88,7 +88,6 @@ app.get('/members/authentication_code', routes.api.codeGenerate);
 app.post('/members/authentication_code_validity', routes.api.codeVerify);  //TODO: better use GET
 app.get('/members/fb_token_validity', routes.member.isFBTokenValid);
 app.post('/members/fb_info', routes.api.signupwithFB);
-app.post('/members/device_tokens', routes.api.deviceToken);
 
 
 
@@ -625,6 +624,9 @@ app.post('/internal/story_cam_controller/available_story_movie', routes.storyCam
 
 
 // == DEPRECATED ==, but used by MiixCard v1.2 or earlier versions
+app.post('/members/device_tokens', routes.api.deviceToken); //DEPRECATED
+
+
 //movie gen
 app.get('/get_template_list', routes.getTemplateList_cb ); //not used in MiixCard v1.2
 app.get('/get_template_raw_data', routes.getTemplateRawData_cb ); //not used in MiixCard v1.2
