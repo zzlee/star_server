@@ -2,7 +2,6 @@ var fs = require('fs');
 var path = require('path');
 var workingPath = process.cwd();
 var ytToken;
-var deleteTestContentMgr = require("../delete_test_content_mgr.js");
 
 
 var refreshYtToken = function(ytRefreshToken){
@@ -80,14 +79,6 @@ exports.YoutubeOAuth2_cb = function(req, res){
 					fs.writeFile(tokenFile, res_token, function(err) {
 						if(!err) {
 							logger.log('Successfully save YouTube token ' + ytToken.access_token );
-							//TODO get accessToken need better solution
-							deleteTestContentMgr.deleteYoutubeTestVideo(ytToken.access_token, function(err, result){
-		                        if(!err)
-		                            console.log(result);
-		                        else{
-		                            console.log(err);
-		                        }
-		                    });
 						} 
 						else {
 							logger.log("Failed to save YouTube access_token");

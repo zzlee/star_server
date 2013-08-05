@@ -415,28 +415,28 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
         },
         function(callback){
             //post on Facebook
-            memberDB.getFBAccessTokenById(ugcInfo.ownerId._id, function(errOfGetFBAccessTokenById, result){
-                
-               if (!errOfGetFBAccessTokenById){
-                   //var userID = result.fb.userID;
-                   //var userName = result.fb.userName;
-                   var can_msg =  "上大螢幕活動初體驗！";
-                   var accessToken = result.fb.auth.accessToken;
-                   fbMgr.postMessage(accessToken, can_msg, ugcS3Url, function(errOfPostMessage, result){
-                       //console.log("result=%s", result);
-                       if (!errOfPostMessage) {
-                           callback(null);
-                       }
-                       else {
-                           callback("Failed to post FB: "+errOfPostMessage);
-                       }
-                   });
-               }
-               else {
-                   callback("Failed to get FB access token from member DB: "+errOfGetFBAccessTokenById);
-               }
-                
-            });
+//            memberDB.getFBAccessTokenById(ugcInfo.ownerId._id, function(errOfGetFBAccessTokenById, result){
+//                
+//               if (!errOfGetFBAccessTokenById){
+//                   //var userID = result.fb.userID;
+//                   //var userName = result.fb.userName;
+//                   var can_msg =  "上大螢幕活動初體驗！";
+//                   var accessToken = result.fb.auth.accessToken;
+//                   fbMgr.postMessage(accessToken, can_msg, ugcS3Url, function(errOfPostMessage, result){
+//                       //console.log("result=%s", result);
+//                       if (!errOfPostMessage) {
+//                           callback(null);
+//                       }
+//                       else {
+//                           callback("Failed to post FB: "+errOfPostMessage);
+//                       }
+//                   });
+//               }
+//               else {
+//                   callback("Failed to get FB access token from member DB: "+errOfGetFBAccessTokenById);
+//               }
+//                
+//            });
         }
     ],
     function(err, results){
