@@ -24,7 +24,7 @@ var candidateUgcCacheModel = db.getDocModel("candidateUgcCache");
  * @mixin
  */
 var scheduleMgr = {};
-var STAR_SERVER_URL = "http://192.168.5.102";  //TODO: make this configurable? 
+var STAR_SERVER_URL = "http://192.168.5.188";  //TODO: make this configurable? 
 var DEFAULT_PROGRAM_PERIOD = 10*60*1000; //10 min
 var DEFAULT_PLAY_DURATION_FOR_STATIC_UGC = 7*1000; //7 sec.  
 var DEFAULT_PLAY_DURATION_FOR_STATIC_PADDING = 2*1000; //2 sec.   
@@ -75,19 +75,19 @@ var programPlanningPattern =(function(){
 
 var paddingContent =(function(){ 
     var PADDING_CONTENT_TABLE = {
-            miix_it: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/dooh_playing_html", format:"web_page"},
+            miix_it: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/stream_video_trigger", format:"web_page"},
                    {dir: "contents/padding_content", file:"miix02.jpg", format:"image"}],
-            cultural_and_creative: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/dooh_playing_html", format:"web_page"},
+            cultural_and_creative: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/stream_video_trigger", format:"web_page"},
                                     {dir: "contents/padding_content", file:"miix02.jpg", format:"image"},
                                     {dir: "contents/padding_content", file:"miix03.jpg", format:"image"},
                                     {dir: "contents/padding_content", file:"miix04.jpg", format:"image"}
                                     ],
-            mood: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/dooh_playing_html", format:"web_page"},
+            mood: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/stream_video_trigger", format:"web_page"},
                    {dir: "contents/padding_content", file:"miix02.jpg", format:"image"},
                    {dir: "contents/padding_content", file:"miix03.jpg", format:"image"},
                    {dir: "contents/padding_content", file:"miix04.jpg", format:"image"}
                    ],
-            check_in: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/dooh_playing_html", format:"web_page"},
+            check_in: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/stream_video_trigger", format:"web_page"},
                        {dir: "contents/padding_content", file:"miix02.jpg", format:"image"},
                        {dir: "contents/padding_content", file:"miix03.jpg", format:"image"},
                        {dir: "contents/padding_content", file:"miix04.jpg", format:"image"}
