@@ -1,8 +1,21 @@
 
 var scala = require('./scalaMgr');
-var scalaMgr = scala( 'http://server-pc:8080', { username: 'administrator', password: '53768608' } );
+var scalaMgr = scala( 'http://192.168.5.189:8080', { username: 'administrator', password: '53768608' } );
 
 setTimeout(function(){
+    //start: 1375635600000
+    /*
+    scalaMgr.listTimeslot(new Date(1375635600000), function(err, res){
+        console.log(res);
+    });
+    */
+    //1375682400000, end: 1375711200000
+    var play_s = new Date(1375682400000);
+    var play_e = new Date(1375711200000);
+    console.log(play_s);
+    console.log(play_e);
+    //(typeof(endDate) === 'undefined')?console.log('undefined'):console.log('123');
+
     /*
     var file = {
         name : 'IMG_0431.jpg',

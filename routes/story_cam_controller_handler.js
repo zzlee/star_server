@@ -38,15 +38,23 @@ FM.storyCamControllerHandler.availableStreetMovies = function(req, res){
     
     //test recordTime: 1374309992529
     
+    logger.info('get story cam report: ' + req.params.playTime);
+    
     var recordTime = req.params.playTime;
     
     getStreetVideo(recordTime, function(err, res){
+        logger.info('getStreetVideo ok.');
         findMember(recordTime, function(err, programInterval){
+            logger.info('findMember ok.');
             cuttingImageFromVideo(programInterval, function(err, res){
+                logger.info('cuttingImageFromVideo ok.');
                 uploadToAwsS3(function(awsStatus){
+                    logger.info('uploadToAwsS3 ok.');
                     updateToUGC(function(ugc_cb){
+                        logger.info('updateToUGC ok.');
                         clearMemory(function(clearStatus){
                             //console.log(clearStatus);
+                            logger.info('availableStreetMovies ok.');
                         });
                     });
                 });
@@ -169,12 +177,12 @@ var uploadToAwsS3 = function(awsS3_cb){
             projectFolder = filetype[0].split('\\');
             s3Path = '/user_project/' + projectFolder[projectFolder.length-1] + '/' + projectFolder[projectFolder.length-1] + '.' + filetype[filetype.length-1];
             awsS3List.push(s3Path);
-            awsS3.uploadToAwsS3(fileList[i], s3Path, 'video/x-msvideo', function(err,result){
+            awsS3.uploadToAwsS3(fileList[i], s3Path, '', function(err,result){
                 if (!err){
-                    logger.info('Story movie was successfully uploaded to S3 '+s3Path);
+                    logger.info('Live content image was successfully uploaded to S3 '+s3Path);
                  }
                 else {
-                    logger.info('Story movie failed to be uploaded to S3 '+s3Path);
+                    logger.info('Live content image failed to be uploaded to S3 '+s3Path);
                 }
             });
         }
