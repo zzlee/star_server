@@ -1,3 +1,6 @@
+/**
+ * Please watch '/JMeter tests/readme.txt' ,before you want to delete something! 
+ */
 var awsS3 = require('./aws_s3.js');
 var youtubeMgr = require('./youtube_mgr.js');
 var db = require('./db.js');
@@ -6,17 +9,18 @@ var readline = require('readline');
 var FM = { deleteTestContentMgr : {} };
 
 var UGCs = db.getDocModel("ugc");
+//var accessToken = null;
 
 
-FM.deleteTestContentMgr.deleteTestContentController = function(){
+FM.deleteTestContentMgr.deleteTestContentController = function(accessToken){
 
     console.log('welcome to delete_test_data_mgr!');
     console.log('1. list Youtube Test Video !');
     console.log('2. list Test Obj In Aws S3 !');
     console.log('3. list Test UGC !');
     console.log('4. delete Test Obj In AwsS3 !');
-    console.log('5. delete Test UGC !');
-    console.log('6. delete Youtube Test Video !');
+    console.log('5. delete Youtube Test Video !');
+    console.log('6. delete Test UGC !');
 
     rl = readline.createInterface(process.stdin, process.stdout);
 
@@ -24,77 +28,70 @@ FM.deleteTestContentMgr.deleteTestContentController = function(){
     rl.prompt();
 
     rl.on('line', function(line) {
-      switch(line.trim()) {
+        switch(line.trim()) {
         case '1':
-          FM.deleteTestContentMgr.listYoutubeTestVideo();
-          break;
+            FM.deleteTestContentMgr.listYoutubeTestVideo();
+            break;
         case '2':
-          FM.deleteTestContentMgr.listTestObjInAwsS3();
+            FM.deleteTestContentMgr.listTestObjInAwsS3();
             break;
         case '3':
             FM.deleteTestContentMgr.listTestUGC();
             break;
         case '4':
-          FM.deleteTestContentMgr.deleteTestObjInAwsS3();
+            FM.deleteTestContentMgr.deleteTestObjInAwsS3();
             break;
         case '5':
-          FM.deleteTestContentMgr.deleteTestUGC();
+            FM.deleteTestContentMgr.deleteYoutubeTestVideo(accessToken);
             break;
         case '6':
-            FM.deleteTestContentMgr.deleteYoutubeTestVideo();
+            FM.deleteTestContentMgr.deleteTestUGC();
             break;
         default:
-          console.log('You have to enter some number!(1~6)');
-          break;
-      }
-      rl.prompt();
+            console.log('You have to enter some number!(1~6)');
+        break;
+        }
+        rl.prompt();
     }).on('close', function() {
-      console.log('Have a great day!');
-      process.exit(0);
+        console.log('Have a great day!');
+        process.exit(0);
     });
 
 };
 
+FM.deleteTestContentMgr.getAccessToken = function(accessToken){
+    console.log('accessToken',accessToken);
+//  accessToken = accessToken;
+    FM.deleteTestContentMgr.deleteTestContentController(accessToken);
+};
 
-FM.deleteTestContentMgr.deleteYoutubeTestVideo = function( delete_cb){
+FM.deleteTestContentMgr.deleteYoutubeTestVideo = function(accessToken){
     var video_ID = null;
-    var accessToken = null;
-    
-    youtubeMgr.getAccessToken( function(err, result){
-        console.log(err, result);
-    });
-    
-        
-    
-        var query = UGCs.find();
-        query.exec(function(err, result){
-            for(var i=0 ; i<result.length; i++){
 
-                if(result[i].projectId && result[i].projectId.substring(0,4) =='test'){
-                    if(result[i].url.youtube){
-                        video_ID = result[i].url.youtube.substring(29,40);
-                        console.log(video_ID);
-                        youtubeMgr.deleteYoutubeVideo(video_ID, accessToken, function(err, result){
-                            console.log(video_ID+accessToken);
-                            if(!err)
-                                delete_cb(null ,'successful');
-                            else{
-                                delete_cb(err , null);
-                            }
-                        });
-                    }
+    var query = UGCs.find();
+    query.exec(function(err, result){
+        for(var i=0 ; i<result.length; i++){
 
+            if(result[i].projectId && result[i].projectId.substring(0,4) =='test'){
+                if(result[i].url.youtube){
+                    video_ID = result[i].url.youtube.substring(29,40);
+                    console.log(result[i].url.youtube);
+                    youtubeMgr.deleteYoutubeVideo(video_ID, accessToken, function(err, result){
+                            console.log(err ,result);
+                    });
                 }
-            } 
 
-        });
+            }
+        } 
+
+    });
 
 
 };
 
 FM.deleteTestContentMgr.listYoutubeTestVideo = function(){
     var video_ID = null;
-
+    var count = 0;
 
     var query = UGCs.find();
     query.exec(function(err, result){
@@ -107,13 +104,14 @@ FM.deleteTestContentMgr.listYoutubeTestVideo = function(){
                     console.log(i.toString()+'-'+result[i].url.youtube);
                     video_ID = result[i].url.youtube.substring(29,40);
                     console.log(video_ID);
+                    count++;
                 }
 
             }
-        } 
-
+        }
+        if(count === 0)
+            console.log('No Test data!');
     });
-
 
 };
 
@@ -121,15 +119,15 @@ FM.deleteTestContentMgr.listTestObjInAwsS3 = function(){
 
     awsS3.listAwsS3('user_project/test' ,function(err, result){
         if(result.Contents.length >0){
-        for(var i=0 ; i<result.Contents.length; i++){
-            if(i === 0)
-                console.log('');
-            console.log(result.Contents[i].Key);
-        }
+            for(var i=0 ; i<result.Contents.length; i++){
+                if(i === 0)
+                    console.log('');
+                console.log(result.Contents[i].Key);
+            }
         }else{
             console.log('No Test data!');
         }
-        
+
 
     });
 
@@ -139,7 +137,7 @@ FM.deleteTestContentMgr.listTestObjInAwsS3 = function(){
 FM.deleteTestContentMgr.deleteTestObjInAwsS3 = function(){
 
     awsS3.listAwsS3('user_project/test' ,function(err, result){
-        
+
         for(var i=0 ; i<result.Contents.length; i++){
             console.log(result.Contents[i].Key);
             awsS3.deleteAwsS3(result.Contents[i].Key, function(err, result){
@@ -166,8 +164,8 @@ FM.deleteTestContentMgr.listTestUGC = function(accessToken, delete_cb){
                 console.log('');
 
             if(result[i].projectId && result[i].projectId.substring(0,4) =='test'){
-                    console.log(result[i]._id+result[i].projectId);
-                    count++;
+                console.log(result[i]._id+result[i].projectId);
+                count++;
             }
         }
         if(count === 0)
@@ -185,15 +183,15 @@ FM.deleteTestContentMgr.deleteTestUGC = function(accessToken, delete_cb){
         for(var i=0 ; i<result.length; i++){
 
             if(result[i].projectId && result[i].projectId.substring(0,4) =='test'){
-                    console.log(result[i]._id+result[i].projectId);
-                    UGCs.findByIdAndRemove(result[i]._id, function(err, result){
+                console.log(result[i]._id+result[i].projectId);
+                UGCs.findByIdAndRemove(result[i]._id, function(err, result){
                     if(!err)
                         console.log(result);
                     else{
                         console.log(err);
                     }
                 });
-                    count++;
+                count++;
             }
         }
         if(count === 0)
@@ -206,5 +204,6 @@ FM.deleteTestContentMgr.deleteTestUGC = function(accessToken, delete_cb){
 
 
 //FM.deleteTestContentMgr.deleteTestContentController();
+//FM.deleteTestContentMgr.getAccessToken();
 
 module.exports = FM.deleteTestContentMgr;
