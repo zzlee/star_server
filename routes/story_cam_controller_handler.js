@@ -52,10 +52,10 @@ FM.storyCamControllerHandler.availableStreetMovies = function(req, res){
                     logger.info('uploadToAwsS3 ok.');
                     updateToUGC(function(ugc_cb){
                         logger.info('updateToUGC ok.');
-                        clearMemory(function(clearStatus){
+                        //clearMemory(function(clearStatus){
                             //console.log(clearStatus);
                             logger.info('availableStreetMovies ok.');
-                        });
+                        //});
                     });
                 });
                 //
@@ -147,6 +147,7 @@ var cuttingImageFromVideo = function(programInterval, cuttingImage_cb){
 var cutImage = function(source, dest, specificTime, cutImage_cb){
     //ffmpeg -i {source} -y -f image2 -ss {specificTime} -vframes 1 {dest}
     execFile(path.join('ffmpeg.exe'), ['-y', '-i', source, '-f', 'image2', '-ss', specificTime, '-frames:v', '1', '-an', dest], function(error, stdout, stderr){
+        logger.info('image content: ' + path.join(__dirname, dest));
         cutImage_cb('done');
     });
 };
@@ -168,8 +169,7 @@ var uploadToAwsS3 = function(awsS3_cb){
 
     var s3Path = '';
     var projectFolder = '';
-
-    console.log(ownerList);
+    
     var i = 0;
     var upload = function(){
         var filetype = fileList[i].split('.');
