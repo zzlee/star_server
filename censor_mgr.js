@@ -101,8 +101,8 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
 var limit = 0;
 var next = 0;
 var UGCList = [];
-var timeslotStart;
-var timeslotEnd;
+//var timeslotStart;
+//var timeslotEnd;
 
 var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, contentGenre, mustPlay, timeslotStart, timeslotEnd, timeStamp, programTimeSlotId, arr) {
     arr.push({
@@ -129,8 +129,8 @@ var mappingUGCList = function(data, set_cb){
     var toDo = function(err, result){
 
         if(data[next].timeslot){
-            timeslotStart = new Date(data[next].timeslot.start).toISOString();
-            timeslotEnd = new Date(data[next].timeslot.end).toISOString();
+            var timeslotStart = new Date(data[next].timeslot.start).toString().substring(0,25);
+            var timeslotEnd = new Date(data[next].timeslot.end).toString().substring(0,25);
         }
 
         if(next == limit - 1) {
