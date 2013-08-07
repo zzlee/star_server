@@ -190,6 +190,7 @@ app.get('/miix/videos/new_videos', routes.api.newUGCList); //v1.2 only, to be DE
  * @memberof miix
  */
 app.put('/miix/video_ugcs/:ugcProjectId', routes.miixHandler.putVideoUgcs_cb);
+app.post('/miix/video_ugcs/:ugcProjectId', routes.miixHandler.putVideoUgcs_cb);//TODO use PUT to do JMeter test
 
 app.post('/miix/videos/miix_videos', routes.api.submitAUGC); //v1.2
 
@@ -219,6 +220,7 @@ app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh); //v1.2 only.  In
  * @memberof miix
  */
 app.put('/miix/base64_image_ugcs/:ugcProjectId', routes.miixHandler.putBase64ImageUgcs_cb); 
+app.post('/miix/base64_image_ugcs/:ugcProjectId', routes.miixHandler.putBase64ImageUgcs_cb);//TODO use PUT to do JMeter test 
 
 
 /**

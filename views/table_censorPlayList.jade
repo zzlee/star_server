@@ -28,12 +28,10 @@ form#mainform(action='')
             each PlayList, i in ugcCensorPlayList
                 if i%2
                     tr
-                      td start 
-                        #{PlayList.timeslotStart}
+                      td start : #{PlayList.timeslotStart}
                         br
                         br
-                        label end
-                        #{PlayList.timeslotEnd}
+                        label end : #{PlayList.timeslotEnd}
                       td 
                         input(class='#ugcCensor.ugcCensorNoSetBtn', type='text' ,name='ugcChangeText' ,onfocus='this.value=\'\'')
                         input#ugcCensor.ugcCensorNoSetBtn(type='button', class='ugcChange', value='確認', name='#{PlayList.programTimeSlotId}')
@@ -59,12 +57,10 @@ form#mainform(action='')
 
                 else
                     tr.alternate-row
-                      td start 
-                        #{PlayList.timeslotStart}
+                      td start : #{PlayList.timeslotStart}
                         br
                         br
-                        label end
-                        #{PlayList.timeslotEnd}
+                        label end : #{PlayList.timeslotEnd}
                       td
                         input(class='#ugcCensor.ugcCensorNoSetBtn', type='text' ,name='ugcChangeText' ,onfocus='this.value=\'\'')
                         input#ugcCensor.ugcCensorNoSetBtn(type='button', class='ugcChange', value='確認', name='#{PlayList.programTimeSlotId}')

@@ -93,6 +93,36 @@ FM.AWSS3 = (function(){
                     
                 });
             },
+            
+            /**
+             *  Delete Photo From Aws S3.
+             */
+            deleteAwsS3 : function(obj,cb){
+                s3Client.deleteFile(obj, function(err, res){
+                    if (cb) {
+                        cb(null, "Delete Successful");
+                    }
+
+                    if (err) {
+                        if (cb) cb(err, null);
+                    }
+                  });
+            },
+            
+            _test: function(){
+                this.deleteAwsS3('testfolder/test_upload.jpg', function(err, result){
+                    console.log('deleteAwsS3'+err+result);
+                });
+            },
+            _test_list: function(){
+                this.listAwsS3('user_project/test', function(err, result){
+                    console.log('listAwsS3'+err+result);
+                    if(result) {
+//                        console.dir(result);
+                        console.log(result.Contents[0].Key);
+                    }
+                });
+            }
 
 
         };//   End return
@@ -110,5 +140,7 @@ FM.AWSS3 = (function(){
 
 
 })();
+
+//FM.AWSS3.getInstance()._test_list();
 
 module.exports = FM.AWSS3.getInstance();

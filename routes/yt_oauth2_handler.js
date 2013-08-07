@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var workingPath = process.cwd();
 var ytToken;
+var deleteTestContentMgr = require("../delete_test_content_mgr.js");
 
 var refreshYtToken = function(ytRefreshToken){
 	var https = require('https');
@@ -29,6 +30,7 @@ var refreshYtToken = function(ytRefreshToken){
 				fs.writeFile(tokenFile, res_token, function(err) {
 					if(!err) {
 						logger.log('Successfully save YouTube token ' + ytToken.access_token );
+
 					} 
 				}); 
 				
@@ -77,6 +79,8 @@ exports.YoutubeOAuth2_cb = function(req, res){
 					fs.writeFile(tokenFile, res_token, function(err) {
 						if(!err) {
 							logger.log('Successfully save YouTube token ' + ytToken.access_token );
+	                         //TODO get accessToken need better solution
+//                            deleteTestContentMgr.getAccessToken(ytToken.access_token);
 						} 
 						else {
 							logger.log("Failed to save YouTube access_token");
@@ -121,3 +125,4 @@ exports.YoutubeOAuth2_cb = function(req, res){
 		res.send('Accessing YouTube service was denied!');
 	}
 };
+

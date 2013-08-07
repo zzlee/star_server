@@ -40,7 +40,6 @@ miixHandler.putBase64ImageUgcs_cb = function(req, res) {
 //PUT /miix/video_ugcs/:ugcProjectId
 miixHandler.putVideoUgcs_cb = function(req, res) {
     logger.info('[PUT '+req.path+'] is called');
-    
     var customizableObjects = JSON.parse(req.body.customizableObjects);
     if (req.body.customizableObjects && req.body.ownerId && req.body.ownerFbUserId){
 
