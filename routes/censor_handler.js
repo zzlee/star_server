@@ -137,7 +137,7 @@ FM.censorHandler.gettimeslots_get_cb = function(req, res){
         var updateUGC = req.query.condition;
     }
 
-    console.log('[FM.censorHandler.gettimeslots_get_cb()] sessionId=%s', sessionId);
+    logger.info('[FM.censorHandler.gettimeslots_get_cb()] sessionId='+ sessionId);
     scheduleMgr.getProgramListBySession(sessionId, limit, skip, function(err, programList){
         debugger;
         if (!err){
