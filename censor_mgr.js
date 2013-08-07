@@ -298,10 +298,10 @@ censorMgr.getPlayList = function(programList, updateUGC, cb){
     var next = 0;
     var playList = [];
 
-    var playListInfo = function(no, description, title, doohPlayedTimes, rating, contentGenre, mustPlay, timeslot, timeStamp, dooh, programTimeSlotId, projectId, ownerId, arr) {
+    var playListInfo = function(no, userRawContent, title, doohPlayedTimes, rating, contentGenre, mustPlay, timeslot, timeStamp, dooh, programTimeSlotId, projectId, ownerId, arr) {
         arr.push({
             no: no,
-            description: description,
+            userRawContent: userRawContent,
             title: title,
             doohPlayedTimes:doohPlayedTimes, 
             rating: rating,
@@ -330,13 +330,13 @@ censorMgr.getPlayList = function(programList, updateUGC, cb){
             }
             if(result !== null){
                 if(next == limit - 1) {
-                    playListInfo(result[0].no, result[0].description, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].contentGenre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
+                    playListInfo(result[0].no, result[0].userRawContent, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].contentGenre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
                     set_cb(null, 'ok'); 
                     next = 0;
                     playList = [];
                 }
                 else{
-                    playListInfo(result[0].no, result[0].description, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].contentGenre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
+                    playListInfo(result[0].no, result[0].userRawContent, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].contentGenre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
                     next += 1;
                     mappingPlayList(data, updateUGC, set_cb);
                 }
