@@ -67,7 +67,7 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
     }
 
     if ( pageLimit && pageSkip ) {
-        FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no contentGenre mustPlay', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
+        FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no contentGenre mustPlay userRawContent', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
             if(err) {
                 logger.error('[censorMgr_db.listOfUGCs]', err);
                 cb(err, null);
@@ -101,8 +101,8 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
 var limit = 0;
 var next = 0;
 var UGCList = [];
-//var timeslotStart;
-//var timeslotEnd;
+var timeslotStart;
+var timeslotEnd;
 
 var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, contentGenre, mustPlay, timeslotStart, timeslotEnd, timeStamp, programTimeSlotId, arr) {
     arr.push({
@@ -127,20 +127,37 @@ var mappingUGCList = function(data, set_cb){
     limit = data.length;
 
     var toDo = function(err, result){
+        var userPhotoUrl = 'No Photo';
+        var description = null;
 
         if(data[next].timeslot){
-            var timeslotStart = new Date(data[next].timeslot.start).toString().substring(0,25);
-            var timeslotEnd = new Date(data[next].timeslot.end).toString().substring(0,25);
+            timeslotStart = new Date(data[next].timeslot.start).toString().substring(0,25);
+            timeslotEnd = new Date(data[next].timeslot.end).toString().substring(0,25);
+        }
+        //TODO  getUserUploadedImageUrls 
+        if(result[2]){
+            userPhotoUrl = result[2];
         }
 
+        if(data[next].userRawContent){
+
+            for(var i=0 ; i <data[next].userRawContent.length ; i++){
+                if(data[next].userRawContent[i].type == 'text')
+                    description = data[next].userRawContent[i].content;
+                if(data[next].userRawContent[i].type == 'image')
+                    userPhotoUrl = data[next].userRawContent[i].content;
+            }
+        }
+        
+
         if(next == limit - 1) {
-            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, data[next].programTimeSlotId, UGCList);
+            UGCListInfo(userPhotoUrl, data[next].no, description, result[1], result[0], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, data[next].programTimeSlotId, UGCList);
             set_cb(null, 'ok'); 
             next = 0;
             UGCList = [];
         }
         else{
-            UGCListInfo(result[0], data[next].no, data[next].description, result[2], result[1], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, data[next].programTimeSlotId, UGCList);
+            UGCListInfo(userPhotoUrl, data[next].no, description, result[1], result[0], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, data[next].programTimeSlotId, UGCList);
             next += 1;
             mappingUGCList(data, set_cb);
         }
@@ -150,14 +167,6 @@ var mappingUGCList = function(data, set_cb){
     //async
     if(data[next] !== null){
         async.parallel([
-                        function(callback){
-                            miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
-                                if(err) {
-                                    callback(err,null);
-                                }
-                                else callback(null, result);
-                            });
-                        },
                         function(callback){
                             getUserContent(data[next].ownerId.userID,function(err, result){
                                 if(err){
@@ -177,6 +186,14 @@ var mappingUGCList = function(data, set_cb){
                                 else callback(null, result.fb.userName);
                             });
 
+                        },
+                        function(callback){
+                            miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
+                                if(!err) {
+                                    callback(null, result);
+                                }
+                                else callback(null, 'No Photo');
+                            });
                         }
                         ], toDo);
     }
@@ -281,10 +298,10 @@ censorMgr.getPlayList = function(programList, updateUGC, cb){
     var next = 0;
     var playList = [];
 
-    var playListInfo = function(no, description, title, doohPlayedTimes, rating, contentGenre, mustPlay, timeslot, timeStamp, dooh, programTimeSlotId, projectId, ownerId, arr) {
+    var playListInfo = function(no, userRawContent, title, doohPlayedTimes, rating, contentGenre, mustPlay, timeslot, timeStamp, dooh, programTimeSlotId, projectId, ownerId, arr) {
         arr.push({
             no: no,
-            description: description,
+            userRawContent: userRawContent,
             title: title,
             doohPlayedTimes:doohPlayedTimes, 
             rating: rating,
@@ -307,19 +324,19 @@ censorMgr.getPlayList = function(programList, updateUGC, cb){
                 data[next].content._id = updateUGC.newUGCId;
         }
 
-        FMDB.listOfdocModels( UGCs, {_id: data[next].content._id},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no contentGenre mustPlay', null, function(err, result){
+        FMDB.listOfdocModels( UGCs, {_id: data[next].content._id},'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no contentGenre mustPlay userRawContent', null, function(err, result){
             if(err) {
                 logger.error('[censorMgr_db.listOfUGCs]', err);
             }
             if(result !== null){
                 if(next == limit - 1) {
-                    playListInfo(result[0].no, result[0].description, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].contentGenre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
+                    playListInfo(result[0].no, result[0].userRawContent, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].contentGenre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
                     set_cb(null, 'ok'); 
                     next = 0;
                     playList = [];
                 }
                 else{
-                    playListInfo(result[0].no, result[0].description, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].contentGenre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
+                    playListInfo(result[0].no, result[0].userRawContent, result[0].title, result[0].doohPlayedTimes, result[0].rating, result[0].contentGenre, result[0].mustPlay, data[next].timeslot, data[next].timeStamp, data[next].dooh, data[next]._id, result[0].projectId, result[0].ownerId, playList);
                     next += 1;
                     mappingPlayList(data, updateUGC, set_cb);
                 }

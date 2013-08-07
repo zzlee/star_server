@@ -55,8 +55,11 @@ form#mainform(action='')
                              label.label_checkin 打卡
                       td #{ugcCensor.ugcCensorNo}
                       td #{ugcCensor.userContent}
-                      td
-                        img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
+                      if(ugcCensor.userPhotoUrl == 'No Photo')
+                       td     
+                      else 
+                       td
+                         img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
                       td #{ugcCensor.fb_userName}
                       td
                         img(src='#{ugcCensor.fbPictureUrl}', alt='', width='100')
@@ -132,8 +135,11 @@ form#mainform(action='')
                              label.label_checkin 打卡
                       td #{ugcCensor.ugcCensorNo}
                       td #{ugcCensor.userContent}
-                      td
-                        img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
+                      if(ugcCensor.userPhotoUrl == 'No Photo')
+                       td      
+                      else 
+                       td
+                         img(src='#{ugcCensor.userPhotoUrl}', alt='', width='208')
                       td #{ugcCensor.fb_userName}
                       td
                         img(src='#{ugcCensor.fbPictureUrl}', alt='', width='100')
