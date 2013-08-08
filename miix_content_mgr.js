@@ -503,12 +503,66 @@ miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUrls_
 miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
     
     var ugcModel = db.getDocModel("ugc");
+    var limit = 0;
+    var next = 0;
+    var newlyUgcHighlights = [];
+    
     //TODO: change to query to meet the requirements
     ugcModel.find({ "rating": "A", $or: [ { "contentGenre":"miix_it" }, { "contentGenre": "mood"} ] }).sort({"createdOn":-1}).limit(limit).exec(function (err, ugcHighlights) {
-        //TODO: get UGC owner's FB user name 
-        
         if (!err){
-            cbOfGetUgcHighlights(null, ugcHighlights);
+            
+            var UGCListInfo = function(ownerId, fb_userName, genre, url, arr) {
+                arr.push({
+                    ownerId: ownerId,
+                    fb_userName: fb_userName,
+                    genre: genre,
+                    url: url,
+                });
+            };
+            var mappingUgcHighlightsList = function(data, set_cb){
+                limit = data.length;
+                
+                var toDo = function(err, result){
+                    if(next == limit - 1) {
+                        UGCListInfo(data[next].ownerId, result[0], data[next].genre, data[next].url, newlyUgcHighlights);
+                        set_cb(null, newlyUgcHighlights); 
+                        next = 0;
+                        UGCList = [];
+                    }
+                    else{
+                        UGCListInfo(data[next].ownerId, result[0], data[next].genre, data[next].url, newlyUgcHighlights);
+                        next += 1;
+                        mappingUgcHighlightsList(data, set_cb);
+                    }
+                };//toDo End ******
+                //async
+                if(data[next] !== null){
+                    async.parallel([
+                                    function(callback){
+                                        memberDB.getUserNameAndID(ugcHighlights[next].ownerId._id, function(err, result){
+                                            if(err) callback(err, null);
+                                            else if(result === null) callback(null, 'No User');
+                                            else callback(null, result.fb.userName);
+                                        });
+
+                                    }
+                                    ], toDo);
+                }
+
+            };
+            if(ugcHighlights.length > 0){
+                mappingUgcHighlightsList(ugcHighlights, function(err, docs){
+                    if (!err){
+//                       console.log('newlyUgcHighlights',newlyUgcHighlights);
+                       cbOfGetUgcHighlights(null, newlyUgcHighlights);
+//                       cbOfGetUgcHighlights(null, ugcHighlights);
+                    }else{
+                       cbOfGetUgcHighlights("Fail to mapping UGC highlights from DB: "+err, newlyUgcHighlights); 
+                    }
+                });
+            }
+            
+            
         }
         else {
             cbOfGetUgcHighlights("Fail to retrieve UGC highlights from DB: "+err, ugcHighlights);
