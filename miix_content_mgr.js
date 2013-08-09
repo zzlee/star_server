@@ -286,9 +286,11 @@ miixContentMgr.preAddMiixMovie = function(ugcProjectID, ugcInfo, cbOfPreAddMiixM
  *     </ul>
  * @param {Function} cbOfAddMiixImage Callback function called when adding operation is done
  */
-miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAddMiixImage) {
+miixContentMgr.addMiixImage = function(imgBase64, imgDoohPreviewBase64, ugcProjectID, ugcInfo, cbOfAddMiixImage) {
     var imageUgcFile = null;
+    var imageUgcDoohPreviewFile = null;
     var ugcS3Path = null;
+    var ugcDoohPrevieS3Path = null;
     var ugcS3Url = null;    
     debugger;
     
@@ -334,6 +336,21 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                         }
                         
                     });
+                },
+                function(callbackOfWaterfall){
+                    //now save the base64 image of DOOH preview to a PNG file
+                    var base64Data = imgDoohPreviewBase64.replace(/^data:image\/png;base64,/,"");
+                    imageUgcDoohPreviewFile = path.join(workingPath,"public/contents/user_project", ugcProjectID, ugcProjectID+"_dooh_preview.png");
+
+                    fs.writeFile(imageUgcDoohPreviewFile, base64Data, 'base64', function(errOfWriteFile) {
+                        if (!errOfWriteFile){
+                            callbackOfWaterfall(null);
+                        }
+                        else {
+                            callbackOfWaterfall("Fail to save base64 image of DOOH preview to a PNG file: "+errOfWriteFile);
+                        }
+                        
+                    });
                 }
             ], function (err, result) {
                 callback(err);    
@@ -341,7 +358,7 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
             
         },
         function(callback){
-            //Upload the PNG (user content) file to S3
+            //Upload the PNG file of original image UGC to S3
             ugcS3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+".png";
             awsS3.uploadToAwsS3(imageUgcFile, ugcS3Path, 'image/png', function(err,result){
                 if (!err){
@@ -355,9 +372,24 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
             });
         },
         function(callback){
+            //Upload the PNG file of image UGC's DOOH preview to S3
+            ugcDoohPrevieS3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+"_dooh_preview.png";
+            awsS3.uploadToAwsS3(imageUgcDoohPreviewFile, ugcDoohPrevieS3Path, 'image/png', function(err,result){
+                if (!err){
+                    logger.info('DOOH preview of Miix image is successfully uploaded to S3 '+ugcDoohPrevieS3Path);
+                    callback(null, ugcS3Path);
+                }
+                else {
+                    logger.info('DOOH preview of Miix image is failed to be uploaded to S3 '+ugcDoohPrevieS3Path);
+                    callback('DOOH preview of Miix movie is failed to be uploaded to S3 '+ugcDoohPrevieS3Path, null);
+                }
+            });
+        },
+        function(callback){
             //Add UGC info (including user content info) to UGC db
             var customizableObjects = ugcInfo.customizableObjects;
             ugcS3Url = "https://s3.amazonaws.com/miix_content" + ugcS3Path;
+            var ugcDoohPreviewS3Url =  "https://s3.amazonaws.com/miix_content" + ugcDoohPrevieS3Path;
             var vjson = {
                     "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
                     "projectId": ugcProjectID,
@@ -366,7 +398,8 @@ miixContentMgr.addMiixImage = function(imgBase64, ugcProjectID, ugcInfo, cbOfAdd
                     "mediaType": "PNG",
                     "fileExtension": "png",
                     "title": ugcInfo.title,
-                    "url": {"s3":ugcS3Url}//, 
+                    "url": {"s3":ugcS3Url},
+                    "doohPreviewUrl": ugcDoohPreviewS3Url
                     //"userRawContent": JSON.stringify(customizableObjects)
                 };
 

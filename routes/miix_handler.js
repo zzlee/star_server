@@ -21,7 +21,7 @@ miixHandler.putBase64ImageUgcs_cb = function(req, res) {
                 customizableObjects: customizableObjects
         };
         
-        miixContentMgr.addMiixImage(req.body.imgBase64, req.params.ugcProjectId, ugcInfo, function(err){
+        miixContentMgr.addMiixImage(req.body.imgBase64, req.body.imgDoohPreviewBase64,  req.params.ugcProjectId, ugcInfo, function(err){
             if (!err){
                 res.send(200);
             }
