@@ -100,7 +100,7 @@ function scalaMgr( url, account ){
                             timeslotDeadline = new Date(list.timeslots[i].endDate + ' 23:59:59');
                         else 
                             timeslotDeadline = new Date(list.timeslots[i].endDate + ' ' + list.timeslots[i].endTime);
-                        console.log(list.timeslots[i].endDate);
+//                        console.log(list.timeslots[i].endDate);
                         if((option.date.getTime() <= timeslotDeadline.getTime()) && (status == 'OK')){
                             result.push({
                                 //playlist: list.timeslots[i].playlist.name,

@@ -46,8 +46,11 @@ form#mainform(action='')
                          if(PlayList.contentGenre == 'check_in')
                              label.label_checkin 打卡
                       td #{PlayList.userContent}
-                      td
-                        img(src='#{PlayList.userPhotoUrl}', alt='', width='208')
+                      if(PlayList.userPhotoUrl == 'No Photo')
+                       td     
+                      else 
+                       td
+                         img(src='#{PlayList.userPhotoUrl}', alt='', width='208')
                       td #{PlayList.fb_userName}
                       td
                         img(src='#{PlayList.fbPictureUrl}', alt='', width='100')
@@ -75,8 +78,11 @@ form#mainform(action='')
                          if(PlayList.contentGenre == 'check_in')
                              label.label_checkin 打卡
                       td #{PlayList.userContent}
-                      td
-                        img(src='#{PlayList.userPhotoUrl}', alt='', width='208')
+                      if(PlayList.userPhotoUrl == 'No Photo')
+                       td     
+                      else 
+                       td
+                         img(src='#{PlayList.userPhotoUrl}', alt='', width='208')
                       td #{PlayList.fb_userName}
                       td
                         img(src='#{PlayList.fbPictureUrl}', alt='', width='100')
