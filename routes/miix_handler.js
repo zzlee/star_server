@@ -138,13 +138,9 @@ miixHandler.getLiveContents_cb = function(req, res) {
 //PUT /miix/fb_ugcs/:ugcProjectId
 miixHandler.putFbPostIdUgcs_cb = function(req, res) {
     logger.info('[PUT '+req.path+'] is called');
-    console.log('[GET '+req.path+'] is called');
-    var fb_postId = req.body.fb_postId;
     if (req.body.fb_postId){
-
-        var ugcInfo = {
-                fb_postId: req.body.fb_postId
-        };
+        var ugcInfo = req.body.fb_postId;
+        
         miixContentMgr.putFbPostIdUgcs( req.params.ugcProjectId, ugcInfo, function(err){
             if (!err){
                 res.send(200);
