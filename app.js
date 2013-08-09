@@ -304,7 +304,28 @@ app.get('/miix/members/:memberId/live_contents', routes.miixHandler.getLiveConte
  */
 app.get('/miix/members/:memberId/live_contents', routes.miixHandler.getLiveContents_cb);
 
-
+/**
+ * Create a FB post id UGC of a specific project ID<br>
+ * 
+ * <h5>Path parameters</h5>
+ * <ul>
+ * <li>ugcProjectId: the project ID of the UGC
+ * </ul>
+ * 
+ * <h5>Query parameters</h5>
+ * None
+ * 
+ * <h5>Request body</h5>
+ * <ul>
+ * <li>fb_postId: the ID of the fb post id
+ * </ul>
+ * 
+ * <h5>Response body</h5>
+ * 
+ * @name PUT /miix/fb_ugcs/:ugcProjectId
+ * @memberof miix
+ */
+app.put('/miix/fb_ugcs/:ugcProjectId', routes.miixHandler.putFbPostIdUgcs_cb); 
 
 /**
  * RESTful APIs for back-end administration of Miix services
