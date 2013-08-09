@@ -222,20 +222,20 @@ FM.api._fbPostUGCThenAdd = function(vjson){
             
             FM_LOG("[POST req to FB with:]\n" + JSON.stringify(path) );
             //  Post on FB.
-            FM.api._fbPost(path, function(response){     
+//            FM.api._fbPost(path, function(response){     
                 
                 //  Get Object_id of Post Item on FB, then update db.
-                if(response.error){
-                    FM_LOG("[POST on FB:ERROR] " + response.error.message );
-                    
-                }else{
-                    var fb_id = response.id;    // Using full_id to get detail info.  full_id = userID + item_id
-                    FM_LOG("\n[Response after POST on FB:]\n" + JSON.stringify(response) ); 
-                    //var fb_id = full_id.substring(full_id.lastIndexOf("_")+1);
-                   
-                    vjsonData.fb_id = fb_id;
-                    
-                }
+//                if(response.error){
+//                    FM_LOG("[POST on FB:ERROR] " + response.error.message );
+//                    
+//                }else{
+//                    var fb_id = response.id;    // Using full_id to get detail info.  full_id = userID + item_id
+//                    FM_LOG("\n[Response after POST on FB:]\n" + JSON.stringify(response) ); 
+//                    //var fb_id = full_id.substring(full_id.lastIndexOf("_")+1);
+//                   
+//                    vjsonData.fb_id = fb_id;
+//                    
+//                }
                 UGCDB.updateOne({"projectId":pid}, vjsonData, {"upsert": true}, function(err, vdoc){
                     if(err)
                         logger.error(err);
@@ -260,7 +260,7 @@ FM.api._fbPostUGCThenAdd = function(vjson){
                         }
                     });
                 });
-            });
+//            });
         }
     });
 };

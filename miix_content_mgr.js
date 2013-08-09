@@ -537,12 +537,66 @@ miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUrls_
 miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
     
     var ugcModel = db.getDocModel("ugc");
+    var listLimit = 0;
+    var next = 0;
+    var newlyUgcHighlights = [];
+    
     //TODO: change to query to meet the requirements
     ugcModel.find({ "rating": "A", $or: [ { "contentGenre":"miix_it" }, { "contentGenre": "mood"} ] }).sort({"createdOn":-1}).limit(limit).exec(function (err, ugcHighlights) {
-        //TODO: get UGC owner's FB user name 
-        
         if (!err){
-            cbOfGetUgcHighlights(null, ugcHighlights);
+            
+            var UGCListInfo = function(ownerId, fb_userName, genre, url, arr) {
+                arr.push({
+                    ownerId: ownerId,
+                    fb_userName: fb_userName,
+                    genre: genre,
+                    url: url
+                });
+            };
+            var mappingUgcHighlightsList = function(data, set_cb){
+                listLimit = data.length;
+                
+                var toDo = function(err, result){
+                    if(next == listLimit - 1) {
+                        UGCListInfo(data[next].ownerId, result[0], data[next].genre, data[next].url, newlyUgcHighlights);
+                        set_cb(null, newlyUgcHighlights); 
+                        next = 0;
+                        UGCList = [];
+                    }
+                    else{
+                        UGCListInfo(data[next].ownerId, result[0], data[next].genre, data[next].url, newlyUgcHighlights);
+                        next += 1;
+                        mappingUgcHighlightsList(data, set_cb);
+                    }
+                };//toDo End ******
+                //async
+                if(data[next] !== null){
+                    async.parallel([
+                                    function(callback){
+                                        memberDB.getUserNameAndID(ugcHighlights[next].ownerId._id, function(err, result){
+                                            if(err) callback(err, null);
+                                            else if(result === null) callback(null, 'No User');
+                                            else callback(null, result.fb.userName);
+                                        });
+
+                                    }
+                                    ], toDo);
+                }
+
+            };
+            if(ugcHighlights.length > 0){
+                mappingUgcHighlightsList(ugcHighlights, function(err, docs){
+                    if (!err){
+//                       console.log('newlyUgcHighlights',newlyUgcHighlights);
+                       cbOfGetUgcHighlights(null, newlyUgcHighlights);
+//                       cbOfGetUgcHighlights(null, ugcHighlights);
+                    }else{
+                       cbOfGetUgcHighlights("Fail to mapping UGC highlights from DB: "+err, newlyUgcHighlights); 
+                    }
+                });
+            }
+            
+            
         }
         else {
             cbOfGetUgcHighlights("Fail to retrieve UGC highlights from DB: "+err, ugcHighlights);
@@ -551,6 +605,48 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
     });
 };
 
+
+miixContentMgr.putFbPostIdUgcs = function(ugcProjectID, ugcInfo, cbOfPutFbPostIdUgcs){
+    var ugcModel = db.getDocModel("ugc");
+    
+    async.waterfall([
+        function(callback){
+            ugcModel.find({ "projectId": ugcProjectID}).sort({"createdOn":-1}).exec(function (err, ugcObj) {
+                if (!err)
+                    callback(null, ugcObj);
+                    if (err)
+                    callback("Fail to retrieve UGC Obj from DB: "+err, ugcObj);
+            });
+            
+        },
+        function(ugcObj, callback){
+            var vjson;
+            var arr = [];
+            
+            if(ugcObj[0].fb_postId[0]){
+              ugcObj[0].fb_postId.push({'postId': ugcInfo});
+              vjson = {"fb_postId" :ugcObj[0].fb_postId};
+            }
+            else{
+                arr = [{'postId': ugcInfo}];
+                vjson = {"fb_postId" : arr};
+            }
+            
+            db.updateAdoc(ugcModel, ugcObj[0]._id, vjson, function(errOfUpdateUGC, resOfUpdateUGC){
+                if (!errOfUpdateUGC){
+                    callback(null, resOfUpdateUGC);
+                }else
+                    callback("Fail to update UGC Obj from DB: "+errOfUpdateUGC, resOfUpdateUGC);
+            });
+            
+        }
+    ],
+    function(err, result){
+        if (cbOfPutFbPostIdUgcs){
+            cbOfPutFbPostIdUgcs(err, result);
+        } 
+    });
+};
 
 
 module.exports = miixContentMgr;
@@ -561,4 +657,9 @@ miixContentMgr.getUserUploadedImageUrls('greeting-50c99d81064d2b841200000a-20130
     console.log('userUploadedImageUrls=');
     console.dir(userUploadedImageUrls);
 });
+
 */
+//miixContentMgr.putFbPostIdUgcs('miix_it-519af8c5b14a8a2c0e00000d-20130808T064444717Z', '123', function(err, putFbPostIdUgcs){
+//    console.log('userUploadedImageUrls=');
+//    console.dir(putFbPostIdUgcs);
+//});

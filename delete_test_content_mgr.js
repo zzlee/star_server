@@ -67,6 +67,10 @@ FM.deleteTestContentMgr.getAccessToken = function(accessToken){
 
 FM.deleteTestContentMgr.deleteYoutubeTestVideo = function(accessToken){
     var video_ID = null;
+    var totalCount = 0;
+    var successCount = 0;
+    var notFoundCount = 0;
+    var denyCount = 0;
 
     var query = UGCs.find();
     query.exec(function(err, result){
@@ -74,16 +78,34 @@ FM.deleteTestContentMgr.deleteYoutubeTestVideo = function(accessToken){
 
             if(result[i].projectId && result[i].projectId.substring(0,4) =='test'){
                 if(result[i].url.youtube){
+                    totalCount++;
                     video_ID = result[i].url.youtube.substring(29,40);
                     console.log(result[i].url.youtube);
+                    console.log('delete input=',video_ID, accessToken);
                     youtubeMgr.deleteYoutubeVideo(video_ID, accessToken, function(err, result){
-                            console.log(err ,result);
+//                      console.log(err ,result);
+                        if(!err){
+                            successCount++;
+                            console.log('successCount',successCount);
+                        }
+                        else{
+                            if(err == '403')
+                                denyCount++;
+                            if(err == '404')
+                                notFoundCount++;
+
+//                            console.log('denyCount',denyCount);
+//                            console.log('notFoundCount',notFoundCount);
+                        }
                     });
                 }
 
             }
         } 
-
+//        console.log('denyCount',denyCount);
+//        console.log('notFoundCount',notFoundCount);
+        console.log('totalCount',totalCount);
+//        console.log('successCount',successCount);
     });
 
 
