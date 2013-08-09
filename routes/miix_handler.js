@@ -135,5 +135,31 @@ miixHandler.getLiveContents_cb = function(req, res) {
     });
 };
 
+//PUT /miix/fb_ugcs/:ugcProjectId
+miixHandler.putFbPostIdUgcs_cb = function(req, res) {
+    logger.info('[PUT '+req.path+'] is called');
+    console.log('[GET '+req.path+'] is called');
+    var fb_postId = req.body.fb_postId;
+    if (req.body.fb_postId){
+
+        var ugcInfo = {
+                fb_postId: req.body.fb_postId
+        };
+        miixContentMgr.putFbPostIdUgcs( req.params.ugcProjectId, ugcInfo, function(err){
+            if (!err){
+                res.send(200);
+            }
+            else {
+                logger.error('[PUT /miix/fb_ugcs/:ugcProjectId] failed: '+ err);
+                res.send(400, {error: err});
+            }
+        });
+    }
+    else {
+        res.send(400, {error: "Not all needed data are sent."});
+    }
+    
+};
+
 
 module.exports = miixHandler;

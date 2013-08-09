@@ -41,7 +41,7 @@ FM.youtubeMgr.getVideoViewCount = function( yt_video_id, gotViewCount_cb ) {
  * youtube version 2.0 http
  */
 FM.youtubeMgr.deleteYoutubeVideo = function(video_ID, ytAccessToken, cb){
-    console.log('youtubeMgr'+video_ID+'--'+ytAccessToken+'--');
+//    console.log('youtubeMgr'+video_ID+'--'+ytAccessToken+'--');
     if (ytAccessToken) {
         var header = {  'Authorization': 'Bearer '+ytAccessToken,
                         'GData-Version': 2,
@@ -62,7 +62,8 @@ FM.youtubeMgr.deleteYoutubeVideo = function(video_ID, ytAccessToken, cb){
             if(response.statusCode == 200)
                 cb(null, 'successful');
             else
-                cb('fail statusCode='+response.statusCode, null);
+                cb(response.statusCode, null);
+//                cb('fail statusCode='+response.statusCode, null);
 
         });
         client_req.end();
