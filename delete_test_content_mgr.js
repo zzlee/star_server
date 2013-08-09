@@ -5,11 +5,11 @@ var awsS3 = require('./aws_s3.js');
 var youtubeMgr = require('./youtube_mgr.js');
 var db = require('./db.js');
 var readline = require('readline');
+var async = require('async');
 
 var FM = { deleteTestContentMgr : {} };
 
 var UGCs = db.getDocModel("ugc");
-//var accessToken = null;
 
 
 FM.deleteTestContentMgr.deleteTestContentController = function(accessToken){
@@ -19,7 +19,7 @@ FM.deleteTestContentMgr.deleteTestContentController = function(accessToken){
     console.log('2. list Test Obj In Aws S3 !');
     console.log('3. list Test UGC !');
     console.log('4. delete Test Obj In AwsS3 !');
-    console.log('5. delete Youtube Test Video !');
+    console.log('5. delete Youtube Test Video And delete Test UGC!');
     console.log('6. delete Test UGC !');
 
     rl = readline.createInterface(process.stdin, process.stdout);
@@ -61,7 +61,6 @@ FM.deleteTestContentMgr.deleteTestContentController = function(accessToken){
 
 FM.deleteTestContentMgr.getAccessToken = function(accessToken){
     console.log('accessToken',accessToken);
-//  accessToken = accessToken;
     FM.deleteTestContentMgr.deleteTestContentController(accessToken);
 };
 
@@ -71,42 +70,69 @@ FM.deleteTestContentMgr.deleteYoutubeTestVideo = function(accessToken){
     var successCount = 0;
     var notFoundCount = 0;
     var denyCount = 0;
+    var next = 0;
+    var limit = 0;
 
     var query = UGCs.find();
     query.exec(function(err, result){
-        for(var i=0 ; i<result.length; i++){
 
-            if(result[i].projectId && result[i].projectId.substring(0,4) =='test'){
-                if(result[i].url.youtube){
-                    totalCount++;
-                    video_ID = result[i].url.youtube.substring(29,40);
-                    console.log(result[i].url.youtube);
-                    console.log('delete input=',video_ID, accessToken);
-                    youtubeMgr.deleteYoutubeVideo(video_ID, accessToken, function(err, result){
-//                      console.log(err ,result);
-                        if(!err){
-                            successCount++;
-                            console.log('successCount',successCount);
-                        }
-                        else{
-                            if(err == '403')
-                                denyCount++;
-                            if(err == '404')
-                                notFoundCount++;
-
-//                            console.log('denyCount',denyCount);
-//                            console.log('notFoundCount',notFoundCount);
-                        }
-                    });
-                }
-
+        async.eachSeries(result, deleteYoutube, function(err0){
+            if (!err0) {
+                console.log('denyCount',denyCount);
+                console.log('notFoundCount',notFoundCount);
+                console.log('totalCount',totalCount);
+                console.log('successCount',successCount);
             }
-        } 
-//        console.log('denyCount',denyCount);
-//        console.log('notFoundCount',notFoundCount);
-        console.log('totalCount',totalCount);
-//        console.log('successCount',successCount);
+            else{
+                console.log('Failed to delete Youtube Test Video: '+err0);
+            }
+        });
+
+
     });
+
+    var deleteYoutube = function(data, cbOfDeleteYoutube){
+
+        if(data.projectId && data.projectId.substring(0,4) =='test'){
+            if(data.url.youtube){
+                console.log('----'+data.projectId+data.url);
+                totalCount++;
+                video_ID = data.url.youtube.substring(29,40);
+                console.log('delete input=',video_ID, accessToken);
+                youtubeMgr.deleteYoutubeVideo(video_ID, accessToken, function(err, result){
+                    console.log(err, result);
+                    if(!err){
+                        successCount++;
+                        cbOfDeleteYoutube(null, 'successful');
+                        UGCs.findByIdAndRemove(data._id, function(err, result){
+                            if(!err)
+                                console.log(result);
+                            else{
+                                console.log(err);
+                            }
+                        });
+                    }
+                    else{
+                        cbOfDeleteYoutube(null, err);
+                        if(err == '403')
+                            denyCount++;
+                        if(err == '404'){
+                            notFoundCount++;
+                            UGCs.findByIdAndRemove(data._id, function(err, result){
+                                if(!err)
+                                    console.log(result);
+                                else{
+                                    console.log(err);
+                                }
+                            });
+                        }
+                    }
+                });
+            }else
+                cbOfDeleteYoutube(null);
+        }else
+            cbOfDeleteYoutube(null);
+    };
 
 
 };
@@ -141,6 +167,7 @@ FM.deleteTestContentMgr.listTestObjInAwsS3 = function(){
 
     awsS3.listAwsS3('user_project/test' ,function(err, result){
         if(result.Contents.length >0){
+            console.log('Test Aws Obj total ='+result.Contents.length);
             for(var i=0 ; i<result.Contents.length; i++){
                 if(i === 0)
                     console.log('');
