@@ -42,14 +42,14 @@ miixHandler.putVideoUgcs_cb = function(req, res) {
     logger.info('[PUT '+req.path+'] is called');
     var customizableObjects = JSON.parse(req.body.customizableObjects);
     if (req.body.customizableObjects && req.body.ownerId && req.body.ownerFbUserId){
-
+        
         var ugcInfo = {
                 ownerId:{_id:req.body.ownerId, fbUserId: req.body.ownerFbUserId },
                 contentGenre: req.body.contentGenre,
                 customizableObjects: customizableObjects,
                 title: req.body.title
         };
-        miixContentMgr.preAddMiixMovie( req.params.ugcProjectId, ugcInfo, function(err){
+        miixContentMgr.preAddMiixMovie( req.body.imgDoohPreviewBase64, req.params.ugcProjectId, ugcInfo, function(err){
             if (!err){
                 res.send(200);
             }
