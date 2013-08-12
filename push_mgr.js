@@ -4,7 +4,7 @@ var DEBUG = true, FM_LOG = (DEBUG) ? function(str) {
 } : function(str) {
 };
 
-FM.pushServiceMgr = (function() {
+FM.pushMgr = (function() {
 	var uInstance = null;
 
 	function constructor() {
@@ -45,8 +45,9 @@ FM.pushServiceMgr = (function() {
 		function APN(deviceToken, msg) {
 			var apns = require('apn');
 			var options = {
-				cert : './apns/apns-dev-cert.pem', /* Certificate file path *//* ./apns-prod/apns-prod-cert.pem *//* ./apns/apns-dev-cert.pem */
-				certData : null, /*
+				cert : './apns/apns-dev-cert.pem', /* Certificate file path */
+													/* ./apns-prod/apns-prod-cert.pem *//* ./apns/apns-dev-cert.pem */
+				certData : null, 	/*
 									 * String or Buffer containing certificate
 									 * data, if supplied uses this instead of
 									 * cert file path
@@ -127,4 +128,4 @@ FM.pushServiceMgr = (function() {
 
 /* TEST */
 // FM.smsMgr.getInstance()._testkaiser();
-module.exports = FM.pushServiceMgr.getInstance();
+module.exports = FM.pushMgr.getInstance();

@@ -251,10 +251,12 @@ FM.api._fbPostUGCThenAdd = function(vjson){
                             FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
                             for( var devicePlatform in result.deviceToken){
                                 if(result.deviceToken[devicePlatform] != 'undefined'){
-                                    if(devicePlatform == 'Android')
-                                        FM.api._GCM_PushNotification(result.deviceToken[devicePlatform]);
-                                    else
-                                        FM.api._pushNotification(result.deviceToken[devicePlatform]);
+//                                    if(devicePlatform == 'Android')
+//                                        FM.api._GCM_PushNotification(result.deviceToken[devicePlatform]);
+//                                    else
+//                                        FM.api._pushNotification(result.deviceToken[devicePlatform]);
+                                	var pushMgr = require("../push_mgr.js");
+                                	pushMgr.sendMessageToDevice(devicePlatform, result.deviceToken[devicePlatform], "You Have A New Content!");
                                 }
                             }
                         }
