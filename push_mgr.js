@@ -38,7 +38,7 @@ FM.pushMgr = (function() {
 			 * retries, callback-function
 			 */
 			sender.send(message, registrationIds, 4, function(result) {
-				FM_LOG(result);
+				FM_LOG("[GCM]send : " + result);
 			});
 		}
 
