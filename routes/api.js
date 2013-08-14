@@ -247,6 +247,7 @@ FM.api._fbPostUGCThenAdd = function(vjson){
                     
                     memberDB.getDeviceTokenById(oid, function(err, result){
                         if(err) throw err;
+                        FM_LOG("TEST_DeviceTokenArry " + JSON.stringify(result.deviceToken));
                         if(result.deviceToken){
                             FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
                             for( var devicePlatform in result.deviceToken){
@@ -256,7 +257,7 @@ FM.api._fbPostUGCThenAdd = function(vjson){
 //                                    else
 //                                        FM.api._pushNotification(result.deviceToken[devicePlatform]);
                                 	var pushMgr = require("../push_mgr.js");
-                                	pushMgr.sendMessageToDevice(devicePlatform, result.deviceToken[devicePlatform], "You Have A New Content!");
+                                	pushMgr.sendMessageToDevice(devicePlatform, result.deviceToken[devicePlatform], "您有一個新影片！");
                                 }
                             }
                         }
