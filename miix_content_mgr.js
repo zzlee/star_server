@@ -479,9 +479,9 @@ miixContentMgr.addMiixImage = function(imgBase64, imgDoohPreviewBase64, ugcProje
                     callback('Miix image info failed to saved to UGC db: '+errAddUgc);
                 }
             });
-        },
-        function(callback){
-            //post on Facebook
+        }//,
+//        function(callback){
+//            //post on Facebook
 //            memberDB.getFBAccessTokenById(ugcInfo.ownerId._id, function(errOfGetFBAccessTokenById, result){
 //                
 //               if (!errOfGetFBAccessTokenById){
@@ -504,7 +504,7 @@ miixContentMgr.addMiixImage = function(imgBase64, imgDoohPreviewBase64, ugcProje
 //               }
 //                
 //            });
-        }
+//        }
     ],
     function(err, results){
         if (cbOfAddMiixImage){
