@@ -10,6 +10,7 @@ var ugc = require('../UGC.js');
 //PUT /miix/base64_image_ugcs/:ugcProjectId
 miixHandler.putBase64ImageUgcs_cb = function(req, res) {
     logger.info('[PUT '+req.path+'] is called');
+    var timeOfBeingCalled = (new Date()).getTime();
     
     var customizableObjects = JSON.parse(req.body.customizableObjects);
     if (req.body.imgBase64 && req.body.ownerId && req.body.ownerFbUserId){
@@ -23,6 +24,8 @@ miixHandler.putBase64ImageUgcs_cb = function(req, res) {
         
         miixContentMgr.addMiixImage(req.body.imgBase64, req.body.imgDoohPreviewBase64,  req.params.ugcProjectId, ugcInfo, function(err){
             if (!err){
+                var elapseTime = (new Date()).getTime() - timeOfBeingCalled;
+                logger.info('[PUT '+req.path+'] responded in '+elapseTime+' ms');
                 res.send(200);
             }
             else {
