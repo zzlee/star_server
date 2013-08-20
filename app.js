@@ -831,8 +831,17 @@ http.createServer(app).listen(app.get('port'), function(){
 //},3000);
 
 
+
 /*
 //test
+setTimeout(function(){
+    routes.api._pushNotification('279dce6929111751da154cfa87a01afe286d4208178b162fabd1a7bcb89ad6a3');
+    console.log('test push sent');
+
+}, 5000);
+
+
+
 var scheduleMgr = require('./schedule_mgr.js');
     setTimeout(function(){
     

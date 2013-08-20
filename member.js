@@ -152,7 +152,8 @@ FM.MEMBER = (function(){
                                                 
                                             }else{
 												//console.log(JSON.stringify(result));
-                                                for(var i in result){
+                                                if (result) {
+                                                    for(var i in result){
                                                     //console.log(result[i]);
                                                     if (result[i].comments){
                                                         comments_count += result[i].comments.count;
@@ -162,6 +163,8 @@ FM.MEMBER = (function(){
                                                     // when count=0, there is no likes object.
                                                     likes_count += (result[i].likes) ? result[i].likes.count : 0;
                                                 }
+                                                }
+                                                
 												callback(null, {totalLikes: likes_count, totalComments: comments_count} );
                                             }
                                         });
