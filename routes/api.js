@@ -20,6 +20,16 @@ var FM = { api: {} };
 
 FM.api.reply = [];  // Queue Res callback according to sessionID.
 
+/**
+ * GET //connectStarServer
+ * Make sure the client side can connect star_server
+ * 
+ */
+FM.api.connection = function(response){
+	FM_LOG("[connection]");
+	response.send(200);
+	
+};
 
 FM.api._pushErrorCallback = function(err, notification){
     FM_LOG("[_pushErrorCallback] ");
