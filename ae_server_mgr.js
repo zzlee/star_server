@@ -171,6 +171,11 @@ aeServerMgr.createStoryMV = function(movieProjectID, miixMovieFileExtension, own
         youtubeTokenMgr.getAccessToken( function(ytAccessToken){
             if (ytAccessToken) {
                 var userDataFolder = path.join( workingPath, 'public/contents/user_project', movieProjectID, 'user_data');
+                var savePath = path.join( workingPath, 'public/contents/user_project', movieProjectID);
+                if(!fs.existsSync(savePath)){
+                    fs.mkdirSync(savePath);
+                    fs.mkdirSync(userDataFolder);
+                }
                 
                 var commandParameters = {
                     userFileList: fs.readdirSync(userDataFolder),
@@ -181,7 +186,7 @@ aeServerMgr.createStoryMV = function(movieProjectID, miixMovieFileExtension, own
                     movieTitle: movieTitle,
                     ytAccessToken: ytAccessToken 
                 };
-                            
+
                 globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "RENDER_STORY_MOVIE", parameters: commandParameters }, function(responseParameters) {
                     //console.dir(responseParameters);
                     if (createMovie_cb )  {
@@ -262,9 +267,28 @@ aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, download
 
 aeServerMgr.downloadStoryMovieFromS3 = function(movieProjectID, downloadMovie_cb) {
 
-
     var starAeServerID;
     var UGCDB = require('./ugc.js');
+    
+    getAeServerWithLowestLoad(function(_aeID, err){
+        if (!err){
+            starAeServerID = _aeID;
+        }
+        else{
+            starAeServerID = defaultAeServer;
+        }
+        var commandParameters = {
+            movieProjectID: movieProjectID
+        };
+        
+        globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_STORY_MOVIE_FROM_S3", parameters: commandParameters }, function(responseParameters) {
+            //console.dir(responseParameters);
+            if (downloadMovie_cb )  {
+                downloadMovie_cb(responseParameters);
+            }
+        });
+    });
+    /*
     UGCDB.getAeIdByPid(movieProjectID,function(err, _aeID){
         
         if (!err){
@@ -286,7 +310,7 @@ aeServerMgr.downloadStoryMovieFromS3 = function(movieProjectID, downloadMovie_cb
         });
     
     });
-
+    */
 
 };
 
@@ -294,6 +318,27 @@ aeServerMgr.downloadMiixMovieFromS3 = function(miixMovieProjectID, miixMovieFile
 
     var starAeServerID;
     var UGCDB = require('./ugc.js');
+    
+    getAeServerWithLowestLoad(function(_aeID, err){
+        if (!err){
+            starAeServerID = _aeID;
+        }
+        else{
+            starAeServerID = defaultAeServer;
+        }
+        var commandParameters = {
+            miixMovieProjectID: miixMovieProjectID,
+            miixMovieFileExtension: miixMovieFileExtension
+        };
+        
+        globalConnectionMgr.sendRequestToRemote( starAeServerID, { command: "DOWNLOAD_MIIX_MOVIE_FROM_S3", parameters: commandParameters }, function(responseParameters) {
+            //console.dir(responseParameters);
+            if (downloadMovie_cb )  {
+                downloadMovie_cb(responseParameters);
+            }
+        });
+    });
+    /*
     UGCDB.getAeIdByPid(miixMovieProjectID,function(err, _aeID){
         
         if (!err){
@@ -315,7 +360,7 @@ aeServerMgr.downloadMiixMovieFromS3 = function(miixMovieProjectID, miixMovieFile
             }
         });
     });
-    
+    */
 
 };
 
