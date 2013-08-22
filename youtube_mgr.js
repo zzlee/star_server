@@ -70,6 +70,74 @@ FM.youtubeMgr.deleteYoutubeVideo = function(video_ID, ytAccessToken, cb){
     }
 };
 
+FM.youtubeMgr.refreshToken = function() {
+    var ytToken = null;
+    var refreshYtToken = function(ytRefreshToken){
+        var https = require('https');
+
+        var options = {
+            host: 'accounts.google.com',
+            port: 443,
+            path: '/o/oauth2/token',
+            headers: { 'content-type': 'application/x-www-form-urlencoded'  },
+            method: 'POST'
+        };
+                
+        var client_req = https.request(options, function(client_res) {
+            client_res.setEncoding('utf8');
+            client_res.on('data', function (res_token) {
+                //logger.log("res_token= %s", res_token);
+                
+                ytToken = JSON.parse(res_token);
+                if ( ytToken.access_token ) {
+                    logger.log('<'+ new Date() +'> Refreshed YouTube token: ', ytToken );
+                    //console.dir(ytToken);
+                    
+                    
+                    var tokenFile = path.join( workingPath, 'yt_token.json');
+                    fs.writeFile(tokenFile, res_token, function(err) {
+                        if(!err) {
+                            logger.log('Successfully save YouTube token ' + ytToken.access_token );
+
+                        } 
+                    }); 
+                    
+                    
+                }
+                else {
+                    logger.log('Failed to refresh YouTube token: '+res_token);              
+                }
+                
+            });
+        });
+        var body = 'client_id=701982981612-434p006n3vi10ghlk6u9op178msavtu2.apps.googleusercontent.com&';
+        body += 'client_secret=NhmRDngvVVHtkLLPnhAN349b&';
+        body += 'refresh_token='+ytRefreshToken+"&";
+        body += 'grant_type=refresh_token';
+        client_req.write(body);
+        client_req.end();
+    };
+    
+    var refreshTokenFile = path.join( workingPath, 'yt_refresh_token.json');
+    fs.readFile( refreshTokenFile, function (err, data) {
+        if (!err) {
+            var refreshToken = data;
+            setInterval( function( _ytRefreshToken){
+                //logger.log("_ytRefreshToken= %s", _ytRefreshToken);
+                refreshYtToken(_ytRefreshToken);
+            }, 3500*1000, refreshToken);
+
+        }
+        else {
+            console.log('Refresh token file does not exist! Please connect to [URL of star_server]/access_youtube_force.html to get the refresh token first');
+        }
+    });
+    
+    
+
+
+};
+
 
 
 module.exports = FM.youtubeMgr;

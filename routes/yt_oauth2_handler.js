@@ -2,8 +2,8 @@ var fs = require('fs');
 var path = require('path');
 var workingPath = process.cwd();
 var ytToken;
-var deleteTestContentMgr = require("../delete_test_content_mgr.js");
 
+/*
 var refreshYtToken = function(ytRefreshToken){
 	var https = require('https');
 
@@ -48,7 +48,8 @@ var refreshYtToken = function(ytRefreshToken){
 	body += 'grant_type=refresh_token';
 	client_req.write(body);
 	client_req.end();
-}
+}; 
+*/
 
 exports.YoutubeOAuth2_cb = function(req, res){
 	if (req.query.code) {
@@ -80,7 +81,6 @@ exports.YoutubeOAuth2_cb = function(req, res){
 						if(!err) {
 							logger.log('Successfully save YouTube token ' + ytToken.access_token );
 	                         //TODO get accessToken need better solution
-//                            deleteTestContentMgr.getAccessToken(ytToken.access_token);
 						} 
 						else {
 							logger.log("Failed to save YouTube access_token");
@@ -103,10 +103,12 @@ exports.YoutubeOAuth2_cb = function(req, res){
 						}
 					});
 					
+					/*
 					setInterval( function( _ytRefreshToken){
 						//logger.log("_ytRefreshToken= %s", _ytRefreshToken);
 						refreshYtToken(_ytRefreshToken);
 					}, 3500*1000, ytToken.refresh_token);
+					*/
 				}
 				
 			});

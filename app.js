@@ -19,6 +19,7 @@ var http = require('http'),
     secureServer = https.createServer(app),
     sio = require('socket.io').listen(server),
     ssio = require('socket.io').listen(secureServer),
+    youtubeMgr = require('./youtube_mgr.js'),
 	winston = require('winston');
   
 
@@ -75,6 +76,8 @@ app.configure('production', function(){
   app.use(express.errorHandler({ dumpExceptions: true })); 
 });
 
+
+youtubeMgr.refreshToken();
 
 app.get('/users', user.list);
 
