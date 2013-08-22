@@ -93,14 +93,13 @@ function scalaMgr( url, account ){
                 if(list.timeslots[i].playlist.name.match(/FM/i)) {
                     checkWeekday(option.date.getDay(), list.timeslots[i].weekdays, function(status){
                         var timeslotDeadline;
-                        //if((typeof(list.timeslots[i].endDate) === 'undefined'))
-                        //    timeslotDeadline = new Date('' + ' 23:59:59');
-                        //else 
-                        if((list.timeslots[i].endTime == '24:00:00'))
+                        if((typeof(list.timeslots[i].endDate) === 'undefined'))
+                            timeslotDeadline = new Date(option.date.getTime() + 86399000);
+                        else if((list.timeslots[i].endTime == '24:00:00'))
                             timeslotDeadline = new Date(list.timeslots[i].endDate + ' 23:59:59');
                         else 
                             timeslotDeadline = new Date(list.timeslots[i].endDate + ' ' + list.timeslots[i].endTime);
-//                        console.log(list.timeslots[i].endDate);
+                        //console.log(list.timeslots[i].endDate);
                         if((option.date.getTime() <= timeslotDeadline.getTime()) && (status == 'OK')){
                             result.push({
                                 //playlist: list.timeslots[i].playlist.name,

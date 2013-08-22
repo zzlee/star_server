@@ -880,9 +880,16 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
                             //download contents from S3 or get from local
                             var fileName;
                             if (aProgram.type == "UGC"){
-                                var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+'.'+aProgram.content.fileExtension; 
-                                //TODO: make sure that target directory exists
-                                var targetLocalPath = path.join(workingPath, 'public/contents/temp', aProgram.content.projectId+'.'+aProgram.content.fileExtension);
+                                if((aProgram.content.fileExtension == 'png')||(aProgram.content.fileExtension == 'jpg')){
+                                    var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+'.'+aProgram.content.fileExtension; 
+                                    //TODO: make sure that target directory exists
+                                    var targetLocalPath = path.join(workingPath, 'public/contents/temp', aProgram.content.projectId+'.'+aProgram.content.fileExtension);
+                                }
+                                else{
+                                    var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+aProgram.content.fileExtension; 
+                                    //TODO: make sure that target directory exists
+                                    var targetLocalPath = path.join(workingPath, 'public/contents/temp', aProgram.content.projectId+aProgram.content.fileExtension);
+                                }
                                 awsS3.downloadFromAwsS3(targetLocalPath, s3Path, function(errS3,resultS3){
                                     if (!errS3){
                                         logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully download from S3 ' + s3Path );

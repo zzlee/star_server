@@ -20,6 +20,16 @@ var FM = { api: {} };
 
 FM.api.reply = [];  // Queue Res callback according to sessionID.
 
+/**
+ * GET //connectStarServer
+ * Make sure the client side can connect star_server
+ * 
+ */
+FM.api.connection = function(response){
+	FM_LOG("[connection]");
+	response.send(200);
+	
+};
 
 FM.api._pushErrorCallback = function(err, notification){
     FM_LOG("[_pushErrorCallback] ");
@@ -222,20 +232,20 @@ FM.api._fbPostUGCThenAdd = function(vjson){
             
             FM_LOG("[POST req to FB with:]\n" + JSON.stringify(path) );
             //  Post on FB.
-            FM.api._fbPost(path, function(response){     
+//            FM.api._fbPost(path, function(response){     
                 
                 //  Get Object_id of Post Item on FB, then update db.
-                if(response.error){
-                    FM_LOG("[POST on FB:ERROR] " + response.error.message );
-                    
-                }else{
-                    var fb_id = response.id;    // Using full_id to get detail info.  full_id = userID + item_id
-                    FM_LOG("\n[Response after POST on FB:]\n" + JSON.stringify(response) ); 
-                    //var fb_id = full_id.substring(full_id.lastIndexOf("_")+1);
-                   
-                    vjsonData.fb_id = fb_id;
-                    
-                }
+//                if(response.error){
+//                    FM_LOG("[POST on FB:ERROR] " + response.error.message );
+//                    
+//                }else{
+//                    var fb_id = response.id;    // Using full_id to get detail info.  full_id = userID + item_id
+//                    FM_LOG("\n[Response after POST on FB:]\n" + JSON.stringify(response) ); 
+//                    //var fb_id = full_id.substring(full_id.lastIndexOf("_")+1);
+//                   
+//                    vjsonData.fb_id = fb_id;
+//                    
+//                }
                 UGCDB.updateOne({"projectId":pid}, vjsonData, {"upsert": true}, function(err, vdoc){
                     if(err)
                         logger.error(err);
@@ -251,16 +261,14 @@ FM.api._fbPostUGCThenAdd = function(vjson){
                             FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
                             for( var devicePlatform in result.deviceToken){
                                 if(result.deviceToken[devicePlatform] != 'undefined'){
-                                    if(devicePlatform == 'Android')
-                                        FM.api._GCM_PushNotification(result.deviceToken[devicePlatform]);
-                                    else
-                                        FM.api._pushNotification(result.deviceToken[devicePlatform]);
+                                	var pushMgr = require("../push_mgr.js");
+                                	pushMgr.sendMessageToDevice(devicePlatform, result.deviceToken[devicePlatform], "您有一個新影片！");
                                 }
                             }
                         }
                     });
                 });
-            });
+//            });
         }
     });
 };
