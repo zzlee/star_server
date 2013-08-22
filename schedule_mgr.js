@@ -677,7 +677,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             });
         },
         function(callback){
-            //TODO: check the content genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
+            //check the content genre of all these UGC contents. If any of the genres is missing, remove it from the programSequence of programPlanningPattern  
             var programSequence = programPlanningPattern.getProgramSequence();
             var found = false;
             var genresToRemove = [];
@@ -878,7 +878,7 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
                     async.waterfall([
                         function(callback){
                             //download contents from S3 or get from local
-                            var fileName;
+                            //var fileName;
                             if (aProgram.type == "UGC"){
                                 var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+aProgram.content.fileExtension; 
                                 //TODO: make sure that target directory exists
