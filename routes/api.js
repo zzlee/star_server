@@ -7,6 +7,7 @@
 var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
     UGCDB = require("../UGC.js"),
+    tokenMgr = require("../token_mgr.js"),
     fbMgr = require("../facebook_mgr.js");
     
 
@@ -581,7 +582,11 @@ FM.api.signupwithFB = function(req, res){
                     if(!result.is_valid){
                         fbMgr.extendToken(accessToken, function(err, response){
                             if(err){
-                                res.send( {"data":{"_id": oid.toHexString(), "accessToken": accessToken, "expiresIn": expiresIn, "verified": mPhone_verified  }, "message":"success"} );
+                                //res.send( {"data":{"_id": oid.toHexString(), "accessToken": accessToken, "expiresIn": expiresIn, "verified": mPhone_verified  }, "message":"success"} );
+                                tokenMgr.getToken(oid, function(err, miixToken){
+                                    res.send( {"data":{"_id": oid.toHexString(), "accessToken": accessToken, "expiresIn": expiresIn, "verified": mPhone_verified, "miixToken": miixToken }, "message":"success"} );
+                                });
+
                             }else{
                                 
                                 member.fb.auth = response.data;
@@ -597,7 +602,10 @@ FM.api.signupwithFB = function(req, res){
                                     if(result) logger.info(result);
                                 });
                                 
-                                res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "verified": mPhone_verified  }, "message":"success"} );
+                                //res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "verified": mPhone_verified  }, "message":"success"} );
+                                tokenMgr.getToken(oid, function(err, miixToken){
+                                    res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "verified": mPhone_verified, "miixToken": miixToken  }, "message":"success"} );
+                                });
                             }
                         });
                         
@@ -607,7 +615,10 @@ FM.api.signupwithFB = function(req, res){
                     
                             fbMgr.extendToken(authRes.accessToken, function(err, response){
                                 if(err){
-                                    res.send( {"data":{"_id": oid.toHexString(), "accessToken": existed_access_token, "verified": mPhone_verified  }, "message":"success"} );
+                                    //res.send( {"data":{"_id": oid.toHexString(), "accessToken": existed_access_token, "verified": mPhone_verified  }, "message":"success"} );
+                                    tokenMgr.getToken(oid, function(err, miixToken){
+                                        res.send( {"data":{"_id": oid.toHexString(), "accessToken": existed_access_token, "verified": mPhone_verified, "miixToken": miixToken  }, "message":"success"} );
+                                    });
                                     
                                 }else{
                                     
@@ -624,7 +635,10 @@ FM.api.signupwithFB = function(req, res){
                                         if(result) logger.info(result);
                                     });
                                     
-                                    res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "expiresIn": data.expiresIn, "verified": mPhone_verified  }, "message":"success"} );
+                                    //res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "expiresIn": data.expiresIn, "verified": mPhone_verified  }, "message":"success"} );
+                                    tokenMgr.getToken(oid, function(err, miixToken){
+                                        res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "expiresIn": data.expiresIn, "verified": mPhone_verified, "miixToken": miixToken  }, "message":"success"} );
+                                    });
                                 }
                             });
                         }else{
@@ -642,8 +656,10 @@ FM.api.signupwithFB = function(req, res){
                             }
                             
                             
-                            res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn, "verified": mPhone_verified}, 
-                                        "message":"success"} );
+                            //res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn, "verified": mPhone_verified}, "message":"success"} );
+                            tokenMgr.getToken(oid, function(err, miixToken){
+                                res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn, "verified": mPhone_verified, "miixToken": miixToken }, "message":"success"} );
+                            });
                         }
                     }
                 });
@@ -683,8 +699,10 @@ FM.api.signupwithFB = function(req, res){
                                 accessToken: member.fb.auth.accessToken
                             };
                             
-                            res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn}, 
-                                "message":"success"} );
+                            //res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn}, "message":"success"} );
+                            tokenMgr.getToken(oid, function(err, miixToken){
+                                res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn, "miixToken": miixToken }, "message":"success"} );
+                            });
                         } //else{}
                     });
                 });
