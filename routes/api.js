@@ -25,9 +25,9 @@ FM.api.reply = [];  // Queue Res callback according to sessionID.
  * Make sure the client side can connect star_server
  * 
  */
-FM.api.connection = function(response){
+FM.api.connection = function(req, res){
 	FM_LOG("[connection]");
-	response.send(200);
+	res.send(200);
 	
 };
 

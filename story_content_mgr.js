@@ -13,13 +13,19 @@ var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID
 
     //storyCamControllerMgr.uploadStoryMovieToMainServer(movieProjectID, function(resParametes){
         //logger.info('uploading story movie from Story Cam Controller to Main Server finished. ');
-    storyCamControllerMgr.uploadStoryMovieToS3(movieProjectID, function(resParametes){
-        logger.info('uploading story movie from Story Cam Controller to S3 finished. ');
-        logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+    //storyCamControllerMgr.uploadStoryMovieToS3(movieProjectID, function(resParametes){
+        //logger.info('uploading story movie from Story Cam Controller to S3 finished. ');
+        //logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
         
         //TODO:: check the file size. If not correct, re-upload.
         
-        if ( (resParametes.err == 'null') || (!resParametes.err) ) {
+        //if ( (resParametes.err == 'null') || (!resParametes.err) ) {
+        if ( (movieProjectID == 'null') || (!movieProjectID) ) {
+            if (downloaded_cb){
+                downloaded_cb('Fail to download story movie from Story Cam Controllerr to S3');
+            }
+        }
+        else{
             //aeServerMgr.downloadStoryMovieFromMainServer(movieProjectID, function(resParameter2){
                 //logger.info('downloading story movie from Main Server to AE Server.');
             aeServerMgr.downloadStoryMovieFromS3(movieProjectID, function(resParameter2){
@@ -40,12 +46,7 @@ var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID
                 }
             }); 
         }
-        else{
-            if (downloaded_cb){
-                downloaded_cb('Fail to download story movie from Story Cam Controllerr to S3');
-            }				
-        }
-    }); 
+    //}); 
     
 
 };
@@ -164,18 +165,24 @@ storyContentMgr.generateStoryMV = function(miixMovieProjectID) {
     //------ using async -----
     async.series([
                   function(cb1){
+                      //console.log('step.1 start');
                       downloadStoryMovieFromStoryCamControllerToAeServer( miixMovieProjectID, function(err1){
+                          //console.log('step.1 end');
                           cb1(err1);
                       });
                   },
                   function(cb2){
+                      //console.log('step.2 start');
                       getUserIdAndName(function(err2){
+                          //console.log('step.2 end');
                           cb2(err2);
                       });
                   },
                   function(cb3){
+                      //console.log('step.3 start');
                       //get the file extension of this Miix movie
                       UGCDB.getValueByProject(miixMovieProjectID, "fileExtension", function(err3, result){ 
+                          //console.log('step.3 end');
                           if (!err3){
                               if (result){
                                   miixMovieFileExtension = result.fileExtension;
@@ -190,13 +197,16 @@ storyContentMgr.generateStoryMV = function(miixMovieProjectID) {
                       
                   },
                   function(cb5){
+                      //console.log('step.5 start');
                       downloadMiixMovieFromS3(miixMovieProjectID, miixMovieFileExtension, function(err5){
+                          //console.log('step.5 end');
                           cb5(err5);
                       });
                   },
                   function(cb4){
+                      //console.log('step.4 start');
                       aeServerMgr.createStoryMV( miixMovieProjectID, miixMovieFileExtension, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
-                          
+                          //console.log('step.4 end');
                           logger.info('generating Story MV finished. ');
                           logger.info('res: _command_id='+responseParameters._command_id+' err='+responseParameters.err+' youtube_video_id='+responseParameters.youtube_video_id);
                           
