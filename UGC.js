@@ -143,7 +143,10 @@ FM.UGC = (function(){
 			        var query = UGCs.find({});
 			        query.sort({no:-1}).exec(function(err, result){
 			            if(!err){
-			                vjson.no = result[0].no + 1;
+			                if(result[0])
+			                    vjson.no = result[0].no + 1;
+			                else
+			                    vjson.no = 1;
 //			                console.log(vjson.no);
 			                FMDB.createAdoc(UGCs, vjson, cb);
 			            }
