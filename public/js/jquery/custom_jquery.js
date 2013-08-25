@@ -135,6 +135,7 @@ $(document).ready(function(){
     FM.storyPlayList = new PageList( 'storyMovieList', 8, '/miix_admin/story_movies');
     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
     FM.UGCPlayList = new PageList( 'ugcCensorPlayList', 5, '/miix_admin/doohs/taipeiarena/timeslots');
+    FM.historyList = new PageList( 'historyList', 5, '/miix_admin/sessions/ ');
 
     FM.currentContent = FM.memberList;
 
@@ -230,7 +231,8 @@ $(document).ready(function(){
                     inputSearchData[$(this).attr("name")] = $(this).attr("value");
 
                     if($(this).attr("name") == 'ugcSequenceText'){
-
+                        
+                        var originSequence = $(this).attr("value");
                         var sequence = encodeURIComponent($(this).attr("value"));
                         
                         programSequenceStringToArr(sequence , function(err ,result){
@@ -243,15 +245,15 @@ $(document).ready(function(){
                     }
                     
                     if($(this).attr("value") == "" && flag == 0){
-                        alert('You have to enter complete condition!!');
+                        alert('請輸入完整的條件!!\n時間格式為2013/08/01 00:00:00\n順序請填入類別字首(合成影片填入"合",心情填入"心",etc)\nex:2013/08/01 00:00:00,合心打打文');
                         flag = 1; 
                     }
                     
-                    if(inputSearchData.TimeStart && inputSearchData.TimeEnd && inputSearchData.playtimeStart && inputSearchData.playtimeEnd && inputSearchData.ugcSequenceText && programSequenceArr){
+                    if(inputSearchData.timeStart && inputSearchData.timeEnd && inputSearchData.playTimeStart && inputSearchData.playTimeEnd && inputSearchData.ugcSequenceText && programSequenceArr){
                         $.ajax({
                             url: url,
                             type: 'POST',
-                            data: {intervalOfSelectingUGC:{start:inputSearchData.TimeStart, end:inputSearchData.TimeEnd}, intervalOfPlanningDoohProgrames:{start:inputSearchData.playtimeStart, end:inputSearchData.playtimeEnd}, programSequence:programSequenceArr},
+                            data: {intervalOfSelectingUGC:{start:inputSearchData.timeStart, end:inputSearchData.timeEnd}, intervalOfPlanningDoohProgrames:{start:inputSearchData.playTimeStart, end:inputSearchData.playTimeEnd}, programSequence:programSequenceArr, originSequence:originSequence},
                             success: function(response) {
                                 if(response.message){
                                     console.log("[Response] message:" + JSON.stringify(response.message));
@@ -278,37 +280,59 @@ $(document).ready(function(){
 
     });
 
+    $('#historyListBtn').click(function(){
+        $('#main_menu ul[class="current"]').attr("class", "select");
+        $('#historyList').attr("class", "current");
+        
+        $.get('/miix_admin/table_censorHistoryList_head.html', function(res){
+            $('#table-content-header').html(res);
+            $('#table-content').html('');
+            
+            $('#createHistoryProgramListBtn').click(function(){
+                var flag = 0;
+                var inputSearchData = {};
+
+                $('#condition-inner input[class="createHistoryProgramListBtn"]').each(function(i){
+
+                    inputSearchData[$(this).attr("name")] = $(this).attr("value");
+                    if($(this).attr("value") == "" && flag == 0){
+                        alert('請輸入完整的條件!!\n時間格式為2013/08/01 00:00:00');
+                        flag = 1; 
+                    }else{
+                     conditions = inputSearchData;
+                    }
+                });
+                  FM.currentContent = FM.historyList;
+                  FM.currentContent.showCurrentPageContent();   
+
+            });
+        });
+        
+        FM.currentContent = FM.historyList;
+        FM.currentContent.showCurrentPageContent();
+
+    });
+    
     // Ajax ---------------------------------------------------------------------    
     $(document).ajaxComplete(function(event,request, settings) {
-//      console.dir('settings'+settings);
-//      console.dir('request'+request);
-//      console.log('settings'+JSON.stringify(settings));
-//      console.log('request'+JSON.stringify(request));
-//      console.log('ajax');
-//      console.log('request'+JSON.stringify(settings.url));
-//      console.log('request'+JSON.stringify(censorCheck));
 
-        playlistCheck = settings.url.substring(0,17);
-        censorCheck = settings.url.substring(0,22);
+        var playlistCheck = settings.url.substring(0,17);
+        var censorCheck = settings.url.substring(0,22);
+        var historyCheck = settings.url.substring(0,20);
 
-//      console.log('playlistCheck'+playlistCheck);
         /**
          * UGCList
          */
         if(censorCheck == '/miix_admin/ugc_censor'){
-            console.log('ajax_censor');
             /**
-             * �d�߼v�� �j�M click
+             * 查詢影片 click
              */
             $('#ugcSearchBtn').click(function(){
-                console.log('ugcSearch');
                 var inputSearchData = {};
                 $('#condition-inner input[class="ugcSearchBtn"]').each(function(){
-                    console.log("item: " + $(this).attr("value"));
                     inputSearchData = {'no':$(this).attr("value")};
                     conditions = inputSearchData;
                 });
-                console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
                 if(conditions != null){
                     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
@@ -318,13 +342,11 @@ $(document).ready(function(){
                 }
             });
             /**
-             * �z���� �|���f�� click
+             * 尚未審核 click
              */
             $('#ugcSearchNoRatingBtn').click(function(){
-                console.log('ugcSearchNoRatingBtn');
 
                 conditions = 'norating';
-                console.log("inputSearchData: " + JSON.stringify(conditions) );
                 if(conditions != null){
                     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
@@ -334,13 +356,11 @@ $(document).ready(function(){
                 }
             });
             /**
-             * �z���� �w�g�f�� click
+             * 已經審核 click
              */
             $('#ugcSearchRatingBtn').click(function(){
-                console.log('ugcSearchNoRatingBtn');
 
                 conditions = 'rating';
-                console.log("inputSearchData: " + JSON.stringify(conditions) );
                 if(conditions != null){
                     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
@@ -350,12 +370,10 @@ $(document).ready(function(){
                 }
             });
             /**
-             * �z���� All click
+             * All click
              */
             $('#ugcSearchAllBtn').click(function(){
-                console.log('ugcSearchNoRatingBtn');
 
-                console.log("inputSearchData: " + JSON.stringify(conditions) );
                 conditions = {};
                 FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                 $('#main_menu ul[class="current"]').attr("class", "select");
@@ -365,15 +383,13 @@ $(document).ready(function(){
 
             });
             /**
-             * ���ɶ� �e�X click
+             * 投件時間 送出 click
              */
             $('#ugcSearchDateBtn').click(function(){
-                console.log('ugcSearchDateBtn');
                 var inputSearchData = {};
                 var flag = 0;
 
                 $('#condition-inner input[class="ugcSearchDateBtn"]').each(function(){
-                    console.log("item: " + $(this).attr("value"));
                     inputSearchData[$(this).attr("name")] = $(this).attr("value");
                     if($(this).attr("value") == "" && flag == 0){
                         alert('You have to enter full date!!');
@@ -381,7 +397,6 @@ $(document).ready(function(){
                     }
                     conditions = inputSearchData;
                 });
-                console.log("inputSearchData: " + JSON.stringify(inputSearchData) );
 
                 FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                 $('#main_menu ul[class="current"]').attr("class", "select");
@@ -394,7 +409,6 @@ $(document).ready(function(){
              * checkbox
              */
             $('#ugcCensor.ugcCensorNoa').click(function(){
-                console.log('check_A');
                 var url = DOMAIN + "user_content_attribute";
                 var no = $(this).attr("name");
                 var rating ='a';
@@ -493,13 +507,10 @@ $(document).ready(function(){
                 var url = DOMAIN + "user_content_attribute";
                 var no = $(this).attr("name");
                 var mustPlay = null;
-                console.log('value'+$(this).attr("value"));
                 if($(this).attr("value") == 'true')
                     mustPlay = false;
                 if($(this).attr("value") == 'false')
                     mustPlay = true;
-
-                console.log('mustplay'+no+mustPlay);
 
                 $.ajax({
                     url: url,
@@ -513,10 +524,10 @@ $(document).ready(function(){
                 });
             });
 
-        }// End of ugc_censor
+        }// End of UGCList
 
         /**
-         * playList
+         * PlayList
          */
 
         if(playlistCheck == '/miix_admin/doohs'){
@@ -615,8 +626,37 @@ $(document).ready(function(){
                 }
             });            
 
-        }// End of doohs
-          
+        }// End of PlayList
+        
+        /**
+         * HistoryList
+         */
+        if(historyCheck == '/miix_admin/sessions'){
+            $('#history._idSetBtn').click(function(){
+
+                sessionItemInfo = $(this).attr("name");
+                sessionItemInfoArray = sessionItemInfo.split(',');
+
+                $.get('/miix_admin/table_censorPlayList_head.html', function(res){
+                    console.log(res);
+                    $('#table-content-header').html(res);
+                    $('#timeStartText').attr('value', sessionItemInfoArray[1]);
+                    $('#timeEndText').attr('value', sessionItemInfoArray[2]);
+                    $('#playTimeStartText').attr('value', sessionItemInfoArray[3]);
+                    $('#playTimeEndText').attr('value', sessionItemInfoArray[4]);
+                    $('#sequenceText').attr('value', sessionItemInfoArray[5]);
+
+                    $('#main_menu ul[class="current"]').attr("class", "select");
+                    $('#UGCPlayList').attr("class", "current");
+
+                    FM.currentContent = FM.UGCPlayList;
+                    FM.currentContent.setExtraParameters({sessionId: sessionItemInfoArray[0]});
+                    FM.currentContent.showCurrentPageContent();
+                    programSequenceArr =[];
+
+                });
+            });
+        }// End of HistoryList 
         
     });
     // Ajax End---------------------------------------------------------------------

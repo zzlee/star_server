@@ -17,6 +17,7 @@ var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://server-pc:8080', { user
 var programTimeSlotModel = db.getDocModel("programTimeSlot");
 var ugcModel = db.getDocModel("ugc");
 var candidateUgcCacheModel = db.getDocModel("candidateUgcCache");
+var sessionItemModel = db.getDocModel("sessionItem");
 
 /**
  * The manager who handles the scheduling of playing UGC on DOOHs
@@ -1345,10 +1346,115 @@ scheduleMgr.removeUgcfromProgramAndAutoSetNewOne = function(sessionId, programTi
  *         
  *     </ul>
  */
-scheduleMgr.getSessionList = function(pageLimit, pageSkip, got_cb ){
+scheduleMgr.getSessionList = function(interval, pageLimit, pageSkip, got_cb ){
     
+    var sessionList = [];
+
+    var sessionListInfo = function(dooh, sessionId, intervalOfSelectingUGCStart, intervalOfSelectingUGCEnd, ntervalOfPlanningDoohProgramesStart, intervalOfPlanningDoohProgramesEnd, programSequence, pushProgramsTime, arr) {
+        arr.push({
+            dooh: dooh,
+            sessionId: sessionId,
+            intervalOfSelectingUGCStart: intervalOfSelectingUGCStart,
+            intervalOfSelectingUGCEnd: intervalOfSelectingUGCEnd,
+            intervalOfPlanningDoohProgramesStart: ntervalOfPlanningDoohProgramesStart, 
+            intervalOfPlanningDoohProgramesEnd: intervalOfPlanningDoohProgramesEnd, 
+            programSequence: programSequence,
+            pushProgramsTime: pushProgramsTime
+        });
+    };
+    
+    var query = sessionItemModel.find({ "intervalOfSelectingUGC.start": {$gte:interval.start}, "intervalOfSelectingUGC.end":{$lt:interval.end}})
+                        .sort({timeStamp:1});
+    
+    if (pageLimit!==null){
+        query = query.limit(pageLimit);
+    }
+    
+    if (pageSkip!==null){
+        query = query.skip(pageSkip);
+    }
+        
+    query.exec(function (_err, result) {
+        
+        if(_err) got_cb(_err, result);
+        if(result === null) got_cb('No result', result);
+        else if (result){
+            async.eachSeries(result, mappingSessionList, function(err0){
+                if (!err0) {
+                    got_cb(null, sessionList);
+                }
+                else{
+                    got_cb('Failed to get session list : '+err0, null);
+                }
+            });
+            
+        }
+        
+    });    
+
+    
+    var mappingSessionList = function(data ,cbOfmappingSessionList){
+
+        var _intervalOfSelectingUGCStart = null;
+        var _intervalOfSelectingUGCEnd = null;
+        var _intervalOfPlanningDoohProgramesStart = null;
+        var _intervalOfPlanningDoohProgramesEnd = null;
+        var _pushProgramsTime = null;
+
+        if(data.intervalOfSelectingUGC){
+            _intervalOfSelectingUGCStart = data.intervalOfSelectingUGC.start;
+            dateTransfer(_intervalOfSelectingUGCStart, function(result){
+                _intervalOfSelectingUGCStart = result;
+            });
+        }
+        if(data.intervalOfSelectingUGC){
+            _intervalOfSelectingUGCEnd = data.intervalOfSelectingUGC.end;
+            dateTransfer(_intervalOfSelectingUGCEnd, function(result){
+                _intervalOfSelectingUGCEnd = result;
+            });
+        }
+        if(data.intervalOfPlanningDoohProgrames){
+            _intervalOfPlanningDoohProgramesStart = data.intervalOfPlanningDoohProgrames.start;
+            dateTransfer(_intervalOfPlanningDoohProgramesStart, function(result){
+                _intervalOfPlanningDoohProgramesStart = result;
+            });
+        }
+        if(data.intervalOfPlanningDoohProgrames){
+            _intervalOfPlanningDoohProgramesEnd = data.intervalOfPlanningDoohProgrames.end;
+            dateTransfer(_intervalOfPlanningDoohProgramesEnd, function(result){
+                _intervalOfPlanningDoohProgramesEnd = result;
+            });
+        }
+        if(data.pushProgramsTime){
+            _pushProgramsTime = new Date(data.pushProgramsTime).getTime();
+            dateTransfer(_pushProgramsTime, function(result){
+                _pushProgramsTime = result;
+            });
+        }
+        
+        sessionListInfo(data.dooh, data.sessionId, _intervalOfSelectingUGCStart, _intervalOfSelectingUGCEnd, _intervalOfPlanningDoohProgramesStart, _intervalOfPlanningDoohProgramesEnd, data.programSequence, _pushProgramsTime, sessionList);
+        cbOfmappingSessionList(null);
+    };
+
 };
 
+var dateTransfer = function(date, cbOfDateTransfer){
+    tempDate = new Date(date).toString().substring(0,25);
+    yyyy = tempDate.substring(11,15);
+    mm = new Date(date).getMonth()+1;
+    dd = tempDate.substring(8,10);
+    time = tempDate.substring(16,25);
+    tempDate = yyyy+'/'+mm+'/'+dd+' '+time;
+//  console.log(yyyy+'/'+mm+'/'+dd+' '+time);
+    cbOfDateTransfer(tempDate);
+};
 
+//dateTransfer(1377144000000, function(result){
+//    console.log(result);
+// });
+
+//scheduleMgr.getSessionList({start:(new Date("2013/5/5 7:30:20")).getTime(), end:(new Date("2013/8/30 8:30:20")).getTime()}, null, null, function(err, result){
+//    console.log(err, result);
+//});
 
 module.exports = scheduleMgr;

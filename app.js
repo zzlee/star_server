@@ -553,6 +553,40 @@ app.put('/miix_admin/doohs/:doohId/timeslots/:sessionId', routes.censorHandler.u
 app.put('/miix_admin/doohs/:doohId/ProgramsTo3rdPartyContentMgr/:sessionId', routes.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb);
 
 /**
+ * Get a list of session items<br>
+ * <h5>Path parameters</h5>
+ * <ul>
+ * <li>sessionId: The id indicating the session of creating program time slot.
+ * </ul>
+ * 
+ * <h5>Query parameters</h5>
+ * <ul>
+ * <li>skip: The number decide that first query.
+ * <li>limit: The number decide that limit of query.
+ * <li>token: authorization.
+ * <li>condition: The json decide that query codition.
+ * </ul>
+ * 
+ * <h5>Request body</h5>
+ * An array of objects containing the following members:
+ * <ul>
+ * <li>_id: session ID with 24 byte hex string
+ * <li>dooh: 
+ * <li>sessionId: 
+ * <li>intervalOfSelectingUGC: 
+ * <li>intervalOfPlanningDoohProgrames: 
+ * <li>programSequence: 
+ * <li>pushProgramsTime: 
+ * </ul>
+ * 
+ * <h5>Response body</h5>
+ * @name GET /miix_admin/sessions/:sessionId
+ * @memberof miix_admin
+ */
+app.get('/miix_admin/sessions/:sessionId', routes.censorHandler.getSessionList_get_cb);
+
+
+/**
  * RESTful APIs for back-end administration of Miix services
  * @namespace miix_service
  */

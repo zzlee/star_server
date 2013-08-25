@@ -7,8 +7,11 @@ var FM = { censorHandler: {} };
 var censorMgr = require("../censor_mgr.js");
 var apis = require("../routes/api.js");
 var scheduleMgr = require("../schedule_mgr.js");
+var db = require('../db.js');
+var sessionItemModel = db.getDocModel("sessionItem");
 
 var sessionId = null;
+var originSequence = null;
 
 /**
  * @param  request  {json}sort:{?}
@@ -108,12 +111,48 @@ FM.censorHandler.postProgramTimeSlotSession_cb = function(req, res){
     var intervalOfPlanningDoohProgrames = {start: intervalOfPlanningDoohProgramesStart, end: intervalOfPlanningDoohProgramesEnd};
     
     var programSequence = req.body.programSequence;
+    originSequence = req.body.originSequence;
 
-
+    console.log(req.body.originSequence);
     scheduleMgr.createProgramList(doohId, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, function(err, result){
         if (!err){
             sessionId = result.sessionId;
             res.send(200, {message: result.sessionId});
+            //write session info to db
+            sessionInfoVjson = {
+                    dooh: doohId,
+                    sessionId: result.sessionId,
+                    intervalOfSelectingUGC: {
+                        start: intervalOfSelectingUGCStart,
+                        end: intervalOfSelectingUGCend
+                    },
+                    intervalOfPlanningDoohProgrames: {
+                        start: intervalOfPlanningDoohProgramesStart,
+                        end: intervalOfPlanningDoohProgramesEnd
+                    }
+//                    programSequence: programSequence
+            };
+            db.getValueOf(sessionItemModel, {"sessionId": sessionId}, null, function(err, result){
+                if(!err){ 
+                    db.updateAdoc(sessionItemModel, result, sessionInfoVjson, function(err, result){
+                        if(!err){
+                            logger.info('[FM.censorHandler.postProgramTimeSlotSession_cb()] sessionItemModel update to db ok! sessionId='+ sessionId);
+                        }else{
+                            logger.info('[FM.censorHandler.postProgramTimeSlotSession_cb()] sessionItemModel update to db fail! sessionId='+ sessionId+'err='+err);
+                        }
+                    });
+                }else{
+                    db.createAdoc(sessionItemModel, sessionInfoVjson, function(err, result){
+                        if(!err){
+                            logger.info('[FM.censorHandler.postProgramTimeSlotSession_cb()] sessionItemModel create to db ok! sessionId='+ sessionId);
+                        }else{
+                            logger.info('[FM.censorHandler.postProgramTimeSlotSession_cb()] sessionItemModel create to db fail! sessionId='+ sessionId+'err='+err);
+                        }
+                    });
+                }
+            });
+
+            //end of write session info to db
         }
         else{
             res.send(400, {error: err});
@@ -182,6 +221,26 @@ FM.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
         if (!err){
             //TODO pushProgramsTo3rdPartyContentMgr
             res.send(200);
+            //update session info to db
+            sessionInfoVjson = {
+                    pushProgramsTime: new Date,
+                    programSequence: originSequence
+            };
+            db.getValueOf(sessionItemModel, {"sessionId": sessionId}, null, function(err, result){
+                if(!err){ 
+                    db.updateAdoc(sessionItemModel, result, sessionInfoVjson, function(err, result){
+                        if(!err){
+                            logger.info('[FM.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb()] sessionItemModel update to db ok! sessionId='+ sessionId);
+                        }else{
+                            logger.info('[FM.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb()] sessionItemModel update to db fail! sessionId='+ sessionId+'err='+err);
+                        }
+                    });
+                }else{
+                    logger.info('[FM.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb()] sessionItemModel update to db fail! sessionId='+ sessionId+'err='+err);
+                }
+            });
+
+            //end of update session info to db
         }
         else{
             res.send(400, {error: err});
@@ -218,6 +277,31 @@ FM.censorHandler.updatetimeslots_get_cb = function(req, res){
             }
         });
     }
+
+};
+
+FM.censorHandler.getSessionList_get_cb = function(req,res){
+
+    var condition;
+    var limit;
+    var skip;
+    var interval= {start: (new Date("1911/1/1 00:00:00")).getTime(), end: (new Date("9999/12/31 12:59:59")).getTime()};
+
+    limit = req.query.limit;
+    skip = req.query.skip;
+    
+    if(req.query.condition){
+        interval = {start :(new Date(req.query.condition.playtimeStart)).getTime(), end :(new Date(req.query.condition.playtimeEnd)).getTime()};
+    }
+
+    scheduleMgr.getSessionList(interval, limit, skip, function(err, historyList){
+        if (!err){
+            res.render( 'table_history', {historyList: historyList} );
+        }
+        else{
+            res.send(400, {error: err});
+        }
+    });
 
 };
 
