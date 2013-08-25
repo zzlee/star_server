@@ -411,7 +411,7 @@ $(document).ready(function(){
             $('#ugcCensor.ugcCensorNoa').click(function(){
                 var url = DOMAIN + "user_content_attribute";
                 var no = $(this).attr("name");
-                var rating ='a';
+                var rating ='A';
                 $.ajax({
                     url: url,
                     type: 'PUT',
@@ -426,7 +426,7 @@ $(document).ready(function(){
             $('#ugcCensor.ugcCensorNob').click(function(){
                 var url = DOMAIN + "user_content_attribute";
                 var no = $(this).attr("name");
-                var rating ='b';
+                var rating ='B';
                 $.ajax({
                     url: url,
                     type: 'PUT',
@@ -441,7 +441,7 @@ $(document).ready(function(){
             $('#ugcCensor.ugcCensorNoc').click(function(){
                 var url = DOMAIN + "user_content_attribute";
                 var no = $(this).attr("name");
-                var rating ='c';
+                var rating ='C';
 
                 $.ajax({
                     url: url,
@@ -457,7 +457,7 @@ $(document).ready(function(){
             $('#ugcCensor.ugcCensorNod').click(function(){
                 var url = DOMAIN + "user_content_attribute";            
                 var no = $(this).attr("name");
-                var rating ='d';
+                var rating ='D';
 
                 $.ajax({
                     url: url,
@@ -473,7 +473,7 @@ $(document).ready(function(){
             $('#ugcCensor.ugcCensorNoe').click(function(){
                 var url = DOMAIN + "user_content_attribute";
                 var no = $(this).attr("name");
-                var rating ='e';
+                var rating ='E';
 
                 $.ajax({
                     url: url,
@@ -489,7 +489,7 @@ $(document).ready(function(){
             $('#ugcCensor.ugcCensorNof').click(function(){
                 var url = DOMAIN + "user_content_attribute";
                 var no = $(this).attr("name");
-                var rating ='f';
+                var rating ='F';
 
                 $.ajax({
                     url: url,
@@ -638,7 +638,7 @@ $(document).ready(function(){
                 sessionItemInfoArray = sessionItemInfo.split(',');
 
                 $.get('/miix_admin/table_censorPlayList_head.html', function(res){
-                    console.log(res);
+                    
                     $('#table-content-header').html(res);
                     $('#timeStartText').attr('value', sessionItemInfoArray[1]);
                     $('#timeEndText').attr('value', sessionItemInfoArray[2]);
