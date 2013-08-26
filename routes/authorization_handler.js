@@ -4,12 +4,19 @@ var FM = { authorizationHandler: {} };
 var tokenMgr = require('../token_mgr.js');
 var memberDB = require("../member.js");
 FM.authorizationHandler.checkAuth = function(req, res, next) {
-    tokenMgr.checkToken(req.param('token'), req.route.path, function(authorized){
+    tokenMgr.checkToken(req.param('miixToken'), req.route.path, function(authorized){
         if (authorized){
             next();
         }
         else{
-            res.send(401);
+            tokenMgr.checkToken(req.param('token'), req.route.path, function(authorized2){
+                if (authorized2){
+                    next();
+                }
+                else{
+                    res.send(401);
+                }
+            });
         }
     });
     

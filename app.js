@@ -87,15 +87,15 @@ app.get('/users', user.list);
 
 app.get('/fb/comment', routes.api.fbGetCommentReq); 
 app.get('/fb/thumbnail', routes.api.fbGetThumbnail);
-app.get('/members/authentication_code', routes.api.codeGenerate);
-app.post('/members/authentication_code_validity', routes.api.codeVerify);  //TODO: better use GET
-app.get('/members/fb_token_validity', routes.member.isFBTokenValid);
-app.post('/members/fb_info', routes.api.signupwithFB);
-app.get('/connectStarServer', routes.api.connection);  //Make sure client side connect connect star_server
+app.get('/members/authentication_code', routes.authorizationHandler.checkAuth, routes.api.codeGenerate);
+app.post('/members/authentication_code_validity', routes.authorizationHandler.checkAuth, routes.api.codeVerify);  //TODO: better use GET
+app.get('/members/fb_token_validity', routes.authorizationHandler.checkAuth, routes.member.isFBTokenValid);
+app.post('/members/fb_info', routes.authorizationHandler.checkAuth, routes.api.signupwithFB);
+app.get('/connectStarServer', routes.authorizationHandler.checkAuth, routes.api.connection);  //Make sure client side connect connect star_server
 
 
 //PUT /members/{_id}/device_tokens 
-app.put('/members/:memberId/device_tokens', routes.authorizationHandler.updateDeviceToken);
+app.put('/members/:memberId/device_tokens', routes.authorizationHandler.checkAuth, routes.authorizationHandler.updateDeviceToken);
 
 
 
@@ -128,7 +128,7 @@ app.put('/members/:memberId/device_tokens', routes.authorizationHandler.updateDe
  * @name POST /miix/ugcs/:ugcProjectId/user_content_files
  * @memberof miix
  */
-app.post('/miix/videos/user_content_files', routes.uploadUserContentFile_cb ); //v1.2
+app.post('/miix/videos/user_content_files', routes.authorizationHandler.checkAuth, routes.uploadUserContentFile_cb ); //v1.2
 
 /**
  * Create an user content description of a specific video UGC<br>
@@ -149,7 +149,7 @@ app.post('/miix/videos/user_content_files', routes.uploadUserContentFile_cb ); /
  * @name POST /miix/video_ugcs/:ugcProjectId/user_content_descriptions
  * @memberof miix
  */
-app.post('/miix/videos/user_content_description',routes.uploadUserDataInfo_cb);  //v1.2
+app.post('/miix/videos/user_content_description', routes.authorizationHandler.checkAuth, routes.uploadUserDataInfo_cb);  //v1.2
 
 /**
  * Create an user content description of a specific image UGC<br>
@@ -193,10 +193,10 @@ app.get('/miix/videos/new_videos', routes.api.newUGCList); //v1.2 only, to be DE
  * @name PUT /miix/video_ugcs/:ugcProjectId
  * @memberof miix
  */
-app.put('/miix/video_ugcs/:ugcProjectId', routes.miixHandler.putVideoUgcs_cb);
-app.post('/miix/video_ugcs/:ugcProjectId', routes.miixHandler.putVideoUgcs_cb);//TODO use PUT to do JMeter test
+app.put('/miix/video_ugcs/:ugcProjectId', routes.authorizationHandler.checkAuth, routes.miixHandler.putVideoUgcs_cb);
+app.post('/miix/video_ugcs/:ugcProjectId', routes.authorizationHandler.checkAuth, routes.miixHandler.putVideoUgcs_cb);//TODO use PUT to do JMeter test
 
-app.post('/miix/videos/miix_videos', routes.api.submitAUGC); //v1.2
+app.post('/miix/videos/miix_videos', routes.authorizationHandler.checkAuth, routes.api.submitAUGC); //v1.2
 
 app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh); //v1.2 only.  In v2.0, all UGCs are to be played on a DOOH
 
@@ -223,8 +223,8 @@ app.post('/miix/videos/videos_on_dooh', routes.api.submitDooh); //v1.2 only.  In
  * @name PUT /miix/base64_image_ugcs/:ugcProjectId
  * @memberof miix
  */
-app.put('/miix/base64_image_ugcs/:ugcProjectId', routes.miixHandler.putBase64ImageUgcs_cb); 
-app.post('/miix/base64_image_ugcs/:ugcProjectId', routes.miixHandler.putBase64ImageUgcs_cb);//TODO use PUT to do JMeter test 
+app.put('/miix/base64_image_ugcs/:ugcProjectId', routes.authorizationHandler.checkAuth, routes.miixHandler.putBase64ImageUgcs_cb); 
+app.post('/miix/base64_image_ugcs/:ugcProjectId', routes.authorizationHandler.checkAuth, routes.miixHandler.putBase64ImageUgcs_cb);//TODO use PUT to do JMeter test 
 
 
 /**
@@ -246,7 +246,7 @@ app.post('/miix/base64_image_ugcs/:ugcProjectId', routes.miixHandler.putBase64Im
  * @name GET /miix/ugc_hightlights
  * @memberof miix
  */
-app.get('/miix/ugc_hightlights', routes.miixHandler.getUgcHighlights_cb);
+app.get('/miix/ugc_hightlights', routes.authorizationHandler.checkAuth, routes.miixHandler.getUgcHighlights_cb);
 /*
 app.get('/miix/ugc_hightlights', function(req, res){
     var db = require('./db.js');
@@ -283,9 +283,9 @@ app.get('/miix/ugc_hightlights', function(req, res){
  * @name GET /miix/members/:memberId/ugcs
  * @memberof miix
  */
-app.get('/miix/members/:memberId/ugcs', routes.miixHandler.getUgcs_cb);
+app.get('/miix/members/:memberId/ugcs', routes.authorizationHandler.checkAuth, routes.miixHandler.getUgcs_cb);
 
-app.get('/miix/members/:memberId/live_contents', routes.miixHandler.getLiveContents_cb);
+app.get('/miix/members/:memberId/live_contents', routes.authorizationHandler.checkAuth, routes.miixHandler.getLiveContents_cb);
 
 /**
  * Get a list of latest live content items (a.k.a. "Miix Story" or "Story MV") of a specific member , sorted by creating time (the newest at beginning)<br>
@@ -306,7 +306,7 @@ app.get('/miix/members/:memberId/live_contents', routes.miixHandler.getLiveConte
  * @name GET /miix/members/:memberId/live_contents
  * @memberof miix
  */
-app.get('/miix/members/:memberId/live_contents', routes.miixHandler.getLiveContents_cb);
+app.get('/miix/members/:memberId/live_contents', routes.authorizationHandler.checkAuth, routes.miixHandler.getLiveContents_cb);
 
 /**
  * Create a FB post id UGC of a specific project ID<br>
@@ -329,7 +329,7 @@ app.get('/miix/members/:memberId/live_contents', routes.miixHandler.getLiveConte
  * @name PUT /miix/fb_ugcs/:ugcProjectId
  * @memberof miix
  */
-app.put('/miix/fb_ugcs/:ugcProjectId', routes.miixHandler.putFbPostIdUgcs_cb); 
+app.put('/miix/fb_ugcs/:ugcProjectId', routes.authorizationHandler.checkAuth, routes.miixHandler.putFbPostIdUgcs_cb); 
 
 /**
  * RESTful APIs for back-end administration of Miix services
