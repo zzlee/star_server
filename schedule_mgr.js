@@ -880,7 +880,7 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
                             //download contents from S3 or get from local
                             //var fileName;
                             if (aProgram.type == "UGC"){
-                                if((aProgram.content.fileExtension == 'png')||(aProgram.content.fileExtension == 'jpg')){
+                               if((aProgram.content.fileExtension == 'png')||(aProgram.content.fileExtension == 'jpg')){
                                     var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+'.'+aProgram.content.fileExtension; 
                                     //TODO: make sure that target directory exists
                                     var targetLocalPath = path.join(workingPath, 'public/contents/temp', aProgram.content.projectId+'.'+aProgram.content.fileExtension);
@@ -888,7 +888,15 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
                                 else{
                                     var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+aProgram.content.fileExtension; 
                                     //TODO: make sure that target directory exists
-                                    var targetLocalPath = path.join(workingPath, 'public/contents/temp', aProgram.content.projectId+aProgram.content.fileExtension);
+                                    if(typeof(aProgram.content.fileExtension) === 'undefined') {
+                                        //aProgram.content.fileExtension = '.mp4';
+                                        var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+'.mp4';
+                                        var targetLocalPath = path.join(workingPath, 'public/contents/temp', aProgram.content.projectId+'.mp4');
+                                    }
+                                    else {
+                                        var s3Path = '/user_project/'+aProgram.content.projectId+'/'+aProgram.content.projectId+aProgram.content.fileExtension;
+                                        var targetLocalPath = path.join(workingPath, 'public/contents/temp', aProgram.content.projectId+aProgram.content.fileExtension);                                        
+                                    }
                                 }
                                 awsS3.downloadFromAwsS3(targetLocalPath, s3Path, function(errS3,resultS3){
                                     if (!errS3){
