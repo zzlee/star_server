@@ -113,7 +113,6 @@ FM.censorHandler.postProgramTimeSlotSession_cb = function(req, res){
     var programSequence = req.body.programSequence;
     originSequence = req.body.originSequence;
 
-    console.log(req.body.originSequence);
     scheduleMgr.createProgramList(doohId, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, function(err, result){
         if (!err){
             sessionId = result.sessionId;
@@ -130,18 +129,7 @@ FM.censorHandler.postProgramTimeSlotSession_cb = function(req, res){
                         start: intervalOfPlanningDoohProgramesStart,
                         end: intervalOfPlanningDoohProgramesEnd
                     }
-//                    programSequence: programSequence
             };
-            db.getValueOf(sessionItemModel, {"sessionId": sessionId}, null, function(err, result){
-                if(!err){ 
-                    db.updateAdoc(sessionItemModel, result, sessionInfoVjson, function(err, result){
-                        if(!err){
-                            logger.info('[FM.censorHandler.postProgramTimeSlotSession_cb()] sessionItemModel update to db ok! sessionId='+ sessionId);
-                        }else{
-                            logger.info('[FM.censorHandler.postProgramTimeSlotSession_cb()] sessionItemModel update to db fail! sessionId='+ sessionId+'err='+err);
-                        }
-                    });
-                }else{
                     db.createAdoc(sessionItemModel, sessionInfoVjson, function(err, result){
                         if(!err){
                             logger.info('[FM.censorHandler.postProgramTimeSlotSession_cb()] sessionItemModel create to db ok! sessionId='+ sessionId);
@@ -149,8 +137,6 @@ FM.censorHandler.postProgramTimeSlotSession_cb = function(req, res){
                             logger.info('[FM.censorHandler.postProgramTimeSlotSession_cb()] sessionItemModel create to db fail! sessionId='+ sessionId+'err='+err);
                         }
                     });
-                }
-            });
 
             //end of write session info to db
         }
@@ -196,23 +182,10 @@ FM.censorHandler.gettimeslots_get_cb = function(req, res){
             
         }
         else{
-            //res.render( 'table_censorPlayList', {ugcCensorPlayList: testArray} );
           res.send(400, {error: err});
         }
     });
 
-//  testArray =
-//  [ { doohTimes: ['2013/5/3 15:14', '2013/6/5 16:14', '2013/8/3 15:08'], //素材照片
-//  ugcCensorNo: '035', //影片編號
-//  contentGenre: 'mood', //觀看次數
-//  userContent: 'yeah', //FB讚次數
-//  userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //FB留言數
-//  fb_userName: 'NO User', //FB分享次數
-//  fbPictureUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //會員名稱
-//  rating: 'a' //投稿次數
-//  }
-//  ];
-//  res.render( 'table_censorPlayList', {ugcCensorPlayList: testArray} );
 };
 
 FM.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){

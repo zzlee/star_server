@@ -203,6 +203,7 @@ $(document).ready(function(){
 
     $('#UGCListBtn').click(function(){
         conditions = {};
+        $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#UGCList').attr("class", "current");
 
@@ -215,16 +216,17 @@ $(document).ready(function(){
     $('#UGCPlayListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#UGCPlayList').attr("class", "current");
-
+        
+        $('#table-content').html('<br> <br>自動配對中，請稍候....');
         $.get('/miix_admin/table_censorPlayList_head.html', function(res){
             $('#table-content-header').html(res);
             $('#table-content').html('');
             
             $('#createProgramListBtn').click(function(){
+                $('#table-content').html('<br> <br>自動配對中，請稍候....');    
                 var flag = 0;
                 var inputSearchData = {};
                 var url = DOMAIN + "doohs/taipeiarena/program_timeslot_session";
-
 
                 $('#condition-inner input[class="createProgramListBtn"]').each(function(i){
 
@@ -250,6 +252,7 @@ $(document).ready(function(){
                     }
                     
                     if(inputSearchData.timeStart && inputSearchData.timeEnd && inputSearchData.playTimeStart && inputSearchData.playTimeEnd && inputSearchData.ugcSequenceText && programSequenceArr){
+                        
                         $.ajax({
                             url: url,
                             type: 'POST',
@@ -633,11 +636,13 @@ $(document).ready(function(){
          */
         if(historyCheck == '/miix_admin/sessions'){
             $('#history._idSetBtn').click(function(){
-
+                $('#table-content').html('<br> <br>播放清單準備中，請稍候....');
                 sessionItemInfo = $(this).attr("name");
                 sessionItemInfoArray = sessionItemInfo.split(',');
 
                 $.get('/miix_admin/table_censorPlayList_head.html', function(res){
+                    
+                    sessionId = sessionItemInfoArray[0];
                     
                     $('#table-content-header').html(res);
                     $('#timeStartText').attr('value', sessionItemInfoArray[1]);
