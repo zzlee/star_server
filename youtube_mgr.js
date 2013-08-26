@@ -90,22 +90,25 @@ FM.youtubeMgr.refreshToken = function() {
                 
                 ytToken = JSON.parse(res_token);
                 if ( ytToken.access_token ) {
-                    logger.log('<'+ new Date() +'> Refreshed YouTube token: ', ytToken );
+                    logger.info('['+ new Date() +'] Refreshed YouTube token: '+ ytToken.access_token );
                     //console.dir(ytToken);
                     
                     
                     var tokenFile = path.join( workingPath, 'yt_token.json');
                     fs.writeFile(tokenFile, res_token, function(err) {
                         if(!err) {
-                            logger.log('Successfully save YouTube token ' + ytToken.access_token );
+                            logger.info('Successfully save YouTube token ' + ytToken.access_token );
 
                         } 
+                        else {
+                            logger.error('Failed to save YouTube token ' + ytToken.access_token );
+                        }
                     }); 
                     
                     
                 }
                 else {
-                    logger.log('Failed to refresh YouTube token: '+res_token);              
+                    logger.error('Failed to refresh YouTube token: '+res_token);              
                 }
                 
             });
@@ -122,6 +125,7 @@ FM.youtubeMgr.refreshToken = function() {
     fs.readFile( refreshTokenFile, function (err, data) {
         if (!err) {
             var refreshToken = data;
+            refreshYtToken(refreshToken);
             setInterval( function( _ytRefreshToken){
                 //logger.log("_ytRefreshToken= %s", _ytRefreshToken);
                 refreshYtToken(_ytRefreshToken);
