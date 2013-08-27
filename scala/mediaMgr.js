@@ -51,7 +51,7 @@ var media = (function() {
             if(option.filters) request += '&filters=' + option.filters;
             
             adapter.get(request, function(err, req, res, obj) {
-                list_cb(obj);
+                list_cb(err, obj);
             });
         },
         create: function( option, create_cb ){
