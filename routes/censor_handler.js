@@ -7,8 +7,14 @@ var FM = { censorHandler: {} };
 var censorMgr = require("../censor_mgr.js");
 var apis = require("../routes/api.js");
 var scheduleMgr = require("../schedule_mgr.js");
+var db = require('../db.js');
+var sessionItemModel = db.getDocModel("sessionItem");
 
 var sessionId = null;
+var originSequence = null;
+var doohId;
+var intervalOfSelectingUGC;
+var intervalOfPlanningDoohProgrames;
 
 /**
  * @param  request  {json}sort:{?}
@@ -101,14 +107,14 @@ FM.censorHandler.postProgramTimeSlotSession_cb = function(req, res){
     var doohId = req.params.doohId;
     var intervalOfSelectingUGCStart =  new Date(req.body.intervalOfSelectingUGC.start).getTime();
     var intervalOfSelectingUGCend =  new Date(req.body.intervalOfSelectingUGC.end).getTime();
-    var intervalOfSelectingUGC = {start: intervalOfSelectingUGCStart, end: intervalOfSelectingUGCend};
+    intervalOfSelectingUGC = {start: intervalOfSelectingUGCStart, end: intervalOfSelectingUGCend};
 
     var intervalOfPlanningDoohProgramesStart = new Date(req.body.intervalOfPlanningDoohProgrames.start).getTime();
     var intervalOfPlanningDoohProgramesEnd = new Date(req.body.intervalOfPlanningDoohProgrames.end).getTime();
-    var intervalOfPlanningDoohProgrames = {start: intervalOfPlanningDoohProgramesStart, end: intervalOfPlanningDoohProgramesEnd};
+    intervalOfPlanningDoohProgrames = {start: intervalOfPlanningDoohProgramesStart, end: intervalOfPlanningDoohProgramesEnd};
     
     var programSequence = req.body.programSequence;
-
+    originSequence = req.body.originSequence;
 
     scheduleMgr.createProgramList(doohId, intervalOfSelectingUGC, intervalOfPlanningDoohProgrames, programSequence, function(err, result){
         if (!err){
@@ -157,23 +163,10 @@ FM.censorHandler.gettimeslots_get_cb = function(req, res){
             
         }
         else{
-            //res.render( 'table_censorPlayList', {ugcCensorPlayList: testArray} );
           res.send(400, {error: err});
         }
     });
 
-//  testArray =
-//  [ { doohTimes: ['2013/5/3 15:14', '2013/6/5 16:14', '2013/8/3 15:08'], //素材照片
-//  ugcCensorNo: '035', //影片編號
-//  contentGenre: 'mood', //觀看次數
-//  userContent: 'yeah', //FB讚次數
-//  userPhotoUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //FB留言數
-//  fb_userName: 'NO User', //FB分享次數
-//  fbPictureUrl: '/contents/user_project/greeting-50ee77e2fc4d981408000014-20130222T023238273Z/user_data/_cdv_photo_010.jpg', //會員名稱
-//  rating: 'a' //投稿次數
-//  }
-//  ];
-//  res.render( 'table_censorPlayList', {ugcCensorPlayList: testArray} );
 };
 
 FM.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
@@ -182,6 +175,23 @@ FM.censorHandler.pushProgramsTo3rdPartyContentMgr_get_cb = function(req, res){
         if (!err){
             //TODO pushProgramsTo3rdPartyContentMgr
             res.send(200);
+            //write session info to db
+          sessionInfoVjson = {
+          dooh: doohId,
+          sessionId: sessionId,
+          intervalOfSelectingUGC: intervalOfSelectingUGC,
+          intervalOfPlanningDoohProgrames: intervalOfPlanningDoohProgrames,
+          pushProgramsTime: new Date,
+          programSequence: originSequence
+          };
+          db.createAdoc(sessionItemModel, sessionInfoVjson, function(err, result){
+          if(!err){
+              logger.info('[FM.censorHandler.postProgramTimeSlotSession_cb()] sessionItemModel create to db ok! sessionId='+ sessionId);
+          }else{
+              logger.info('[FM.censorHandler.postProgramTimeSlotSession_cb()] sessionItemModel create to db fail! sessionId='+ sessionId+'err='+err);
+          }
+      });
+            //end of write session info to db
         }
         else{
             res.send(400, {error: err});
@@ -218,6 +228,31 @@ FM.censorHandler.updatetimeslots_get_cb = function(req, res){
             }
         });
     }
+
+};
+
+FM.censorHandler.getSessionList_get_cb = function(req,res){
+
+    var condition;
+    var limit;
+    var skip;
+    var interval= {start: (new Date("1911/1/1 00:00:00")).getTime(), end: (new Date("9999/12/31 12:59:59")).getTime()};
+
+    limit = req.query.limit;
+    skip = req.query.skip;
+    
+    if(req.query.condition){
+        interval = {start :(new Date(req.query.condition.playtimeStart)).getTime(), end :(new Date(req.query.condition.playtimeEnd)).getTime()};
+    }
+
+    scheduleMgr.getSessionList(interval, limit, skip, function(err, historyList){
+        if (!err){
+            res.render( 'table_history', {historyList: historyList} );
+        }
+        else{
+            res.send(400, {error: err});
+        }
+    });
 
 };
 

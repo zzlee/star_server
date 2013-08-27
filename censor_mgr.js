@@ -131,8 +131,22 @@ var mappingUGCList = function(data, set_cb){
         var description = null;
 
         if(data[next].timeslot){
-            timeslotStart = new Date(data[next].timeslot.start).toString().substring(0,25);
-            timeslotEnd = new Date(data[next].timeslot.end).toString().substring(0,25);
+//            timeslotStart = new Date(data[next].timeslot.start).toString().substring(0,25);
+//            timeslotEnd = new Date(data[next].timeslot.end).toString().substring(0,25);
+            timeslotDateStart = new Date(data[next].timeslot.start).toString().substring(0,25);
+            timeslotDateEnd = new Date(data[next].timeslot.end).toString().substring(0,25);
+            //timeslotStart date format
+            yyyy = timeslotDateStart.substring(11,15);
+            mm = new Date(data[next].timeslot.start).getMonth()+1;
+            dd = timeslotDateStart.substring(8,10);
+            time = timeslotDateStart.substring(16,25);
+            timeslotStart = yyyy+'/'+mm+'/'+dd+' '+time;
+            //timeslotEnd date format
+            yyyy = timeslotDateEnd.substring(11,15);
+            mm = new Date(data[next].timeslot.end).getMonth()+1;
+            dd = timeslotDateEnd.substring(8,10);
+            time = timeslotDateEnd.substring(16,25);
+            timeslotEnd = yyyy+'/'+mm+'/'+dd+' '+time;
         }
         //TODO  getUserUploadedImageUrls 
         if(result[2]){
@@ -278,7 +292,7 @@ censorMgr.setUGCAttribute = function(no, vjson, cb){
  */
 censorMgr.getUGCListLite = function(condition, cb){
 
-    FMDB.listOfdocModels( UGCs,{'createdOn' : {$gte: condition.start, $lt: condition.end}},'_id genre contentGenre projectId fileExtension no', {sort :'no'}, function(err, result){
+    FMDB.listOfdocModels( UGCs,{'createdOn' : {$gte: condition.start, $lt: condition.end}},'_id genre contentGenre projectId fileExtension no', {sort :{'doohPlayedTimes':1,'rating':1,'createdOn':1}}, function(err, result){
         if(err) {
             logger.error('[censorMgr.getUGCListLite]', err);
             cb(err, null);

@@ -274,6 +274,21 @@ FM.DB = (function(){
             answerTime: Date,                                
             remarks: {type: String}
         }); //   customerService collection
+        
+        var SessionItemSchema = new Schema({
+            dooh: {type: String},
+            sessionId: {type: String},
+            intervalOfSelectingUGC: {
+                start: Number,
+                end: Number,
+            },
+            intervalOfPlanningDoohProgrames: {
+                start: Number,
+                end: Number,
+            },
+            programSequence: [],
+            pushProgramsTime: {type: Date}
+        }); //   sessionItem collection
 		
         /****************** End of DB Schema ******************/
 		
@@ -291,6 +306,7 @@ FM.DB = (function(){
             StoryPlayListInfo = connection.model('StoryPlayListInfo', StoryPlayListInfoSchema, 'storyPlayListInfo'),
             UGC = connection.model('UGC', UGCSchema, 'ugc');
             CustomerServiceItem = connection.model('CustomerServiceItem', CustomerServiceItemSchema, 'customerServiceItem');
+            SessionItem = connection.model('SessionItem', SessionItemSchema, 'sessionItem');
            
             
         var dbModels = [];
@@ -308,6 +324,7 @@ FM.DB = (function(){
         dbModels["storyPlayListInfo"] = StoryPlayListInfo;  
         dbModels["ugc"] = UGC;
         dbModels["customerServiceItem"] = CustomerServiceItem;
+        dbModels["sessionItem"] = SessionItem;
         
         //???? nobody uses it, so this section can be removed? 
         var dbSchemas = [];
@@ -409,6 +426,9 @@ FM.DB = (function(){
                         break;
                     case 'customerServiceItem':
                         return CustomerServiceItem;
+                        break;
+                    case 'sessionItem':
+                        return SessionItem;
                         break;
                     default:
                         throw new error('DB Cannot find this Collection: ' + collection);
