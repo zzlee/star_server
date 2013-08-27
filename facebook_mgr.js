@@ -64,8 +64,8 @@ FM.facebookMgr = (function(){
                         console.logger("[postOnFB] ", error);
                         cb(error, null);
                         
-                    }else if(body.error){
-						cb(body.error, null);
+//                    }else if(body.error){
+//						cb(body.error, null);
 					}else{
                         var result = [];
                         //console.log("BODY: " + JSON.stringify(body));
@@ -116,10 +116,10 @@ FM.facebookMgr = (function(){
                     if(error){
                         logger.error("[isTokenValid err] ", JSON.stringify(error));
                         cb(error, null);
-                    }else if(body.data.error){
-                            cb(body.data.error, null);
-                            FM_LOG("[isTokenValid body err] " + JSON.stringify(body.data));  
-                    }else{
+//                    }else if(body.data.error){
+//                            cb(body.data.error, null);
+//                            FM_LOG("[isTokenValid body err] " + JSON.stringify(body.data));  
+                    }if(body !== null){
                         FM_LOG("[isTokenValid ok] " + JSON.stringify(body.data)+"user_token"+user_token);
                         cb(null, { is_valid: body.data.is_valid, expires_at: body.data.expires_at });
                     }

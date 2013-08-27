@@ -504,8 +504,8 @@ FM.api.deviceToken =  function(req, res){
         var json = JSON.parse(jsonStr);
         
         memberDB.updateMember( oid, json, function(err, result){
-            if(err) logger.info(err);
-            if(result) logger.info(result);
+            if(err) logger.info("[updateMember api line507 err]"+err);
+            if(result) logger.info("[updateMember api line508 result]"+result);
             res.send({"message": "Update Device Token!"});
         });
     }else{
@@ -598,8 +598,8 @@ FM.api.signupwithFB = function(req, res){
                                     update.email = email;
                                 
                                 memberDB.updateMember( oid, update, function(err, result){
-                                    if(err) logger.info(err);
-                                    if(result) logger.info(result);
+                                    if(err) logger.info("[fbMgr.extendToken line601 error]"+err);
+                                    if(result) logger.info("[fbMgr.extendToken line602 result]"+fbMgr.extendTokenresult);
                                 });
                                 
                                 //res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "verified": mPhone_verified  }, "message":"success"} );
@@ -631,8 +631,8 @@ FM.api.signupwithFB = function(req, res){
                                         update.email = email;
                                     
                                     memberDB.updateMember( oid, update, function(err, result){
-                                        if(err) logger.info(err);
-                                        if(result) logger.info(result);
+                                        if(err) logger.info("[fbMgr.extendToken line634 error]"+err);
+                                        if(result) logger.info("[fbMgr.extendToken line635 result]"+result);
                                     });
                                     
                                     //res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "expiresIn": data.expiresIn, "verified": mPhone_verified  }, "message":"success"} );
@@ -650,8 +650,8 @@ FM.api.signupwithFB = function(req, res){
                                 
                             if(update.deviceToken || update.email){
                                 memberDB.updateMember( oid, update, function(err, result){
-                                    if(err) logger.info(err);
-                                    if(result) logger.info(result);
+                                    if(err) logger.info("[updateMember api line653 err]"+err);
+                                    if(result) logger.info("[updateMember api line654 result]"+result);
                                 });
                             }
                             

@@ -246,9 +246,9 @@ FM.MEMBER = (function(){
                                         }else{
                                             FM.MEMBER.getInstance().updateMember(oid, {"fb.auth": result.data}, function(err, result){
                                                 if(err)
-                                                    logger.error("[updateMember] ", err);
+                                                    logger.error("[updateMember fb.auth error] ", err);
                                                 else
-                                                    FM_LOG("[updateMember]", result);
+                                                    FM_LOG("[updateMember fb.auth result]", result);
                                             });
                                             
                                             res.send({message: is_valid, access_token: result.data.accessToken});

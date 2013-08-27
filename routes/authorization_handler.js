@@ -35,8 +35,8 @@ FM.authorizationHandler.updateDeviceToken = function(req, res) {
 	    
         var json = JSON.parse(jsonStr);
         memberDB.updateMember( oid, json, function(err, result){
-            if(err) logger.info(err);
-            if(result) logger.info(result);
+            if(err) logger.info("[authorizationHandler.updateDeviceToken error]"+err);
+            if(result) logger.info("[authorizationHandler.updateDeviceToken result]"+result);
             res.send({"message": "Update Device Token!"});
 //            res.send(200);
         });

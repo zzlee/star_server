@@ -81,10 +81,10 @@ FM.ADMINCACHE = (function(){
                                         });
                                     },
                                     function(callback){
-                                        member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
-                                            if(err) callback(err, null);
-                                            else callback(null, result);
-                                        });
+//                                        member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
+//                                            if(err) callback(err, null);
+//                                            else callback(null, result);
+//                                        });
                                     },
                                     ], toDo);
                 }
@@ -315,11 +315,11 @@ FM.ADMINCACHE = (function(){
 
         //TODO: need to implement
 
-        cacheMember();
-
-        cacheMiixUGC();
-
-        cacheStoryUGC();
+//        cacheMember();
+//
+//        cacheMiixUGC();
+//
+//        cacheStoryUGC();
 
         /*
          * Timer
