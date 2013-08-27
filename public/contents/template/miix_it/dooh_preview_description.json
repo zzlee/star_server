@@ -1,0 +1,26 @@
+{
+    "taipei_arena":{
+        "miix_one_image":{
+            "backgroundImageUrl":"template_resource/taipei_arena-miix_one_image.png",
+            "coverImageUrl":"template_resource/taipei_arena-miix_one_image_fence.png",
+            "resizeFactor":"0.8",
+            "customizableObjects":[
+                {
+                    "id":"picture0",
+                    "type":"image",
+                    "quadrilateral":{
+                        "x_ul":"102",
+                        "y_ul":"57",
+                        "x_ur":"608",
+                        "y_ur":"57",
+                        "x_ll":"102",
+                        "y_ll":"340",
+                        "x_lr":"608",
+                        "y_lr":"340"
+                    },
+                    "alpha":"0.5"
+                }
+            ]
+        }
+    }
+}
