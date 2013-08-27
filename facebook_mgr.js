@@ -17,10 +17,13 @@ FM.facebookMgr = (function(){
     var s_link="www.google.com"
     
     /**  for miix.tv @ AWS */
-    var app_access_token = "116813818475773|d9EXxXNwTt2eCbSkIWYs9dJv-N0", 
-        app_id = "116813818475773",
-        app_secret = "b8f94311a712b98531b292165884124a";
-    
+//    var app_access_token = "116813818475773|d9EXxXNwTt2eCbSkIWYs9dJv-N0", 
+//        app_id = "116813818475773",
+//        app_secret = "b8f94311a712b98531b292165884124a";
+        var app_access_token = "430008873778732|99f7c401c399ce8caaa90cc79a29f795", 
+        app_id = "430008873778732",
+        app_secret = "99f7c401c399ce8caaa90cc79a29f795";
+  
     
     /** for feltmeng.idv.tw @ Local */
     /*
@@ -99,21 +102,25 @@ FM.facebookMgr = (function(){
                 }
                     
                 qs = { 'input_token': user_token, 'access_token': app_access_token };
+//                console.log('user_token='+user_token);
                     
                 request({
                     method: 'GET',
                     uri:  fb_url + path,
                     qs: qs,
                     json: true,
-                    //body: {'batch': JSON.stringify(data),},
+                    //body: {'batch': isTokenValiddata),},
                     
                 }, function(error, response, body){
+//                    console.log(body);
                     if(error){
-                        logger.error("[isTokenValid] ", error);
+                        logger.error("[isTokenValid err] ", JSON.stringify(error));
                         cb(error, null);
-                        
+                    }else if(body.data.error){
+                            cb(body.data.error, null);
+                            FM_LOG("[isTokenValid body err] " + JSON.stringify(body.data));  
                     }else{
-                        FM_LOG("[isTokenValid] " + body.data);
+                        FM_LOG("[isTokenValid ok] " + JSON.stringify(body.data)+"user_token"+user_token);
                         cb(null, { is_valid: body.data.is_valid, expires_at: body.data.expires_at });
                     }
                 });

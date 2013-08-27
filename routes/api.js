@@ -576,7 +576,7 @@ FM.api.signupwithFB = function(req, res){
                     
                 }
                 
-                fbMgr.isTokenValid(userID, function(err, result){
+                fbMgr.isTokenValid(accessToken, function(err, result){
                     
                     // Extending new/short access_token replaces invalid existed access_token.
                     if(!result.is_valid){
