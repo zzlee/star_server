@@ -85,7 +85,8 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
                             cb(err, UGCList);
                         }
                     });
-                }
+                }else
+                    cb(err, UGCList);
             }
         });
 

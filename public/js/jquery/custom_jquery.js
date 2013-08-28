@@ -337,6 +337,7 @@ $(document).ready(function(){
                     conditions = inputSearchData;
                 });
                 if(conditions != null){
+				    $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
                     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
                     $('#UGCList').attr("class", "current");
@@ -348,9 +349,9 @@ $(document).ready(function(){
              * 尚未審核 click
              */
             $('#ugcSearchNoRatingBtn').click(function(){
-                $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
                 conditions = 'norating';
                 if(conditions != null){
+				    $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
                     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
                     $('#UGCList').attr("class", "current");
@@ -362,9 +363,9 @@ $(document).ready(function(){
              * 已經審核 click
              */
             $('#ugcSearchRatingBtn').click(function(){
-                $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
                 conditions = 'rating';
                 if(conditions != null){
+				    $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
                     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
                     $('#UGCList').attr("class", "current");
@@ -391,7 +392,7 @@ $(document).ready(function(){
             $('#ugcSearchDateBtn').click(function(){
                 var inputSearchData = {};
                 var flag = 0;
-                $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
+                
                 $('#condition-inner input[class="ugcSearchDateBtn"]').each(function(){                 
                     inputSearchData[$(this).attr("name")] = $(this).attr("value");
                     if($(this).attr("value") == "" && flag == 0){
@@ -401,6 +402,7 @@ $(document).ready(function(){
                     conditions = inputSearchData;
                 });
                 if(conditions != null){
+				$('#table-content').html('<br> <br>審查名單準備中，請稍候....');
                 FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                 $('#main_menu ul[class="current"]').attr("class", "select");
                 $('#UGCList').attr("class", "current");
