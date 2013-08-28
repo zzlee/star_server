@@ -37,8 +37,8 @@ var miixContentMgr = {};
 miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbID, movieTitle) {
     
     //console.log('generateMiixMoive is called.');
-    var mediaType = "MP4";
-    //var mediaType = "H.264";
+    //var mediaType = "MP4";
+    var mediaType = "H.264";
     //var mediaType = "FLV";
     
     aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, mediaType, function(responseParameters){
