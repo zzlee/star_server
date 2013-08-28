@@ -1134,7 +1134,8 @@ scheduleMgr.removeUgcfromProgramAndAutoSetNewOne = function(sessionId, programTi
                       var interval = {start: Number(sessionIdInfoArray[0]), end: Number(sessionIdInfoArray[1]) };
                       
                       //TODO: call the real censorMgr
-                      censorMgr_getUGCList_fake(interval, function(err0, _sortedUgcList ){
+//                      censorMgr_getUGCList_fake(interval, function(err0, _sortedUgcList ){
+                          censorMgr.getUGCListLite(interval, function(err0, _sortedUgcList ){
                           if (!err0) {
                               sortedUgcList = _sortedUgcList;
                               //console.log('sortedUgcList=');

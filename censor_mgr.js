@@ -37,17 +37,11 @@ censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
     if(condition){
         //
         if(condition.TimeStart && condition.TimeEnd){
-            start = new Date(condition.TimeStart);
-            h = start.getHours()-8;
-            startutc = start.setHours(h);
-            end = new Date(condition.TimeEnd);
-            h = end.getHours()-8;
-            endutc = end.setHours(h);
             condition ={
                     'no':{ $exists: true},
                     'ownerId':{ $exists: true},
                     'projectId':{ $exists: true},
-                    'createdOn': {$gte: startutc, $lt: endutc}
+                    'createdOn': {$gte: condition.TimeStart, $lt: condition.TimeEnd}
             };
         }
         //
