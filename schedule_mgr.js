@@ -1082,14 +1082,16 @@ scheduleMgr.setUgcToProgram = function( programTimeSlotId, ugcReferenceNo, set_c
         if (!err1){
             var oidOfprogramTimeSlot = mongoose.Types.ObjectId(programTimeSlotId);
             var _ugc = JSON.parse(JSON.stringify(ugc)); //clone ugc object due to strange error "RangeError: Maximum call stack size exceeded"
-            
+            if(ugc !== null){
             //TODO: Shall we have some protection here in case the user choose an UGC with different genra (This will normally introduce different paly duration
             db.updateAdoc(programTimeSlotModel, oidOfprogramTimeSlot, {"content": _ugc }, function(err2, result){
                 if (set_cb){
                     set_cb(err2, ugc._id);
                 }
             });
-            
+            }else{
+                set_cb(err1, "Cannot find the UGC with this referece number: "+ugcReferenceNo);
+            }
             //set_cb(err1, ugc);
         }
         else {
@@ -1134,7 +1136,8 @@ scheduleMgr.removeUgcfromProgramAndAutoSetNewOne = function(sessionId, programTi
                       var interval = {start: Number(sessionIdInfoArray[0]), end: Number(sessionIdInfoArray[1]) };
                       
                       //TODO: call the real censorMgr
-                      censorMgr_getUGCList_fake(interval, function(err0, _sortedUgcList ){
+//                      censorMgr_getUGCList_fake(interval, function(err0, _sortedUgcList ){
+                          censorMgr.getUGCListLite(interval, function(err0, _sortedUgcList ){
                           if (!err0) {
                               sortedUgcList = _sortedUgcList;
                               //console.log('sortedUgcList=');

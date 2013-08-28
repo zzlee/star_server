@@ -217,13 +217,11 @@ $(document).ready(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#UGCPlayList').attr("class", "current");
         
-        $('#table-content').html('<br> <br>自動配對中，請稍候....');
         $.get('/miix_admin/table_censorPlayList_head.html', function(res){
             $('#table-content-header').html(res);
             $('#table-content').html('');
             
-            $('#createProgramListBtn').click(function(){
-                $('#table-content').html('<br> <br>自動配對中，請稍候....');    
+            $('#createProgramListBtn').click(function(){   
                 var flag = 0;
                 var inputSearchData = {};
                 var url = DOMAIN + "doohs/taipeiarena/program_timeslot_session";
@@ -259,6 +257,7 @@ $(document).ready(function(){
                             data: {intervalOfSelectingUGC:{start:inputSearchData.timeStart, end:inputSearchData.timeEnd}, intervalOfPlanningDoohProgrames:{start:inputSearchData.playTimeStart, end:inputSearchData.playTimeEnd}, programSequence:programSequenceArr, originSequence:originSequence},
                             success: function(response) {
                                 if(response.message){
+								    $('#table-content').html('<br> <br>自動配對中，請稍候....');
                                     console.log("[Response] message:" + JSON.stringify(response.message));
                                     sessionId = response.message;
                                     $('#main_menu ul[class="current"]').attr("class", "select");
@@ -337,6 +336,7 @@ $(document).ready(function(){
                     conditions = inputSearchData;
                 });
                 if(conditions != null){
+				    $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
                     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
                     $('#UGCList').attr("class", "current");
@@ -348,9 +348,9 @@ $(document).ready(function(){
              * 尚未審核 click
              */
             $('#ugcSearchNoRatingBtn').click(function(){
-                $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
                 conditions = 'norating';
                 if(conditions != null){
+				    $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
                     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
                     $('#UGCList').attr("class", "current");
@@ -362,9 +362,9 @@ $(document).ready(function(){
              * 已經審核 click
              */
             $('#ugcSearchRatingBtn').click(function(){
-                $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
                 conditions = 'rating';
                 if(conditions != null){
+				    $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
                     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                     $('#main_menu ul[class="current"]').attr("class", "select");
                     $('#UGCList').attr("class", "current");
@@ -391,7 +391,7 @@ $(document).ready(function(){
             $('#ugcSearchDateBtn').click(function(){
                 var inputSearchData = {};
                 var flag = 0;
-                $('#table-content').html('<br> <br>審查名單準備中，請稍候....');
+                
                 $('#condition-inner input[class="ugcSearchDateBtn"]').each(function(){                 
                     inputSearchData[$(this).attr("name")] = $(this).attr("value");
                     if($(this).attr("value") == "" && flag == 0){
@@ -401,6 +401,7 @@ $(document).ready(function(){
                     conditions = inputSearchData;
                 });
                 if(conditions != null){
+				$('#table-content').html('<br> <br>審查名單準備中，請稍候....');
                 FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
                 $('#main_menu ul[class="current"]').attr("class", "select");
                 $('#UGCList').attr("class", "current");
@@ -537,7 +538,7 @@ $(document).ready(function(){
         if(playlistCheck == '/miix_admin/doohs'){
             
             $('#ugcCensor.ugcCensorNoSetBtn').click(function(){
-                
+                var flag = 0;
                 var url = DOMAIN + "doohs/taipeiarena/timeslots/sessionId";
                 var programTimeSlotId = $(this).attr("name");
                 var ugcReferenceNo;
@@ -553,16 +554,20 @@ $(document).ready(function(){
                             data: { type: 'setUgcToProgram', programTimeSlotId: programTimeSlotId, ugcReferenceNo: ugcReferenceNo},
                             success: function(response) {
                                 if(response.message){
-                                    response.message;
                                     console.log("[Response_Set] message:" + response.message);
                                     conditions = { newUGCId :response.message, oldUGCId: programTimeSlotId};
-
+                                    if(response.message.substring(0,6) != 'Cannot'){
                                     $('#main_menu ul[class="current"]').attr("class", "select");
                                     $('#UGCPlayList').attr("class", "current");
 
                                     FM.currentContent = FM.UGCPlayList;
                                     FM.currentContent.showCurrentPageContent();
-
+									}else{
+									     if(flag == 0){
+									         alert(response.message);
+											 flag = 1;
+											 }
+									}
                                 }
                             }
                         });
@@ -587,7 +592,6 @@ $(document).ready(function(){
                         data: { type:'removeUgcfromProgramAndAutoSetNewOne', programTimeSlotId: programTimeSlotId},
                         success: function(response) {
                             if(response.message){
-                                response.message;
                                 console.log("[Response] message:" + response.message);
                                 conditions = { newUGCId :response.message, oldUGCId: programTimeSlotId};
 
@@ -637,7 +641,6 @@ $(document).ready(function(){
          */
         if(historyCheck == '/miix_admin/sessions'){
             $('#history._idSetBtn').click(function(){
-                $('#table-content').html('<br> <br>播放清單準備中，請稍候....');
                 sessionItemInfo = $(this).attr("name");
                 sessionItemInfoArray = sessionItemInfo.split(',');
 
@@ -654,7 +657,8 @@ $(document).ready(function(){
 
                     $('#main_menu ul[class="current"]').attr("class", "select");
                     $('#UGCPlayList').attr("class", "current");
-
+                     
+					$('#table-content').html('<br> <br>播放清單準備中，請稍候....');
                     FM.currentContent = FM.UGCPlayList;
                     FM.currentContent.setExtraParameters({sessionId: sessionItemInfoArray[0]});
                     FM.currentContent.showCurrentPageContent();
