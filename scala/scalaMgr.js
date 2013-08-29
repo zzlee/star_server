@@ -68,6 +68,27 @@ function scalaMgr( url, account ){
         
         return new Date(date.getFullYear(), date.getMonth(), date.getDate(), time[0], time[1], time[2]).getTime();
     };
+    var cutOffPlaylistItem = function(target, playlistItemList, cutOff_cb){
+        var afterPlaylistItem = '';
+        for(var i=0; i<playlistItemList.length; i++){
+            if(target.id == playlistItemList[i].id){
+                afterPlaylistItem = playlistItemList.slice(0,i);
+                afterPlaylistItem = afterPlaylistItem.concat(playlistItemList.slice(i+1));
+            }
+            if(i == playlistItemList.length-1){
+                (afterPlaylistItem == '')?afterPlaylistItem = playlistItemList:'';
+                cutOff_cb(afterPlaylistItem);
+            }
+        }
+    };
+    var isCheckContent = function( fileInfo, check_cb ){        
+        contractor.media.list({search: fileInfo.name}, function(err, res){ 
+            if(typeof(res.list) === 'undefined')
+                check_cb(false);
+            else
+                check_cb(true);
+        });
+    };
     
     /**
      * List timeslots from server.
@@ -131,84 +152,40 @@ function scalaMgr( url, account ){
      */
     var setItemToPlaylist = function( file, playTime, reportStatus_cb ){
         
-        var limit = 0,
-            addlimit = 0,
-            updatelimit = 0;
+        var limit = 0;
         
-        var itemPlaySetting = {
-            playlist: { id: '', name: 'OnDaScreen' },
-            item: { id: '', useValidRange: true, playFullscreen: true },
-            media: { id: '', duration: '' },
-            playTime : { start: playTime.start, end: playTime.end }
-        };
-        
-        var option = {
+        var setting = {
             media: { name: file.name },
             playlist: { name: 'OnDaScreen' },
-            playTime: { start: playTime.start, end: playTime.end, duration: playTime.duration },
+            playTime: { start: playTime.start, end: playTime.end, duration: playTime.duration }
         };
         
         async.waterfall([
             function(callback){
                 if(limit < 1){
-                    //Step.1: upload file to server
-                    contractor.media.fileupload(file, function(err, status){
-                        callback(null, status);
+                    isCheckContent(file, function(existStatus){
+                        if(existStatus){
+                            callback(null, 'OK');
+                        }
+                        else {
+                            contractor.media.fileupload(file, function(err, status){
+                                callback(null, status);
+                            });
+                        }
                     });
                     limit++;
                 }
             },
             function(status, callback){
-                //Step.2: find out media(file) id
                 if(status == 'OK') {
-                    contractor.media.findMediaIdByName(file.name, function(err, mediaInfo){
-                        if(!err) {
-                            itemPlaySetting.media.id = mediaInfo.id;
-                            itemPlaySetting.media.duration = mediaInfo.duration;
-                            callback(null, 'OK');
-                        }
-                        else callback(err, null);
+                    pushMediaToPlaylist(setting, function(err, res){
+                        callback(err, res);
                     });
-                }
-            },
-            function(status, callback){
-                //Step.3: find out playlist id
-                if(status == 'OK') {
-                    contractor.playlist.findPlaylistIdByName(itemPlaySetting.playlist.name, function(err, playlistId){
-                        if(!err) {
-                            itemPlaySetting.playlist.id = playlistId;
-                            callback(null, 'OK');
-                        }
-                        else callback(err, null);
-                    });
-                }
-            },
-            function(status, callback){
-                if(addlimit < 1){
-                    //Step.4: add media to playlist
-                    if(status == 'OK') {
-                        contractor.item.addItemToPlaylist(itemPlaySetting, function(err, addItem_cb){
-                            if(!err) callback(null, 'OK');
-                            else callback(err, null);
-                        });
-                    }
-                    addlimit++;
-                }
-            },
-            function(status, callback){
-                if(updatelimit < 1){
-                    //Step.5: update item play info. to playlist
-                    if(status == 'OK') {
-                        contractor.playlist.updateOneProgram(option, function(err, updateOneProgram_cb){
-                            if(!err) callback(null, 'OK');
-                            else callback(err, null);
-                        });
-                    }
-                    updatelimit++;
                 }
             }
-        ], function (err, result) {
-            if(result == 'OK') reportStatus_cb(null, 'OK');
+        ],function(err, result){
+            limit = 0;
+            if(!err) reportStatus_cb(null, result);
             else reportStatus_cb(err, null);
         });
     };
@@ -219,90 +196,47 @@ function scalaMgr( url, account ){
      */
     var setWebpageToPlaylist = function( webpage, playTime, reportStatus_cb ){
     
-        var limit = 0,
-            addlimit = 0,
-            updatelimit = 0;
+        var limit = 0;
         
-        var itemPlaySetting = {
-            playlist: { id: '', name: 'OnDaScreen' },
-            item: { id: '', useValidRange: true, playFullscreen: true },
-            media: { id: '', duration: '' },
-            playTime : { start: playTime.start, end: playTime.end }
-        };
-        
-        var option = {
+        var setting = {
             media: { name: webpage.name },
             playlist: { name: 'OnDaScreen' },
-            playTime: { start: playTime.start, end: playTime.end, duration: playTime.duration },
+            playTime: { start: playTime.start, end: playTime.end, duration: playTime.duration }
         };
         
         async.waterfall([
             function(callback){
                 if(limit < 1){
-                    //Step.1: upload file to server
-                    contractor.media.createWebPage(webpage, function(err, status){
-                        callback(null, status);
+                    isCheckContent(webpage, function(existStatus){
+                        if(existStatus){
+                            callback(null, 'OK');
+                        }
+                        else {
+                            contractor.media.createWebPage(webpage, function(err, status){
+                                callback(null, status);
+                            });
+                        }
                     });
                     limit++;
                 }
             },
             function(status, callback){
-                //Step.2: find out media(webpage) id
                 if(status == 'OK') {
-                    contractor.media.findMediaIdByName(webpage.name, function(err, mediaInfo){
-                        if(!err) {
-                            itemPlaySetting.media.id = mediaInfo.id;
-                            itemPlaySetting.media.duration = mediaInfo.duration;
-                            callback(null, 'OK');
-                        }
-                        else callback(err, null);
+                    pushMediaToPlaylist(setting, function(err, res){
+                        callback(err, res);
                     });
-                }
-            },
-            function(status, callback){
-                //Step.3: find out playlist id
-                if(status == 'OK') {
-                    contractor.playlist.findPlaylistIdByName(itemPlaySetting.playlist.name, function(err, playlistId){
-                        if(!err) {
-                            itemPlaySetting.playlist.id = playlistId;
-                            callback(null, 'OK');
-                        }
-                        else callback(err, null);
-                    });
-                }
-            },
-            function(status, callback){
-                if(addlimit < 1){
-                    //Step.4: add media to playlist
-                    if(status == 'OK') {
-                        contractor.item.addItemToPlaylist(itemPlaySetting, function(err, addItem_cb){
-                            if(!err) callback(null, 'OK');
-                            else callback(err, null);
-                        });
-                    }
-                    addlimit++;
-                }
-            },
-            function(status, callback){
-                if(updatelimit < 1){
-                    //Step.5: update item play info. to playlist
-                    if(status == 'OK') {
-                        contractor.playlist.updateOneProgram(option, function(err, updateOneProgram_cb){
-                            if(!err) callback(null, 'OK');
-                            else callback(err, null);
-                        });
-                    }
-                    updatelimit++;
                 }
             }
         ], function (err, result) {
-            if(result == 'OK') reportStatus_cb(null, 'OK');
+            limit = 0;
+            if(!err) reportStatus_cb(null, result);
             else reportStatus_cb(err, null);
         });
     };
     
     /**
-     * Push webpage to playlist item.
+     * Push media to playlist item.
+     *
      */
     var pushMediaToPlaylist = function(option, reportPlaylistItem_cb){
         
@@ -372,11 +306,61 @@ function scalaMgr( url, account ){
                         reportPlaylistItem_cb(err, null);
                         return;
                     }
-                    reportPlaylistItem_cb(err, { playlistItem: setting.playlistItem });
+                    reportPlaylistItem_cb(err, { 
+                        media: setting.media,
+                        playlist: { id: setting.playlist.id, name: setting.playlist.name },
+                        playlistItem: setting.playlistItem 
+                    });
                 });
             });
         });
-    }; 
+    };
+    
+    /**
+     * Pull playlist item. (no work)
+     */
+    var pullPlaylistItem = function(option, pull_cb){
+        contractor.playlist.list({ search: option.playlist.name }, function(err, playlistInfo){
+            if(err)
+                pull_cb(err, null);
+            else {
+                cutOffPlaylistItem(option.playlistItem, playlistInfo.list[0].playlistItems, function(afterPlaylistItems){
+                    playlistInfo.list[0].playlistItems = afterPlaylistItems;
+                    contractor.playlist.update({
+                        playlist: { id: playlistInfo.list[0].id, content: playlistInfo.list[0] },
+                    }, function(report){
+                        pull_cb(null, report);
+                    });
+                });
+            }
+        });
+    };
+    
+    /**
+     * Clear all playlist Item
+     *
+     */
+    var clearPlaylistItems = function(option, clear_cb){
+        if(typeof(option) === 'function'){
+            clear_cb = option;
+            option = { playlist: { name: 'OnDaScreen' } }
+        }
+        contractor.playlist.list({ search: option.playlist.name }, function(err, res){
+            if(err)
+                clear_cb(err, null);
+            else {
+                res.list[0].playlistItems = [];
+                var updateOption = {
+                    playlist: { id: res.list[0].id, content: res.list[0] }
+                };
+                contractor.playlist.update({
+                    playlist: { id: res.list[0].id, content: res.list[0] },
+                }, function(res){
+                    clear_cb(null, res);
+                });
+            }
+        });
+    };
     
     /**
      * Push event list to all playlist in server.
@@ -443,6 +427,8 @@ function scalaMgr( url, account ){
         pushEvent : pushEvent,
         setWebpageToPlaylist: setWebpageToPlaylist,
         pushMediaToPlaylist: pushMediaToPlaylist,
+        pullPlaylistItem: pullPlaylistItem,
+        clearPlaylistItems: clearPlaylistItems,
         contractor: contractor,   //test
     };
 }

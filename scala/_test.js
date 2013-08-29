@@ -3,10 +3,20 @@ var scala = require('./scalaMgr');
 var scalaMgr = scala( 'http://192.168.5.189:8080', { username: 'administrator', password: '53768608' } );
 
 setTimeout(function(){
+    /*
+    var option = {
+        playlistItem: { id: 379 },
+        playlist: { name: 'lastModified' }
+    };
+    
+    scalaMgr.pullPlaylistItem(option, function(err, res){
+        (err)?console.dir(err):console.dir(res);
+    });
+    */
     
     var setting = {
-        media: { name: 'miix_it-5192f1cac6e16fa00d000006-20130822T020933832Z.mp4' },
-        //playlist:{ name: 'lastModified' },
+        media: { name: 'black' },
+        playlist:{ name: 'lastModified' },
         playTime: { start: '2013-08-27 10:00:00', end: '2013-08-27 22:00:00', duration: 50 }
     };
     
@@ -14,6 +24,14 @@ setTimeout(function(){
         (err)?console.dir(err):console.dir(res);
     });
     
+    /*
+    scalaMgr.clearPlaylistItems(function(err, res){
+        if(err)
+            console.dir(err);
+        else
+            console.dir(res);
+    });
+    */
     /*
     var web = {
         name: 'web_test',
@@ -27,7 +45,7 @@ setTimeout(function(){
     };
     
     scalaMgr.setWebpageToPlaylist(web, playTime, function(err, res){
-        console.log(res);
+        (err)?console.dir(err):console.dir(res);
     });
     */
     /*
@@ -41,13 +59,13 @@ setTimeout(function(){
     */
     /*
     var file = {
-        name : 'fc2_save_2013-08-07-135229-0000.mp4',
+        name : 'test_1.avi',
         path : 'C:\\tmp\\',
         savepath : ''
     };
     */
     //var web = { name: 'test_yahoo', uri: 'tw.yahoo.com' };
-    //var playTime = { start: '2013-08-16 10:00:00', end: '2013-08-16 22:00:00', duration: 50 };
+    //var playTime = { start: '2013-08-28 10:00:00', end: '2013-08-28 22:00:00', duration: 50 };
     /*
     var option = {
         media: { name: file.name, type: '' },
@@ -67,4 +85,3 @@ setTimeout(function(){
     */
     
 }, 1500);
-

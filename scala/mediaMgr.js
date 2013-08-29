@@ -93,7 +93,8 @@ var media = (function() {
         },
         findMediaIdByName : function( mediaName, list_cb ) {
             _private.list( { fields : 'id,duration', search : mediaName }, function( mediaInfo ){
-                if( typeof( mediaInfo.list[0].id ) !== 'undefined' ) list_cb( null, { id: mediaInfo.list[0].id, duration: mediaInfo.list[0].duration } );
+                //if( typeof( mediaInfo.list[0].id ) !== 'undefined' ) list_cb( null, { id: mediaInfo.list[0].id, duration: mediaInfo.list[0].duration } );
+                if( mediaInfo.count > 0 ) list_cb( null, { id: mediaInfo.list[0].id, duration: mediaInfo.list[0].duration } );
                 else list_cb( 'NOT_FOUND_MEDIA', null );
             } );
         },
