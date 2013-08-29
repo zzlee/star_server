@@ -255,7 +255,7 @@ var playlist = (function() {
                             listInfo.list[0].playlistItems[i].duration = option.playTime.duration;
                             listInfo.list[0].playlistItems[i].durationHoursSeconds = duraionTime.getHours() + ':' + duraionTime.getMinutes() + ':' + duraionTime.getSeconds()
                         }
-                        //listInfo.list[0].playlistItems[i].useValidRange = true;
+                        listInfo.list[0].playlistItems[i].useValidRange = true;
                         //listInfo.list[0].playlistItems[i].playFullscreen = true;
                     }
                 }
@@ -318,6 +318,8 @@ var playlist = (function() {
                             listInfo.list[0].playlistItems[i].duration = option.playTime.duration;
                             listInfo.list[0].playlistItems[i].durationHoursSeconds = duraionTime.getHours() + ':' + duraionTime.getMinutes() + ':' + duraionTime.getSeconds()
                         }
+                        listInfo.list[0].playlistItems[i].useValidRange = true;
+                        //listInfo.list[0].playlistItems[i].playFullscreen = true;
                     }
                 }
                 //update to scala content manager
@@ -329,6 +331,7 @@ var playlist = (function() {
                 });
             });
         },
+        //showPlaylistItems : function(){},
     };
 }());
 
