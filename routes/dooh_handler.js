@@ -5,6 +5,7 @@
 var FM = { dooh_handler: {} };
 var schedule_handler = require("../schedule.js"),
     UGC_handler = require("../ugc.js");
+var workingPath = process.cwd();
 
 var DEBUG = true,
     FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str)); } : function(str){} ;
@@ -132,16 +133,18 @@ FM.dooh_handler.doohMoviePlayingState_post_cb = function(req, res) {
 
 //GET /internal/dooh/dooh_playing_html
 FM.dooh_handler.streamVideoTrigger = function(req, res){
-  fs.readFile(path.join(__dirname, 'fm.html'), 'utf8', function(err, text){
-      res.send(text);
-      FM.dooh_handler.lastMoviePlayed = req.headers.miix_movie_project_id;
-      storyCamControllerMgr.startRecording( '', function(resParametes){
-          logger.info('story cam started recording.');
-          logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
-          res.send(200);
-          resIsSent = true;
-      });
-  });
+    var contentGenre = req.params.contentGenre;
+    var contentHtmlFile = 
+    fs.readFile(path.join(__dirname, 'fm.html'), 'utf8', function(err, text){
+        res.send(text);
+        FM.dooh_handler.lastMoviePlayed = req.headers.miix_movie_project_id;
+        storyCamControllerMgr.startRecording( '', function(resParametes){
+            logger.info('story cam started recording.');
+            logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+            res.send(200);
+            resIsSent = true;
+        });
+    });
 };
 
 module.exports = FM.dooh_handler;
