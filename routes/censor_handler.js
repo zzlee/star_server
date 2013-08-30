@@ -56,7 +56,7 @@ FM.censorHandler.getUGCList_get_cb = function(req,res){
     };
 
     sort = {
-            'no':-1
+            'createdOn':-1
     };
     if(req.query.condition)   
         condition = req.query.condition;

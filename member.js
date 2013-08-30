@@ -225,7 +225,7 @@ FM.MEMBER = (function(){
                     if(err){
                         res.send({error: "Internal Server Error"});
                         
-                    }else{
+                    }else if(result.fb){
                         user_token = result.fb.auth.accessToken;
                         var is_valid = null;
                         //console.log("getFBAccessTokenByFBId" + JSON.stringify(result));
@@ -262,6 +262,8 @@ FM.MEMBER = (function(){
                                 res.send({message: result.is_valid});
                             }
                         });
+                    }else{
+                        res.send({error: "get FB Access Token Error"});
                     }
                 });
             },

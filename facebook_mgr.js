@@ -112,16 +112,28 @@ FM.facebookMgr = (function(){
                     //body: {'batch': isTokenValiddata),},
                     
                 }, function(error, response, body){
-//                    console.log(body);
                     if(error){
                         logger.error("[isTokenValid err] ", JSON.stringify(error));
                         cb(error, null);
-//                    }else if(body.data.error){
-//                            cb(body.data.error, null);
-//                            FM_LOG("[isTokenValid body err] " + JSON.stringify(body.data));  
-                    }if(body !== null){
-                        FM_LOG("[isTokenValid ok] " + JSON.stringify(body.data)+"user_token"+user_token);
-                        cb(null, { is_valid: body.data.is_valid, expires_at: body.data.expires_at });
+                    }else if(body){
+                        if(body.data !== null){
+                            if(body.error){
+                                logger.error("[isTokenValid] error="+JSON.stringify(body.error));
+                                cb("get incorrect response from facebook", null);
+                            }else if(body.data.error){
+                                logger.error("[isTokenValid] error="+JSON.stringify(body.data));
+                                cb("get incorrect response from facebook", null);
+                            }else if(body.data.is_valid && body.data.expires_at){
+                                FM_LOG("[isTokenValid ok] " + JSON.stringify(body.data)+"user_token"+user_token);
+                                cb(null, { is_valid: body.data.is_valid, expires_at: body.data.expires_at });
+                            }
+                        }else{
+                            logger.error("[isTokenValid] error=","get incorrect response from facebook");
+                            cb("get incorrect response from facebook", null);
+                        }
+                    }else{
+                        logger.error("[isTokenValid] error=","get incorrect response from facebook");
+                        cb("get incorrect response from facebook", null);
                     }
                 });
             },

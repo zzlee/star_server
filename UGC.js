@@ -140,22 +140,10 @@ FM.UGC = (function(){
             /*  ownerId must be included in vjson. [callback]  */
 			addUGC: function(vjson, cb){
 			    if(vjson.ownerId){
-			        var query = UGCs.find({});
-			        query.sort({no:-1}).exec(function(err, result){
-			            if(!err){
-			                if(result[0])
-			                    vjson.no = result[0].no + 1;
-			                else
-			                    vjson.no = 1;
-//			                console.log(vjson.no);
-			                FMDB.createAdoc(UGCs, vjson, cb);
-			            }
-			            else cb(err, null);
+			        UGCs.count({}, function(err, count){
+			        vjson.no = parseInt(count)+1;
+			        FMDB.createAdoc(UGCs, vjson, cb);
 			        });
-//			        UGCs.count({}, function(err, count){
-//			        vjson.no = parseInt(count)+1;
-//			        FMDB.createAdoc(UGCs, vjson, cb);
-//			        });
 
 			    }else{
 			        var err = {error: "ownerId is MUST-HAVE!"};

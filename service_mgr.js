@@ -36,30 +36,28 @@ serviceMgr.createCustomerServiceItem = function(vjson, cb ){
     var customerServiceItemNO;
     customerServiceItemModel.count(condition, function(err, result){
         if(!err){
-            if(result)
-                customerServiceItemNO = result + 1;
-            else
-                customerServiceItemNO = 1;
-        }
+            customerServiceItemNO = result + 1;
+            db.listOfdocModels( memberModel, {_id: vjson.ownerId._id}, null, null, function(err, result){
+                if(!err){
+                    newVjson = {
+                            ownerId: {_id: vjson.ownerId._id},
+                            genre: vjson.genre,
+                            phoneVersion: vjson.phoneVersion,
+                            question: vjson.question,
+                            fb_userName: result[0].fb.userName,
+                            fb_id: result[0].fb.userID,
+                            no: customerServiceItemNO
+                    };
+                    db.createAdoc(customerServiceItemModel , newVjson, function(err,result){
+                        cb(err, result); 
+                    });
+                }
+                else cb(err, result); 
+            });
+
+        }else cb(err, result); 
     });
     
-    db.listOfdocModels( memberModel, {_id: vjson.ownerId._id}, null, null, function(err, result){
-        if(!err){
-            newVjson = {
-                    ownerId: {_id: vjson.ownerId._id},
-                    genre: vjson.genre,
-                    phoneVersion: vjson.phoneVersion,
-                    question: vjson.question,
-                    fb_userName: result[0].fb.userName,
-                    fb_id: result[0].fb.userID,
-                    no: customerServiceItemNO
-            };
-            db.createAdoc(customerServiceItemModel , newVjson, function(err,result){
-                cb(err, result); 
-            });
-        }
-        else cb(err, result); 
-    });
 
     
 };

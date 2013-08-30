@@ -553,7 +553,9 @@ FM.api.signupwithFB = function(req, res){
         /* New FB User or Exsited User */
         memberDB.isFBValid( userID, function(err, result){
         
-            if(err) throw err;      
+            if(err){
+                res.send(500, { error: "Valid User/Password"});
+            }     
             
             if(result){ //  fb user existed.
                 FM_LOG("[signupwithFB] FB user[" + userID + "] Existed!");
@@ -578,8 +580,12 @@ FM.api.signupwithFB = function(req, res){
                 
                 fbMgr.isTokenValid(accessToken, function(err, result){
                     
+                    if(err){
+                        res.send(500, { error: "Valid User/Password"});
+                    }  
+                    
                     // Extending new/short access_token replaces invalid existed access_token.
-                    if(!result.is_valid){
+                    else if(!result.is_valid){
                         fbMgr.extendToken(accessToken, function(err, response){
                             if(err){
                                 //res.send( {"data":{"_id": oid.toHexString(), "accessToken": accessToken, "expiresIn": expiresIn, "verified": mPhone_verified  }, "message":"success"} );
@@ -598,8 +604,8 @@ FM.api.signupwithFB = function(req, res){
                                     update.email = email;
                                 
                                 memberDB.updateMember( oid, update, function(err, result){
-                                    if(err) logger.info("[fbMgr.extendToken line601 error]"+err);
-                                    if(result) logger.info("[fbMgr.extendToken line602 result]"+fbMgr.extendTokenresult);
+                                    if(err) logger.info("[fbMgr.extendToken line607 error]"+err);
+                                    if(result) logger.info("[fbMgr.extendToken line608 result]"+fbMgr.extendTokenresult);
                                 });
                                 
                                 //res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "verified": mPhone_verified  }, "message":"success"} );
@@ -611,7 +617,7 @@ FM.api.signupwithFB = function(req, res){
                         
                     }else{
                         // existed access_token is valid. Check if expire within 20days, then renew it.
-                        if( parseInt(fb.auth.expiresIn) - Date.now() < 20*86400*1000 ){
+                        if( parseInt(fb.auth.expiresIn) - Date.now() < 20*86400*1000 || isNaN(fb.auth.expiresIn) || fb.auth.expiresIn === null){
                     
                             fbMgr.extendToken(authRes.accessToken, function(err, response){
                                 if(err){
@@ -631,8 +637,8 @@ FM.api.signupwithFB = function(req, res){
                                         update.email = email;
                                     
                                     memberDB.updateMember( oid, update, function(err, result){
-                                        if(err) logger.info("[fbMgr.extendToken line634 error]"+err);
-                                        if(result) logger.info("[fbMgr.extendToken line635 result]"+result);
+                                        if(err) logger.info("[fbMgr.extendToken line640 error]"+err);
+                                        if(result) logger.info("[fbMgr.extendToken line641 result]"+result);
                                     });
                                     
                                     //res.send( {"data":{"_id": oid.toHexString(), "accessToken": data.accessToken, "expiresIn": data.expiresIn, "verified": mPhone_verified  }, "message":"success"} );
@@ -650,8 +656,8 @@ FM.api.signupwithFB = function(req, res){
                                 
                             if(update.deviceToken || update.email){
                                 memberDB.updateMember( oid, update, function(err, result){
-                                    if(err) logger.info("[updateMember api line653 err]"+err);
-                                    if(result) logger.info("[updateMember api line654 result]"+result);
+                                    if(err) logger.info("[updateMember api line659 err]"+err);
+                                    if(result) logger.info("[updateMember api line660 result]"+result);
                                 });
                             }
                             
@@ -674,37 +680,48 @@ FM.api.signupwithFB = function(req, res){
                     member.deviceToken= deviceToken;
                 }
                 
-                FM.api._fbExtendToken(authRes.accessToken, function(response){
+                fbMgr.extendToken(authRes.accessToken, function(err, response){
+
                     
-                    if(response.data){
+                    if(err){
+                        //res.send( {"data":{"_id": oid.toHexString(), "accessToken": accessToken, "expiresIn": expiresIn, "verified": mPhone_verified  }, "message":"success"} );
+                        tokenMgr.getToken(oid, function(err, miixToken){
+                            res.send( {"data":{"_id": oid.toHexString(), "accessToken": accessToken, "expiresIn": expiresIn, "verified": mPhone_verified, "miixToken": miixToken }, "message":"success"} );
+                        });
+
+                    }else{
+                        
                         member.fb.auth = response.data;
+                        var data = response.data;
+//                        newdata.auth = data;
+                        
+                        memberDB.addMember(member, function(err, result){
+                            if(err) logger.info("[addMember api line700 err]"+err);
+                            
+                            FM_LOG("with userId " + result["_id"]);
+                            if(result){
+                                FM_LOG("\n[addMember]:");
+                                logger.info("[addMember api line704 result]"+result);
+                                
+                                oid = result["_id"];
+                                /* ACK LongPolling from Client
+                                var ack = { "data":{"sessionID": sid, "accessToken": accessToken, "userID": userID, "_id": oid} };
+                                FM.api._fbStatusAck(ack);
+                                */
+                                
+                                req.session.user = {
+                                    userID: member.fb.userID,
+                                    _id: oid,
+                                    accessToken: member.fb.auth.accessToken
+                                };
+                                
+                                //res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn}, "message":"success"} );
+                                tokenMgr.getToken(oid, function(err, miixToken){
+                                    res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn, "miixToken": miixToken }, "message":"success"} );
+                                });
+                            }
+                        });
                     }
-                    
-                    memberDB.addMember(member, function(err, result){
-        
-                        FM_LOG("with userId " + result["_id"]);
-                        if(result){
-                            FM_LOG("\n[addMember]:");
-                            logger.info(result);
-                            
-                            oid = result["_id"];
-                            /* ACK LongPolling from Client
-                            var ack = { "data":{"sessionID": sid, "accessToken": accessToken, "userID": userID, "_id": oid} };
-                            FM.api._fbStatusAck(ack);
-                            */
-                            
-                            req.session.user = {
-                                userID: member.fb.userID,
-                                _id: oid,
-                                accessToken: member.fb.auth.accessToken
-                            };
-                            
-                            //res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn}, "message":"success"} );
-                            tokenMgr.getToken(oid, function(err, miixToken){
-                                res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn, "miixToken": miixToken }, "message":"success"} );
-                            });
-                        } //else{}
-                    });
                 });
             }
         });
