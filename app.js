@@ -1,4 +1,5 @@
 ﻿
+var MONGO_DB_SERVER_ADDRESS = '192.168.5.189';
 
 //Module dependencies.
 var http = require('http'),
@@ -9,7 +10,7 @@ var http = require('http'),
     crypto = require('crypto'),
     Db = require('mongodb').Db,
     dbserver = require('mongodb').Server,
-    dbserver_config = new dbserver('192.168.5.189', 27017, {auto_reconnect: true, native_parser: true} ),
+    dbserver_config = new dbserver(MONGO_DB_SERVER_ADDRESS, 27017, {auto_reconnect: true, native_parser: true} ),
     fmdb = new Db('feltmeng', dbserver_config, {}),
     mongoStore = require('connect-mongodb'),
     app = express(),
@@ -21,15 +22,21 @@ var http = require('http'),
     ssio = require('socket.io').listen(secureServer),
     youtubeMgr = require('./youtube_mgr.js'),
 	winston = require('winston');
-  
+
+var workingPath = process.cwd();
+
+var logDir = path.join(workingPath,'log');
+if (!fs.existsSync(logDir) ){
+    fs.mkdirSync(logDir);
+}
 
 require('winston-mongodb').MongoDB;
 var logger = new(winston.Logger)({
 	transports: [ 
-		new winston.transports.MongoDB({host:'192.168.5.189', db: 'feltmeng', level: 'info'}),
+		new winston.transports.MongoDB({host:MONGO_DB_SERVER_ADDRESS, db: 'feltmeng', level: 'info'}),
 		new winston.transports.File({ filename: './log/winston.log'})	
 	],
-	exceptionHandlers: [new winston.transports.MongoDB({host:'192.168.5.189', db: 'feltmeng', level: 'info'}),
+	exceptionHandlers: [new winston.transports.MongoDB({host:MONGO_DB_SERVER_ADDRESS, db: 'feltmeng', level: 'info'}),
 	                    new winston.transports.File({filename: './log/exceptions.log'})
 	]
 	
@@ -37,6 +44,12 @@ var logger = new(winston.Logger)({
 
 global.logger = logger;  
   
+var userProjectDir = path.join(workingPath,'public/contents/user_project');
+if (!fs.existsSync(userProjectDir) ){
+    fs.mkdirSync(userProjectDir);
+}
+
+
 
 app.configure(function(){
   app.set('port', process.env.PORT || 80);
