@@ -21,7 +21,13 @@ var http = require('http'),
     ssio = require('socket.io').listen(secureServer),
     youtubeMgr = require('./youtube_mgr.js'),
 	winston = require('winston');
-  
+
+var workingPath = process.cwd();
+
+var logDir = path.join(workingPath,'log');
+if (!fs.existsSync(logDir) ){
+    fs.mkdirSync(logDir);
+}
 
 require('winston-mongodb').MongoDB;
 var logger = new(winston.Logger)({
@@ -37,6 +43,12 @@ var logger = new(winston.Logger)({
 
 global.logger = logger;  
   
+var userProjectDir = path.join(workingPath,'public/contents/user_project');
+if (!fs.existsSync(userProjectDir) ){
+    fs.mkdirSync(userProjectDir);
+}
+
+
 
 app.configure(function(){
   app.set('port', process.env.PORT || 80);
