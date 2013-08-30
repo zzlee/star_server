@@ -1,6 +1,6 @@
-var FM = {};
+﻿var FM = {};
 var DEBUG = true, FM_LOG = (DEBUG) ? function(str) {
-	logger.info(str);
+//	logger.info(str);
 } : function(str) {
 };
 
@@ -22,7 +22,7 @@ FM.pushMgr = (function() {
 			var registrationIds = [];
 
 			// Optional
-			message.addData('title', '登大螢幕');
+			message.addData('title', '上大螢幕');
 			message.addData('message', msg);
 			message.addData('msgcnt', '1');
 			message.collapseKey = 'OnDascreen';
@@ -99,7 +99,37 @@ FM.pushMgr = (function() {
 				}
 
 			},
+			
+            sendMessageToDeviceByMemberId : function(memberId, message, cbOfSendMessageToDeviceByMemberId){
+                 memberDB = require("./member.js");
 
+                 memberDB.getDeviceTokenById(memberId, function(err, result){
+                     if(err){
+                         FM_LOG('[pus_mgr.sendMessageToDeviceByMemberId] error='+err);
+                         cbOfSendMessageToDeviceByMemberId(err, result);
+                     }
+                     
+                     if(result.deviceToken){
+                         FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
+                         for( var devicePlatform in result.deviceToken){
+                             if(result.deviceToken[devicePlatform]){
+                                 FM.pushMgr.getInstance().sendMessageToDevice(devicePlatform, result.deviceToken[devicePlatform], message);
+                             }
+                         }
+                         cbOfSendMessageToDeviceByMemberId(err, "Push Successful");
+                     }
+                 });
+
+            },
+            /** TEST */
+            _testkaiser: function(){
+                var userNo = 1234;
+                var memberId = '52201b3999f24f9809000006';
+                var message = '您目前是第'+userNo+'位試鏡者，等候通告期間，您可以先到客棧打個工。';
+                this.sendMessageToDeviceByMemberId( memberId, message, function(err, result){
+                        console.log(err, result);
+                });
+            },
 		};// end return
 	}
 
@@ -115,5 +145,5 @@ FM.pushMgr = (function() {
 })();
 
 /* TEST */
-// FM.smsMgr.getInstance()._testkaiser();
+// FM.pushMgr.getInstance()._testkaiser();
 module.exports = FM.pushMgr.getInstance();

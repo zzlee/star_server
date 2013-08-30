@@ -27,6 +27,11 @@ miixHandler.putBase64ImageUgcs_cb = function(req, res) {
                 var elapseTime = (new Date()).getTime() - timeOfBeingCalled;
                 logger.info('[PUT '+req.path+'] responded in '+elapseTime+' ms');
                 res.send(200);
+                miixContentMgr.pushRandomMessage( ugcInfo.ownerId._id, req.params.ugcProjectId, function(err, result){
+                    console.log(err, result);
+                    if(!err) logger.info('[miixHandler_pushRandomMessage] ownerId= '+ugcInfo.ownerId._id+' ugcProjectId'+req.params.ugcProjectId+'result ='+result);
+                    else logger.error('[miixHandler_pushRandomMessage] ownerId= '+ugcInfo.ownerId._id+' ugcProjectId'+req.params.ugcProjectId+'err ='+err);
+                });
             }
             else {
                 logger.error('[PUT /miix/base64_image_ugcs/:ugcProjectId]: '+ err);
@@ -54,6 +59,11 @@ miixHandler.putVideoUgcs_cb = function(req, res) {
         };
         miixContentMgr.preAddMiixMovie( req.body.imgDoohPreviewBase64, req.params.ugcProjectId, ugcInfo, function(err){
             if (!err){
+                miixContentMgr.pushRandomMessage( ugcInfo.ownerId._id, req.params.ugcProjectId, function(err, result){
+                    console.log(err, result);
+                    if(!err) logger.info('[miixHandler_pushRandomMessage] ownerId= '+ugcInfo.ownerId._id+' ugcProjectId'+req.params.ugcProjectId+'result ='+result);
+                    else logger.error('[miixHandler_pushRandomMessage] ownerId= '+ugcInfo.ownerId._id+' ugcProjectId'+req.params.ugcProjectId+'err ='+err);
+                });
                 res.send(200);
             }
             else {

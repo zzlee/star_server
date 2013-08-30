@@ -16,6 +16,7 @@ var awsS3 = require('./aws_s3.js');
 var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
 var db = require('./db.js');
 var fbMgr = require('./facebook_mgr.js');
+var pushMgr = require('./push_mgr.js');
 
 
 /**
@@ -647,7 +648,7 @@ miixContentMgr.putFbPostIdUgcs = function(ugcProjectID, ugcInfo, cbOfPutFbPostId
             ugcModel.find({ "projectId": ugcProjectID}).sort({"createdOn":-1}).exec(function (err, ugcObj) {
                 if (!err)
                     callback(null, ugcObj);
-                    if (err)
+                else
                     callback("Fail to retrieve UGC Obj from DB: "+err, ugcObj);
             });
             
@@ -659,8 +660,7 @@ miixContentMgr.putFbPostIdUgcs = function(ugcProjectID, ugcInfo, cbOfPutFbPostId
             if(ugcObj[0].fb_postId[0]){
               ugcObj[0].fb_postId.push({'postId': ugcInfo});
               vjson = {"fb_postId" :ugcObj[0].fb_postId};
-            }
-            else{
+            }else{
                 arr = [{'postId': ugcInfo}];
                 vjson = {"fb_postId" : arr};
             }
@@ -681,6 +681,81 @@ miixContentMgr.putFbPostIdUgcs = function(ugcProjectID, ugcInfo, cbOfPutFbPostId
     });
 };
 
+var getRandomMessage = function(userNo, cbOfRandomMessage){
+    var max= 7;//you have to check your max if you add a new case
+    var min= 1;
+    var randomNum = Math.floor(Math.random()*(max-min+1)+min);
+    
+    switch(randomNum){
+    case 1:
+        cbOfRandomMessage(null, '您目前是第'+userNo+'位試鏡者，等候通告期間，您可以先到客棧打個工。');
+        break;
+    case 2:
+        cbOfRandomMessage(null, '您目前是第'+userNo+'位試鏡者，等候通告期間，記得要每天敷臉。');
+        break;
+    case 3:
+        cbOfRandomMessage(null, '您目前是第'+userNo+'位試鏡者，等候通告期間，您可以先練練身段。');
+        break;
+    case 4:
+        cbOfRandomMessage(null, '您目前是第'+userNo+'位試鏡者，等候通告期間，您可以先吊個嗓子。');
+        break;
+    case 5:
+        cbOfRandomMessage(null, '您目前是第'+userNo+'位試鏡者，等候通告期間，您得趕緊準備胭脂水粉。');
+        break;
+    case 6:
+        cbOfRandomMessage(null, '您目前是第'+userNo+'位試鏡者，等候通告期間，您記得備好轎，看倌不等人的。');
+        break;
+    case 7:
+        cbOfRandomMessage(null, '您目前是第'+userNo+'位試鏡者，等候通告期間，您記得用膳節制，以免戲服穿不上。');
+        break;
+    default:
+        cbOfRandomMessage('get random Message failed', '您目前是第'+userNo+'位試鏡者，等候通告期間，您可以先到客棧打個工。');
+    break;
+    }
+    
+};
+
+
+miixContentMgr.pushRandomMessage = function(memberId, ugcProjectID, cbOfPushRandomMessage){
+    
+    async.waterfall([
+                     function(callback){
+                         UGCDB.getValueByProject( ugcProjectID, 'no', function(err, ugcObj){
+                             if (!err)
+                                 callback(null, ugcObj);
+                             else{
+                                 callback("Fail to retrieve UGC Obj from DB: "+err, null);
+                             }
+
+                         });
+                     },
+                     function(ugcObj, callback){
+                         console.log(ugcObj.no);
+                         getRandomMessage(ugcObj.no, function(err, randomMessage){
+                             if (!err)
+                                 callback(null, randomMessage);
+                             else{
+                                 callback("Fail to get random message: "+err, null);
+                             }
+                         });
+                     },
+                     function(randomMessage, callback){
+                         pushMgr.sendMessageToDeviceByMemberId( memberId, randomMessage, function(err, result){
+                             if (!err)
+                                 callback(null, result);
+                             else{
+                                 callback("Fail to send message to device by memberId: "+err, null);
+                             }
+                     });
+                     }
+                 ],
+                 function(err, result){
+                     if (cbOfPushRandomMessage){
+                         cbOfPushRandomMessage(err, result);
+                     } 
+                 });
+};
+
 
 module.exports = miixContentMgr;
 
@@ -695,4 +770,8 @@ miixContentMgr.getUserUploadedImageUrls('greeting-50c99d81064d2b841200000a-20130
 //miixContentMgr.putFbPostIdUgcs('miix_it-519af8c5b14a8a2c0e00000d-20130808T064444717Z', '123', function(err, putFbPostIdUgcs){
 //    console.log('userUploadedImageUrls=');
 //    console.dir(putFbPostIdUgcs);
+//});
+
+//miixContentMgr.pushRandomMessage( '52201b3999f24f9809000006', 'miix_it-522022ad2ca7ced40600000e-20130830T052614052Z', function(err, result){
+//    console.log(err, result);
 //});

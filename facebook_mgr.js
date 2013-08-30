@@ -116,7 +116,7 @@ FM.facebookMgr = (function(){
                         logger.error("[isTokenValid err] ", JSON.stringify(error));
                         cb(error, null);
                     }else if(body){
-                        if(body.data !== null){
+                        if(body.data){
                             if(body.error){
                                 logger.error("[isTokenValid] error="+JSON.stringify(body.error));
                                 cb("get incorrect response from facebook", null);
@@ -126,6 +126,9 @@ FM.facebookMgr = (function(){
                             }else if(body.data.is_valid && body.data.expires_at){
                                 FM_LOG("[isTokenValid ok] " + JSON.stringify(body.data)+"user_token"+user_token);
                                 cb(null, { is_valid: body.data.is_valid, expires_at: body.data.expires_at });
+                            }else{
+                                logger.error("[isTokenValid] error=","get incorrect response from facebook");
+                                cb("get incorrect response from facebook", null);
                             }
                         }else{
                             logger.error("[isTokenValid] error=","get incorrect response from facebook");
