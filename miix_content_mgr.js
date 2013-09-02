@@ -730,7 +730,6 @@ miixContentMgr.pushRandomMessage = function(memberId, ugcProjectID, cbOfPushRand
                          });
                      },
                      function(ugcObj, callback){
-                         console.log(ugcObj.no);
                          getRandomMessage(ugcObj.no, function(err, randomMessage){
                              if (!err)
                                  callback(null, randomMessage);
