@@ -601,6 +601,52 @@ app.put('/miix_admin/doohs/:doohId/ProgramsTo3rdPartyContentMgr/:sessionId', rou
  */
 app.get('/miix_admin/sessions/:sessionId', routes.censorHandler.getSessionList_get_cb);
 
+/**
+ * Get the UGC list for highlight<br>
+ * <h5>Path Parameters</h5>
+ * None
+ * <h5>Query Parameters</h5>
+ * <ul>
+ * <li>skip: The number decide that first query.
+ * <li>limit: The number decide that limit of query.
+ * <li>token: authorization.
+ * <li>condition: The json decide that query codition.
+ * </ul>
+ * <h5>Request body</h5>
+ * None
+ * <h5>Response body</h5>
+ * An array of objects containing the following members:
+ * <ul>
+ * <li>_id: UGC ID with 24 byte hex string
+ * <li>userPhotoUrl: 
+ * <li>ugcCensorNo: 
+ * <li>userContent: 
+ * <li>fb_userName: 
+ * <li>fbPictureUrl: 
+ * <li>title: 
+ * <li>doohPlayedTimes: 
+ * <li>rating: 
+ * <li>genre: 
+ * <li>contentGenre:
+ * <li>mustPlay: 
+ * </ul>
+ * For example, <br>
+ * [{_id: '51d837f6830459c42d000023',
+ * "userPhotoUrl":["/contents/user_project/greeting-50c99d81064d2b841200000a-20130227T033827565Z/user_data/_cdv_photo_012.jpg"],
+ * "ugcCensorNo":1,
+ * "fb_userName":"No User",
+ * "fbPictureUrl":"http://profile.ak.fbcdn.net/hprofile-ak-frc1/371959_100004619173955_82185728_q.jpg",
+ * "doohPlayedTimes":0,
+ * "rating":"d",
+ * "genre":"miix",
+ * "contentGenre":"miit_it"
+ * "mustPlay":true}] <br>
+ *
+ * @name GET /miix_admin/user_content_items
+ * @memberof miix_admin
+ */
+app.get('/miix_admin/highlight', routes.censorHandler.getHighlightUGCList_get_cb);
+
 
 /**
  * RESTful APIs for back-end administration of Miix services

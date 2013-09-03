@@ -43,21 +43,21 @@ var intervalOfPlanningDoohProgrames;
  *                       doohPlayedTimes}
  */
 FM.censorHandler.getUGCList_get_cb = function(req,res){
-
+    
     var condition;
     var sort;
     var limit;
     var skip;
-
+    //default
     condition = {
             'no':{ $exists: true},
             'ownerId':{ $exists: true},
             'projectId':{ $exists: true}
     };
-
     sort = {
             'createdOn':-1
     };
+    
     if(req.query.condition)   
         condition = req.query.condition;
     if(req.query.sort) 
@@ -255,5 +255,42 @@ FM.censorHandler.getSessionList_get_cb = function(req,res){
     });
 
 };
+
+FM.censorHandler.getHighlightUGCList_get_cb = function(req,res){
+    
+    var condition;
+    var sort;
+    var limit;
+    var skip;
+    //default
+    condition = {
+            'no':{ $exists: true},
+            'ownerId':{ $exists: true},
+            'projectId':{ $exists: true},
+            'doohPlayedTimes':{$gte : 1}
+    };
+    sort = {
+            'createdOn':-1
+    };
+    
+    if(req.query.condition)   
+        condition = req.query.condition;
+    if(req.query.sort) 
+        sort = req.query.sort;
+
+    limit = req.query.limit;
+    skip = req.query.skip;
+
+    censorMgr.getUGCList(condition, sort, limit, skip, function(err, UGCList){
+        if (!err){
+            res.render( 'table_censorHighlight', {ugcCensorMovieList: UGCList} );
+        }
+        else{
+            res.send(400, {error: err});
+        }
+    });
+
+};
+
 
 module.exports = FM.censorHandler;

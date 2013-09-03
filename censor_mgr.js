@@ -32,36 +32,49 @@ sheculeMgr.init(censorMgr);
  *                       doohPlayedTimes}
  */
 censorMgr.getUGCList = function(condition, sort, pageLimit, pageSkip, cb){
-
+    var start;
+    var end;
 
     if(condition){
-        //
-        if(condition.TimeStart && condition.TimeEnd){
+        //for UGC page
+        if(condition.timeStart && condition.timeEnd){
+            start = (new Date(condition.timeStart)).getTime();
+            end = (new Date(condition.timeEnd)).getTime();
             condition ={
                     'no':{ $exists: true},
                     'ownerId':{ $exists: true},
                     'projectId':{ $exists: true},
-                    'createdOn': {$gte: condition.TimeStart, $lt: condition.TimeEnd}
+                    'createdOn': {$gte: start, $lt: end}
             };
         }
-        //
-        if(condition == 'rating') condition ={
+        else if(condition == 'rating') condition ={
                 'no':{ $exists: true},
                 'ownerId':{ $exists: true},
                 'projectId':{ $exists: true},
                 'rating':{ $exists: true}
         };
-        //
-        if(condition == 'norating') condition ={
+        else if(condition == 'norating') condition ={
                 'no':{ $exists: true},
                 'ownerId':{ $exists: true},
                 'projectId':{ $exists: true},
                 'rating':{ $exists: false}
         };
+        //for highlight page
+        else if(condition.highlightTimeStart && condition.highlightTimeEnd){
+            start = (new Date(condition.highlightTimeStart)).getTime();
+            end = (new Date(condition.highlightTimeEnd)).getTime();
+            condition ={
+                    'no':{ $exists: true},
+                    'ownerId':{ $exists: true},
+                    'projectId':{ $exists: true},
+                    'createdOn': {$gte: start, $lt: end},
+                    'doohPlayedTimes':{$gte : 1}
+            };
+        }
     }
 
     if ( pageLimit && pageSkip ) {
-        FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no contentGenre mustPlay userRawContent', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
+        FMDB.listOfdocModels( UGCs,condition,'fb.userID _id title description createdOn rating doohPlayedTimes projectId ownerId no contentGenre mustPlay userRawContent highlight', {sort :sort ,limit: pageLimit ,skip: pageSkip}, function(err, result){
             if(err) {
                 logger.error('[censorMgr_db.listOfUGCs]', err);
                 cb(err, null);
@@ -99,7 +112,7 @@ var UGCList = [];
 var timeslotStart;
 var timeslotEnd;
 
-var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, contentGenre, mustPlay, timeslotStart, timeslotEnd, timeStamp, programTimeSlotId, arr) {
+var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, fbPictureUrl, title, description, doohPlayedTimes, rating, contentGenre, mustPlay, timeslotStart, timeslotEnd, timeStamp, programTimeSlotId, highlight, arr) {
     arr.push({
         userPhotoUrl: userPhotoUrl,
         ugcCensorNo: ugcCensorNo,
@@ -115,7 +128,8 @@ var UGCListInfo = function(userPhotoUrl, ugcCensorNo, userContent, fb_userName, 
         timeslotStart: timeslotStart,
         timeslotEnd: timeslotEnd,
         timeStamp: timeStamp,
-        programTimeSlotId: programTimeSlotId
+        programTimeSlotId: programTimeSlotId,
+        highlight: highlight
     });
 };
 var mappingUGCList = function(data, set_cb){
@@ -126,8 +140,6 @@ var mappingUGCList = function(data, set_cb){
         var description = null;
 
         if(data[next].timeslot){
-//            timeslotStart = new Date(data[next].timeslot.start).toString().substring(0,25);
-//            timeslotEnd = new Date(data[next].timeslot.end).toString().substring(0,25);
             timeslotDateStart = new Date(data[next].timeslot.start).toString().substring(0,25);
             timeslotDateEnd = new Date(data[next].timeslot.end).toString().substring(0,25);
             //timeslotStart date format
@@ -160,13 +172,13 @@ var mappingUGCList = function(data, set_cb){
         
 
         if(next == limit - 1) {
-            UGCListInfo(userPhotoUrl, data[next].no, description, result[1], result[0], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, data[next].programTimeSlotId, UGCList);
+            UGCListInfo(userPhotoUrl, data[next].no, description, result[1], result[0], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, data[next].programTimeSlotId, data[next].highlight, UGCList);
             set_cb(null, 'ok'); 
             next = 0;
             UGCList = [];
         }
         else{
-            UGCListInfo(userPhotoUrl, data[next].no, description, result[1], result[0], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, data[next].programTimeSlotId, UGCList);
+            UGCListInfo(userPhotoUrl, data[next].no, description, result[1], result[0], data[next].title, data[next].description, data[next].doohPlayedTimes, data[next].rating, data[next].contentGenre, data[next].mustPlay, timeslotStart, timeslotEnd, data[next].timeStamp, data[next].programTimeSlotId, data[next].highlight, UGCList);
             next += 1;
             mappingUGCList(data, set_cb);
         }
