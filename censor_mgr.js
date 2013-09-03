@@ -270,8 +270,12 @@ censorMgr.setUGCAttribute = function(no, vjson, cb){
 
     if(vjson.mustPlay == 'true')
         vjson = {mustPlay : true};
-    if(vjson.mustPlay == 'false')
+    else if(vjson.mustPlay == 'false')
         vjson = {mustPlay : false};
+    if(vjson.highlight == 'true')
+        vjson = {highlight : true};
+    else if(vjson.highlight == 'false')
+        vjson = {highlight : false};
 
 
     UGC_mgr.getOwnerIdByNo(no, function(err, result){
