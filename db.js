@@ -143,7 +143,8 @@ FM.DB = (function(){
             rating: {type: String},//range A~E      kaiser
             fb_postId: [{
                 postId: String,
-            }]
+            }],
+            highlight: {type: Boolean, default: false}
         }); //  UGC collection
         
         var CommentSchema = new Schema({

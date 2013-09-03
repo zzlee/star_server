@@ -136,6 +136,7 @@ $(document).ready(function(){
     FM.UGCList = new PageList( 'ugcCensorMovieList', 5, '/miix_admin/ugc_censor');
     FM.UGCPlayList = new PageList( 'ugcCensorPlayList', 5, '/miix_admin/doohs/taipeiarena/timeslots');
     FM.historyList = new PageList( 'historyList', 5, '/miix_admin/sessions/ ');
+    FM.highlightList = new PageList( 'highlightList', 5, '/miix_admin/highlight');
 
     FM.currentContent = FM.memberList;
 
@@ -285,11 +286,11 @@ $(document).ready(function(){
     $('#historyListBtn').click(function(){
         $('#main_menu ul[class="current"]').attr("class", "select");
         $('#historyList').attr("class", "current");
-        
+
         $.get('/miix_admin/table_censorHistoryList_head.html', function(res){
             $('#table-content-header').html(res);
             $('#table-content').html('');
-            
+
             $('#createHistoryProgramListBtn').click(function(){
                 var flag = 0;
                 var inputSearchData = {};
@@ -301,16 +302,51 @@ $(document).ready(function(){
                         alert('請輸入完整的條件!!\n時間格式為2013/08/01 00:00:00');
                         flag = 1; 
                     }else{
-                     conditions = inputSearchData;
+                        conditions = inputSearchData;
                     }
                 });
-                  FM.currentContent = FM.historyList;
-                  FM.currentContent.showCurrentPageContent();   
+                FM.currentContent = FM.historyList;
+                FM.currentContent.showCurrentPageContent();   
 
             });
         });
-        
+
         FM.currentContent = FM.historyList;
+        FM.currentContent.showCurrentPageContent();
+
+    });
+    
+    $('#highlightListBtn').click(function(){
+        $('#main_menu ul[class="current"]').attr("class", "select");
+        $('#highlightList').attr("class", "current");
+        $('#table-content').html('<br> <br>刊登名單準備中，請稍候....');
+
+        $.get('/miix_admin/table_censorHighlightList_head.html', function(res){
+            $('#table-content-header').html(res);
+            //$('#table-content').html('');
+
+            $('#searchHighlightListBtn').click(function(){
+                var flag = 0;
+                var inputSearchData = {};
+
+                $('#condition-inner input[class="searchHighlightListBtn"]').each(function(i){
+
+                    inputSearchData[$(this).attr("name")] = $(this).attr("value");
+                    if($(this).attr("value") == "" && flag == 0){
+                        alert('請輸入完整的條件!!\n時間格式為2013/08/01 00:00:00');
+                        flag = 1; 
+                    }else{
+                        conditions = inputSearchData;
+                    }
+                });
+                $('#table-content').html('<br> <br>刊登名單準備中，請稍候....');
+                FM.currentContent = FM.highlightList;
+                FM.currentContent.showCurrentPageContent();   
+
+            });
+        });
+
+        FM.currentContent = FM.highlightList;
         FM.currentContent.showCurrentPageContent();
 
     });
@@ -321,6 +357,7 @@ $(document).ready(function(){
         var playlistCheck = settings.url.substring(0,17);
         var censorCheck = settings.url.substring(0,22);
         var historyCheck = settings.url.substring(0,20);
+        var highlightCheck = settings.url.substring(0,21);
 
         /**
          * UGCList
@@ -668,6 +705,32 @@ $(document).ready(function(){
             });
         }// End of HistoryList 
         
+        /**
+         * HighlightList
+         */
+        if(highlightCheck == '/miix_admin/highlight'){
+            $('#ugcCensor.ugcCensorNoHL').click(function(){
+
+                var url = DOMAIN + "user_content_attribute";
+                var no = $(this).attr("name");
+                var mustPlay = null;
+                if($(this).attr("value") == 'true')
+                    highlight = false;
+                if($(this).attr("value") == 'false')
+                    highlight = true;
+
+                $.ajax({
+                    url: url,
+                    type: 'PUT',
+                    data: {no: no, vjson:{highlight: highlight}},
+                    success: function(response) {
+                        if(response.message){
+                            console.log("[Response] message:" + response.message);
+                        }
+                    }
+                });
+            });
+        }// End of HighlightList 
     });
     // Ajax End---------------------------------------------------------------------
 
