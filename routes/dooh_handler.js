@@ -5,6 +5,7 @@
 var FM = { dooh_handler: {} };
 var schedule_handler = require("../schedule.js"),
     UGC_handler = require("../ugc.js");
+var workingPath = process.cwd();
 
 var DEBUG = true,
     FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JSON.stringify(str)); } : function(str){} ;
@@ -130,18 +131,37 @@ FM.dooh_handler.doohMoviePlayingState_post_cb = function(req, res) {
 	}
 };
 
-//GET /internal/dooh/dooh_playing_html
+//GET /internal/dooh/padding_start_html
 FM.dooh_handler.streamVideoTrigger = function(req, res){
-  fs.readFile(path.join(__dirname, 'fm.html'), 'utf8', function(err, text){
-      res.send(text);
-      FM.dooh_handler.lastMoviePlayed = req.headers.miix_movie_project_id;
-      storyCamControllerMgr.startRecording( '', function(resParametes){
-          logger.info('story cam started recording.');
-          logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
-          res.send(200);
-          resIsSent = true;
-      });
-  });
+    var contentGenre = req.params.contentGenre;
+    var contentHtmlFile = null;
+    switch(contentGenre)
+    {
+    case 'miix_it':
+        contentHtmlFile = path.join(workingPath, 'public/contents/padding_content/ondascreen_padding_miixit-start.html');
+        break;
+    case 'cultural_and_creative':
+        contentHtmlFile = path.join(workingPath, 'public/contents/padding_content/ondascreen_padding_cultural_and_creative-start.html');
+        break;
+    case 'mood':
+        contentHtmlFile = path.join(workingPath, 'public/contents/padding_content/ondascreen_padding_wish-start.html');
+        break;
+    case 'check_in':
+        contentHtmlFile = path.join(workingPath, 'public/contents/padding_content/ondascreen_padding_checkin-start.html');
+        break;
+    default:
+        
+    } 
+    fs.readFile(contentHtmlFile, 'utf8', function(err, text){
+        res.send(text);
+        FM.dooh_handler.lastMoviePlayed = req.headers.miix_movie_project_id;
+        storyCamControllerMgr.startRecording( '', function(resParametes){
+            logger.info('story cam started recording.');
+            logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+            res.send(200);
+            resIsSent = true;
+        });
+    });
 };
 
 module.exports = FM.dooh_handler;
