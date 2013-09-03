@@ -789,7 +789,7 @@ app.post('/internal/dooh/dooh_periodic_data', routes.doohHandler.importPeriodicD
 app.get('/internal/dooh/dooh_current_video', routes.doohHandler.dooh_current_UGC);  
 
 //GET push html to dooh player and trigger story camera.
-app.get('/internal/dooh/dooh_playing_html/:contentGenre', routes.doohHandler.streamVideoTrigger);
+app.get('/internal/dooh/padding_start_html/:contentGenre', routes.doohHandler.streamVideoTrigger);
 //PUT get play dooh video play time.
 app.put('/available_street_movies/:playTime', routes.storyCamControllerHandler.availableStreetMovies);
 
@@ -881,11 +881,15 @@ http.createServer(app).listen(app.get('port'), function(){
 //	
 //},3000);
 
-setTimeout(function(){
-    routes.api._pushNotification('be63fd268cec11e01d69a435101a7d33efe4ebc984a03a66e540f28f9f5f107b');
-    console.log('test push sent');
-
-}, 5000);
+//setTimeout(function(){
+//    //routes.api._pushNotification('279dce6929111751da154cfa87a01afe286d4208178b162fabd1a7bcb89ad6a3');
+//    var pushMgr = require("./push_mgr.js");
+//    pushMgr.sendMessageToDevice('iPhone', '279dce6929111751da154cfa87a01afe286d4208178b162fabd1a7bcb89ad6a3', "您有一個新影片！"); //Gance's iPHone 4S
+//    pushMgr.sendMessageToDevice('iPhone', 'ef8bcdfdb6445f172962dd4a1c6adc78e13c0e2373ef11a926366a3bfb59e3ce', "test push"); //team's iPHone 4S
+//    pushMgr.sendMessageToDevice('iPhone', 'be63fd268cec11e01d69a435101a7d33efe4ebc984a03a66e540f28f9f5f107b', "您有一個新影片！"); //Joy's iPHone 4S
+//    console.log('test push sent');
+//
+//}, 5000);
 
 
 /*
