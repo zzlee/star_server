@@ -138,16 +138,16 @@ FM.dooh_handler.streamVideoTrigger = function(req, res){
     switch(contentGenre)
     {
     case 'miix_it':
-        contentHtmlFile = path.join(workingPath, 'public/contents/padding_content/ondascreen_padding_miixit-start.html');
+        contentHtmlFile = path.join(workingPath, 'public/contents/padding_content/ondascreen_padding-miix_it-start.html');
         break;
     case 'cultural_and_creative':
-        contentHtmlFile = path.join(workingPath, 'public/contents/padding_content/ondascreen_padding_cultural_and_creative-start.html');
+        contentHtmlFile = path.join(workingPath, 'public/contents/padding_content/ondascreen_padding-cultural_and_creative-start.html');
         break;
     case 'mood':
-        contentHtmlFile = path.join(workingPath, 'public/contents/padding_content/ondascreen_padding_wish-start.html');
+        contentHtmlFile = path.join(workingPath, 'public/contents/padding_content/ondascreen_padding-wish-start.html');
         break;
     case 'check_in':
-        contentHtmlFile = path.join(workingPath, 'public/contents/padding_content/ondascreen_padding_checkin-start.html');
+        contentHtmlFile = path.join(workingPath, 'public/contents/padding_content/ondascreen_padding-check_in-start.html');
         break;
     default:
         
