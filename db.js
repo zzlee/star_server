@@ -37,7 +37,10 @@ FM.DB = (function(){
             questionGenre = 'account publish sign_in others'.split(' '),
             
             programTimeSlotType = 'UGC padding'.split(' '),
-            programTimeSlotContnetType = 'file web_page'.split(' '),
+            programTimeSlotContnetType = 'file web_page media_item'.split(' '),
+                //file
+                //web_page
+                //media_item: the media item that has already stored in Media of Scala's Content Manager
             
             videoStatus = 'good soso bad waiting none'.split(' '), //DEPRECATE, keep for reference
             videoGenre = 'miix miix_street miix_story'.split(' '); //DEPRECATE, keep for reference 
