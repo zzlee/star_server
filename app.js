@@ -49,6 +49,11 @@ if (!fs.existsSync(userProjectDir) ){
     fs.mkdirSync(userProjectDir);
 }
 
+var tempDir = path.join(workingPath,'public/contents/temp');
+if (!fs.existsSync(tempDir) ){
+    fs.mkdirSync(tempDir);
+}
+
 
 
 app.configure(function(){

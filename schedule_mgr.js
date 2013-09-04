@@ -75,23 +75,23 @@ var programPlanningPattern =(function(){
 
 
 var paddingContent =(function(){ 
-    var PADDING_CONTENT_TABLE = {
-            miix_it: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/stream_video_trigger", format:"web_page"},
-                   {dir: "contents/padding_content", file:"miix02.jpg", format:"image"}],
-            cultural_and_creative: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/stream_video_trigger", format:"web_page"},
-                                    {dir: "contents/padding_content", file:"miix02.jpg", format:"image"},
-                                    {dir: "contents/padding_content", file:"miix03.jpg", format:"image"},
-                                    {dir: "contents/padding_content", file:"miix04.jpg", format:"image"}
+    var PADDING_CONTENT_TABLE = { //specify the media name of each padding content store on Scala's Content Manager
+            miix_it: [{name: "ondascreen_padding-miix_it-start"},
+                      {name: "ondascreen_padding-miix_it-end.jpg"}],
+            cultural_and_creative: [{name: "ondascreen_padding-cultural_and_creative-start"},
+                                    {name: "ondascreen_padding-cultural_and_creative-middle.jpg"},
+                                    {name: "ondascreen_padding-cultural_and_creative-middle.jpg"},
+                                    {name: "ondascreen_padding-cultural_and_creative-end.jpg"}
                                     ],
-            mood: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/stream_video_trigger", format:"web_page"},
-                   {dir: "contents/padding_content", file:"miix02.jpg", format:"image"},
-                   {dir: "contents/padding_content", file:"miix03.jpg", format:"image"},
-                   {dir: "contents/padding_content", file:"miix04.jpg", format:"image"}
+            mood: [{name: "ondascreen_padding-wish-start"},
+                   {name: "ondascreen_padding-wish-middle.jpg"},
+                   {name: "ondascreen_padding-wish-middle.jpg"},
+                   {name: "ondascreen_padding-wish-end.jpg"}
                    ],
-            check_in: [{name: "OnDaScreen", uri:STAR_SERVER_URL+"/internal/dooh/stream_video_trigger", format:"web_page"},
-                       {dir: "contents/padding_content", file:"miix02.jpg", format:"image"},
-                       {dir: "contents/padding_content", file:"miix03.jpg", format:"image"},
-                       {dir: "contents/padding_content", file:"miix04.jpg", format:"image"}
+            check_in: [{name: "ondascreen_padding-check_in-start"},
+                       {name: "ondascreen_padding-check_in-middle.jpg"},
+                       {name: "ondascreen_padding-check_in-middle.jpg"},
+                       {name: "ondascreen_padding-check_in-end.jpg"}
                        ]                                
     };
         
@@ -456,7 +456,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                               // put padding program 0
                               var aProgramTimeSlot = new ProgramTimeSlot(vjsonDefault);
                               aProgramTimeSlot.type = 'padding';
-                              aProgramTimeSlot.contentType = 'web_page';
+                              aProgramTimeSlot.contentType = 'media_item';
                               aProgramTimeSlot.content = paddingContents[0];
                               aProgramTimeSlot.timeslot.playDuration = DEFAULT_PLAY_DURATION_FOR_STATIC_PADDING;
                               aProgramTimeSlot.timeStamp = interval.start + '-' + pad(timeStampIndex, 3);
@@ -488,6 +488,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                                                     //put padding program
                                                     var aProgramTimeSlot = new ProgramTimeSlot(vjsonDefault);
                                                     aProgramTimeSlot.type = 'padding';
+                                                    aProgramTimeSlot.contentType = 'media_item';
                                                     aProgramTimeSlot.content = paddingContents[indexOfUgcContents+1];
                                                     aProgramTimeSlot.markModified('content');
                                                     aProgramTimeSlot.timeslot.playDuration = DEFAULT_PLAY_DURATION_FOR_STATIC_PADDING;
@@ -958,7 +959,7 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
                     });
                     
                 }
-                else {
+                else if (aProgram.contentType == "web_page" ){
                     //contentType is "web_page"
                     
                     if (aProgram.content.uri){
@@ -984,6 +985,30 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
                     }
                     
                     //callbackIterator(null);
+                }
+                else {
+                    //contentType is "media_item"
+                    if (aProgram.content.name){
+                        var setting = {
+                            media: { name: aProgram.content.name },
+                            //playlist:{ name: 'lastModified' },
+                            playTime: { start: aProgram.timeslot.start, end: aProgram.timeslot.end, duration: aProgram.timeslot.playDuration/1000 }
+                        };
+                        
+                        scalaMgr.pushMediaToPlaylist(setting, function(errScala, res){
+                            if (!errScala){
+                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + aProgram.content.name );
+                                //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + aProgram.content.name );
+                                callbackIterator(null);
+                            }
+                            else{
+                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + web.uri );
+                                //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + web.uri );
+                                callbackIterator('Failed to push content to Scala :'+errScala);
+                            }
+                        });
+                        
+                    }
                 }
                 
             };
