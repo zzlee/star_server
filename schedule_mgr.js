@@ -658,7 +658,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
     }
     
     
-    async.series([
+    async.waterfall([
         function(callback){
             //censorMgr_getUGCList_fake(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
             censorMgr.getUGCListLite(intervalOfSelectingUGC, function(err_1, _sortedUgcList ){
@@ -671,7 +671,13 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
                     for (var i=0;i<sortedUgcList.length; i++){
                         logger.info( '{ no:'+sortedUgcList[i].no+', contentGenre:'+sortedUgcList[i].contentGenre+', genre:'+sortedUgcList[i].genre+', fileExtension:'+sortedUgcList[i].fileExtension+' }' );
                     }
-                    callback(null);
+                    if (sortedUgcList.length>0) {
+                        callback(null);
+                    }
+                    else {
+                        callback("There is no UGC available for playing.");
+                    }
+                    
                 }
                 else {
                     callback("Fail to get UGC list from Censor manager: "+err_1);
@@ -703,6 +709,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             callback(null);
         },
         function(callback){
+            //generate program time slots
             generateTimeSlot( function(err_2){
                 if (!err_2) {
                     //console.log('generateTimeSlot() done! ');
@@ -714,6 +721,7 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             });
         }, /**/
         function(callback){
+            //put UGCs into programe time slots
             putUgcIntoTimeSlots(function(err_3, result){
                 if (!err_3) {
                     //console.log('putUgcIntoTimeSlots() done! ');
@@ -726,9 +734,14 @@ scheduleMgr.createProgramList = function(dooh, intervalOfSelectingUGC, intervalO
             });
         }  
     ],
-    function(err, results){
+    function(err, result){
         if (created_cb){
-            created_cb(err, results[results.length-1]);
+            if (!err) {
+                created_cb(null, result);
+            }
+            else {
+                created_cb(err, null);
+            }
         } 
     });
 
