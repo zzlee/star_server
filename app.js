@@ -911,6 +911,19 @@ http.createServer(app).listen(app.get('port'), function(){
 });
 
 
+//var globalConnectionMgr = require('./global_connection_mgr.js');
+//setTimeout(function(){
+//    var commandParameters = {
+//        para1: "hello",
+//        paraTest2: "test"
+//    };
+//                
+//    globalConnectionMgr.sendRequestToRemote( "AE_Server_Gance_PC", { command: "TEST_LONG_POLLING", parameters: commandParameters }, function(responseParameters) {
+//        console.log('responseParameters=');
+//        console.dir(responseParameters);
+//    });
+//}, 10000);
+
 
 
 //var test_s3 = require('./aws_s3.js');
