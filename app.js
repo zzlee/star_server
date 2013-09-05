@@ -6,7 +6,6 @@ var http = require('http'),
     https = require('https'),
     express = require('express'),
     routes = require('./routes'),
-	user = require('./routes/user'),
     crypto = require('crypto'),
     Db = require('mongodb').Db,
     dbserver = require('mongodb').Server,
@@ -24,6 +23,11 @@ var http = require('http'),
 	winston = require('winston');
 
 var workingPath = process.cwd();
+
+require('./system_configuration.js').getInstance(function(_config){
+    global.config = _config;
+});
+
 
 var logDir = path.join(workingPath,'log');
 if (!fs.existsSync(logDir) ){
@@ -96,8 +100,6 @@ app.configure('production', function(){
 
 
 youtubeMgr.refreshToken();
-
-app.get('/users', user.list);
 
 
 
@@ -832,8 +834,8 @@ app.get('/miix_service/customer_service_items', routes.service.getCustomerServic
 // Internal
 
 app.get('/internal/oauth2callback', routes.YoutubeOAuth2_cb );
-app.get('/internal/commands', routes.command_get_cb);
-app.post('/internal/command_responses', routes.commandResponse_post_cb); 
+app.get('/internal/commands', routes.connectionHandler.command_get_cb);
+app.post('/internal/command_responses', routes.connectionHandler.commandResponse_post_cb); 
 
 app.post('/internal/dooh/movie_playing_state', routes.doohHandler.doohMoviePlayingState_post_cb);  //TODO: PUT /internal/dooh/movie_playing_state is better
 app.post('/internal/dooh/dooh_periodic_data', routes.doohHandler.importPeriodicData);  //TODO: POST /internal/adapter/schedule_periodic_data is better
@@ -911,18 +913,18 @@ http.createServer(app).listen(app.get('port'), function(){
 });
 
 
-//var globalConnectionMgr = require('./global_connection_mgr.js');
-//setTimeout(function(){
-//    var commandParameters = {
-//        para1: "hello",
-//        paraTest2: "test"
-//    };
-//                
-//    globalConnectionMgr.sendRequestToRemote( "AE_Server_Gance_PC", { command: "TEST_LONG_POLLING", parameters: commandParameters }, function(responseParameters) {
-//        console.log('responseParameters=');
-//        console.dir(responseParameters);
-//    });
-//}, 10000);
+var globalConnectionMgr = require('./global_connection_mgr.js');
+setTimeout(function(){
+    var commandParameters = {
+        para1: "hello",
+        paraTest2: "test"
+    };
+                
+    globalConnectionMgr.sendRequestToRemote( "story_cam_server_Gance_PC", { command: "CONNECTION_TEST", parameters: commandParameters }, function(responseParameters) {
+        console.log('responseParameters=');
+        console.dir(responseParameters);
+    });
+}, 10000);
 
 
 
