@@ -96,10 +96,6 @@ connectionHandler.command_get_cb = function(req, res) {
             
         }, function(error, response, body){
 
-            logger.info('Connection to star_coordinator ends');
-            connectionMgr.connectToMainServer( remoteID, remoteType, getCommand_cb);            
-
-            
             if (body) {
                 res.send(body);    
             }
