@@ -25,8 +25,14 @@ var workingPath = process.cwd();
 
 
 require('./system_configuration.js').getInstance(function(_config){
+    
+    if ( (!_config.HOST_STAR_COORDINATOR_URL) || (!_config.IS_STAND_ALONE) ) {
+        console.log("ERROR: system_configuration.xml is not properly filled!");
+        process.exit(1);
+    }
+    
     var routes = require('./routes');
-    global.config = _config;
+    global.config = _config;   
     global.routes = routes;
     global.app = app;
 
