@@ -18,6 +18,7 @@ var http = require('http'),
     secureServer = https.createServer(app),
     sio = require('socket.io').listen(server),
     ssio = require('socket.io').listen(secureServer),
+    globalConnectionMgr = require('./global_connection_mgr.js'),
     youtubeMgr = require('./youtube_mgr.js'),
 	winston = require('winston');
 

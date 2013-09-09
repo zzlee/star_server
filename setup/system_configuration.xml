@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <systemConfiguration>
     <HOST_STAR_COORDINATOR_URL>http://192.168.5.124:3000</HOST_STAR_COORDINATOR_URL> <!-- The full URL of host star_coordinator -->
-    <HOST_MONGO_DB_SERVER>192.168.5.124</HOST_MONGO_DB_SERVER> <!-- The address of MongoDB server -->
-    <IS_STAND_ALONE>false</IS_STAND_ALONE>
+    <IS_STAND_ALONE>NO</IS_STAND_ALONE> <!-- Set it to "NO" if there are multiple instances of star_server due to auto-scaling of AWS -->
 </systemConfiguration>

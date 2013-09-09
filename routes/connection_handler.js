@@ -32,15 +32,36 @@ connectionHandler.sendRequestToRemote = function( targetID, reqToRemote, cb ) {
 //POST /internal/command_responses
 connectionHandler.commandResponse_post_cb = function(req, res) {
 
-	var commandID = req.body._command_id;
-	var remoteID = req.body._remote_id;
-	var responseParameters = req.body;
+    if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
+        var commandID = req.body._command_id;
+        var remoteID = req.body._remote_id;
+        var responseParameters = req.body;
+        
+        eventEmitter.emit('RESPONSE_'+commandID, responseParameters);
+        logger.info('Got response ' + commandID + ' from ' + remoteID + ' :' );
+        logger.info(JSON.stringify(responseParameters));
+        
+        res.send(200);
+    }
+    else { //star_server has multiple instances (due to auto-scale of AWS)
+        request({
+            method: 'POST',
+            uri: config.HOST_STAR_COORDINATOR_URL + '/internal/command_responses',
+            body: req.body,
+            json: true
+            
+        }, function(error, response, body){
 
-	eventEmitter.emit('RESPONSE_'+commandID, responseParameters);
-	logger.info('Got response ' + commandID + ' from ' + remoteID + ' :' );
-	logger.info(JSON.stringify(responseParameters));
-	
-	res.send(200);
+            if (body) {
+                res.send(body);    
+            }
+            else {
+                res.send(500,{error:"star_coordinator does not successfully return the command info"});
+            }
+                    
+        });
+        
+    }
 };
 
 
