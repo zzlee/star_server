@@ -82,7 +82,25 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
                 });
             };
             
-            autoOrient();
+            var rotate = function(angle) {
+                gm( _fileToProcess )
+                .rotate('white', angle)
+                .write(fileAutoOrinted, function (err) {
+                    if (!err) {
+                        getSize();
+                    }
+                    else  {
+                        logger.info('[user_content_handler.rotate error=]'+err);
+                        res.send( {err:'Fail to rotate the image file: '+err } );
+                    }
+                });
+            };
+            
+            if(!_areaToCrop.rotate){
+                autoOrient();
+            }else{
+                rotate(_areaToCrop.rotate);    
+            }
             
         };
         
@@ -172,7 +190,8 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
             areaToCrop = {  x: req.body.croppedArea_x,
                             y: req.body.croppedArea_y,
                             width: req.body.croppedArea_width,
-                            height: req.body.croppedArea_height };
+                            height: req.body.croppedArea_height,
+                            rotate: req.body.croppedArea_rotate};
                                 
             resizeTo = { width: req.body.obj_OriginalWidth, height: req.body.obj_OriginalHeight};
             
