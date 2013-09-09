@@ -227,13 +227,13 @@ FM.DB = (function(){
         var MemberListInfoSchema = new Schema({
             fb: {type: Mixed},  //  Facebook, Carefull! don't use {type: [Mixed]}
             email: {type: String, default: 'xyz@feltmeng.com'},
-            mPhone: { number: String, verified: {type: Boolean, default: false}, code: String },
+            mPhone: {type: String},
             miixMovieVideo_count: {type: Number, min: 0, default: 0}, //已製作影片數
             doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH刊登次數
             movieViewed_count: {type: Number, min: 0, default: 0},    //影片觀看總次數
             fbLike_count: {type: Number, min: 0, default: 0},         //FB讚總數
             fbComment_count: {type: Number, min: 0, default: 0},      //FB留言總數
-            fbShare_count: {type: Number, min: 0, default: 0}         //FB分享次數
+            fbShare_count: {type: Number, min: 0, default: 0},         //FB分享次數
             
         }); //  memberListInfo collection
         
@@ -248,7 +248,9 @@ FM.DB = (function(){
             movieMaker: {type: String},                               //會員名稱
             applyDoohPlay_count: {type: Number, min: 0, default: 0},  //投稿次數
             doohPlay_count: {type: Number, min: 0, default: 0},       //DOOH刊登次數
-            timesOfPlaying: {type: Number}      
+            timesOfPlaying: {type: Number},
+            createdOn: {type: Date},
+            userContentType:{type: String} 
             
         }); //  miixPlayListInfo collection
         
@@ -259,7 +261,8 @@ FM.DB = (function(){
             fbLike_count: {type: Number, min: 0, default: 0},         //FB讚次數
             fbComment_count: {type: Number, min: 0, default: 0},      //FB留言數
             fbShare_count: {type: Number, min: 0, default: 0},        //FB分享次數
-            movieMaker: {type: String}                                //會員名稱
+            movieMaker: {type: String},                               //會員名稱
+            createdOn: {type: Date}
             
         }); //  storyPlayListInfo collection
         

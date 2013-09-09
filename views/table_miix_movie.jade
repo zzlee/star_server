@@ -27,8 +27,11 @@ form#mainform(action='')
             each movie, i in miixMovieList
                 if i%2
                     tr
-                      td
-                        img(src='#{movie.userPhotoUrl}', alt='', width='208')
+                      if(movie.userContentType == 'text')
+                         td #{movie.userPhotoUrl}     
+                      else 
+                         td
+                             img(src='#{movie.userPhotoUrl}', alt='', width='208')
                       td #{movie.movieNo}
                       td #{movie.movieViewedCount}
                       td #{movie.fbLikeCount}
@@ -43,8 +46,11 @@ form#mainform(action='')
 
                 else
                     tr.alternate-row
-                      td
-                        img(src='#{movie.userPhotoUrl}', alt='', width='208')
+                      if(movie.userContentType == 'text')
+                         td #{movie.userPhotoUrl}     
+                      else 
+                         td
+                             img(src='#{movie.userPhotoUrl}', alt='', width='208')
                       td #{movie.movieNo}
                       td #{movie.movieViewedCount}
                       td #{movie.fbLikeCount}

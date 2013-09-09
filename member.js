@@ -118,78 +118,91 @@ FM.MEMBER = (function(){
                 var likes_count = 0,
                     comments_count = 0,
                     shares_count = 0;
-                    
+                    debugger;
                 UGCDB.getUGCListOnFB(userID, function(err, UGCs){
+//                    console.log('UGCs'+UGCs);
                     if(err){
                          cb(err, null);
                          logger.error("[UGCDB.getUGCListOnFB] ", err);
                          
                     }else if(UGCs && UGCs.length > 0){
+//                        console.log('---UGCs---'+UGCs);
                         var async = require("async");
                         
                         FM.MEMBER.getInstance().getFBAccessTokenByFBId(userID, function(err, fb_auth){
                             if(err){
                                 logger.error("[getTotalLikesOnFB] ", err);
                                 cb(err, null);
-                                
+
                             }else if(fb_auth){
+                                
                                 var access_token = fb_auth.fb.auth.accessToken;
                                 var async = require("async");
-                                
-                                
+//                                console.log('access_token'+access_token+',userID'+userID);
+
                                 async.parallel([
-                                    function(callback){
-                                        var batch = [];
-                                        
-                                        for(var idx in UGCs){
-                                            var relative_url = UGCs[idx].fb_id + "?fields=comments,likes";
-                                            batch.push( {"method": "GET", "relative_url": relative_url} );
-                                        }
-                                        
-                                        fbMgr.batchRequestToFB(access_token, null, batch, function(err, result){
-                                            if(err){
-                                                callback(null, {totalLikes: likes_count, totalComments: comments_count});
-                                                
-                                            }else{
-												//console.log(JSON.stringify(result));
-                                                if (result) {
-                                                    for(var i in result){
-                                                    //console.log(result[i]);
-                                                    if (result[i].comments){
-                                                        comments_count += result[i].comments.count;
+                                                function(callback){
+                                                    var batch = [];
+                                                    
+                                                    for(var idx in UGCs){
+                                                        for(var _idx=0; _idx<UGCs[idx].fb_postId.length;_idx++){
+                                                            var relative_url = UGCs[idx].fb_postId[_idx].postId + "?fields=comments,likes,shares";
+//                                                            console.log('UGCs[idx].fb_postId[_idx].postId.length'+UGCs[idx].fb_postId[_idx].postId.length);
+                                                            if(UGCs[idx].fb_postId[_idx].postId){
+                                                                batch.push( {"method": "GET", "relative_url": relative_url} );
+                                                            }
+                                                        }
                                                     }
-                                                    
-                                                    
-                                                    // when count=0, there is no likes object.
-                                                    likes_count += (result[i].likes) ? result[i].likes.count : 0;
-                                                }
-                                                }
-                                                
-												callback(null, {totalLikes: likes_count, totalComments: comments_count} );
-                                            }
-                                        });
-                                    },
-                                    function(callback){
-                                        var batch = [];
-                                        
-                                        for(var idx in UGCs){
-                                            var relative_url = UGCs[idx].url.youtube;
-                                            batch.push( {"method": "GET", "relative_url": relative_url} );
-                                        }
-                                        
-                                        fbMgr.batchRequestToFB(access_token, null, batch, function(err, result){
-                                            if(err){
-                                                //callback(err, null);
-												callback(null, {totalShares: shares_count} );
-                                            }else{
-                                                for(var i in result){
-                                                    shares_count += (result[i].shares) ? result[i].shares: 0;
-                                                }
-												callback(null, {totalShares: shares_count} );
-                                            }
-                                        });
-                                    }
-                                ]
+//                                                    console.dir(batch);
+                                                    fbMgr.batchRequestToFB(access_token, null, batch, function(err, result){
+                                                        if(err){
+                                                            callback(null, {totalLikes: likes_count, totalComments: comments_count, totalShares: shares_count});
+                                                        }else if(!result){
+                                                            callback(null, {totalLikes: likes_count, totalComments: comments_count, totalShares: shares_count} );
+                                                        }else{
+                                                            if (result) {
+//                                                                console.log('result'+result);
+                                                                for(var i in result){
+                                                                    if(result[i]){
+                                                                    if (result[i].comments){
+                                                                        comments_count += result[i].comments.data.length;
+                                                                    }
+                                                                    // when count=0, there is no likes object.
+                                                                    if (result[i].likes){
+                                                                        likes_count += (result[i].likes) ? result[i].likes.count : 0;
+                                                                    }
+                                                                    if (result[i].shares){
+                                                                        shares_count += (result[i].shares) ? result[i].shares.count : 0;
+                                                                    }
+                                                                    }
+                                                                }
+                                                            }
+
+                                                            callback(null, {totalLikes: likes_count, totalComments: comments_count, totalShares: shares_count} );
+                                                        }
+                                                    });
+                                                },
+//                                              function(callback){
+//                                              var batch = [];
+
+//                                              for(var idx in UGCs){
+//                                              var relative_url = UGCs[idx].url.youtube;
+//                                              batch.push( {"method": "GET", "relative_url": relative_url} );
+//                                              }
+
+//                                              fbMgr.batchRequestToFB(access_token, null, batch, function(err, result){
+//                                              if(err){
+//                                              //callback(err, null);
+//                                              callback(null, {totalShares: shares_count} );
+//                                              }else{
+//                                              for(var i in result){
+//                                              shares_count += (result[i].shares) ? result[i].shares: 0;
+//                                              }
+//                                              callback(null, {totalShares: shares_count} );
+//                                              }
+//                                              });
+//                                              }
+                                                ]
                                 , function(err, result){
                                     if(err){
                                         cb(err, null);
@@ -197,12 +210,16 @@ FM.MEMBER = (function(){
                                         cb(null, result);
                                     }
                                 });
+                            }else{
+                                logger.info("[member.js getCommentsLikesSharesOnFB] fb_auth is null. owner_id="+owner_id);
+                                cb(null, [{totalLikes: likes_count, totalComments: comments_count, totalShares: shares_count}]);
                             }
                         });
                         
                         
                     }else{
-                        cb(null, [{totalLikes: likes_count, totalComments: comments_count}, {totalShares: shares_count}]);
+//                        cb(null, [{totalLikes: likes_count, totalComments: comments_count}, {totalShares: shares_count}]);
+                        cb(null, [{totalLikes: likes_count, totalComments: comments_count, totalShares: shares_count}]);
                     }
                 });
             },
@@ -268,8 +285,21 @@ FM.MEMBER = (function(){
                 });
             },
             
+            getTotalCommentsLikesShares: function( memberId, cbOfGetTotalCommentsLikesShares ){
+                var likes_count = 0,
+                comments_count = 0,
+                shares_count = 0;
+                
+                UGCDB.getUGCListByOwnerId(memberId, null, 0, function(err, ugcList){
+                    console.log(err, ugcList);
+                    if (!err) {
+                        
+                    }
+                    else {
+                    }
+                });
             
-            
+            },
             
             /*    TEST    */
             _test: function(){
@@ -363,5 +393,6 @@ FM.MEMBER = (function(){
 //FM.MEMBER.getInstance()._test();
 //FM.MEMBER.getInstance()._JF_test();
 //FM.MEMBER.getInstance()._GZ_test();
+//FM.MEMBER.getInstance().getTotalCommentsLikesShares("52201b3999f24f9809000006",null);
 
 module.exports = FM.MEMBER.getInstance();
