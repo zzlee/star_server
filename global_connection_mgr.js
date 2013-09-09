@@ -2,6 +2,7 @@ var FM = {};
 var DEBUG = true,
     FM_LOG = (DEBUG) ? function(str){ logger.info(str); } : function(str){} ;
     
+var request = require("request");
 var connectionHandler = require('./routes/connection_handler.js');
 
 FM.globalConnectionMgr = (function(){
@@ -21,23 +22,43 @@ FM.globalConnectionMgr = (function(){
                 delete connectedRemotes[remoteID];
             },
             
-            getConnectedRemotes: function(type){
-                var result = new Array();
-                //console.log('total connections');
-                
-                for (anId in connectedRemotes){
-                    //console.log('%s %s', anId, connectedRemotes[anId]);
-                    if (type){
-                        if (connectedRemotes[anId]==type){
+            getConnectedRemotes: function(type, cb){
+                if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
+                    var result = new Array();
+                    //console.log('total connections');
+                    
+                    for (anId in connectedRemotes){
+                        //console.log('%s %s', anId, connectedRemotes[anId]);
+                        if (type){
+                            if (connectedRemotes[anId]==type){
+                                result.push(anId);
+                            }                        
+                        }
+                        else { //push all the items in connectedRemotes
                             result.push(anId);
-                        }                        
+                        }
                     }
-                    else { //push all the items in connectedRemotes
-                        result.push(anId);
-                    }
+                    
+                    cb(null, result);
                 }
-                
-                return result;
+                else { //TODO: star_server has multiple instances (due to auto-scale of AWS)
+                    request({
+                        method: 'GET',
+                        uri: config.HOST_STAR_COORDINATOR_URL + '/internal/connected_remotes',
+                        qs: {"type": type},
+                        json: true
+                        
+                    }, function(error, response, body){
+
+                        if (body) {
+                            cb(null, body.connectedRemotes);    
+                        }
+                        else {
+                            cb("Failed to get connected remotes from star_coordinator: "+error, null);  //TODO: check the content of error parameters
+                        }
+                                
+                    });
+                }
             },
             
             isConnectedTo: function(remoteID){
@@ -50,7 +71,12 @@ FM.globalConnectionMgr = (function(){
             },
             
             sendRequestToRemote: function( targetedRemoteID, reqToRemote, cb ) {
-                connectionHandler.sendRequestToRemote( targetedRemoteID, reqToRemote, cb );
+                if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
+                    connectionHandler.sendRequestToRemote( targetedRemoteID, reqToRemote, cb );
+                }
+                else { //TODO: star_server has multiple instances (due to auto-scale of AWS)
+                    
+                }
             }
             
                 

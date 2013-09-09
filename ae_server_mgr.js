@@ -73,38 +73,51 @@ aeServerMgr.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, 
 
 };
 
-var getAeServerWithLowestLoad = function(got_cb){
+//TODO: Have AE Servers report server load when it connects to Main Server
+var getAeServerWithLowestLoad = function(cbOfGetAeServerWithLowestLoad){
     
-    var connectedAeServers = globalConnectionMgr.getConnectedRemotes('AE_SERVER');
-    var connectedAeServerWithLowestLoad = null;
-    var lowestLoadIndex =-1;
-    
-    
-    var iteratorGetAeServerLoadIndex = function(aeServerToAsk, interationDone_cb){
-        globalConnectionMgr.sendRequestToRemote( aeServerToAsk, { command: "GET_LOAD_INDEX", parameters: null }, function(responseParameters) {
-
-            if ((responseParameters.load_index < lowestLoadIndex) || (lowestLoadIndex == -1) ){
-                lowestLoadIndex = responseParameters.load_index;
-                connectedAeServerWithLowestLoad = aeServerToAsk;
-            }
+    //var connectedAeServers = globalConnectionMgr.getConnectedRemotes('AE_SERVER');
+    globalConnectionMgr.getConnectedRemotes('AE_SERVER', function(errOfGetConnectedRemotes, result){
+        if (!errOfGetConnectedRemotes){
+            var connectedAeServers = result;
+            var connectedAeServerWithLowestLoad = null;
+            var lowestLoadIndex =-1;
             
-            interationDone_cb();
-        });
-    };
-    
-    async.each(connectedAeServers, iteratorGetAeServerLoadIndex, function(err){
-        if (!err) {
-            if (got_cb){
-                got_cb(connectedAeServerWithLowestLoad, null);
+            
+            var iteratorGetAeServerLoadIndex = function(aeServerToAsk, interationDone_cb){
+                globalConnectionMgr.sendRequestToRemote( aeServerToAsk, { command: "GET_LOAD_INDEX", parameters: null }, function(responseParameters) {
+
+                    if ((responseParameters.load_index < lowestLoadIndex) || (lowestLoadIndex == -1) ){
+                        lowestLoadIndex = responseParameters.load_index;
+                        connectedAeServerWithLowestLoad = aeServerToAsk;
+                    }
+                    
+                    interationDone_cb();
+                });
+            };
+            
+            async.each(connectedAeServers, iteratorGetAeServerLoadIndex, function(err){
+                if (!err) {
+                    if (cbOfGetAeServerWithLowestLoad){
+                        cbOfGetAeServerWithLowestLoad(connectedAeServerWithLowestLoad, null);
+                    }
+                }
+                else{
+                    if (cbOfGetAeServerWithLowestLoad){
+                        cbOfGetAeServerWithLowestLoad(null, err);
+                    }
+                }
+                
+            });
+
+        }
+        else {
+            if (cbOfGetAeServerWithLowestLoad){
+                cbOfGetAeServerWithLowestLoad(null, "Failed to get connected remotes: "+errOfGetConnectedRemotes);
             }
         }
-        else{
-            if (got_cb){
-                got_cb(null, err);
-            }
-        }
-        
     });
+    
     
 };
 
