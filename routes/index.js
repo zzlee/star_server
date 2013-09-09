@@ -12,8 +12,10 @@ exports.uploadUserContentFile_cb = userContentHandler.uploadUserContentFile_cb;
 exports.uploadUserDataInfo_cb = userContentHandler.uploadUserDataInfo_cb;
 
 var connectionHandler = require('./connection_handler.js');
-exports.commandResponse_post_cb = connectionHandler.commandResponse_post_cb;
-exports.command_get_cb = connectionHandler.command_get_cb;
+exports.connectionHandler = connectionHandler;
+//exports.commandResponse_post_cb = connectionHandler.commandResponse_post_cb;
+//exports.command_get_cb = connectionHandler.command_get_cb;
+
 
 var storyCamControllerHandler = require('./story_cam_controller_handler.js');
 exports.storyCamControllerHandler = storyCamControllerHandler;

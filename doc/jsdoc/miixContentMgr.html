@@ -64,7 +64,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line21">line 21</a>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line27">line 27</a>
     </li></ul></dd>
     
     
@@ -98,7 +98,7 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="addMiixImage"><span class="type-signature">&lt;static> </span>addMiixImage<span class="signature">(imgBase64, ugcProjectID, ownerId, title)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="addMiixImage"><span class="type-signature">&lt;static> </span>addMiixImage<span class="signature">(imgBase64, ugcProjectID, ugcInfo, cbOfAddMiixImage)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -186,7 +186,7 @@
 	
         <tr>
             
-                <td class="name"><code>ownerId</code></td>
+                <td class="name"><code>ugcInfo</code></td>
             
             
             <td class="type">
@@ -202,20 +202,20 @@
             
             
             
-            <td class="description last">An object containing owner's id info:    <ul>    <li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)    <li>fbId: owner's Facebook ID    </ul></td>
+            <td class="description last">An object containing UGC info:    <ul>    <li>ownerId: ownerId An object containing owner's id info:        <ul>                                                                                     <li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)        <li>fbUserId: owner's Facebook user ID                                                            </ul>                                                                                <li>contentGenre: it is normally the template (id) that this UGC uses    <li>title: title of UGC     </ul></td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>title</code></td>
+                <td class="name"><code>cbOfAddMiixImage</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Function</span>
 
 
             
@@ -225,7 +225,7 @@
             
             
             
-            <td class="description last">Tile of UGC</td>
+            <td class="description last">Callback function called when adding operation is done</td>
         </tr>
 	
 	
@@ -256,7 +256,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line128">line 128</a>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line323">line 323</a>
     </li></ul></dd>
     
     
@@ -442,7 +442,147 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line32">line 32</a>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line38">line 38</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="getUgcHighlights"><span class="type-signature">&lt;static> </span>getUgcHighlights<span class="signature">(limit, cbOfGetUgcHighlights)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Retrieve the latest highlights of UGCs.<br>
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>limit</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The number of UGC highlights to retrieve</td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>cbOfGetUgcHighlights</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">The callback function called when finishing retrieving. It has the following signature:<br>    cbOfGetUgcHighlights(err, ugcHighlightList)</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line571">line 571</a>
     </li></ul></dd>
     
     
@@ -582,7 +722,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line138">line 138</a>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line524">line 524</a>
     </li></ul></dd>
     
     
@@ -610,7 +750,7 @@
         
             
 <dt>
-    <h4 class="name" id="preAddMiixMovie"><span class="type-signature">&lt;static> </span>preAddMiixMovie<span class="signature">(doohID, miixMovieProjectID)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="preAddMiixMovie"><span class="type-signature">&lt;static> </span>preAddMiixMovie<span class="signature">(ugcProjectID, ugcInfo, cbOfPreAddMiixMovie)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -618,7 +758,7 @@
     
     
     <div class="description">
-        Add some info some preliminary info of Miix movie to UGC db while AE is rending its concrete content.<br>  <br>These info are for clinet side to show some dummy icon for Miix movie which is under rendering
+        Add some info some preliminary info of Miix movie to UGC db and ask AE Server to render Miix video.<br>  <br>These info are for clinet side to show some dummy icon for Miix movie which is under rendering
     </div>
     
 
@@ -652,7 +792,7 @@
 	
         <tr>
             
-                <td class="name"><code>doohID</code></td>
+                <td class="name"><code>ugcProjectID</code></td>
             
             
             <td class="type">
@@ -668,20 +808,20 @@
             
             
             
-            <td class="description last"></td>
+            <td class="description last">Project ID of this UGC</td>
         </tr>
 	
 	
 	
         <tr>
             
-                <td class="name"><code>miixMovieProjectID</code></td>
+                <td class="name"><code>ugcInfo</code></td>
             
             
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
 
 
             
@@ -691,7 +831,30 @@
             
             
             
-            <td class="description last"></td>
+            <td class="description last">An object containing UGC info:    <ul>    <li>ownerId: ownerId An object containing owner's id info:        <ul>                                                                                     <li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)        <li>fbUserId: owner's Facebook user ID                                                            </ul>                                                                                <li>contentGenre: it is normally the template (id) that this UGC uses    <li>customizableObjects: an array of objects describing the customizable objects    <li>title: title of UGC. This title will be used when it is posted on YouTube    </ul></td>
+        </tr>
+	
+	
+	
+        <tr>
+            
+                <td class="name"><code>cbOfPreAddMiixMovie</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">Function</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">Callback function called when adding operation is done</td>
         </tr>
 	
 	
@@ -722,7 +885,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line109">line 109</a>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line127">line 127</a>
     </li></ul></dd>
     
     
@@ -864,7 +1027,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line81">line 81</a>
+        <a href="miix_content_mgr.js.html">miix_content_mgr.js</a>, <a href="miix_content_mgr.js.html#line88">line 88</a>
     </li></ul></dd>
     
     
@@ -905,13 +1068,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Namespaces</h3><ul><li><a href="miix.html">miix</a></li><li><a href="miix_admin.html">miix_admin</a></li></ul><h3>Mixins</h3><ul><li><a href="customerServiceMgr.html">customerServiceMgr</a></li><li><a href="miixContentMgr.html">miixContentMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Namespaces</h3><ul><li><a href="miix.html">miix</a></li><li><a href="miix_admin.html">miix_admin</a></li><li><a href="miix_service.html">miix_service</a></li></ul><h3>Mixins</h3><ul><li><a href="miixContentMgr.html">miixContentMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li><li><a href="serviceMgr.html">serviceMgr</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Thu Jul 18 2013 16:38:19 GMT+0800 (TST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Sep 06 2013 12:28:16 GMT+0800 (TST)
 </footer>
 
 <script> prettyPrint(); </script>
