@@ -268,6 +268,85 @@ FM.facebookMgr = (function(){
                 });
             },
             
+            //JF
+            postPhoto : function(access_token, message, img_url, album_id, cb){
+                if(typeof(album_id) === 'undefined'){
+                    cb = album_id;
+                    album_id = 'me';
+                }
+                var url = 'https://graph.facebook.com/' + album_id + '/photos?access_token=' + access_token;
+                var params =
+                {
+                    access_token: access_token,
+                    message: message,
+                    url: img_url,
+                };
+                request.post({url: url, qs: params}, function(err, resp, body) {
+      
+                    // Handle any errors that occur
+                    
+                    if (err) return console.error("Error occured: ", err);
+                    body = JSON.parse(body);
+                    if (body.error) return console.error("Error returned from facebook: ", body.error);
+                    
+                    var result = JSON.stringify(body);
+                    if (cb){
+                        cb(err, result);
+                    }
+                });
+            },
+            
+            createAlbum : function(access_token, album_name, message, cb){
+                var url = 'https://graph.facebook.com/me/albums?access_token=' + access_token;
+                var params =
+                {
+                    access_token: access_token,
+                    message: message,
+                    name: album_name,
+                };
+                request.post({url: url, qs: params}, function(err, resp, body) {
+      
+                    // Handle any errors that occur
+                    
+                    if (err) return console.error("Error occured: ", err);
+                    body = JSON.parse(body);
+                    if (body.error) return console.error("Error returned from facebook: ", body.error);
+                    
+                    var result = JSON.stringify(body);
+                    if (cb){
+                        cb(err, result);
+                    }
+                });
+            },
+            
+            postMessageAndShare : function(access_token, message, share_option, cb ) {
+
+                // Specify the URL and query string parameters needed for the request
+                var url = 'https://graph.facebook.com/me/feed?access_token=' + access_token;
+                var params = {
+                    access_token: access_token,
+                    message: message,
+                    name: (!share_option.name)?'':share_option.name, 
+                    picture: (!share_option.img_url)?'':share_option.img_url,
+                    link: (!share_option.link)?'':share_option.link,  // Go here if user click the picture
+                    description: (!share_option.description)?'':share_option.description 
+                };
+            	// Send the request
+                request.post({url: url, qs: params}, function(err, resp, body) {
+                  
+					// Handle any errors that occur
+					
+					if (err) return console.error("Error occured: ", err);
+					body = JSON.parse(body);
+					if (body.error) return console.error("Error returned from facebook: ", body.error);
+					
+					var result = JSON.stringify(body);
+					if (cb){
+					    cb(err, result);
+					}
+                });
+            },
+            
             //TODO: need to verify
             postOnFeed: function(fb_id, message, cb){
                 if(!fb_id || !message){

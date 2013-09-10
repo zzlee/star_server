@@ -13,21 +13,26 @@ var fs = require('fs'),
     request = require('request');
 var async = require('async');
 var awsS3 = require('../aws_s3.js');
+var facebookMgr = require('./facebook_mgr.js');
+var pushMgr = require('./push_mgr.js');
 var db = require('../db.js');
 var UGCDB = require(process.cwd()+'/ugc.js');
 var programTimeSlotModel = db.getDocModel("programTimeSlot");
 var ugcModel = db.getDocModel("ugc");
+var memberModel = db.getDocModel("member");
 var execFile = require('child_process').execFile;
+var recordTime = '';
 var savePath = '';
 var fileList = [];
 var ownerList = [];
 var awsS3List = [];
+var doohPreviewList = [];
     
 //POST /internal/story_cam_controller/available_story_movie
 FM.storyCamControllerHandler.availableStoryMovie_post_cb = function(req, res) {
 
     if ( req.headers.miix_movie_project_id ) {
-        storyContentMgr.generateStoryMV( req.headers.miix_movie_project_id );
+        storyContentMgr.generateStoryMV( req.headers.miix_movie_project_id, req.headers.record_time );
         res.send(200);
     }
 	else {
@@ -40,7 +45,7 @@ FM.storyCamControllerHandler.availableStreetMovies = function(req, res){
 
     logger.info('get story cam report: ' + req.params.playTime);
     
-    var recordTime = req.params.playTime;
+    recordTime = req.params.playTime;
     
     async.waterfall([
         //step.1 : get video file by aws s3
@@ -107,7 +112,7 @@ FM.storyCamControllerHandler.availableStreetMovies = function(req, res){
                 projectId = projectId[projectId.length-1].split('__');
                 //callback(null, type, 'done');
                 var url = 'http://127.0.0.1/internal/story_cam_controller/available_story_movie';
-                var headers = { 'miix_movie_project_id' : projectId };
+                var headers = { 'miix_movie_project_id' : projectId, 'record_time' : recordTime };
                 request.post({ url: url, headers: headers }, function (e, r, body) {
                     callback(null, type, 'done');
                 });
@@ -130,6 +135,7 @@ FM.storyCamControllerHandler.availableStreetMovies = function(req, res){
         fileList = [];
         ownerList = [];
         awsS3List = [];
+        doohPreviewList = [];
     });
     
     res.end();
@@ -217,6 +223,7 @@ var imageNaming = function(ugcInfo, naming_cb){
     ugcModel.find({"_id": ugcInfo.content._id}).exec(function (_err, result) {
         //console.log(result[0].ownerId._id);
         ownerList.push(result[0].ownerId);
+        doohPreviewList.push({ doohPreviewUrl: result[0].doohPreviewUrl, url: result[0].url });
         name = ugcInfo.contentGenre + '-' + 
                result[0].ownerId._id + '-' + 
                ugcInfo.timeStamp + '.jpg';
@@ -266,12 +273,25 @@ var updateToUGC = function(updateUGC_cb){
             'genre': 'miix_image_live_photo',
             'projectId': projectId[0]
         };
-        UGCDB.addUGC(vjson, function(err, result){
-            //if(err) console.log(err);
-            //else console.log(result);
-            //if(!err) fmapi._fbPostUGCThenAdd(vjson);
-            i++;
-            (i < ownerList.length)?update():updateUGC_cb(null, 'done');
+        var photoUrl = 
+        {
+            preview: doohPreviewList.url,
+            simulate: doohPreviewList.doohPreviewUrl,
+            play: awsS3List[i]
+        };
+        postMessageAndPicture(ownerList[i].userID, photoUrl, function(err, res){
+            if(err)
+                logger.info('Post message and pictrue to user is Error: ' + err);
+            else
+                logger.info('Post message and pictrue to user is Success: ' + res);
+                
+            UGCDB.addUGC(vjson, function(err, result){
+                //if(err) console.log(err);
+                //else console.log(result);
+                //if(!err) fmapi._fbPostUGCThenAdd(vjson);
+                i++;
+                (i < ownerList.length)?update():updateUGC_cb(null, 'done');
+            });
         });
     };
     update();
@@ -314,7 +334,7 @@ var uploadVideoToAwsS3 = function(programInterval, awsS3_cb){
         ugcModel.find({"_id": contentId}).exec(function (_err, result) {
             var name = result[0].projectId + '__story.avi';
             s3Path = '/user_project/' + result[0].projectId + '/' + name;
-            awsS3List.push(s3Path);
+            awsS3List.push('https://s3.amazonaws.com/miix_content' + s3Path);
             awsS3.uploadToAwsS3(fileList[0], s3Path, 'video/x-msvideo', function(err,result){
                 if (!err){
                     logger.info('Live content video was successfully uploaded to S3 '+s3Path);
@@ -360,6 +380,58 @@ var updateVideoToUGC = function(programInterval, updateVideoToUGC_cb){
         if(programInterval.list[i].type == 'UGC')
             update(programInterval.list[i].content._id);
     }
+};
+
+var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
+    
+    var access_token;
+    var fb_name, message, playTime, start, link;
+    
+    var pushPhotosToUser = function(albumId, pushPhotos_cb){
+        async.parallel([
+            /*function(simulate){
+                message = fb_name + '於' + playTime + '，登上台北天幕LED，上大螢幕APP特此感謝他精采的作品！\n' + 
+                          '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
+                facebookMgr.postPhoto(access_token, message, photoUrl.simulate, albumId, simulate);
+            },*/
+            function(preview){
+                message = fb_name + '於' + playTime + '，登上台北天幕LED，，這是原始刊登素材，天幕尺寸：100公尺x16公尺。\n' + 
+                          '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
+                facebookMgr.postPhoto(access_token, message, photoUrl.preview, albumId, preview);
+            },
+            function(play){
+                message = fb_name + '於' + playTime + '，登上台北天幕LED，特此感謝他精采的作品！\n' + 
+                          '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
+                facebookMgr.postPhoto(access_token, message, photoUrl.play, albumId, play);
+            },
+        ], function(err, res){
+            //(err)?console.log(err):console.dir(res);
+            if(!err)
+                pushPhotos_cb(null, 'done');
+            else
+                pushPhotos_cb(err, null);
+        });
+    };
+    //
+    async.waterfall([
+        function(memberSearch){
+            memberModel.find({'fb.userID': fb_id}).exec(memberSearch);
+        },
+    ], function(err, member){
+        access_token = member[0].fb.auth.accessToken;
+        fb_name = member[0].fb.userName;
+        start = new Date(recordTime);
+        if(start.getHours()>12)
+            playTime = start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日下午'+(start.getHours()-12)+':'+start.getMinutes();
+        else
+            playTime = start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日上午'+start.getHours()+':'+start.getMinutes();
+        
+        var album_name = '實況記錄：' + start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日' + '登上台北天幕LED';
+        var album_message = '';
+        facebookMgr.createAlbum(access_token, album_name, album_message, function(err, res){
+            pushPhotosToUser(JSON.parse(res).id, postPicture_cb);
+        });
+    });
 };
 
 module.exports = FM.storyCamControllerHandler;
