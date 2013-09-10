@@ -92,7 +92,7 @@ miixContentMgr.submitMiixMovieToDooh = function( doohID, miixMovieProjectID ) {
             var miixMovieFileExtension = result.fileExtension;
             doohMgr.downloadMovieFromS3(miixMovieProjectID, miixMovieFileExtension,  function(resParametes){
                 logger.info('downloading Miix movie from S3.');
-                logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+                logger.info('res: _commandId='+resParametes._commandId+' err='+resParametes.err);
                 
             }); 
         }                              

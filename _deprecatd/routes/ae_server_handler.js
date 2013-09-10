@@ -41,7 +41,7 @@ aeServerHandler.reportRenderingResult_cb = function(req, res) {
 
 aeServerHandler.commandResponse_cb = function(req, res) {
 
-	var commandID = req.headers._command_id;
+	var commandID = req.headers._commandId;
 	var responseParameters = req.headers
 
 	eventEmitter.emit('RESPONSE_'+commandID, responseParameters);

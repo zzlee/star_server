@@ -28,6 +28,8 @@ FM.confuguration = (function(){
                     resultObj.HOST_STAR_COORDINATOR_URL = systemConfigXML.HOST_STAR_COORDINATOR_URL[0];
                 if (systemConfigXML.IS_STAND_ALONE)
                     resultObj.IS_STAND_ALONE = systemConfigXML.IS_STAND_ALONE[0];
+                if (systemConfigXML.DEFAULT_AE_SERVER)
+                    resultObj.DEFAULT_AE_SERVER = systemConfigXML.DEFAULT_AE_SERVER[0];
                 constructed_cb(resultObj);
             }
             else{

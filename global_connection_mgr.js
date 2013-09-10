@@ -12,9 +12,9 @@ FM.globalConnectionMgr = (function(){
     function constructor(){
         //the methods exposed to public
         var _this = {
-            addConnection: function(remoteID, type){
+            addConnection: function(remoteID, type, load){
                 //console.log('%s is connected! [type=%s]', remoteID, type);
-                connectedRemotes[remoteID] = type;
+                connectedRemotes[remoteID] = {type: type, load: load};
             },
             
             removeConnection: function(remoteID){
@@ -22,7 +22,7 @@ FM.globalConnectionMgr = (function(){
                 delete connectedRemotes[remoteID];
             },
             
-            getConnectedRemotes: function(type, cb){
+            getConnectedRemotes: function(type, cb){ //deprecated
                 if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
                     var result = new Array();
                     //console.log('total connections');
@@ -30,7 +30,7 @@ FM.globalConnectionMgr = (function(){
                     for (anId in connectedRemotes){
                         //console.log('%s %s', anId, connectedRemotes[anId]);
                         if (type){
-                            if (connectedRemotes[anId]==type){
+                            if (connectedRemotes[anId].type==type){
                                 result.push(anId);
                             }                        
                         }
@@ -41,7 +41,7 @@ FM.globalConnectionMgr = (function(){
                     
                     cb(null, result);
                 }
-                else { //TODO: star_server has multiple instances (due to auto-scale of AWS)
+                else { //TODO: star_server has multiple instances (due to auto-scale of AWS).  This section of code is NOT verified yet. 
                     request({
                         method: 'GET',
                         uri: config.HOST_STAR_COORDINATOR_URL + '/internal/connected_remotes',
@@ -58,6 +58,33 @@ FM.globalConnectionMgr = (function(){
                         }
                                 
                     });
+                }
+            },
+            
+            getConnectedRemoteWithLowestLoad: function(type, cbOfGetConnectedRemoteWithLowestLoad){
+                debugger;
+                if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
+                    for (anId in connectedRemotes){
+                        var lowestLoadIndex = 1000000;
+                        var connectedRemoteWithLowestLoad = null;
+                        //console.log('%s %s', anId, connectedRemotes[anId]);
+                        if (type){
+                            if (connectedRemotes[anId].type==type){
+                                if (connectedRemotes[anId].load < lowestLoadIndex ) {
+                                    lowestLoadIndex = connectedRemotes[anId].load;
+                                    connectedRemoteWithLowestLoad = anId;
+                                }
+                            }                        
+                        }
+                        else { 
+                            cbOfGetConnectedRemoteWithLowestLoad('Parameter "type" is not specified.', null);
+                        }
+                    }
+                    
+                    cbOfGetConnectedRemoteWithLowestLoad(null, connectedRemoteWithLowestLoad);
+                }
+                else { //TODO: star_server has multiple instances (due to auto-scale of AWS)
+                    
                 }
             },
             

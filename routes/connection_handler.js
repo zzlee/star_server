@@ -33,7 +33,7 @@ connectionHandler.sendRequestToRemote = function( targetID, reqToRemote, cb ) {
 connectionHandler.commandResponse_post_cb = function(req, res) {
 
     if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
-        var commandID = req.body._command_id;
+        var commandID = req.body._commandId;
         var remoteID = req.body._remote_id;
         var responseParameters = req.body;
         
@@ -67,11 +67,9 @@ connectionHandler.commandResponse_post_cb = function(req, res) {
 
 //GET /internal/commands
 connectionHandler.command_get_cb = function(req, res) {
-	logger.info('['+ new Date() +']Got long-polling from remote: '+ req.query.remote_id );
-	//console.log('['+ new Date() +']Got long-polling HTTP request from remote: '+ req.query.remote_id )
+	logger.info('['+ new Date() +']Got long-polling from remote: '+ req.query.remoteId );
+	//console.log('['+ new Date() +']Got long-polling HTTP request from remote: '+ req.query.remoteId )
 	//console.dir(req);
-	
-	debugger;
 	
 	if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
         var messageToRemote = {};
@@ -82,27 +80,26 @@ connectionHandler.command_get_cb = function(req, res) {
             messageToRemote.type = "COMMAND";
             messageToRemote.body = reqToRemote;
             res.send(messageToRemote);
-            globalConnectionMgr.removeConnection(req.query.remote_id);
+            globalConnectionMgr.removeConnection(req.query.remoteId);
         };
 
-        globalConnectionMgr.addConnection(req.query.remote_id,
-                req.query.remote_type);
+        globalConnectionMgr.addConnection(req.query.remoteId, req.query.remoteType, req.query.remoteLoad);
 
         var timer = setTimeout(function() {
-            eventEmitter.removeListener('COMMAND_' + req.query.remote_id,
+            eventEmitter.removeListener('COMMAND_' + req.query.remoteId,
                     callback);
             messageToRemote.type = "LONG_POLLING_TIMEOUT";
             messageToRemote.body = null;
             res.send(messageToRemote);
-            globalConnectionMgr.removeConnection(req.query.remote_id);
+            globalConnectionMgr.removeConnection(req.query.remoteId);
         }, 60000);
         // }, 5000);
 
-        eventEmitter.once('COMMAND_' + req.query.remote_id, callback);
-        if (requestsToRemote[req.query.remote_id]) {
-            if (requestsToRemote[req.query.remote_id].length > 0) {
-                eventEmitter.emit('COMMAND_' + req.query.remote_id,
-                        requestsToRemote[req.query.remote_id].shift());
+        eventEmitter.once('COMMAND_' + req.query.remoteId, callback);
+        if (requestsToRemote[req.query.remoteId]) {
+            if (requestsToRemote[req.query.remoteId].length > 0) {
+                eventEmitter.emit('COMMAND_' + req.query.remoteId,
+                        requestsToRemote[req.query.remoteId].shift());
             }
         }
 
