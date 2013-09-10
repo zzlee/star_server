@@ -112,8 +112,17 @@ FM.pushMgr = (function() {
                      if(result.deviceToken){
                          FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
                          for( var devicePlatform in result.deviceToken){
-                             if(result.deviceToken[devicePlatform]){
+                             var deviceTokenCheck = result.deviceToken[devicePlatform];
+                             if(!deviceTokenCheck){
+                                 FM_LOG("[push_mgr]deviceToken is null" + JSON.stringify(result.deviceToken)+"memberId="+memberId ); 
+                             }
+                             else if(deviceTokenCheck == "undefined"){
+                                 FM_LOG("[push_mgr]deviceToken is undefined" + JSON.stringify(result.deviceToken)+"memberId="+memberId ); 
+                             }
+                             else if(deviceTokenCheck){
                                  FM.pushMgr.getInstance().sendMessageToDevice(devicePlatform, result.deviceToken[devicePlatform], message);
+                             }else{
+                                 FM_LOG("[push_mgr]deviceToken error" + JSON.stringify(result.deviceToken)+"memberId="+memberId );
                              }
                          }
                          cbOfSendMessageToDeviceByMemberId(err, "Push Successful");

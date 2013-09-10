@@ -29,7 +29,6 @@ var memberModel = db.getDocModel("member");
  * @mixin
  */
 var scheduleMgr = {};
-var STAR_SERVER_URL = "http://192.168.5.188";  //TODO: make this configurable? 
 var DEFAULT_PROGRAM_PERIOD = 10*60*1000; //10 min
 var DEFAULT_PLAY_DURATION_FOR_STATIC_UGC = 7*1000; //7 sec.  
 var DEFAULT_PLAY_DURATION_FOR_STATIC_PADDING = 2*1000; //2 sec.   

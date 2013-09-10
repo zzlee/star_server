@@ -64,7 +64,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line258">line 258</a>
+        <a href="api_miix_admin.js.html">restful_api/api_miix_admin.js</a>, <a href="api_miix_admin.js.html#line4">line 4</a>
     </li></ul></dd>
     
     
@@ -94,60 +94,6 @@
         <h3 class="subsection-title">Members</h3>
         
         <dl>
-            
-<dt>
-    <h4 class="name" id="GET /members/:memberId/questions"><span class="type-signature">&lt;static> </span>GET /members/:memberId/questions<span class="type-signature"></span></h4>
-    
-    
-</dt>
-<dd>
-    
-    <div class="description">
-        Get the questions of a specific member<br><h5>Path parameters</h5><ul><li>memberId: Member ID (_id with hex string)</ul><h5>Query parameters</h5>None<h5>Request body</h5>None<h5>Response body</h5>An array of objects containing the following members:<ul><li>_id: member ID (_id of 24 character hex string)<li>ugcReferenceNo: reference number for this UGC<li>genre: string indicating the question genre. It is of one of the following values: "acount", "login", or "verification"<li>question: an object containing the following members:    <ul>    <li>description: the description of the question    <li>date: its issue date (the number of milliseconds since midnight Jan 1, 1970)    </ul><li>answer: an object containing the following members:    <ul>    <li>description: the description of the answer    <li>date: its issue date (the number of milliseconds since midnight Jan 1, 1970)    </ul></ul>For example, <br>[{_id: '51d837f6830459c42d000023', ugcReferenceNo: 234, genre: 'acount', question:{description:'我忘記了我FB帳號的密碼', date: 1371862000000}, answer:{description:'請至Facebook官網(www.facebook.com)新設定', date: 1371962000000} } <br> {_id: '51d837f6830459c42d000023', ugcReferenceNo: 256, genre: 'login', question:{description:'我的帳號登不進去', date: 1371862000000}, answer:{description:'請確認您有出現faceboo授權頁面嗎', date: 1371892000000} }, <br>                  {_id: '51d837f6830459c42d000023', ugcReferenceNo: 314, genre: 'verification', question:{description:'我無法通迥認證', date: 1471862000000}, answer:{description:'請確認您有收到認證簡訊', date: 1471962000000} }];
-    </div>
-    
-    
-    
-
-    
-<dl class="details">
-    
-        
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line312">line 312</a>
-    </li></ul></dd>
-    
-    
-    
-    
-    
-    
-    
-</dl>
-
-    
-    
-</dd>
-
-        
             
 <dt>
     <h4 class="name" id="GET /miix_admin/doohs/:doohId/timeslots"><span class="type-signature">&lt;static> </span>GET /miix_admin/doohs/:doohId/timeslots<span class="type-signature"></span></h4>
@@ -186,7 +132,61 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line474">line 474</a>
+        <a href="api_miix_admin.js.html">restful_api/api_miix_admin.js</a>, <a href="api_miix_admin.js.html#line130">line 130</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="GET /miix_admin/sessions/:sessionId"><span class="type-signature">&lt;static> </span>GET /miix_admin/sessions/:sessionId<span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        Get a list of session items<br><h5>Path parameters</h5><ul><li>sessionId: The id indicating the session of creating program time slot.</ul><h5>Query parameters</h5><ul><li>skip: The number decide that first query.<li>limit: The number decide that limit of query.<li>token: authorization.<li>condition: The json decide that query codition.</ul><h5>Request body</h5>An array of objects containing the following members:<ul><li>_id: session ID with 24 byte hex string<li>dooh: <li>sessionId: <li>intervalOfSelectingUGC: <li>intervalOfPlanningDoohProgrames: <li>programSequence: <li>pushProgramsTime: </ul><h5>Response body</h5>
+    </div>
+    
+    
+    
+
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api_miix_admin.js.html">restful_api/api_miix_admin.js</a>, <a href="api_miix_admin.js.html#line228">line 228</a>
     </li></ul></dd>
     
     
@@ -240,7 +240,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line368">line 368</a>
+        <a href="api_miix_admin.js.html">restful_api/api_miix_admin.js</a>, <a href="api_miix_admin.js.html#line23">line 23</a>
     </li></ul></dd>
     
     
@@ -258,14 +258,14 @@
         
             
 <dt>
-    <h4 class="name" id="POST /miix_admin/doohs/:doohId/timeslots"><span class="type-signature">&lt;static> </span>POST /miix_admin/doohs/:doohId/timeslots<span class="type-signature"></span></h4>
+    <h4 class="name" id="GET /miix_admin/user_content_items"><span class="type-signature">&lt;static> </span>GET /miix_admin/user_content_items<span class="type-signature"></span></h4>
     
     
 </dt>
 <dd>
     
     <div class="description">
-        New a timeslots for dooh<br><h5>Path Parameters</h5><ul><li>doohId: Dooh ID (ex:'taipeiarena')</ul><h5>Query Parameters</h5><ul><li>intervalOfSelectingUGC: An object specifying the starting and ending of of the time interval for scheduleMgr to select the applied UGC items.<li>intervalOfPlanningDoohProgrames: An object specifying the starting and ending of of the time interval which the generated schedule covers.<li>programSequence: An array of strings showing the sequence of program content genres.</ul><h5>Request body</h5>None<h5>Response body</h5>The callback function called when the result program list is created :    <ul>    <li>err: error message if any error happens    <li>result: object containing the following information:        <ul>        <li>numberOfProgramTimeSlots: number of program time slots created.         <li>sessionId: id indicating this session of creating program time slots (This will be used when           calling scheduleMgr.removeUgcfromProgramAndAutoSetNewOne()        </ul>        For example, <br>        { numberOfProgramTimeSlots: 33, sessionId: '1367596800000-1367683140000-1373332978201' }         </ul>
+        Get the UGC list for highlight<br><h5>Path Parameters</h5>None<h5>Query Parameters</h5><ul><li>skip: The number decide that first query.<li>limit: The number decide that limit of query.<li>token: authorization.<li>condition: The json decide that query codition.</ul><h5>Request body</h5>None<h5>Response body</h5>An array of objects containing the following members:<ul><li>_id: UGC ID with 24 byte hex string<li>userPhotoUrl: <li>ugcCensorNo: <li>userContent: <li>fb_userName: <li>fbPictureUrl: <li>title: <li>doohPlayedTimes: <li>rating: <li>genre: <li>contentGenre:<li>mustPlay: </ul>For example, <br>[{_id: '51d837f6830459c42d000023',"userPhotoUrl":["/contents/user_project/greeting-50c99d81064d2b841200000a-20130227T033827565Z/user_data/_cdv_photo_012.jpg"],"ugcCensorNo":1,"fb_userName":"No User","fbPictureUrl":"http://profile.ak.fbcdn.net/hprofile-ak-frc1/371959_100004619173955_82185728_q.jpg","doohPlayedTimes":0,"rating":"d","genre":"miix","contentGenre":"miit_it""mustPlay":true}] <br>
     </div>
     
     
@@ -294,7 +294,61 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line442">line 442</a>
+        <a href="api_miix_admin.js.html">restful_api/api_miix_admin.js</a>, <a href="api_miix_admin.js.html#line261">line 261</a>
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="POST /miix_admin/doohs/:doohId/program_timeslot_session"><span class="type-signature">&lt;static> </span>POST /miix_admin/doohs/:doohId/program_timeslot_session<span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        New a session of programe timeslots for dooh<br><h5>Path Parameters</h5><ul><li>doohId: Dooh ID (ex:'taipeiarena')</ul><h5>Query Parameters</h5><ul><li>intervalOfSelectingUGC: An object specifying the starting and ending of of the time interval for scheduleMgr to select the applied UGC items.<li>intervalOfPlanningDoohProgrames: An object specifying the starting and ending of of the time interval which the generated schedule covers.<li>programSequence: An array of strings showing the sequence of program content genres.</ul><h5>Request body</h5>None<h5>Response body</h5>The callback function called when the result program list is created :    <ul>    <li>err: error message if any error happens    <li>result: object containing the following information:        <ul>        <li>numberOfProgramTimeSlots: number of program time slots created.         <li>sessionId: id indicating this session of creating program time slots (This will be used when           calling scheduleMgr.removeUgcfromProgramAndAutoSetNewOne()        </ul>        For example, <br>        { numberOfProgramTimeSlots: 33, sessionId: '1367596800000-1367683140000-1373332978201' }         </ul>
+    </div>
+    
+    
+    
+
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="api_miix_admin.js.html">restful_api/api_miix_admin.js</a>, <a href="api_miix_admin.js.html#line97">line 97</a>
     </li></ul></dd>
     
     
@@ -348,7 +402,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line548">line 548</a>
+        <a href="api_miix_admin.js.html">restful_api/api_miix_admin.js</a>, <a href="api_miix_admin.js.html#line204">line 204</a>
     </li></ul></dd>
     
     
@@ -402,7 +456,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line521">line 521</a>
+        <a href="api_miix_admin.js.html">restful_api/api_miix_admin.js</a>, <a href="api_miix_admin.js.html#line177">line 177</a>
     </li></ul></dd>
     
     
@@ -456,7 +510,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line414">line 414</a>
+        <a href="api_miix_admin.js.html">restful_api/api_miix_admin.js</a>, <a href="api_miix_admin.js.html#line69">line 69</a>
     </li></ul></dd>
     
     
@@ -489,13 +543,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Index</a></h2><h3>Namespaces</h3><ul><li><a href="miix.html">miix</a></li><li><a href="miix_admin.html">miix_admin</a></li></ul><h3>Mixins</h3><ul><li><a href="customerServiceMgr.html">customerServiceMgr</a></li><li><a href="miixContentMgr.html">miixContentMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li></ul>
+    <h2><a href="index.html">Index</a></h2><h3>Namespaces</h3><ul><li><a href="miix.html">miix</a></li><li><a href="miix_admin.html">miix_admin</a></li><li><a href="miix_service.html">miix_service</a></li></ul><h3>Mixins</h3><ul><li><a href="miixContentMgr.html">miixContentMgr</a></li><li><a href="scalaMgr.html">scalaMgr</a></li><li><a href="scheduleMgr.html">scheduleMgr</a></li><li><a href="serviceMgr.html">serviceMgr</a></li></ul>
 </nav>
 
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Thu Jul 18 2013 16:38:19 GMT+0800 (TST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Sep 06 2013 12:28:16 GMT+0800 (TST)
 </footer>
 
 <script> prettyPrint(); </script>
