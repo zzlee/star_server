@@ -369,7 +369,7 @@ FM.ADMINCACHE = (function(){
     /**     StoryUGC End     **/  
 
     var retrieveDataAndUpdateCacheDB = function(){    
-        console.log('cache start'); 
+//        console.log('cache start'); 
         //TODO: need to implement
        
 //        cacheMember();
