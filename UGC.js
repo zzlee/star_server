@@ -12,6 +12,7 @@ FM.UGC = (function(){
 		var FMDB = require('./db.js'),
 			memberDB = require('./member.js'),
 			youtubeInfo = require('./youtube_mgr.js'),
+		    fbMgr = require('./facebook_mgr.js'),
 			UGCs = FMDB.getDocModel("ugc");
         
         return {
@@ -91,10 +92,13 @@ FM.UGC = (function(){
             },
             
             getUGCListOnFB: function(userID, genre, cb){
-                var query = UGCs.find(null, 'fb_id url.youtube');
+                debugger;
+                var query = UGCs.find(null, 'fb_postId.postId');
+                
                 if('function' === typeof (genre)){
                     cb = genre;
-                    query.where("ownerId.userID", userID).ne("fb_id", null).sort({createdOn: -1}).exec(cb);
+                    query.where("ownerId.userID", userID).ne("fb_postId.postId", null).sort({createdOn: -1}).exec(cb);
+//                    console.log('UGC.js cb'+cb);
                 }else{
                     query.where("ownerId.userID", userID).where("genre", genre).ne("fb_id", null).sort({createdOn: -1}).exec(cb);
                 }
@@ -151,91 +155,78 @@ FM.UGC = (function(){
 			    }
 			},
             
-            getCommentsLikesSharesOnFB: function( v_id, owner_id, fb_id, youtube_url, cb){
-                var access_token;
-                var async = require("async");
-                var likes_count = 0,
-                    comments_count = 0,
-                    shares_count = 0;	
-				var memberDB_fb = require('./member.js');
-				
-                memberDB_fb.getFBAccessTokenById(owner_id, function(err, fb_auth){
-					//console.log(fb_auth);
-                    if(err){
-                        logger.error("[memberDB.getFBAccessTokenById] ", err);
-                        cb(err, null);
-                        
-                    }else{
-                        access_token = fb_auth.fb.auth.accessToken;
-                        
-                        async.parallel([
-                            function(callback){
-                                var request = require("request");
-                                var qs = {'access_token': access_token, 'fields':'comments,likes'};
-                    
-                                request({
-                                    method: 'GET',
-                                    uri: 'https://graph.facebook.com/' + fb_id,
-                                    qs: qs,
-                                    json: true,
-                                    //body: {'batch': JSON.stringify(data),},
-                                    
-                                }, function(error, response, body){
-                                    if(error){
-                                        logger.error("[ReqCommentsLikesToFB] ", error);
-                                        callback(error, null);
-                                        
-                                    }else{
-                                        //console.log("comments " + body);
-										if(body.error) 
-											callback(null, {comments: comments_count, likes: likes_count} );
-										else {
-											comments_count = (body.comments) ? body.comments.count: 0;
-											likes_count = (body.likes) ? body.likes.count : 0;
-											
-											callback(null, {comments: comments_count, likes: likes_count} );
-										}
-                                    }
-                                });
-                            }
-                            , function(callback){
-                                var request = require("request");
-                                //var qs = {'access_token':token, 'fields':'comments,likes'};
-                    
-                                request({
-                                    method: 'GET',
-                                    uri: 'https://graph.facebook.com/' + youtube_url,
-                                    //qs: qs,
-                                    json: true,
-                                    //body: {'batch': JSON.stringify(data),},
-                                    
-                                }, function(error, response, body){
-                                    if(error){
-                                        logger.error("[ReqCommentsLikesToFB] ", error);
-                                        callback(error, null);
-                                    }else{
-                                        //console.log("shares" + body);
-                                        shares_count = (body.shares) ? body.shares : 0;
-                                        
-                                        callback(null, {shares: shares_count} );
-                                    }
-                                });
-                            }
-                        ]
-                        
-                        , function(err, result){
-                            if(err){
-                                logger.err("[getCommentsLikesSharesOnFB] ", err);
-                                cb(err, null);
-                                
-                            }else{
-                                cb(null, result);
-								//cb(null, [{comments: comments_count, likes: likes_count}, {shares: shares_count}]);
-                            }
-                        });
-                    }
-                });
-            },
+			getCommentsLikesSharesOnFB: function( v_id, owner_id, fb_postId, cb){
+			    var access_token;
+			    var async = require("async");
+			    var likes_count = 0,
+			    comments_count = 0,
+			    shares_count = 0;	
+			    var memberDB_fb = require('./member.js');
+
+			    memberDB_fb.getFBAccessTokenById(owner_id, function(err, fb_auth){
+//			        console.log(fb_auth);
+			        if(err){
+			            logger.error("[memberDB.getFBAccessTokenById] ", err);
+			            cb(err, null);
+
+			        }if(fb_auth){
+			            access_token = fb_auth.fb.auth.accessToken;
+
+			            async.parallel([
+			                            function(callback){
+			                                var batch = [];
+
+			                                for(var _idx=0; _idx<fb_postId.length;_idx++){
+			                                    var relative_url = fb_postId[_idx].postId + "?fields=comments,likes,shares";
+			                                    batch.push( {"method": "GET", "relative_url": relative_url} );
+			                                }
+//			                                console.dir(batch);
+			                                fbMgr.batchRequestToFB(access_token, null, batch, function(err, result){
+			                                    if(err){
+			                                        callback(null, {totalComments: comments_count, totalLikes: likes_count, totalShares: shares_count});
+
+			                                    }else{
+			                                        if (result) {
+//			                                            console.log('result'+result);
+			                                            for(var i in result){
+			                                                if (result[i].comments){
+			                                                    comments_count += result[i].comments.data.length;
+			                                                }
+			                                                // when count=0, there is no likes object.
+			                                                if (result[i].likes){
+			                                                    likes_count += (result[i].likes) ? result[i].likes.count : 0;
+			                                                }
+			                                                if (result[i].shares){
+			                                                    shares_count += (result[i].shares) ? result[i].shares.count : 0;
+			                                                }
+			                                            }
+			                                        }
+
+			                                        callback(null, {totalComments: comments_count, totalLikes: likes_count, totalShares: shares_count} );
+			                                    }
+			                                });
+			                            },
+			                            ]
+
+			            , function(err, result){
+			                if(err){
+			                    logger.err("[getCommentsLikesSharesOnFB] ", err);
+			                    cb(err, null);
+
+			                }else if(!result){
+			                    cb(null, [{totalComments: comments_count, totalLikes: likes_count, totalShares: shares_count}]);
+			                }else if(result){
+			                    cb(null, result);
+			                }else{
+			                    cb(null, [{totalComments: comments_count, totalLikes: likes_count, totalShares: shares_count}]);
+			                }
+			            });
+			        }else{
+			            logger.info("[UGC.js getCommentsLikesSharesOnFB] fb_auth is null. owner_id="+owner_id);
+			            cb(null, [{totalComments: comments_count, totalLikes: likes_count, totalShares: shares_count}]);
+			        }
+			    });
+			},
             
             /*  For TEST. */
             

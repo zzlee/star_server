@@ -18,31 +18,47 @@ FM.ADMINCACHE = (function(){
 
         var member_mgr_t = require('./member.js');
         var memberListInfos = FMDB.getDocModel("memberListInfo");
+        var miixPlayListInfos = FMDB.getDocModel("miixPlayListInfo");
 
         var async = require('async');
         var next = 0,
         limit = 0;
 
         var cacheMemberList = function(data, set_cb){
+//            console.log('data'+data);
             var toDo = function(err, result){
+//                console.log('toDo'+err+result);
+                var mPhone = null;
+                if(data[next].mPhone.number)
+                    mPhone = data[next].mPhone.number;
+                    
                 //update mongoDB
-                var vjson = {fb: { userID: data[next].fb.userID, userName: data[next].fb.userName},
-                        email:data[next].email,
-                        mPhone:data[next].mPhone.number,
-                        miixMovieVideo_count:result[0],
-                        doohPlay_count:result[1],
-                        movieViewed_count:result[2],
-                        fbLike_count:result[3][0].totalLikes,
-                        fbComment_count:result[3][0].totalComments,
-                        fbShare_count:result[3][1].totalShares,
+                var vjson = {
+                        fb: { userID: data[next].fb.userID, userName: data[next].fb.userName},
+                        email: data[next].email,
+                        mPhone: mPhone,
+                        miixMovieVideo_count: result[0],
+                        doohPlay_count: result[1],
+                        movieViewed_count: result[2],
+                        fbLike_count: result[3][0].totalLikes,
+                        fbComment_count: result[3][0].totalComments,
+                        fbShare_count: result[3][0].totalShares,
+//                        fbLike_count:0,
+//                        fbComment_count:0,
+//                        fbShare_count:0,
                 };
 
                 var field = "fb.userID";
                 FMDB.getValueOf(memberListInfos, {"fb.userID": data[next].fb.userID}, field, function(err, result){
-                    if(result == null){ 
-                        FMDB.createAdoc(memberListInfos,vjson, null);
-                    }else{
-                        FMDB.updateAdoc(memberListInfos, result, vjson, null);
+//                    console.log('getValueOf'+err+result);
+                    if(!result){ 
+                        FMDB.createAdoc(memberListInfos, vjson, function(err, result){
+//                            console.log('createAdoc'+err+result+'vjson'+JSON.stringify(vjson));
+                        });
+                    }else if(result){
+                        FMDB.updateAdoc(memberListInfos, result, vjson, function(err, result){
+//                            console.log('updateAdoc'+err+result+'vjson'+JSON.stringify(vjson));
+                        });
                     }
                 });
                 next += 1;
@@ -81,7 +97,10 @@ FM.ADMINCACHE = (function(){
                                         });
                                     },
                                     function(callback){
+                                        
+//                                        debugger;
 //                                        member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
+////                                            console.log('admincache'+err, result);
 //                                            if(err) callback(err, null);
 //                                            else callback(null, result);
 //                                        });
@@ -94,7 +113,7 @@ FM.ADMINCACHE = (function(){
         member_mgr_t.listOfMembers( null, 'fb.userName fb.userID _id email mPhone ugc_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result){
             if(err) console.log('[member_mgr.listOfMemebers]', err);
             if(result){
-
+//                console.log('result'+result);
                 limit = result.length;
                 if(limit > 0){
                     cacheMemberList(result, function(err, docs){
@@ -117,7 +136,6 @@ FM.ADMINCACHE = (function(){
         var miix_content_mgr = require('./miix_content_mgr.js');
 
         var UGCs = FMDB.getDocModel("ugc");
-        var miixPlayListInfos = FMDB.getDocModel("miixPlayListInfo");
 
         var async = require('async');
         var next = 0,
@@ -125,28 +143,49 @@ FM.ADMINCACHE = (function(){
 
         var cacheMiixPlayList = function(data, set_cb){
             var toDo = function(err, result){
+//                console.dir(err);
+//                console.log('cacheMiixUGC-toDo'+JSON.stringify(err)+','+JSON.stringify(result)+'next='+next);
+                var userPhotoUrl = null;
+                var userText = null;
+//                console.log(':result[0]'+result[0]);
+//                console.log(':result[1]'+result[1]);
+//                console.log(':result[2]'+result[2][0].likes);
+                if(data[next].userRawContent[0]){
+                userPhotoUrl = data[next].userRawContent[0].content;
+                userContentType = data[next].userRawContent[0].type;
+//                console.log('userPhotoUrl'+userPhotoUrl);
+                }
                 //update mongoDB
                 var vjson = {
                         projectId:data[next].projectId,
-                        userPhotoUrl:result[0],
+                        userPhotoUrl:userPhotoUrl,
                         movieNo: data[next].no,
-                        movieViewed_count:result[1],
-                        fbLike_count:result[3][0].likes,
-                        fbComment_count:result[3][0].comments,
-                        fbShare_count:result[3][1].shares,
-                        movieMaker:result[2],
+                        movieViewed_count:result[0],
+                        fbLike_count:result[2][0].totalLikes,
+                        fbComment_count:result[2][0].totalComments,
+                        fbShare_count:result[2][0].totalShares,
+                        movieMaker:result[1],
                         applyDoohPlay_count:data[next].triedDoohTimes,
                         doohPlay_count:data[next].doohPlayedTimes,
 //                      timesOfPlaying:0,
+                        createdOn: data[next].createdOn,
+                        userContentType: userContentType
                 };
 
                 var field = "projectId";
+//                console.log('data[next].projectId'+data[next].projectId+'--'+data[next].no+'--'+JSON.stringify(vjson));
                 FMDB.getValueOf(miixPlayListInfos, {"projectId": data[next].projectId}, field, function(err, result){
-                    if(result == null){ 
-                        FMDB.createAdoc(miixPlayListInfos,vjson, null);
+//                    console.log('getValueOf'+err, result);
+                    if(!result){ 
+                        FMDB.createAdoc(miixPlayListInfos, vjson, function(err, result){
+//                            console.log('createAdoc'+err, result);
+                        });
                     }else{
-                        FMDB.updateAdoc(miixPlayListInfos, result, vjson, null);
+                        FMDB.updateAdoc(miixPlayListInfos, result, vjson, function(err, result){
+//                            console.log('updateAdoc'+err, result);
+                        });
                     }
+                        
                 });
                 next += 1;
 
@@ -163,18 +202,19 @@ FM.ADMINCACHE = (function(){
 
             //get count 
             if(data[next]){
-                if( data[next].ownerId._id && data[next].projectId && data[next].fb_id ){
+                if( data[next].ownerId._id && data[next].projectId){
+//                    console.log('data[next].fb_postId'+data[next].fb_postId[0]);
                     async.parallel([
-                                    function(callback){
-                                        miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
-                                            if(err) {
-        //                                        callback(err,null);
-                                                next += 1;
-                                                cacheMiixPlayList(data, set_cb);
-                                            }
-                                            else callback(null, result);
-                                        });
-                                    },
+//                                    function(callback){
+//                                        miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
+//                                            if(err) {
+//        //                                        callback(err,null);
+//                                                next += 1;
+//                                                cacheMiixPlayList(data, set_cb);
+//                                            }
+//                                            else callback(null, result);
+//                                        });
+//                                    },
                                     function(callback){
                                         UGC_mgr.getUGCCount(data[next]._id, 'miix', function(err, result){
                                             if(err) callback(err, null);
@@ -183,30 +223,40 @@ FM.ADMINCACHE = (function(){
                                     },
                                     function(callback){
                                         member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
-                                            if(err) callback(err, null);
-                                            else if(result == null) callback(null, 'No User');
-                                            else callback(null, result.fb.userName);
+//                                            console.log(err, result);
+                                            if(err){callback(err, null);}
+                                            else if(!result){ callback(null, 'No User');}
+                                            else{ callback(null, result.fb.userName);}
                                         });
                                     },
                                     function(callback){
-                                        if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
-                                                (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
+                                        
+//                                        if((typeof(data[next].fb_postId) == null) || (typeof(data[next].fb_postId) === 'undefined') ||
+//                                                (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
+                                        if((typeof(data[next].fb_postId[0]) == null) || (typeof(data[next].fb_postId[0]) === 'undefined'))
+                                             callback(null, [{ totalComments: 0, totalLikes: 0, totalShares: 0 }]);
                                         else {
-                                            UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
+//                                            for(var idx=0;idx<data[next].fb_postId.length;idx++){
+//                                            console.log('data[next].fb_postId.postId'+data[next].fb_postId[idx]+','+next+','idx);
+//                                        console.log('data[next].fb_postId.postId'+data[next].fb_postId+','+next);
+                                            UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_postId, function(err, result){
+//                                                console.dir(result);
                                                 if(err) callback(err, null);
                                                 else callback(null, result);
                                             });
+//                                            }
                                         }
                                     },
                                     ], toDo);
                 }
             }
         };
-
-        var query = UGCs.find({'genre': 'miix'});
-        query.sort({'no':1}).exec(function(err, result){
+        console.log('MiixUGC start'); 
+        var query = UGCs.find();
+        query.exec(function(err, result){
  
             limit = result.length;
+            console.log('UGC limit'+limit);
             if(limit > 0){
                 cacheMiixPlayList(result, function(err, result){
                     if(err) console.log(err);
@@ -234,23 +284,30 @@ FM.ADMINCACHE = (function(){
 
         var cacheStoryPlayList = function(data, set_cb){
             var toDo = function(err, result){
+//                console.dir(err);
+//                console.log('cacheStoryUGC-toDo'+JSON.stringify(err)+','+JSON.stringify(result)+'next='+next);
                 //update mongoDB
                 var vjson = {
-                        projectId:data[next].projectId,
+                        projectId: data[next].projectId,
                         movieNo: data[next].no,
-                        movieViewed_count:result[1],
-                        fbLike_count:result[2][0].likes,
-                        fbComment_count:result[2][0].comments,
-                        fbShare_count:result[2][1].shares,
-                        movieMaker:result[0],
+                        movieViewed_count: result[1],
+                        fbLike_count: result[2][0].likes,
+                        fbComment_count: result[2][0].comments,
+                        fbShare_count: result[2][1].shares,
+                        movieMaker: result[0],
+                        createdOn: data[next].createdOn
                 };
 
                 var field = "projectId";
                 FMDB.getValueOf(storyPlayListInfos, {"projectId": data[next].projectId}, field, function(err, result){
                     if(result == null){ 
-                        FMDB.createAdoc(storyPlayListInfos,vjson, null);
+                        FMDB.createAdoc(storyPlayListInfos,vjson, function(err, result){
+//                            console.log('createAdoc'+err, result);
+                        });
                     }else{
-                        FMDB.updateAdoc(storyPlayListInfos, result, vjson, null);
+                        FMDB.updateAdoc(storyPlayListInfos, result, vjson, function(err, result){
+//                            console.log('createAdoc'+err, result);
+                        });
                     }
                 });
                 next += 1;
@@ -283,22 +340,22 @@ FM.ADMINCACHE = (function(){
                                     });
                                 },
                                 function(callback){
-                                    if((typeof(data[next].fb_id) == null) || (typeof(data[next].fb_id) === 'undefined') ||
-                                            (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
-                                    else {
-                                        UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_id, data[next].url.youtube, function(err, result){
-                                            if(err) callback(err, null);
-                                            else callback(null, result);
-                                        });
-                                    }
+                                  if((typeof(data[next].fb_postId[0]) == null) || (typeof(data[next].fb_postId[0]) == 'undefined'))
+                                       callback(null, [{ totalComments: 0, totalLikes: 0, totalShares: 0 }]);
+                                  else {
+                                      UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_postId, function(err, result){
+                                          if(err) callback(err, null);
+                                          else callback(null, result);
+                                      });
+                                  }
                                 },
                                 ], toDo);
                 }
             }
         };
-
+        
         var query = UGCs.find({'genre': 'miix_story'});
-        query.sort({'no': 1}).exec(function(err, result){
+        query.exec(function(err, result){
 
             limit = result.length;
             if(limit > 0){
@@ -312,13 +369,13 @@ FM.ADMINCACHE = (function(){
     /**     StoryUGC End     **/  
 
     var retrieveDataAndUpdateCacheDB = function(){    
-
+//        console.log('cache start'); 
         //TODO: need to implement
-
+       
 //        cacheMember();
 //
 //        cacheMiixUGC();
-//
+
 //        cacheStoryUGC();
 
         /*
@@ -370,62 +427,61 @@ FM.ADMINCACHE = (function(){
                     limit = 0;
 
                 var setMemberList = function(data, set_cb){
-                    if(next == limit-1 || limit-1 < 0) {
-                        if(next > 0)
-                            memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, data[next].miixMovieVideo_count, data[next].doohPlay_count, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count,data[next].fbShare_count, memberList);               
+                    if(next == limit-1) {
+                        memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone, data[next].miixMovieVideo_count, data[next].doohPlay_count, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count,data[next].fbShare_count, memberList);               
                         next = 0;
                         set_cb(null, 'OK');
                     }
                     else {
-                        memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone.number, data[next].miixMovieVideo_count, data[next].doohPlay_count, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count,data[next].fbShare_count, memberList);               
+                        memberListInfo(data[next].fb.userID, data[next].fb.userName, data[next].email, data[next].mPhone, data[next].miixMovieVideo_count, data[next].doohPlay_count, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count,data[next].fbShare_count, memberList);               
                         next += 1;
                         setMemberList(data, set_cb);
                     }
 
                 };
 
-                if ( (_limit !== null) && (_skip !== null) ) {
-                    FM_LOG("[admin.memberList_get_cb]");
-                    FMDB.listOfdocModels( memberListInfos,null,'fb.userName fb.userID _id email mPhone miixMovieVideo_count doohPlay_count movieViewed_count fbLike_count fbComment_count fbShare_count', {sort:'fb.userName',limit: _limit, skip: _skip}, function(err, result){
-                        if(err) logger.error('[db.listOfMemebers]', err);
-                        if(result){
-
-                            if(_skip < result.length)
-                                limit = _limit;
-                            else 
-                                limit = result.length;
-
-                            setMemberList(result, function(err, docs){
-                                if(err) console.log(err);
-                                else {
-                                    //res.render( 'table_member', {'memberList': memberList} );
-                                    if (cb){
-                                        cb(err, memberList);
-                                    }
-                                }
-                            });
-
-                        }
-                    });
-                }
-                else{
+                if ( (!_limit) && (!_skip) ) {
                     //res.send(400, {error: "Parameters are not correct"});
                     if (cb){
                         cb("Parameters are not correct", null);
                     }
+                }
+                else{
+                    FMDB.listOfdocModels( memberListInfos,null,'fb.userName fb.userID _id email mPhone miixMovieVideo_count doohPlay_count movieViewed_count fbLike_count fbComment_count fbShare_count', {sort:'fb.userName',limit: _limit, skip: _skip}, function(err, result){
+                        if(err) logger.error('[db.listOfMemebers]', err);
+                        if(result){
+
+                            if(_skip < result.length && result.length >= _limit)
+                                limit = _limit;
+                            else 
+                                limit = result.length;
+                            if(limit > 0){
+                                setMemberList(result, function(err, docs){
+                                    if(err) console.log(err);
+                                    else {
+                                        //res.render( 'table_member', {'memberList': memberList} );
+                                        if (cb){
+                                            cb(err, memberList);
+                                        }
+                                    }
+                                });
+                            }else cb(err, memberList);
+
+                        }
+                    });
                 }
 
             },
             /**     Member End     **/
 
             /**     MiixUGC     **/
-            getMiixPlayListInfo : function(req, res){
+            getMiixPlayListInfo : function(_limit, _skip, cb){
 
                 //TODO: need to implement
 
                 var miixPlayList = [];
 
-                var miixPlayListInfo = function(userPhotoUrl, movieNo, movieViewed_count, fbLike_count, fbComment_count, fbShare_count, movieMaker, applyDoohPlay_count, doohPlay_count, timesOfPlaying, arr) {
+                var miixPlayListInfo = function(userPhotoUrl, movieNo, movieViewed_count, fbLike_count, fbComment_count, fbShare_count, movieMaker, applyDoohPlay_count, doohPlay_count, timesOfPlaying, userContentType, arr) {
                     arr.push({ 
                         userPhotoUrl: userPhotoUrl,          
                         movieNo: movieNo,                    
@@ -436,7 +492,8 @@ FM.ADMINCACHE = (function(){
                         movieMaker: movieMaker,              
                         applyDoohPlayCount: applyDoohPlay_count, 
                         doohPlayCount: doohPlay_count,       
-                        timesOfPlaying: timesOfPlaying 
+                        timesOfPlaying: timesOfPlaying,
+                        userContentType: userContentType
                     });
                 };
 
@@ -444,50 +501,57 @@ FM.ADMINCACHE = (function(){
                 limit = 0;
 
                 var setMiixPlayList = function(data, set_cb){
-                    if(next == limit-1 || limit-1 < 0) {
-                        if(next > 0)
-                            miixPlayListInfo(data[next].userPhotoUrl, data[next].movieNo, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count, data[next].fbShare_count,data[next].movieMaker,data[next].applyDoohPlay_count,data[next].doohPlay_count,0, miixPlayList);               
+                    if(next == limit-1) {
+                        miixPlayListInfo(data[next].userPhotoUrl, data[next].movieNo, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count, data[next].fbShare_count,data[next].movieMaker,data[next].applyDoohPlay_count,data[next].doohPlay_count,0, data[next].userContentType, miixPlayList);               
                         next = 0;
                         set_cb(null, 'OK');
                     }
                     else {
-                        miixPlayListInfo(data[next].userPhotoUrl, data[next].movieNo, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count, data[next].fbShare_count,data[next].movieMaker,data[next].applyDoohPlay_count,data[next].doohPlay_count,0, miixPlayList);               
+                        miixPlayListInfo(data[next].userPhotoUrl, data[next].movieNo, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count, data[next].fbShare_count,data[next].movieMaker,data[next].applyDoohPlay_count,data[next].doohPlay_count,0, data[next].userContentType, miixPlayList);               
                         next += 1;
                         setMiixPlayList(data, set_cb);
                     }
 
                 };
 
-                if ( req.query.limit && req.query.skip ) {
-                    FM_LOG("[admin.memberList_get_cb]");
-                    FMDB.listOfdocModels( miixPlayListInfos,null,'projectId userPhotoUrl movieNo movieViewed_count fbLike_count fbComment_count fbShare_count movieMaker applyDoohPlay_count doohPlay_count timesOfPlaying', {sort:'movieNo',limit: req.query.limit, skip: req.query.skip}, function(err, result){
-                        if(err) logger.error('[db.listOfMemebers]', err);
+                if ( (!_limit) && (!_skip) ) {
+//                  res.send(400, {error: "Parameters are not correct"});
+                    if (cb){
+                        cb("Parameters are not correct", null);
+                    }
+                }
+                else{
+                    FMDB.listOfdocModels( miixPlayListInfos,null,'projectId userPhotoUrl movieNo movieViewed_count fbLike_count fbComment_count fbShare_count movieMaker applyDoohPlay_count doohPlay_count timesOfPlaying createdOn userContentType', {sort:{'createdOn':-1},limit:_limit, skip: _skip}, function(err, result){
+                        if(err) logger.error('[cache-getMiixPlayListInfo]', err);
                         if(result){
 
-                            if(req.query.skip < result.length)
-                                limit = req.query.limit;
+                            if(_skip < result.length && result.length >= _limit)
+                                limit = _limit;
                             else 
                                 limit = result.length;
 
-                            setMiixPlayList(result, function(err, docs){
-                                if(err) console.log(err);
-                                else {
-                                    res.render( 'table_miix_movie', {miixMovieList: miixPlayList} );
-                                }
-                            });
+                            if(limit > 0){
+                                setMiixPlayList(result, function(err, docs){
+                                    if(err) console.log(err);
+                                    else {
+                                        if (cb){
+                                            cb(err, miixPlayList);
+                                        }
+//                                        res.render( 'table_miix_movie', {miixMovieList: miixPlayList} );
+                                    }
+                                });
+                            }else cb(err, miixPlayList);
 
                         }
                     });
-                }
-                else{
-                    res.send(400, {error: "Parameters are not correct"});
+                
                 }
 
             },
             /**     MiixUGC End     **/
 
             /**     StoryUGC     **/
-            getStoryPlayListInfo : function(req, res){
+            getStoryPlayListInfo : function(_limit, _skip, cb){
 
                 //TODO: need to implement
 
@@ -509,9 +573,8 @@ FM.ADMINCACHE = (function(){
                 limit = 0;
 
                 var setStoryPlayList = function(data, set_cb){
-                    if(next == limit-1 || limit-1 < 0) {
-                        if(next > 0)
-                            storyPlayListInfo(data[next].movieNo, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count, data[next].fbShare_count, data[next].movieMaker, storyPlayList);
+                    if(next == limit-1) {
+                        storyPlayListInfo(data[next].movieNo, data[next].movieViewed_count, data[next].fbLike_count, data[next].fbComment_count, data[next].fbShare_count, data[next].movieMaker, storyPlayList);
                         next = 0;
                         set_cb(null, 'OK');
                     }
@@ -522,29 +585,34 @@ FM.ADMINCACHE = (function(){
                     }
 
                 };
-
-                if ( req.query.limit && req.query.skip ) {
-                    FM_LOG("[admin.memberList_get_cb]");
-                    FMDB.listOfdocModels( storyPlayListInfos,null,'projectId movieNo movieViewed_count fbLike_count fbComment_count fbShare_count movieMaker', {sort:'movieNo',limit: req.query.limit, skip: req.query.skip}, function(err, result){
+                if ( (!_limit) && (!_skip) ) {
+//                  res.send(400, {error: "Parameters are not correct"});
+                    if (cb){
+                        cb("Parameters are not correct", null);
+                    }
+                }else{
+                    FMDB.listOfdocModels( storyPlayListInfos,null,'projectId movieNo movieViewed_count fbLike_count fbComment_count fbShare_count movieMaker createdOn', {sort:{'createdOn':-1},limit: _limit, skip: _skip}, function(err, result){
                         if(err) logger.error('[db.listOfMemebers]', err);
                         if(result){
 
-                            if(req.query.skip < result.length)
-                                limit = req.query.limit;
+                            if(_skip < result.length && result.length >= _limit)
+                                limit = _limit;
                             else 
                                 limit = result.length;
-                            
+
+                            if(limit > 0){
                                 setStoryPlayList(result, function(err, docs){
                                     if(err) console.log(err);
                                     else {
-                                        res.render( 'table_story_movie', {storyMovieList: storyPlayList} );
+                                        if (cb){
+                                            cb(err, storyPlayList);
+                                        }
+//                                        res.render( 'table_story_movie', {storyMovieList: storyPlayList} );
                                     }
                                 });
+                            }else cb(err, storyPlayList);
                         }
                     });
-                }
-                else{
-                    res.send(400, {error: "Parameters are not correct"});
                 }
 
             },

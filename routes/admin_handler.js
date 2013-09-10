@@ -117,13 +117,35 @@ FM.admin.memberList_get_cb = function(req, res){
 
 FM.admin.miixPlayList_get_cb = function(req, res){
 
-    admincache_mgr.getMiixPlayListInfo(req, res);
+//    admincache_mgr.getMiixPlayListInfo(req, res);
+    FM_LOG("[admin.miixPlayList_get_cb]");
+    var skip =  req.query.skip;
+    var limit = req.query.limit;
+    admincache_mgr.getMiixPlayListInfo(limit, skip, function(err, miixPlayList){
+        if (!err){
+            res.render( 'table_miix_movie', {miixMovieList: miixPlayList} );
+        }
+        else{
+            res.send(400, {error: err});
+        }
+    });
     
 };
 
 FM.admin.storyPlayList_get_cb = function(req, res){
 
-    admincache_mgr.getStoryPlayListInfo(req, res);
+//    admincache_mgr.getStoryPlayListInfo(req, res);
+    FM_LOG("[admin.storyPlayList_get_cb]");
+    var skip =  req.query.skip;
+    var limit = req.query.limit;
+    admincache_mgr.getStoryPlayListInfo(limit, skip, function(err, storyPlayList){
+        if (!err){
+            res.render( 'table_story_movie', {storyMovieList: storyPlayList} );
+        }
+        else{
+            res.send(400, {error: err});
+        }
+    });
      
 };
 
