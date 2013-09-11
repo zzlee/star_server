@@ -75,23 +75,27 @@ var programPlanningPattern =(function(){
     };
 })();
 
-
+//Jeff_start
 
 var paddingContent =(function(){ 
     var PADDING_CONTENT_TABLE = { //specify the media name of each padding content store on Scala's Content Manager
-            miix_it: [{name: "ondascreen_padding-miix_it-start"},
+            miix_it: [//{name: "ondascreen_padding-miix_it-start"},
+                      {name: "Jeff_start"},
                       {name: "ondascreen_padding-miix_it-end.jpg"}],
-            cultural_and_creative: [{name: "ondascreen_padding-cultural_and_creative-start"},
+            cultural_and_creative: [//{name: "ondascreen_padding-cultural_and_creative-start"},
+                                    {name: "Jeff_start"},
                                     {name: "ondascreen_padding-cultural_and_creative-middle.jpg"},
                                     {name: "ondascreen_padding-cultural_and_creative-middle.jpg"},
                                     {name: "ondascreen_padding-cultural_and_creative-end.jpg"}
                                     ],
-            mood: [{name: "ondascreen_padding-wish-start"},
+            mood: [//{name: "ondascreen_padding-wish-start"},
+                   {name: "Jeff_start"},
                    {name: "ondascreen_padding-wish-middle.jpg"},
                    {name: "ondascreen_padding-wish-middle.jpg"},
                    {name: "ondascreen_padding-wish-end.jpg"}
                    ],
-            check_in: [{name: "ondascreen_padding-check_in-start"},
+            check_in: [//{name: "ondascreen_padding-check_in-start"},
+                       {name: "Jeff_start"},
                        {name: "ondascreen_padding-check_in-middle.jpg"},
                        {name: "ondascreen_padding-check_in-middle.jpg"},
                        {name: "ondascreen_padding-check_in-end.jpg"}

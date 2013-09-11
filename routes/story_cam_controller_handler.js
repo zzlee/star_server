@@ -13,8 +13,8 @@ var fs = require('fs'),
     request = require('request');
 var async = require('async');
 var awsS3 = require('../aws_s3.js');
-var facebookMgr = require('./facebook_mgr.js');
-var pushMgr = require('./push_mgr.js');
+var facebookMgr = require('../facebook_mgr.js');
+var pushMgr = require('../push_mgr.js');
 var db = require('../db.js');
 var UGCDB = require(process.cwd()+'/ugc.js');
 var programTimeSlotModel = db.getDocModel("programTimeSlot");
@@ -275,8 +275,8 @@ var updateToUGC = function(updateUGC_cb){
         };
         var photoUrl = 
         {
-            preview: doohPreviewList.url,
-            simulate: doohPreviewList.doohPreviewUrl,
+            preview: doohPreviewList[i].url,
+            simulate: doohPreviewList[i].doohPreviewUrl,
             play: awsS3List[i]
         };
         postMessageAndPicture(ownerList[i].userID, photoUrl, function(err, res){
@@ -385,7 +385,7 @@ var updateVideoToUGC = function(programInterval, updateVideoToUGC_cb){
 var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
     
     var access_token;
-    var fb_name, message, playTime, start, link;
+    var fb_name, playTime, start, link;
     
     var pushPhotosToUser = function(albumId, pushPhotos_cb){
         async.parallel([
@@ -395,12 +395,12 @@ var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
                 facebookMgr.postPhoto(access_token, message, photoUrl.simulate, albumId, simulate);
             },*/
             function(preview){
-                message = fb_name + '於' + playTime + '，登上台北天幕LED，，這是原始刊登素材，天幕尺寸：100公尺x16公尺。\n' + 
+                var message = fb_name + '於' + playTime + '，登上台北天幕LED，，這是原始刊登素材，天幕尺寸：100公尺x16公尺。\n' + 
                           '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
                 facebookMgr.postPhoto(access_token, message, photoUrl.preview, albumId, preview);
             },
             function(play){
-                message = fb_name + '於' + playTime + '，登上台北天幕LED，特此感謝他精采的作品！\n' + 
+                var message = fb_name + '於' + playTime + '，登上台北天幕LED，特此感謝他精采的作品！\n' + 
                           '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
                 facebookMgr.postPhoto(access_token, message, photoUrl.play, albumId, play);
             },
@@ -420,7 +420,7 @@ var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
     ], function(err, member){
         access_token = member[0].fb.auth.accessToken;
         fb_name = member[0].fb.userName;
-        start = new Date(recordTime);
+        start = new Date(parseInt(recordTime));
         if(start.getHours()>12)
             playTime = start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日下午'+(start.getHours()-12)+':'+start.getMinutes();
         else
@@ -428,8 +428,20 @@ var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
         
         var album_name = '實況記錄：' + start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日' + '登上台北天幕LED';
         var album_message = '';
-        facebookMgr.createAlbum(access_token, album_name, album_message, function(err, res){
-            pushPhotosToUser(JSON.parse(res).id, postPicture_cb);
+        //facebookMgr.createAlbum(access_token, album_name, album_message, function(err, res){
+        //    pushPhotosToUser(JSON.parse(res).id, postPicture_cb);
+        //});
+        var message = fb_name + '於' + playTime + '，登上台北天幕LED，特此感謝您精采的作品！\n' + 
+                      '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
+        //pushMgr.sendMessageToDeviceByMemberId(member[0]._id, message, function(err, res){});
+        async.waterfall([
+            function(push_cb){
+                pushMgr.sendMessageToDeviceByMemberId(member[0]._id, message, push_cb);
+            }
+        ], function(err, res){
+            facebookMgr.createAlbum(access_token, album_name, album_message, function(err, res){
+                pushPhotosToUser(JSON.parse(res).id, postPicture_cb);
+            });
         });
     });
 };
