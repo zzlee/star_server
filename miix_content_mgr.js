@@ -44,7 +44,7 @@ miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbI
     
     aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, mediaType, function(responseParameters){
         
-        if ( responseParameters.youtube_video_id ) {
+        if ( responseParameters ) {
             var aeServerID = responseParameters.ae_server_id;
             var youtubeVideoID = responseParameters.youtube_video_id;
             var movieProjectID = responseParameters.movie_project_id;
@@ -70,8 +70,9 @@ miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbI
                 
             }
             
-            //for test
-            //miixContentMgr.submitMiixMovieToDooh('', movieProjectID);
+        }
+        else {
+            logger.error("aeServerMgr.createMiixMovie() returns invalid responseParameters! responseParameters="+responseParameters);
         }
         
     });
