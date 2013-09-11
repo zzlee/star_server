@@ -183,8 +183,6 @@ exports.init = function() {
      */
     app.get('/miix/members/:memberId/ugcs', routes.authorizationHandler.checkAuth, routes.miixHandler.getUgcs_cb);
 
-    app.get('/miix/members/:memberId/live_contents', routes.authorizationHandler.checkAuth, routes.miixHandler.getLiveContents_cb);
-
     /**
      * Get a list of latest live content items (a.k.a. "Miix Story" or "Story MV") of a specific member , sorted by creating time (the newest at beginning)<br>
      * <h5>Path parameters</h5>
@@ -204,7 +202,38 @@ exports.init = function() {
      * @name GET /miix/members/:memberId/live_contents
      * @memberof miix
      */
-    app.get('/miix/members/:memberId/live_contents', routes.authorizationHandler.checkAuth, routes.miixHandler.getLiveContents_cb);
+//    app.get('/miix/members/:memberId/live_contents', routes.authorizationHandler.checkAuth, routes.miixHandler.getLiveContents_cb);
+    app.get('/miix/members/:memberId/live_contents', routes.authorizationHandler.checkAuth, function(req, res){
+        
+        var result = [
+                      {
+            _id: '5200d08d76c1bc281000003b',
+            no: 1673,
+            genre:'miix_image_live_photo',
+            ownerId:{fbUserId: '100006239742920', userID: '100006239742920'},
+            projectId: 'cultural_and_creative-51d38ca086fa21440a000002-1375784400000-003',
+            liveTime: 1371962000000,
+            url:{
+                s3:'/user_project/cultural_and_creative-51d38ca086fa21440a000002-1375784400000-003/cultural_and_creative-51d38ca086fa21440a000002-1375784400000-003.jpg',
+                longPhoto:'https://s3.amazonaws.com/miix_content/user_project/mood-512de6f7989cfc240300000e-20130815T091253591Z/mood-512de6f7989cfc240300000e-20130815T091253591Z.png'
+            }
+        },
+        {
+            _id: '5200d08d76c1bc281000003b',
+            no: 3935,
+            genre:'miix_story',
+            ownerId:{fbUserId: '100006239742920', userID: '100006239742920'},
+            projectId: 'miix_it-5192f1cac6e16fa00d000006-20130822T104338342Z.mp4_storymv_20130822T105532835Z',
+            liveTime: 1371962000000,
+            url:{
+                youtube:'http://www.youtube.com/embed/ZZ8A7hTQHjA',
+                longPhoto:'https://s3.amazonaws.com/miix_content/user_project/mood-512de6f7989cfc240300000e-20130815T091253591Z/mood-512de6f7989cfc240300000e-20130815T091253591Z.png'
+            }
+        },
+        ];
+        
+        res.send(200, result);
+    });
 
     /**
      * Create a FB post id UGC of a specific project ID<br>
