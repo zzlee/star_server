@@ -136,9 +136,17 @@ miixHandler.getLiveContents_cb = function(req, res) {
         limit = 10;
     }
     
-    ugc.getLiveUGCListByOwnerId(req.params.memberId, limit, 0, function(err, ugcList){
+//    ugc.getLiveUGCListByOwnerId(req.params.memberId, limit, 0, function(err, ugcList){
+//        if (!err) {
+//            res.send(ugcList);
+//        }
+//        else {
+//            res.send(500, {error: err});
+//        }
+//    });
+    miixContentMgr.getUserLiveContentList(req.params.memberId, limit, 0, function(err, userLiveContentList){
         if (!err) {
-            res.send(ugcList);
+            res.send(userLiveContentList);
         }
         else {
             res.send(500, {error: err});
