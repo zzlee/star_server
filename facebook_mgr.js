@@ -420,8 +420,25 @@ FM.facebookMgr = (function(){
                         console.log("result: " + JSON.stringify(result));
                 });*/
             
-                this.postMessage(test_token,my_message,s_link, function(err, result){
+                /*this.postMessage(test_token,my_message,s_link, function(err, result){
                 	console.log("result=%s", result);
+                });*/
+                var batch = [];
+                var access_token ="CAAGHFz4rZCiwBABbfOFZBMaokZCeJCtZAspTxuklOf6ITvDtvRMsn3Advjp7OMYXoog3aVaG66gTxJ88OcKeZAHXV1Vhaf1rQZAayBYtJBJlFvFPyWmvNOgyI7KLzLSSo7NoeV3WH69r4BiyDvtgwC2eaeDAzLqLw3Qk1VnLmtXpRWGZC97KqzY"; 
+                var relative_url = "100006588456341" + "?fields=comments,likes";
+                batch.push( {"method": "GET", "relative_url": relative_url} );
+                var i = 0;
+                var likes_count =0;
+                this.batchRequestToFB(access_token,null,batch, function(err, result){
+                    var i = 0;
+                    if (result[i].likes){
+                        likes_count += result[i].likes.count;
+                    }
+//                    likes_count += (result[i].likes) ? result[i].likes.count : 0;
+                    console.dir(result);
+                    console.dir(result[0].likes.paging);
+                    console.dir(result[0].likes.data);
+                    console.log("result=", likes_count);
                 });
             },
         };

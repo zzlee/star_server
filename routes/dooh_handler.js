@@ -103,7 +103,7 @@ FM.dooh_handler.doohMoviePlayingState_post_cb = function(req, res) {
             FM.dooh_handler.lastMoviePlayed = req.headers.miix_movie_project_id;
 			storyCamControllerMgr.startRecording( req.headers.miix_movie_project_id, function(resParametes){
 				logger.info('story cam started recording.');
-				logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+				logger.info('res: _commandId='+resParametes._commandId+' err='+resParametes.err);
 				res.send(200);
                 resIsSent = true;
 			});
@@ -114,7 +114,7 @@ FM.dooh_handler.doohMoviePlayingState_post_cb = function(req, res) {
             FM.dooh_handler.lastMovieStopped = req.headers.miix_movie_project_id;
 			storyCamControllerMgr.stopRecording( function(resParametes){
 				logger.info('story cam stopped recording.');
-				logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+				logger.info('res: _commandId='+resParametes._commandId+' err='+resParametes.err);
 				res.send(200);
                 resIsSent = true;
 			});
@@ -157,7 +157,7 @@ FM.dooh_handler.streamVideoTrigger = function(req, res){
         FM.dooh_handler.lastMoviePlayed = req.headers.miix_movie_project_id;
         storyCamControllerMgr.startRecording( '', function(resParametes){
             logger.info('story cam started recording.');
-            logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+            logger.info('res: _commandId='+resParametes._commandId+' err='+resParametes.err);
             res.send(200);
             resIsSent = true;
         });

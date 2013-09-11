@@ -22,7 +22,7 @@ var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID
         //logger.info('uploading story movie from Story Cam Controller to Main Server finished. ');
     //storyCamControllerMgr.uploadStoryMovieToS3(movieProjectID, function(resParametes){
         //logger.info('uploading story movie from Story Cam Controller to S3 finished. ');
-        //logger.info('res: _command_id='+resParametes._command_id+' err='+resParametes.err);
+        //logger.info('res: _commandId='+resParametes._commandId+' err='+resParametes.err);
         
         //TODO:: check the file size. If not correct, re-upload.
         
@@ -37,7 +37,7 @@ var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID
                 //logger.info('downloading story movie from Main Server to AE Server.');
             aeServerMgr.downloadStoryMovieFromS3(movieProjectID, function(resParameter2){
                 logger.info('downloading story movie from S3 to AE Server.');
-                logger.info('res: _command_id='+resParameter2._command_id+' err='+resParameter2.err);
+                logger.info('res: _commandId='+resParameter2._commandId+' err='+resParameter2.err);
                 
                 //TODO:: check the file size. If not correct, re-download.
                 
@@ -154,7 +154,7 @@ storyContentMgr.generateStoryMV = function(miixMovieProjectID, recordTime) {
                     aeServerMgr.createStoryMV( miixMovieProjectID, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
                     
                         logger.info('generating Story MV finished. ');
-                        logger.info('res: _command_id='+responseParameters._command_id+' err='+responseParameters.err+' youtube_video_id='+responseParameters.youtube_video_id);
+                        logger.info('res: _commandId='+responseParameters._commandId+' err='+responseParameters.err+' youtube_video_id='+responseParameters.youtube_video_id);
                         
                         if ( responseParameters.youtube_video_id ) {
                             var aeServerID = responseParameters.ae_server_id;
@@ -250,7 +250,7 @@ storyContentMgr.generateStoryMV = function(miixMovieProjectID, recordTime) {
                       aeServerMgr.createStoryMV( miixMovieProjectID, miixMovieFileExtension, ownerStdID, ownerFbID, movieTitle, function(responseParameters){
                           //console.log('step.4 end');
                           logger.info('generating Story MV finished. ');
-                          logger.info('res: _command_id='+responseParameters._command_id+' err='+responseParameters.err+' youtube_video_id='+responseParameters.youtube_video_id);
+                          logger.info('res: _commandId='+responseParameters._commandId+' err='+responseParameters.err+' youtube_video_id='+responseParameters.youtube_video_id);
                           
                           if ( responseParameters.youtube_video_id ) {
                               var aeServerID = responseParameters.ae_server_id;

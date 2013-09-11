@@ -73,56 +73,64 @@ aeServerMgr.createMovie = function(starAeServerURL, movieProjectID, ownerStdID, 
 
 };
 
-var getAeServerWithLowestLoad = function(got_cb){
-    
-    var connectedAeServers = globalConnectionMgr.getConnectedRemotes('AE_SERVER');
-    var connectedAeServerWithLowestLoad = null;
-    var lowestLoadIndex =-1;
-    
-    
-    var iteratorGetAeServerLoadIndex = function(aeServerToAsk, interationDone_cb){
-        globalConnectionMgr.sendRequestToRemote( aeServerToAsk, { command: "GET_LOAD_INDEX", parameters: null }, function(responseParameters) {
+//DEPRECATED
+//var getAeServerWithLowestLoad = function(cbOfGetAeServerWithLowestLoad){
+//    
+//    
+//    globalConnectionMgr.getConnectedRemotes('AE_SERVER', function(errOfGetConnectedRemotes, result){
+//        if (!errOfGetConnectedRemotes){
+//            var connectedAeServers = result;
+//            var connectedAeServerWithLowestLoad = null;
+//            var lowestLoadIndex =-1;
+//            
+//            
+//            var iteratorGetAeServerLoadIndex = function(aeServerToAsk, interationDone_cb){
+//                globalConnectionMgr.sendRequestToRemote( aeServerToAsk, { command: "GET_LOAD_INDEX", parameters: null }, function(responseParameters) {
+//
+//                    if ((responseParameters.load_index < lowestLoadIndex) || (lowestLoadIndex == -1) ){
+//                        lowestLoadIndex = responseParameters.load_index;
+//                        connectedAeServerWithLowestLoad = aeServerToAsk;
+//                    }
+//                    
+//                    interationDone_cb();
+//                });
+//            };
+//            
+//            async.each(connectedAeServers, iteratorGetAeServerLoadIndex, function(err){
+//                if (!err) {
+//                    if (cbOfGetAeServerWithLowestLoad){
+//                        cbOfGetAeServerWithLowestLoad(connectedAeServerWithLowestLoad, null);
+//                    }
+//                }
+//                else{
+//                    if (cbOfGetAeServerWithLowestLoad){
+//                        cbOfGetAeServerWithLowestLoad(null, err);
+//                    }
+//                }
+//                
+//            });
+//
+//        }
+//        else {
+//            if (cbOfGetAeServerWithLowestLoad){
+//                cbOfGetAeServerWithLowestLoad(null, "Failed to get connected remotes: "+errOfGetConnectedRemotes);
+//            }
+//        }
+//    });
+//};
 
-            if ((responseParameters.load_index < lowestLoadIndex) || (lowestLoadIndex == -1) ){
-                lowestLoadIndex = responseParameters.load_index;
-                connectedAeServerWithLowestLoad = aeServerToAsk;
-            }
-            
-            interationDone_cb();
-        });
-    };
-    
-    async.each(connectedAeServers, iteratorGetAeServerLoadIndex, function(err){
-        if (!err) {
-            if (got_cb){
-                got_cb(connectedAeServerWithLowestLoad, null);
-            }
-        }
-        else{
-            if (got_cb){
-                got_cb(null, err);
-            }
-        }
-        
-    });
-    
-};
-
-//for test 
-//aeServerMgr.getAeServerWithLowestLoad = getAeServerWithLowestLoad;
-
-var defaultAeServer = 'AE_Server_feltmeng_art_PC';
 
 
 //use long polling to ask AE Server to create Miix movie
 aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, mediaType, createMovie_cb) {
 
-	var starAeServerID = defaultAeServer;
+	var starAeServerID = config.DEFAULT_AE_SERVER;
 	
-	getAeServerWithLowestLoad(function(aeServerWithLowestLoad, err){
-    if (!err){
-        starAeServerID = aeServerWithLowestLoad;
-    }
+	//getAeServerWithLowestLoad(function(aeServerWithLowestLoad, err){
+	globalConnectionMgr.getConnectedRemoteWithLowestLoad('AE_SERVER', function(err, aeServerWithLowestLoad){
+        if (!err){
+            starAeServerID = aeServerWithLowestLoad;
+        }
     
         logger.info('[aeServerMgr.createMiixMovie] aeServer to do rendering is : '+aeServerWithLowestLoad);
 
@@ -162,9 +170,10 @@ aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, mo
 //use long polling to ask AE Server to create Story movie
 aeServerMgr.createStoryMV = function(movieProjectID, miixMovieFileExtension, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
 
-	var starAeServerID = defaultAeServer;
+	var starAeServerID = config.DEFAULT_AE_SERVER;
 	
-    getAeServerWithLowestLoad(function(aeServerWithLowestLoad, err){
+    //getAeServerWithLowestLoad(function(aeServerWithLowestLoad, err){
+	globalConnectionMgr.getConnectedRemoteWithLowestLoad('AE_SERVER', function(err, aeServerWithLowestLoad){
         if (!err){
             starAeServerID = aeServerWithLowestLoad;
         }
@@ -216,7 +225,7 @@ aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
             starAeServerID = _aeID;
         }
         else{
-            starAeServerID = defaultAeServer;
+            starAeServerID = config.DEFAULT_AE_SERVER;
         }
     
         var commandParameters = {
@@ -246,7 +255,7 @@ aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, download
             starAeServerID = _aeID;
         }
         else{
-            starAeServerID = defaultAeServer;
+            starAeServerID = config.DEFAULT_AE_SERVER;
         }
 
         var commandParameters = {
@@ -270,12 +279,14 @@ aeServerMgr.downloadStoryMovieFromS3 = function(movieProjectID, downloadMovie_cb
     var starAeServerID;
     var UGCDB = require('./ugc.js');
     
-    getAeServerWithLowestLoad(function(_aeID, err){
+    
+    //getAeServerWithLowestLoad(function(_aeID, err){  //TODO: find a more robust way to get the right AE Server
+    globalConnectionMgr.getConnectedRemoteWithLowestLoad('AE_SERVER', function(err, aeServerWithLowestLoad){
         if (!err){
             starAeServerID = _aeID;
         }
         else{
-            starAeServerID = defaultAeServer;
+            starAeServerID = config.DEFAULT_AE_SERVER;
         }
         var commandParameters = {
             movieProjectID: movieProjectID
@@ -295,7 +306,7 @@ aeServerMgr.downloadStoryMovieFromS3 = function(movieProjectID, downloadMovie_cb
             starAeServerID = _aeID;
         }
         else{
-            starAeServerID = defaultAeServer;
+            starAeServerID = config.DEFAULT_AE_SERVER;
         }
 
         var commandParameters = {
@@ -319,12 +330,13 @@ aeServerMgr.downloadMiixMovieFromS3 = function(miixMovieProjectID, miixMovieFile
     var starAeServerID;
     var UGCDB = require('./ugc.js');
     
-    getAeServerWithLowestLoad(function(_aeID, err){
+    //getAeServerWithLowestLoad(function(_aeID, err){
+    globalConnectionMgr.getConnectedRemoteWithLowestLoad('AE_SERVER', function(err, aeServerWithLowestLoad){
         if (!err){
             starAeServerID = _aeID;
         }
         else{
-            starAeServerID = defaultAeServer;
+            starAeServerID = config.DEFAULT_AE_SERVER;
         }
         var commandParameters = {
             miixMovieProjectID: miixMovieProjectID,
@@ -345,7 +357,7 @@ aeServerMgr.downloadMiixMovieFromS3 = function(miixMovieProjectID, miixMovieFile
             starAeServerID = _aeID;
         }
         else{
-            starAeServerID = defaultAeServer;
+            starAeServerID = config.DEFAULT_AE_SERVER;
         }
     
         var commandParameters = {

@@ -227,7 +227,16 @@ exports.init = function() {
      * @name PUT /miix/fb_ugcs/:ugcProjectId
      * @memberof miix
      */
-    app.put('/miix/fb_ugcs/:ugcProjectId', routes.authorizationHandler.checkAuth, routes.miixHandler.putFbPostIdUgcs_cb); 
-
+    app.put('/miix/fb_ugcs/:ugcProjectId', routes.authorizationHandler.checkAuth, routes.miixHandler.putFbPostIdUgcs_cb);
+    
+    //TODO need to implement
+//    app.get('/miix/live_contents/:ugcProjectId', routes.authorizationHandler.checkAuth, ???);
+    app.get('/miix/live_contents/:ugcProjectId', routes.authorizationHandler.checkAuth, function(req, res){
+//        console.log('req.params.ugcProjectId=%s',req.params.ugcProjectId);
+        
+        var result = [{_id: '51d837f6830459c42d000023', no: 234, contentGenre: 'miix', doohPlayedDate: 1371962000000, url :"https://s3.amazonaws.com/miix_content/user_project/mood-512de6f7989cfc240300000e-20130815T091253591Z/mood-512de6f7989cfc240300000e-20130815T091253591Z.png" }];
+        
+        res.send(200, result);
+    });
     
 };
