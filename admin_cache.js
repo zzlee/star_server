@@ -11,6 +11,7 @@ var FM = {};
 FM.ADMINCACHE = (function(){
     var uInstance = null;
 
+
     /**     Member     **/
     var cacheMember = function(){
 
@@ -18,7 +19,6 @@ FM.ADMINCACHE = (function(){
 
         var member_mgr_t = require('./member.js');
         var memberListInfos = FMDB.getDocModel("memberListInfo");
-        var miixPlayListInfos = FMDB.getDocModel("miixPlayListInfo");
 
         var async = require('async');
         var next = 0,
@@ -99,11 +99,11 @@ FM.ADMINCACHE = (function(){
                                     function(callback){
                                         
 //                                        debugger;
-//                                        member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
-////                                            console.log('admincache'+err, result);
-//                                            if(err) callback(err, null);
-//                                            else callback(null, result);
-//                                        });
+                                        member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
+//                                            console.log('admincache'+err, result);
+                                            if(err) callback(err, null);
+                                            else callback(null, result);
+                                        });
                                     },
                                     ], toDo);
                 }
@@ -134,7 +134,8 @@ FM.ADMINCACHE = (function(){
         var member_mgr = require('./member.js');
         var UGC_mgr = require('./ugc.js');
         var miix_content_mgr = require('./miix_content_mgr.js');
-
+        
+        var miixPlayListInfos = FMDB.getDocModel("miixPlayListInfo");
         var UGCs = FMDB.getDocModel("ugc");
 
         var async = require('async');
@@ -146,7 +147,7 @@ FM.ADMINCACHE = (function(){
 //                console.dir(err);
 //                console.log('cacheMiixUGC-toDo'+JSON.stringify(err)+','+JSON.stringify(result)+'next='+next);
                 var userPhotoUrl = null;
-                var userText = null;
+                var userContentType = null;
 //                console.log(':result[0]'+result[0]);
 //                console.log(':result[1]'+result[1]);
 //                console.log(':result[2]'+result[2][0].likes);
@@ -251,12 +252,12 @@ FM.ADMINCACHE = (function(){
                 }
             }
         };
-        console.log('MiixUGC start'); 
+//        console.log('MiixUGC start'); 
         var query = UGCs.find();
-        query.exec(function(err, result){
+        query.sort({'createdOn': -1}).exec(function(err, result){
  
             limit = result.length;
-            console.log('UGC limit'+limit);
+//            console.log('UGC limit'+limit);
             if(limit > 0){
                 cacheMiixPlayList(result, function(err, result){
                     if(err) console.log(err);
@@ -372,9 +373,9 @@ FM.ADMINCACHE = (function(){
 //        console.log('cache start'); 
         //TODO: need to implement
        
-//        cacheMember();
-//
-//        cacheMiixUGC();
+        cacheMember();
+
+        cacheMiixUGC();
 
 //        cacheStoryUGC();
 
@@ -384,6 +385,22 @@ FM.ADMINCACHE = (function(){
         setTimeout(retrieveDataAndUpdateCacheDB,300000);
 
     };
+    
+    var deleteCacheDB = function(){
+        var memberListInfos = FMDB.getDocModel("memberListInfo");
+        var miixPlayListInfos = FMDB.getDocModel("miixPlayListInfo");
+        
+        memberListInfos.remove().exec(function(err, res){
+//            console.log(err, res);
+        });
+        miixPlayListInfos.remove().exec(function(err, res){
+//            console.log(err, res);
+        });
+
+//      setTimeout(deleteCacheDB,3000000);
+
+    };
+    deleteCacheDB();
 
     retrieveDataAndUpdateCacheDB();
 
