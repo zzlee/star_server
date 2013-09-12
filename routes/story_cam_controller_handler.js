@@ -223,7 +223,7 @@ var imageNaming = function(ugcInfo, naming_cb){
     ugcModel.find({"_id": ugcInfo.content._id}).exec(function (_err, result) {
         //console.log(result[0].ownerId._id);
         ownerList.push(result[0].ownerId);
-        doohPreviewList.push({ doohPreviewUrl: result[0].doohPreviewUrl, url: result[0].url });
+        doohPreviewList.push({ doohPreviewUrl: result[0].doohPreviewUrl, url: result[0].url.s3 });
         name = ugcInfo.contentGenre + '-' + 
                result[0].ownerId._id + '-' + 
                ugcInfo.timeStamp + '.jpg';
@@ -242,7 +242,7 @@ var uploadToAwsS3 = function(awsS3_cb){
         if((filetype[filetype.length-1] == 'jpg')||(filetype[filetype.length-1] == 'png')) {
             projectFolder = filetype[0].split('\\');
             s3Path = '/user_project/' + projectFolder[projectFolder.length-1] + '/' + projectFolder[projectFolder.length-1] + '.' + filetype[filetype.length-1];
-            awsS3List.push(s3Path);
+            awsS3List.push('https://s3.amazonaws.com/miix_content' + s3Path);
             awsS3.uploadToAwsS3(fileList[i], s3Path, '', function(err,result){
                 if (!err){
                     logger.info('Live content image was successfully uploaded to S3 '+s3Path);
@@ -284,7 +284,7 @@ var updateToUGC = function(updateUGC_cb){
                 logger.info('Post message and pictrue to user is Error: ' + err);
             else
                 logger.info('Post message and pictrue to user is Success: ' + res);
-                
+            
             UGCDB.addUGC(vjson, function(err, result){
                 //if(err) console.log(err);
                 //else console.log(result);
@@ -388,7 +388,7 @@ var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
     var fb_name, playTime, start, link;
     
     var pushPhotosToUser = function(albumId, pushPhotos_cb){
-        async.parallel([
+        async.series([
             /*function(simulate){
                 message = fb_name + '於' + playTime + '，登上台北天幕LED，上大螢幕APP特此感謝他精采的作品！\n' + 
                           '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
@@ -406,8 +406,10 @@ var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
             },
         ], function(err, res){
             //(err)?console.log(err):console.dir(res);
-            if(!err)
+            if(!err){
+                logger.info('post message to user on facebook, member id is ' + member[0]._id);
                 pushPhotos_cb(null, 'done');
+            }
             else
                 pushPhotos_cb(err, null);
         });
@@ -428,21 +430,24 @@ var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
         
         var album_name = '實況記錄：' + start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日' + '登上台北天幕LED';
         var album_message = '';
-        //facebookMgr.createAlbum(access_token, album_name, album_message, function(err, res){
-        //    pushPhotosToUser(JSON.parse(res).id, postPicture_cb);
-        //});
         var message = fb_name + '於' + playTime + '，登上台北天幕LED，特此感謝您精采的作品！\n' + 
                       '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
-        //pushMgr.sendMessageToDeviceByMemberId(member[0]._id, message, function(err, res){});
+        //pushMgr.sendMessageToDeviceByMemberId(member[0]._id, message, postPicture_cb);
+        
         async.waterfall([
             function(push_cb){
-                pushMgr.sendMessageToDeviceByMemberId(member[0]._id, message, push_cb);
+                pushMgr.sendMessageToDeviceByMemberId(member[0]._id, message, function(err, res){
+                    logger.info('push played notification to user, member id is ' + member[0]._id);
+                    push_cb(err, res);
+                });
             }
         ], function(err, res){
             facebookMgr.createAlbum(access_token, album_name, album_message, function(err, res){
+                logger.info('create fb album for user, member id is ' + member[0]._id);
                 pushPhotosToUser(JSON.parse(res).id, postPicture_cb);
             });
         });
+        
     });
 };
 

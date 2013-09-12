@@ -10,7 +10,8 @@ var path = require('path');
 var fs = require('fs');
 var awsS3 = require('./aws_s3.js');
 var db = require('./db.js');
-var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://server-pc:8080', { username: 'administrator', password: '53768608' } );
+//var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://server-pc:8080', { username: 'administrator', password: '53768608' } );
+var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://192.168.5.189:8080', { username: 'administrator', password: '53768608' } );
 
 //var scalaMgr = require('./scala/scalaMgr.js')();
 
