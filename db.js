@@ -296,6 +296,21 @@ FM.DB = (function(){
             programSequence: [],
             pushProgramsTime: {type: Date}
         }); //   sessionItem collection
+        
+        var UserLiveContentSchema = new Schema({
+            title: {type: String},
+            description: {type: String},
+            url: { youtube: String, tudou: String, s3: String , longPhoto: String},  //  Youtube, Tudou
+            ownerId: { _id:ObjectID, userID: String, fbUserId: String }, //userID is used to be owner's fb id, and is now DEPRECATED in Miix 2.0
+            projectId: {type: String},  // project ID which is unique to each AE rendering
+            createdOn: {type: Date, default: Date.now},
+            genre: {type: String, enum: UGCGenre},
+            contentGenre: {type: String, enum: ugcContentGenre}, //Is normally the id of main template that this UGC uses
+            contentSubGenre: {type: String}, //Is normally the id of sub template that this UGC uses
+            no: {type: Number}, //Unique serial number shown to user  
+            aeId: {type: String}, //ID of AE Server who renders this UGC
+            liveTime: {type: Number}, 
+        }); //  UserLiveContent collection
 		
         /****************** End of DB Schema ******************/
 		
@@ -311,9 +326,10 @@ FM.DB = (function(){
             MemberListInfo = connection.model('MemberListInfo', MemberListInfoSchema, 'memberListInfo'),//kaiser
             MiixPlayListInfo = connection.model('MiixPlayListInfo', MiixPlayListInfoSchema, 'miixPlayListInfo'),
             StoryPlayListInfo = connection.model('StoryPlayListInfo', StoryPlayListInfoSchema, 'storyPlayListInfo'),
-            UGC = connection.model('UGC', UGCSchema, 'ugc');
-            CustomerServiceItem = connection.model('CustomerServiceItem', CustomerServiceItemSchema, 'customerServiceItem');
-            SessionItem = connection.model('SessionItem', SessionItemSchema, 'sessionItem');
+            UGC = connection.model('UGC', UGCSchema, 'ugc'),
+            CustomerServiceItem = connection.model('CustomerServiceItem', CustomerServiceItemSchema, 'customerServiceItem'),
+            SessionItem = connection.model('SessionItem', SessionItemSchema, 'sessionItem'),
+            UserLiveContent = connection.model('UserLiveContent', UserLiveContentSchema, 'userLiveContent');
            
             
         var dbModels = [];
@@ -332,6 +348,7 @@ FM.DB = (function(){
         dbModels["ugc"] = UGC;
         dbModels["customerServiceItem"] = CustomerServiceItem;
         dbModels["sessionItem"] = SessionItem;
+        dbModels["userLiveContent"] = UserLiveContent;
         
         //???? nobody uses it, so this section can be removed? 
         var dbSchemas = [];
@@ -436,6 +453,9 @@ FM.DB = (function(){
                         break;
                     case 'sessionItem':
                         return SessionItem;
+                        break;
+                    case 'userLiveContent':
+                        return UserLiveContent;
                         break;
                     default:
                         throw new error('DB Cannot find this Collection: ' + collection);
@@ -560,6 +580,18 @@ FM.DB = (function(){
                     }
                 });
             },
+            addUserLiveContent: function(vjson, cb){
+                if(vjson.ownerId){
+                    UserLiveContent.count({}, function(err, count){
+                    vjson.no = parseInt(count)+1;
+                    FM.DB.getInstance().createAdoc(UserLiveContent, vjson, cb);
+                    });
+
+                }else{
+                    var err = {error: "ownerId is MUST-HAVE!"};
+                    cb(err, null);
+                }
+            },
             
             test: function(){
                 //var docModel = this.getDocModel2("member");
@@ -582,9 +614,35 @@ FM.DB = (function(){
 
 module.exports = FM.DB.getInstance();
 
-
-
-
+//test
+//var vjson= {
+////    no: 1673, 
+//    genre:'miix_image_live_photo',
+//    contentGenre: 'miix_it',
+//    ownerId:{_id: '51d38ca086fa21440a000002', fbUserId: '100006239742920', userID: '100006239742920'},
+//    projectId: 'cultural_and_creative-51d38ca086fa21440a000002-1375784400000-005',
+//    liveTime: 1371962000000,
+//    url:{
+//        s3:'/user_project/cultural_and_creative-51d38ca086fa21440a000002-1375784400000-003/cultural_and_creative-51d38ca086fa21440a000002-1375784400000-003.jpg',
+//        longPhoto:'https://s3.amazonaws.com/miix_content/user_project/mood-512de6f7989cfc240300000e-20130815T091253591Z/mood-512de6f7989cfc240300000e-20130815T091253591Z.png'
+//    }
+//};
+//
+//var vjson2={
+//    _id: '5200d08d76c1bc281000003b',
+////    no: 3935,
+//    genre:'miix_story',
+//    ownerId:{_id: '51d38ca086fa21440a000002', fbUserId: '100006239742920', userID: '100006239742920'},
+//    projectId: 'miix_it-5192f1cac6e16fa00d000006-20130822T104338342Z.mp4_storymv_20130822T105532835Z',
+//    liveTime: 1371962000000,
+//    url:{
+//        youtube:'http://www.youtube.com/embed/ZZ8A7hTQHjA',
+//        longPhoto:'https://s3.amazonaws.com/miix_content/user_project/mood-512de6f7989cfc240300000e-20130815T091253591Z/mood-512de6f7989cfc240300000e-20130815T091253591Z.png'
+//    }
+//};
+//module.exports = FM.DB.getInstance().addUserLiveContent(vjson2, function(err,result){
+//    console.log(err,result);
+//});
 
 
 /* User Token
