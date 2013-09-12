@@ -44,13 +44,16 @@ miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbI
     
     aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, mediaType, function(responseParameters){
         
+        console.log('[aeServerMgr.createMiixMovie()] responseParameters=');
+        console.dir(responseParameters);
+        
         if ( responseParameters ) {
             var aeServerID = responseParameters.ae_server_id;
             var youtubeVideoID = responseParameters.youtube_video_id;
-            var movieProjectID = responseParameters.movie_project_id;
-            var ownerStdID = responseParameters.owner_std_id;
-            var ownerFbID = responseParameters.owner_fb_id;
-            var movieTitle = responseParameters.movie_title;
+            //var movieProjectID = responseParameters.movie_project_id;
+            //var ownerStdID = responseParameters.owner_std_id;
+            //var ownerFbID = responseParameters.owner_fb_id;
+            //var movieTitle = responseParameters.movie_title;
             var fileExtension = responseParameters.movie_file_extension;
             
             
@@ -67,7 +70,11 @@ miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbI
                              "fileExtension": fileExtension
                              };
                 fmapi._fbPostUGCThenAdd(vjson); //TODO: split these tasks to different rolls
+                logger.info("aeServerMgr.createMiixMovie(): responseParameters= "+JSON.stringify(responseParameters));
                 
+            }
+            else {
+                logger.error("aeServerMgr.createMiixMovie() returns responseParameters with error! responseParameters.err="+responseParameters.err);
             }
             
         }

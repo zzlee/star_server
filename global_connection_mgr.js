@@ -62,7 +62,7 @@ FM.globalConnectionMgr = (function(){
 //            },
             
             getConnectedRemoteWithLowestLoad: function(type, cbOfGetConnectedRemoteWithLowestLoad){
-                debugger;
+                
                 if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
                     for (anId in connectedRemotes){
                         var lowestLoadIndex = 1000000;
@@ -121,15 +121,16 @@ FM.globalConnectionMgr = (function(){
                         method: 'POST',
                         uri: config.HOST_STAR_COORDINATOR_URL + '/internal/requests_to_remote',
                         body: {"targetedRemoteID": targetedRemoteID, "reqToRemote": reqToRemote},
-                        json: true
+                        json: true,
+                        timeout: 60*60*1000
                         
                     }, function(error, response, body){
                     
                         if (body) {
-                            cbOfSendRequestToRemote(null, body.responseParameters);    
+                            cbOfSendRequestToRemote(body.responseParameters);    
                         }
                         else {
-                            cbOfSendRequestToRemote("Failed to send request to remote: "+error, null);  //TODO: check the content of error parameters
+                            cbOfSendRequestToRemote({err: "Failed to send request to remote: "+error});  //TODO: check the content of error parameters
                         }
                                 
                     });
