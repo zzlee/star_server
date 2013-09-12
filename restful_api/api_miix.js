@@ -202,38 +202,7 @@ exports.init = function() {
      * @name GET /miix/members/:memberId/live_contents
      * @memberof miix
      */
-//    app.get('/miix/members/:memberId/live_contents', routes.authorizationHandler.checkAuth, routes.miixHandler.getLiveContents_cb);
-    app.get('/miix/members/:memberId/live_contents', routes.authorizationHandler.checkAuth, function(req, res){
-        
-        var result = [
-                      {
-            _id: '5200d08d76c1bc281000003b',
-            no: 1673,
-            genre:'miix_image_live_photo',
-            ownerId:{fbUserId: '100006239742920', userID: '100006239742920'},
-            projectId: 'cultural_and_creative-51d38ca086fa21440a000002-1375784400000-003',
-            liveTime: 1371962000000,
-            url:{
-                s3:'/user_project/cultural_and_creative-51d38ca086fa21440a000002-1375784400000-003/cultural_and_creative-51d38ca086fa21440a000002-1375784400000-003.jpg',
-                longPhoto:'https://s3.amazonaws.com/miix_content/user_project/mood-512de6f7989cfc240300000e-20130815T091253591Z/mood-512de6f7989cfc240300000e-20130815T091253591Z.png'
-            }
-        },
-        {
-            _id: '5200d08d76c1bc281000003b',
-            no: 3935,
-            genre:'miix_story',
-            ownerId:{fbUserId: '100006239742920', userID: '100006239742920'},
-            projectId: 'miix_it-5192f1cac6e16fa00d000006-20130822T104338342Z.mp4_storymv_20130822T105532835Z',
-            liveTime: 1371962000000,
-            url:{
-                youtube:'http://www.youtube.com/embed/ZZ8A7hTQHjA',
-                longPhoto:'https://s3.amazonaws.com/miix_content/user_project/mood-512de6f7989cfc240300000e-20130815T091253591Z/mood-512de6f7989cfc240300000e-20130815T091253591Z.png'
-            }
-        },
-        ];
-        
-        res.send(200, result);
-    });
+    app.get('/miix/members/:memberId/live_contents', routes.authorizationHandler.checkAuth, routes.miixHandler.getLiveContents_cb);
 
     /**
      * Create a FB post id UGC of a specific project ID<br>
@@ -258,14 +227,28 @@ exports.init = function() {
      */
     app.put('/miix/fb_ugcs/:ugcProjectId', routes.authorizationHandler.checkAuth, routes.miixHandler.putFbPostIdUgcs_cb);
     
-    //TODO need to implement
-//    app.get('/miix/live_contents/:ugcProjectId', routes.authorizationHandler.checkAuth, ???);
-    app.get('/miix/live_contents/:ugcProjectId', routes.authorizationHandler.checkAuth, function(req, res){
-//        console.log('req.params.ugcProjectId=%s',req.params.ugcProjectId);
-        
-        var result = [{_id: '51d837f6830459c42d000023', no: 234, contentGenre: 'miix', doohPlayedDate: 1371962000000, url :"https://s3.amazonaws.com/miix_content/user_project/mood-512de6f7989cfc240300000e-20130815T091253591Z/mood-512de6f7989cfc240300000e-20130815T091253591Z.png" }];
-        
-        res.send(200, result);
-    });
+    /**
+     * Create a FB post id userLiveContent of a specific project ID<br>
+     * 
+     * <h5>Path parameters</h5>
+     * <ul>
+     * <li>ugcProjectId: the project ID of the userLiveContent
+     * </ul>
+     * 
+     * <h5>Query parameters</h5>
+     * None
+     * 
+     * <h5>Request body</h5>
+     * <ul>
+     * <li>fb_postId: the ID of the fb post id
+     * </ul>
+     * 
+     * <h5>Response body</h5>
+     * 
+     * @name PUT /miix/fb_userLiveContents/:ugcProjectId
+     * @memberof miix
+     */
+    app.put('/miix/fb_userLiveContents/:ugcProjectId', routes.authorizationHandler.checkAuth, routes.miixHandler.putFbPostIdUserLiveContents_cb);
+
     
 };

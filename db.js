@@ -309,7 +309,10 @@ FM.DB = (function(){
             contentSubGenre: {type: String}, //Is normally the id of sub template that this UGC uses
             no: {type: Number}, //Unique serial number shown to user  
             aeId: {type: String}, //ID of AE Server who renders this UGC
-            liveTime: {type: Number}, 
+            liveTime: {type: Number},
+            fb_postId: [{
+                postId: String,
+            }],
         }); //  UserLiveContent collection
 		
         /****************** End of DB Schema ******************/
@@ -620,7 +623,7 @@ module.exports = FM.DB.getInstance();
 //    genre:'miix_image_live_photo',
 //    contentGenre: 'miix_it',
 //    ownerId:{_id: '51d38ca086fa21440a000002', fbUserId: '100006239742920', userID: '100006239742920'},
-//    projectId: 'cultural_and_creative-51d38ca086fa21440a000002-1375784400000-005',
+//    projectId: 'cultural_and_creative-51d38ca086fa21440a000002-1375784400000-003',
 //    liveTime: 1371962000000,
 //    url:{
 //        s3:'/user_project/cultural_and_creative-51d38ca086fa21440a000002-1375784400000-003/cultural_and_creative-51d38ca086fa21440a000002-1375784400000-003.jpg',
