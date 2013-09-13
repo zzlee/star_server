@@ -120,6 +120,20 @@ http.createServer(app).listen(app.get('port'), function(){
 
 
 //var globalConnectionMgr = require('./global_connection_mgr.js');
+//setInterval(function(){
+//    var commandParameters = {
+//        para1: "hello_from_star_server",
+//        paraTest2: "test"
+//    };
+//                
+//    globalConnectionMgr.sendRequestToRemote( "AE_Server_Gance_PC", { command: "CONNECTION_TEST", parameters: commandParameters }, function(responseParameters) {
+//        console.log('responseParameters=');
+//        console.dir(responseParameters);
+//    });
+//}, 4000);
+
+
+//var globalConnectionMgr = require('./global_connection_mgr.js');
 //setTimeout(function(){
 //    var commandParameters = {
 //        para1: "hello",

@@ -30,6 +30,8 @@ FM.confuguration = (function(){
                     resultObj.IS_STAND_ALONE = systemConfigXML.IS_STAND_ALONE[0];
                 if (systemConfigXML.DEFAULT_AE_SERVER)
                     resultObj.DEFAULT_AE_SERVER = systemConfigXML.DEFAULT_AE_SERVER[0];
+                if (systemConfigXML.RENDER_MIIX_MOVIE_IMMEDIATELY_AFTER_GETTING_USER_CONTENT)
+                    resultObj.RENDER_MIIX_MOVIE_IMMEDIATELY_AFTER_GETTING_USER_CONTENT = systemConfigXML.RENDER_MIIX_MOVIE_IMMEDIATELY_AFTER_GETTING_USER_CONTENT[0];
                 constructed_cb(resultObj);
             }
             else{
