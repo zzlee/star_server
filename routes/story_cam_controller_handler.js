@@ -258,14 +258,17 @@ var updateToUGC = function(updateUGC_cb){
     var update = function(){
         var projectId = awsS3List[i].split('/');
         projectId = projectId[projectId.length-1].split('.');
+      //TODO 'longPhoto'&'liveTime' need to implement
         var vjson = {
             "ownerId": { '_id': ownerList[i]._id, 
                          'fbUserId': ownerList[i].userID,
                          'userID': ownerList[i].userID },
-            'url': { 's3': awsS3List[i] },
+            'url': { 's3': awsS3List[i],'longPhoto' :'https://s3.amazonaws.com/miix_content/user_project/mood-512de6f7989cfc240300000e-20130815T091253591Z/mood-512de6f7989cfc240300000e-20130815T091253591Z.png' },
             'genre': 'miix_image_live_photo',
-            'projectId': projectId[0]
+            'projectId': projectId[0],
+            'liveTime':1371962000000
         };
+      //TODO To use db.js function addUserLiveContent
         UGCDB.addUGC(vjson, function(err, result){
             //if(err) console.log(err);
             //else console.log(result);
@@ -340,14 +343,17 @@ var updateVideoToUGC = function(programInterval, updateVideoToUGC_cb){
         ugcModel.find({"_id": contentId}).exec(function (_err, result) {
             var projectId = awsS3List[0].split('/');
             projectId = projectId[projectId.length-1].split('__');
+            //TODO 'liveTime' need to implement
             var vjson = {
                 "ownerId": { '_id': result[0].ownerId._id, 
                              'userID': result[0].ownerId.userID,
                              'fbUserId': result[0].ownerId.userID },
-                'url': { 's3': awsS3List[0] },
+                'url': { 's3': awsS3List[0]},
                 'genre': 'miix_story',
-                'projectId': projectId[0]
+                'projectId': projectId[0],
+                'liveTime':1371962000000
             };
+            //TODO To use db.js function addUserLiveContent
             UGCDB.addUGC(vjson, function(err, result){
                 //if(err) console.log(err);
                 //else console.log(result);
