@@ -221,7 +221,6 @@ var imageNaming = function(ugcInfo, naming_cb){
     //[contentGenre]-[ownerId._id]-[time stamp]
     var name = '';
     ugcModel.find({"_id": ugcInfo.content._id}).exec(function (_err, result) {
-        //console.log(result[0].ownerId._id);
         ownerList.push(result[0].ownerId);
         doohPreviewList.push({ doohPreviewUrl: result[0].doohPreviewUrl, url: result[0].url.s3 });
         name = ugcInfo.contentGenre + '-' + 
@@ -246,7 +245,7 @@ var uploadToAwsS3 = function(awsS3_cb){
             awsS3.uploadToAwsS3(fileList[i], s3Path, '', function(err,result){
                 if (!err){
                     logger.info('Live content image was successfully uploaded to S3 '+s3Path);
-                 }
+                }
                 else {
                     logger.info('Live content image failed to be uploaded to S3 '+s3Path);
                 }
@@ -269,9 +268,10 @@ var updateToUGC = function(updateUGC_cb){
             "ownerId": { '_id': ownerList[i]._id, 
                          'fbUserId': ownerList[i].userID,
                          'userID': ownerList[i].userID },
-            'url': { 's3': awsS3List[i] },
+            'url': { 's3': awsS3List[i], 'longPhoto': doohPreviewList[i].url },
             'genre': 'miix_image_live_photo',
-            'projectId': projectId[0]
+            'projectId': projectId[0],
+            'liveTime': parseInt(recordTime)
         };
         var photoUrl = 
         {
@@ -285,7 +285,7 @@ var updateToUGC = function(updateUGC_cb){
             else
                 logger.info('Post message and pictrue to user is Success: ' + res);
             
-            UGCDB.addUGC(vjson, function(err, result){
+            db.addUserLiveContent(vjson, function(err, result){
                 //if(err) console.log(err);
                 //else console.log(result);
                 //if(!err) fmapi._fbPostUGCThenAdd(vjson);
@@ -339,7 +339,7 @@ var uploadVideoToAwsS3 = function(programInterval, awsS3_cb){
                 if (!err){
                     logger.info('Live content video was successfully uploaded to S3 '+s3Path);
                     awsS3_cb(null, 'success');
-                 }
+                }
                 else {
                     logger.info('Live content video failed to be uploaded to S3 '+s3Path);
                     awsS3_cb(null, 'failed');
@@ -360,15 +360,17 @@ var updateVideoToUGC = function(programInterval, updateVideoToUGC_cb){
         ugcModel.find({"_id": contentId}).exec(function (_err, result) {
             var projectId = awsS3List[0].split('/');
             projectId = projectId[projectId.length-1].split('__');
+            //TODO 'liveTime' need to implement
             var vjson = {
                 "ownerId": { '_id': result[0].ownerId._id, 
                              'userID': result[0].ownerId.userID,
                              'fbUserId': result[0].ownerId.userID },
-                'url': { 's3': awsS3List[0] },
+                'url': { 's3': awsS3List[0]},
                 'genre': 'miix_story',
-                'projectId': projectId[0]
+                'projectId': projectId[0],
+                'liveTime': parseInt(recordTime)
             };
-            UGCDB.addUGC(vjson, function(err, result){
+            db.addUserLiveContent(vjson, function(err, result){
                 //if(err) console.log(err);
                 //else console.log(result);
                 updateVideoToUGC_cb(null, 'done');
@@ -397,17 +399,19 @@ var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
             function(preview){
                 var message = fb_name + '於' + playTime + '，登上台北天幕LED，，這是原始刊登素材，天幕尺寸：100公尺x16公尺。\n' + 
                           '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
-                facebookMgr.postPhoto(access_token, message, photoUrl.preview, albumId, preview);
+                //facebookMgr.postPhoto(access_token, message, photoUrl.preview, albumId, preview);
+                facebookMgr.postMessage(access_token, message, photoUrl.preview, preview);
             },
             function(play){
                 var message = fb_name + '於' + playTime + '，登上台北天幕LED，特此感謝他精采的作品！\n' + 
                           '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
-                facebookMgr.postPhoto(access_token, message, photoUrl.play, albumId, play);
+                //facebookMgr.postPhoto(access_token, message, photoUrl.play, albumId, play);
+                facebookMgr.postMessage(access_token, message, photoUrl.play, play);
             },
         ], function(err, res){
             //(err)?console.log(err):console.dir(res);
             if(!err){
-                logger.info('post message to user on facebook, member id is ' + member[0]._id);
+                logger.info('post message to user on facebook, fb id is ' + fb_id);
                 pushPhotos_cb(null, 'done');
             }
             else
@@ -432,7 +436,6 @@ var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
         var album_message = '';
         var message = fb_name + '於' + playTime + '，登上台北天幕LED，特此感謝您精采的作品！\n' + 
                       '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
-        //pushMgr.sendMessageToDeviceByMemberId(member[0]._id, message, postPicture_cb);
         
         async.waterfall([
             function(push_cb){
@@ -442,10 +445,12 @@ var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
                 });
             }
         ], function(err, res){
-            facebookMgr.createAlbum(access_token, album_name, album_message, function(err, res){
+            /*facebookMgr.createAlbum(access_token, album_name, album_message, function(err, res){
                 logger.info('create fb album for user, member id is ' + member[0]._id);
                 pushPhotosToUser(JSON.parse(res).id, postPicture_cb);
-            });
+            });*/
+            pushPhotosToUser(JSON.parse(res).id, postPicture_cb);
+            //postPicture_cb(err, res);
         });
         
     });

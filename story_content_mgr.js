@@ -124,7 +124,7 @@ storyContentMgr.generateStoryMV = function(miixMovieProjectID, recordTime) {
             var access_token = res.member.fb.auth.accessToken;
             var fb_name = res.member.fb.userName;
             var link = youtube_url;
-            var playTime, start = new Date(record_time);
+            var playTime, start = new Date(parseInt(record_time));
             if(start.getHours()>12)
                 playTime = start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日下午'+(start.getHours()-12)+':'+start.getMinutes();
             else
@@ -270,7 +270,8 @@ storyContentMgr.generateStoryMV = function(miixMovieProjectID, recordTime) {
                                                "url": url,
                                                "genre":"miix_story",
                                                "aeId": aeServerID,
-                                               "projectId":storyMovieProjectID};
+                                               "projectId":storyMovieProjectID,
+                                               "liveTime":parseInt(record_time)};
                                   //add story MV notification
                                   postStoryMVRenderOK(miixMovieProjectID, recordTime, url.youtube, function(err, res){
                                     if(err)
@@ -278,7 +279,8 @@ storyContentMgr.generateStoryMV = function(miixMovieProjectID, recordTime) {
                                     else
                                         logger.info('Post FB message is Success: ' + res);
                                         
-                                      UGCDB.addUGC(vjson, function(err, result){
+                                      //UGCDB.addUGC(vjson, function(err, result){
+                                      db.addUserLiveContent(vjson, function(err, result){
                                           if(err) {
                                               cb4("UGCDB.addUGC() failed : "+ err);
                                           }
