@@ -449,7 +449,7 @@ var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
                 logger.info('create fb album for user, member id is ' + member[0]._id);
                 pushPhotosToUser(JSON.parse(res).id, postPicture_cb);
             });*/
-            pushPhotosToUser(JSON.parse(res).id, postPicture_cb);
+            pushPhotosToUser('', postPicture_cb);
             //postPicture_cb(err, res);
         });
         
