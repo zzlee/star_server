@@ -480,7 +480,7 @@ miixContentMgr.addMiixImage = function(imgBase64, imgDoohPreviewBase64, ugcProje
                     callback('Miix image info failed to saved to UGC db: '+errAddUgc);
                 }
             });
-        }//,
+        },
 //        function(callback){
 //            //post on Facebook
 //            memberDB.getFBAccessTokenById(ugcInfo.ownerId._id, function(errOfGetFBAccessTokenById, result){
@@ -506,15 +506,50 @@ miixContentMgr.addMiixImage = function(imgBase64, imgDoohPreviewBase64, ugcProje
 //                
 //            });
 //        }
+        function(callback){
+            var projectDir = path.join( workingPath, 'public/contents/user_project', ugcProjectID);
+            async.waterfall([
+                function(callbackOfWaterfall){
+                    //check if project dir exists
+                    fs.exists(projectDir, function (exists) {
+                        callbackOfWaterfall(null, exists);
+                    });
+                },
+                function(projectDirExists, callbackOfWaterfall){
+                    //if exists, delete one
+                    if (projectDirExists) {
+                        rmDirectory(projectDir);
+                        callbackOfWaterfall(null);
+                    }
+                    else {
+                        callbackOfWaterfall(null);
+                    }
+                }        
+                ], function (err, result) {
+                callback(err);    
+            });
+        }
+
     ],
     function(err, results){
         if (cbOfAddMiixImage){
             cbOfAddMiixImage(err);
         }
     });
+    
+
 };
-
-
+var rmDirectory = function(dirName, cbOfRmDirectory) {
+    if(!fs.existsSync(dirName)) return;  
+    fs.readdirSync(dirName).forEach(function(file,index){
+      var currentPath = dirName + "/" + file;
+      if(fs.statSync(currentPath).isDirectory()) 
+        rmDirectory(currentPath);
+      else 
+        fs.unlinkSync(currentPath);
+    });
+    fs.rmdirSync(dirName);
+  };
 /**
  * Get the url of user-uploaded image <br>  
  * 
