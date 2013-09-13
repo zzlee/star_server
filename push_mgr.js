@@ -107,9 +107,10 @@ FM.pushMgr = (function() {
                      if(err){
                          FM_LOG('[pus_mgr.sendMessageToDeviceByMemberId] error='+err);
                          cbOfSendMessageToDeviceByMemberId(err, result);
-                     }
-                     
-                     if(result.deviceToken){
+                     }else if(!result){
+                         FM_LOG('[pus_mgr.sendMessageToDeviceByMemberId] error = result is null'+err);
+                         cbOfSendMessageToDeviceByMemberId(err, result);
+                     }else if(result.deviceToken){
                          FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
                          for( var devicePlatform in result.deviceToken){
                              var deviceTokenCheck = result.deviceToken[devicePlatform];
