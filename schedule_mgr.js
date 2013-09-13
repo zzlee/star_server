@@ -10,7 +10,8 @@ var path = require('path');
 var fs = require('fs');
 var awsS3 = require('./aws_s3.js');
 var db = require('./db.js');
-var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://server-pc:8080', { username: 'administrator', password: '53768608' } );
+//var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://server-pc:8080', { username: 'administrator', password: '53768608' } );
+var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://192.168.5.189:8080', { username: 'administrator', password: '53768608' } );
 
 //var scalaMgr = require('./scala/scalaMgr.js')();
 
@@ -18,6 +19,10 @@ var programTimeSlotModel = db.getDocModel("programTimeSlot");
 var ugcModel = db.getDocModel("ugc");
 var candidateUgcCacheModel = db.getDocModel("candidateUgcCache");
 var sessionItemModel = db.getDocModel("sessionItem");
+
+var facebookMgr = require('./facebook_mgr.js');
+var pushMgr = require('./push_mgr.js');
+var memberModel = db.getDocModel("member");
 
 /**
  * The manager who handles the scheduling of playing UGC on DOOHs
@@ -71,23 +76,27 @@ var programPlanningPattern =(function(){
     };
 })();
 
-
+//Jeff_start
 
 var paddingContent =(function(){ 
     var PADDING_CONTENT_TABLE = { //specify the media name of each padding content store on Scala's Content Manager
-            miix_it: [{name: "ondascreen_padding-miix_it-start"},
+            miix_it: [//{name: "ondascreen_padding-miix_it-start"},
+                      {name: "Jeff_start"},
                       {name: "ondascreen_padding-miix_it-end.jpg"}],
-            cultural_and_creative: [{name: "ondascreen_padding-cultural_and_creative-start"},
+            cultural_and_creative: [//{name: "ondascreen_padding-cultural_and_creative-start"},
+                                    {name: "Jeff_start"},
                                     {name: "ondascreen_padding-cultural_and_creative-middle.jpg"},
                                     {name: "ondascreen_padding-cultural_and_creative-middle.jpg"},
                                     {name: "ondascreen_padding-cultural_and_creative-end.jpg"}
                                     ],
-            mood: [{name: "ondascreen_padding-wish-start"},
+            mood: [//{name: "ondascreen_padding-wish-start"},
+                   {name: "Jeff_start"},
                    {name: "ondascreen_padding-wish-middle.jpg"},
                    {name: "ondascreen_padding-wish-middle.jpg"},
                    {name: "ondascreen_padding-wish-end.jpg"}
                    ],
-            check_in: [{name: "ondascreen_padding-check_in-start"},
+            check_in: [//{name: "ondascreen_padding-check_in-start"},
+                       {name: "Jeff_start"},
                        {name: "ondascreen_padding-check_in-middle.jpg"},
                        {name: "ondascreen_padding-check_in-middle.jpg"},
                        {name: "ondascreen_padding-check_in-end.jpg"}
@@ -884,6 +893,50 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
             });
         },
         function(programs, cb2){
+        
+            //post each users to Facbook
+            var postPreview = function(aProgram, postPreview_cb){
+                
+                var access_token, message, link;
+                var fb_name, play_time;
+                
+                async.waterfall([
+                    function(ugcSearch){
+                        ugcModel.find({'no': aProgram.content.no}).exec(function(err, ugc){ ugcSearch(null, ugc) });
+                    },
+                    function(ugc, memberSearch){
+                        memberModel.find({'fb.userID': ugc[0].ownerId.userID}).exec(function(err, member){ memberSearch(null, {ugc: ugc, member: member}); });
+                    },
+                ], function(err, res){
+                    access_token = res.member[0].fb.auth.accessToken;
+                    fb_name = res.member[0].fb.userName;
+                    var start = new Date(aProgram.timeslot.start);
+                    var end = new Date(aProgram.timeslot.end);
+                    if(start.getHours()>12)
+                        play_time = start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日下午'+(start.getHours()-12)+':'+start.getMinutes()+'~'+(end.getHours()-12)+':'+end.getMinutes();
+                    else
+                        play_time = start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日上午'+start.getHours()+':'+start.getMinutes()+'~'+end.getHours()+':'+end.getMinutes();
+                    //message = fb_name + '的試鏡編號：' + res.ugc[0].no + '作品，將於' + play_time + '之間，登上台北天幕LED，敬請期待！\n' + '上大螢幕APP(連結到FB粉絲團)特此預告。';
+                    message = fb_name + '即將粉墨登場！\n' + fb_name + '的試鏡編號' + res.ugc[0].no + '作品，將於' + play_time + '之間，登上台北天幕LED，敬請期待！';
+                    var shareOption =
+                    {
+                        name: "上大螢幕", 
+                        img_url: 'https://lh5.googleusercontent.com/-fpFqpP6pBoI/UihA_MSQaAI/AAAAAAAAAIU/b6FlwLNWBu0/s0/fb.png',
+                        link: "https://www.facebook.com/OnDaScreen?directed_target_id=0",
+                        description: "你可以將你的創作，發表在小巨蛋台北天幕LED！"
+                    };
+
+                    async.parallel([
+                        function(push_cb){pushMgr.sendMessageToDeviceByMemberId(res.member[0]._id, message, function(err, res){ push_cb(null, res); });},
+                        function(postFB_cb){facebookMgr.postMessageAndShare(access_token, message, shareOption, function(err, res){ postFB_cb(err, res); });}
+                    ], function(err, res){
+                        //(err)?console.log(err):console.dir(res);
+                        postPreview_cb(err, res);
+                    });
+                });
+
+            };
+
             //push each programs to Scala
             var iteratorPushAProgram = function(aProgram, callbackIterator){
                 
@@ -925,7 +978,13 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
                                     }
                                     
                                 });
-    
+                                //add fb push
+                                postPreview(aProgram, function(err, res){
+                                    if(err)
+                                        logger.info('Post FB message is Error: ' + err);
+                                    else
+                                        logger.info('Post FB message is Success: ' + res);
+                                });
                             }
                             else {
                                 var paddingFilePath = path.join(workingPath, 'public', aProgram.content.dir, aProgram.content.file);

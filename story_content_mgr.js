@@ -7,7 +7,14 @@ var doohMgr = require(workingPath+'/dooh_mgr.js');
 var storyCamControllerMgr = require(workingPath+'/story_cam_controller_mgr.js');
 var memberDB = require(workingPath+'/member.js');
 var UGCDB = require(workingPath+'/ugc.js');
-var fmapi = require(workingPath+'/routes/api.js'); 
+var fmapi = require(workingPath+'/routes/api.js');
+
+var db = require('./db.js');
+var programTimeSlotModel = db.getDocModel("programTimeSlot");
+var ugcModel = db.getDocModel("ugc");
+var memberModel = db.getDocModel("member");
+var facebookMgr = require('./facebook_mgr.js');
+var pushMgr = require('./push_mgr.js');
 
 var downloadStoryMovieFromStoryCamControllerToAeServer = function(movieProjectID, downloaded_cb){
 
@@ -66,7 +73,7 @@ var downloadMiixMovieFromS3 = function(_miixMovieProjectID, _miixMovieFileExtens
     });
 };
 
-storyContentMgr.generateStoryMV = function(miixMovieProjectID) {
+storyContentMgr.generateStoryMV = function(miixMovieProjectID, recordTime) {
     var ownerStdID = null;
     var ownerFbID = null;
     //var ownerFbName = null;
@@ -102,6 +109,41 @@ storyContentMgr.generateStoryMV = function(miixMovieProjectID) {
     
     };
     
+    var postStoryMVRenderOK = function(pid, record_time, youtube_url, postStory_cb){
+        //
+        async.waterfall([
+            function(ugcSearch){
+                ugcModel.find({projectId: pid}).exec(ugcSearch);
+            },
+            function(ugc, memberSearch){
+                memberModel.find({'fb.userID': ugc[0].ownerId.userID}).exec(function(err, member){
+                    memberSearch(err, {ugc: ugc[0], member: member[0]});
+                });
+            }
+        ], function(err, res){
+            var access_token = res.member.fb.auth.accessToken;
+            var fb_name = res.member.fb.userName;
+            var link = youtube_url;
+            var playTime, start = new Date(parseInt(record_time));
+            if(start.getHours()>12)
+                playTime = start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日下午'+(start.getHours()-12)+':'+start.getMinutes();
+            else
+                playTime = start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日上午'+start.getHours()+':'+start.getMinutes();
+            
+            var message = fb_name + '於' + playTime + '，登上台北天幕LED，上大螢幕APP特此感謝他精采的作品！\n' + 
+                          '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
+            
+            var shareOption = { link: link };
+            //facebookMgr.postMessageAndShare(access_token, message, shareOption, postStory_cb);
+            async.parallel([
+                function(push_cb){pushMgr.sendMessageToDeviceByMemberId(res.member._id, message, push_cb);},
+                function(postFB_cb){facebookMgr.postMessageAndShare(access_token, message, shareOption, postFB_cb);}
+            ], function(err, res){
+                //(err)?console.log(err):console.dir(res);
+                postStory_cb(err, res);
+            });
+        });
+    };
     /*
     downloadStoryMovieFromStoryCamControllerToAeServer( miixMovieProjectID, function(err){
         
@@ -228,16 +270,26 @@ storyContentMgr.generateStoryMV = function(miixMovieProjectID) {
                                                "url": url,
                                                "genre":"miix_story",
                                                "aeId": aeServerID,
-                                               "projectId":storyMovieProjectID};
-                                  UGCDB.addUGC(vjson, function(err, result){
-                                      if(err) {
-                                          cb4("UGCDB.addUGC() failed : "+ err);
-                                      }
-                                      else {
-                                          fmapi._fbPostUGCThenAdd(vjson); 
-                                          logger.info('fmapi._fbPostUGCThenAdd(vjson) called. vjson='+JSON.stringify(vjson));
-                                          cb4(null);
-                                      }
+                                               "projectId":storyMovieProjectID,
+                                               "liveTime":parseInt(record_time)};
+                                  //add story MV notification
+                                  postStoryMVRenderOK(miixMovieProjectID, recordTime, url.youtube, function(err, res){
+                                    if(err)
+                                        logger.info('Post FB message is Error: ' + err);
+                                    else
+                                        logger.info('Post FB message is Success: ' + res);
+                                        
+                                      //UGCDB.addUGC(vjson, function(err, result){
+                                      db.addUserLiveContent(vjson, function(err, result){
+                                          if(err) {
+                                              cb4("UGCDB.addUGC() failed : "+ err);
+                                          }
+                                          else {
+                                              fmapi._fbPostUGCThenAdd(vjson); 
+                                              logger.info('fmapi._fbPostUGCThenAdd(vjson) called. vjson='+JSON.stringify(vjson));
+                                              cb4(null);
+                                          }
+                                      });
                                   });
                               }
                               
