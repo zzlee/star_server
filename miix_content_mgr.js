@@ -763,6 +763,57 @@ miixContentMgr.pushRandomMessage = function(memberId, ugcProjectID, cbOfPushRand
                  });
 };
 
+miixContentMgr.getUserLiveContentList = function(memberId, limit, skip, cbOfGetLiveContent){
+    var userLiveContentModel = db.getDocModel("userLiveContent");
+    
+    userLiveContentModel.find({"ownerId._id": memberId}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(cbOfGetLiveContent);
+    
+    
+};
+
+
+miixContentMgr.putFbPostIduserLiveContents = function(userLiveContentProjectID, userLiveContentInfo, cbOfPutFbPostIduserLiveContents){
+    var userLiveContentModel = db.getDocModel("userLiveContent");
+    
+    async.waterfall([
+        function(callback){
+            userLiveContentModel.find({ "projectId": userLiveContentProjectID}).sort({"createdOn":-1}).exec(function (err, userLiveContentObj) {
+                if (!err)
+                    callback(null, userLiveContentObj);
+                else
+                    callback("Fail to retrieve userLiveContent Obj from DB: "+err, userLiveContentObj);
+            });
+            
+        },
+        function(userLiveContentObj, callback){
+            var vjson;
+            var arr = [];
+            
+            if(userLiveContentObj[0].fb_postId[0]){
+                userLiveContentObj[0].fb_postId.push({'postId': userLiveContentInfo});
+              vjson = {"fb_postId" :userLiveContentObj[0].fb_postId};
+            }else{
+                arr = [{'postId': userLiveContentInfo}];
+                vjson = {"fb_postId" : arr};
+            }
+            
+            db.updateAdoc(userLiveContentModel, userLiveContentObj[0]._id, vjson, function(errOfUpdateUserLiveContent, resOfUpdateUserLiveContent){
+                if (!errOfUpdateUserLiveContent){
+                    callback(null, resOfUpdateUserLiveContent);
+                }else
+                    callback("Fail to update userLiveContent Obj from DB: "+errOfUpdateUserLiveContent, resOfUpdateUserLiveContent);
+            });
+            
+        }
+    ],
+    function(err, result){
+        if (cbOfPutFbPostIduserLiveContents){
+            cbOfPutFbPostIduserLiveContents(err, result);
+        } 
+    });
+};
+
+
 
 module.exports = miixContentMgr;
 
@@ -781,4 +832,13 @@ miixContentMgr.getUserUploadedImageUrls('greeting-50c99d81064d2b841200000a-20130
 
 //miixContentMgr.pushRandomMessage( '52201b3999f24f9809000006', 'miix_it-522022ad2ca7ced40600000e-20130830T052614052Z', function(err, result){
 //    console.log(err, result);
+//});
+
+//miixContentMgr.getLiveContent( '51d38ca086fa21440a000002',10,0, function(err, result){
+//console.log(err, result);
+//});
+
+//miixContentMgr.putFbPostIduserLiveContents('cultural_and_creative-51d38ca086fa21440a000002-1375784400000-005', '123', function(err, putFbPostIdUgcs){
+//console.log('userUploadedImageUrls=');
+//console.dir(putFbPostIdUgcs);
 //});

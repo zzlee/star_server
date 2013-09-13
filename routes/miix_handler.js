@@ -136,9 +136,9 @@ miixHandler.getLiveContents_cb = function(req, res) {
         limit = 10;
     }
     
-    ugc.getLiveUGCListByOwnerId(req.params.memberId, limit, 0, function(err, ugcList){
+    miixContentMgr.getUserLiveContentList(req.params.memberId, limit, 0, function(err, userLiveContentList){
         if (!err) {
-            res.send(ugcList);
+            res.send(userLiveContentList);
         }
         else {
             res.send(500, {error: err});
@@ -158,6 +158,28 @@ miixHandler.putFbPostIdUgcs_cb = function(req, res) {
             }
             else {
                 logger.error('[PUT /miix/fb_ugcs/:ugcProjectId] failed: '+ err);
+                res.send(400, {error: err});
+            }
+        });
+    }
+    else {
+        res.send(400, {error: "Not all needed data are sent."});
+    }
+    
+};
+
+//PUT /miix/fb_userLiveContents/:ugcProjectId
+miixHandler.putFbPostIdUserLiveContents_cb = function(req, res) {
+    logger.info('[PUT '+req.path+'] is called');
+    if (req.body.fb_postId){
+        var ugcInfo = req.body.fb_postId;
+        
+        miixContentMgr.putFbPostIduserLiveContents( req.params.ugcProjectId, ugcInfo, function(err){
+            if (!err){
+                res.send(200);
+            }
+            else {
+                logger.error('[PUT /miix/fb_userLiveContents/:ugcProjectId] failed: '+ err);
                 res.send(400, {error: err});
             }
         });

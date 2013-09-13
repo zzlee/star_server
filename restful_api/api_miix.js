@@ -183,8 +183,6 @@ exports.init = function() {
      */
     app.get('/miix/members/:memberId/ugcs', routes.authorizationHandler.checkAuth, routes.miixHandler.getUgcs_cb);
 
-    app.get('/miix/members/:memberId/live_contents', routes.authorizationHandler.checkAuth, routes.miixHandler.getLiveContents_cb);
-
     /**
      * Get a list of latest live content items (a.k.a. "Miix Story" or "Story MV") of a specific member , sorted by creating time (the newest at beginning)<br>
      * <h5>Path parameters</h5>
@@ -229,14 +227,28 @@ exports.init = function() {
      */
     app.put('/miix/fb_ugcs/:ugcProjectId', routes.authorizationHandler.checkAuth, routes.miixHandler.putFbPostIdUgcs_cb);
     
-    //TODO need to implement
-//    app.get('/miix/live_contents/:ugcProjectId', routes.authorizationHandler.checkAuth, ???);
-    app.get('/miix/live_contents/:ugcProjectId', routes.authorizationHandler.checkAuth, function(req, res){
-//        console.log('req.params.ugcProjectId=%s',req.params.ugcProjectId);
-        
-        var result = [{_id: '51d837f6830459c42d000023', no: 234, contentGenre: 'miix', doohPlayedDate: 1371962000000, url :"https://s3.amazonaws.com/miix_content/user_project/mood-512de6f7989cfc240300000e-20130815T091253591Z/mood-512de6f7989cfc240300000e-20130815T091253591Z.png" }];
-        
-        res.send(200, result);
-    });
+    /**
+     * Create a FB post id userLiveContent of a specific project ID<br>
+     * 
+     * <h5>Path parameters</h5>
+     * <ul>
+     * <li>ugcProjectId: the project ID of the userLiveContent
+     * </ul>
+     * 
+     * <h5>Query parameters</h5>
+     * None
+     * 
+     * <h5>Request body</h5>
+     * <ul>
+     * <li>fb_postId: the ID of the fb post id
+     * </ul>
+     * 
+     * <h5>Response body</h5>
+     * 
+     * @name PUT /miix/fb_userLiveContents/:ugcProjectId
+     * @memberof miix
+     */
+    app.put('/miix/fb_userLiveContents/:ugcProjectId', routes.authorizationHandler.checkAuth, routes.miixHandler.putFbPostIdUserLiveContents_cb);
+
     
 };
