@@ -11,6 +11,7 @@ var FM = {};
 FM.ADMINCACHE = (function(){
     var uInstance = null;
 
+
     /**     Member     **/
     var cacheMember = function(){
 
@@ -18,16 +19,13 @@ FM.ADMINCACHE = (function(){
 
         var member_mgr_t = require('./member.js');
         var memberListInfos = FMDB.getDocModel("memberListInfo");
-        var miixPlayListInfos = FMDB.getDocModel("miixPlayListInfo");
 
         var async = require('async');
         var next = 0,
         limit = 0;
 
         var cacheMemberList = function(data, set_cb){
-//            console.log('data'+data);
             var toDo = function(err, result){
-//                console.log('toDo'+err+result);
                 var mPhone = null;
                 if(data[next].mPhone.number)
                     mPhone = data[next].mPhone.number;
@@ -43,21 +41,15 @@ FM.ADMINCACHE = (function(){
                         fbLike_count: result[3][0].totalLikes,
                         fbComment_count: result[3][0].totalComments,
                         fbShare_count: result[3][0].totalShares,
-//                        fbLike_count:0,
-//                        fbComment_count:0,
-//                        fbShare_count:0,
                 };
 
                 var field = "fb.userID";
                 FMDB.getValueOf(memberListInfos, {"fb.userID": data[next].fb.userID}, field, function(err, result){
-//                    console.log('getValueOf'+err+result);
                     if(!result){ 
                         FMDB.createAdoc(memberListInfos, vjson, function(err, result){
-//                            console.log('createAdoc'+err+result+'vjson'+JSON.stringify(vjson));
                         });
                     }else if(result){
                         FMDB.updateAdoc(memberListInfos, result, vjson, function(err, result){
-//                            console.log('updateAdoc'+err+result+'vjson'+JSON.stringify(vjson));
                         });
                     }
                 });
@@ -97,14 +89,11 @@ FM.ADMINCACHE = (function(){
                                         });
                                     },
                                     function(callback){
-                                        
-//                                        debugger;
-//                                        member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
-////                                            console.log('admincache'+err, result);
-//                                            if(err) callback(err, null);
-//                                            else callback(null, result);
-//                                        });
-                                    },
+                                        member_mgr.getTotalCommentsLikesSharesOnFB(data[next].fb.userID, function(err, result){
+                                            if(err) callback(err, null);
+                                            else callback(null, result);
+                                        });
+                                    }
                                     ], toDo);
                 }
             }
@@ -113,7 +102,6 @@ FM.ADMINCACHE = (function(){
         member_mgr_t.listOfMembers( null, 'fb.userName fb.userID _id email mPhone ugc_count doohTimes triedDoohTimes', {sort: 'fb.userName'}, function(err, result){
             if(err) console.log('[member_mgr.listOfMemebers]', err);
             if(result){
-//                console.log('result'+result);
                 limit = result.length;
                 if(limit > 0){
                     cacheMemberList(result, function(err, docs){
@@ -134,7 +122,8 @@ FM.ADMINCACHE = (function(){
         var member_mgr = require('./member.js');
         var UGC_mgr = require('./ugc.js');
         var miix_content_mgr = require('./miix_content_mgr.js');
-
+        
+        var miixPlayListInfos = FMDB.getDocModel("miixPlayListInfo");
         var UGCs = FMDB.getDocModel("ugc");
 
         var async = require('async');
@@ -143,17 +132,11 @@ FM.ADMINCACHE = (function(){
 
         var cacheMiixPlayList = function(data, set_cb){
             var toDo = function(err, result){
-//                console.dir(err);
-//                console.log('cacheMiixUGC-toDo'+JSON.stringify(err)+','+JSON.stringify(result)+'next='+next);
                 var userPhotoUrl = null;
-                var userText = null;
-//                console.log(':result[0]'+result[0]);
-//                console.log(':result[1]'+result[1]);
-//                console.log(':result[2]'+result[2][0].likes);
+                var userContentType = null;
                 if(data[next].userRawContent[0]){
                 userPhotoUrl = data[next].userRawContent[0].content;
                 userContentType = data[next].userRawContent[0].type;
-//                console.log('userPhotoUrl'+userPhotoUrl);
                 }
                 //update mongoDB
                 var vjson = {
@@ -167,22 +150,17 @@ FM.ADMINCACHE = (function(){
                         movieMaker:result[1],
                         applyDoohPlay_count:data[next].triedDoohTimes,
                         doohPlay_count:data[next].doohPlayedTimes,
-//                      timesOfPlaying:0,
                         createdOn: data[next].createdOn,
                         userContentType: userContentType
                 };
 
                 var field = "projectId";
-//                console.log('data[next].projectId'+data[next].projectId+'--'+data[next].no+'--'+JSON.stringify(vjson));
                 FMDB.getValueOf(miixPlayListInfos, {"projectId": data[next].projectId}, field, function(err, result){
-//                    console.log('getValueOf'+err, result);
                     if(!result){ 
                         FMDB.createAdoc(miixPlayListInfos, vjson, function(err, result){
-//                            console.log('createAdoc'+err, result);
                         });
                     }else{
                         FMDB.updateAdoc(miixPlayListInfos, result, vjson, function(err, result){
-//                            console.log('updateAdoc'+err, result);
                         });
                     }
                         
@@ -203,18 +181,7 @@ FM.ADMINCACHE = (function(){
             //get count 
             if(data[next]){
                 if( data[next].ownerId._id && data[next].projectId){
-//                    console.log('data[next].fb_postId'+data[next].fb_postId[0]);
                     async.parallel([
-//                                    function(callback){
-//                                        miix_content_mgr.getUserUploadedImageUrls(data[next].projectId, function(result, err){
-//                                            if(err) {
-//        //                                        callback(err,null);
-//                                                next += 1;
-//                                                cacheMiixPlayList(data, set_cb);
-//                                            }
-//                                            else callback(null, result);
-//                                        });
-//                                    },
                                     function(callback){
                                         UGC_mgr.getUGCCount(data[next]._id, 'miix', function(err, result){
                                             if(err) callback(err, null);
@@ -223,40 +190,29 @@ FM.ADMINCACHE = (function(){
                                     },
                                     function(callback){
                                         member_mgr.getUserNameAndID(data[next].ownerId._id, function(err, result){
-//                                            console.log(err, result);
                                             if(err){callback(err, null);}
                                             else if(!result){ callback(null, 'No User');}
                                             else{ callback(null, result.fb.userName);}
                                         });
                                     },
                                     function(callback){
-                                        
-//                                        if((typeof(data[next].fb_postId) == null) || (typeof(data[next].fb_postId) === 'undefined') ||
-//                                                (typeof(data[next].url.youtube) == null) || (typeof(data[next].url.youtube) === 'undefined')) callback(null, [{ comments: 0, likes: 0 }, { shares: 0 }]);
                                         if((typeof(data[next].fb_postId[0]) == null) || (typeof(data[next].fb_postId[0]) === 'undefined'))
                                              callback(null, [{ totalComments: 0, totalLikes: 0, totalShares: 0 }]);
                                         else {
-//                                            for(var idx=0;idx<data[next].fb_postId.length;idx++){
-//                                            console.log('data[next].fb_postId.postId'+data[next].fb_postId[idx]+','+next+','idx);
-//                                        console.log('data[next].fb_postId.postId'+data[next].fb_postId+','+next);
                                             UGC_mgr.getCommentsLikesSharesOnFB(data[next]._id, data[next].ownerId._id, data[next].fb_postId, function(err, result){
-//                                                console.dir(result);
                                                 if(err) callback(err, null);
                                                 else callback(null, result);
                                             });
-//                                            }
                                         }
                                     },
                                     ], toDo);
                 }
             }
         };
-        console.log('MiixUGC start'); 
         var query = UGCs.find();
-        query.exec(function(err, result){
+        query.sort({'createdOn': -1}).exec(function(err, result){
  
             limit = result.length;
-            console.log('UGC limit'+limit);
             if(limit > 0){
                 cacheMiixPlayList(result, function(err, result){
                     if(err) console.log(err);
@@ -284,8 +240,6 @@ FM.ADMINCACHE = (function(){
 
         var cacheStoryPlayList = function(data, set_cb){
             var toDo = function(err, result){
-//                console.dir(err);
-//                console.log('cacheStoryUGC-toDo'+JSON.stringify(err)+','+JSON.stringify(result)+'next='+next);
                 //update mongoDB
                 var vjson = {
                         projectId: data[next].projectId,
@@ -302,11 +256,9 @@ FM.ADMINCACHE = (function(){
                 FMDB.getValueOf(storyPlayListInfos, {"projectId": data[next].projectId}, field, function(err, result){
                     if(result == null){ 
                         FMDB.createAdoc(storyPlayListInfos,vjson, function(err, result){
-//                            console.log('createAdoc'+err, result);
                         });
                     }else{
                         FMDB.updateAdoc(storyPlayListInfos, result, vjson, function(err, result){
-//                            console.log('createAdoc'+err, result);
                         });
                     }
                 });
@@ -369,12 +321,11 @@ FM.ADMINCACHE = (function(){
     /**     StoryUGC End     **/  
 
     var retrieveDataAndUpdateCacheDB = function(){    
-//        console.log('cache start'); 
         //TODO: need to implement
        
-//        cacheMember();
-//
-//        cacheMiixUGC();
+        cacheMember();
+
+        cacheMiixUGC();
 
 //        cacheStoryUGC();
 
@@ -384,6 +335,20 @@ FM.ADMINCACHE = (function(){
         setTimeout(retrieveDataAndUpdateCacheDB,300000);
 
     };
+    
+    var deleteCacheDB = function(){
+        var memberListInfos = FMDB.getDocModel("memberListInfo");
+        var miixPlayListInfos = FMDB.getDocModel("miixPlayListInfo");
+        
+        memberListInfos.remove().exec(function(err, res){
+        });
+        miixPlayListInfos.remove().exec(function(err, res){
+        });
+
+//      setTimeout(deleteCacheDB,3000000);
+
+    };
+    deleteCacheDB();
 
     retrieveDataAndUpdateCacheDB();
 
