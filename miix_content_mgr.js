@@ -138,6 +138,7 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
     var userContentDescriptionFilePath = path.join( userDataDir, 'customized_content.xml');
     var customizableObjects = ugcInfo.customizableObjects;
     var ugcDoohPreviewS3Path = null;
+    var allUserContentExist = true;
 
     async.series([
         function(callback){
@@ -226,6 +227,18 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
 
         function(callback){
             //Add UGC info to UGC db 
+            
+            //check if all the user data exist. 
+            //TODO: use async to better check file existance
+            if( Object.prototype.toString.call( customizableObjects ) === '[object Array]' ) {
+                for (var i in customizableObjects) {
+                    allUserContentExist = allUserContentExist && fs.existsSync( path.join( userDataDir, "_"+customizableObjects[i].content) );
+                }
+            }
+            else {
+                allUserContentExist = fs.existsSync( path.join( userDataDir, "_"+customizableObjects.content) );
+            }
+
             var ugcDoohPreviewS3Url =  "https://s3.amazonaws.com/miix_content" + ugcDoohPreviewS3Path;
             var vjson = {
                     "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
@@ -233,7 +246,8 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
                     "genre": "miix",
                     "contentGenre": ugcInfo.contentGenre,
                     "title": ugcInfo.title,
-                    "doohPreviewUrl": ugcDoohPreviewS3Url
+                    "doohPreviewUrl": ugcDoohPreviewS3Url,
+                    "allUserContentExist": allUserContentExist
                 };
 
             UGCDB.addUGC(vjson, function(errOfAddUGC, newlyAddedUgc){
@@ -275,25 +289,19 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
             });
         },
         function(callback){
-            //check if all the user data exist. If yes, start generating the movie in miixContentMgr.generateMiixMoive
-            //TODO: use async to better check file existance
-            var allUserContentExist = true;
-            if( Object.prototype.toString.call( customizableObjects ) === '[object Array]' ) {
-                for (var i in customizableObjects) {
-                    allUserContentExist = allUserContentExist && fs.existsSync( path.join( userDataDir, "_"+customizableObjects[i].content) );
+            //Generate the Miix movie
+            if ( (config.RENDER_MIIX_MOVIE_IMMEDIATELY_AFTER_GETTING_USER_CONTENT=="yes")||(config.RENDER_MIIX_MOVIE_IMMEDIATELY_AFTER_GETTING_USER_CONTENT=="Yes")||(config.RENDER_MIIX_MOVIE_IMMEDIATELY_AFTER_GETTING_USER_CONTENT=="YES") ) {
+                if ( allUserContentExist ) {
+                    logger.info('Start generating movie '+ ugcProjectID +'!');
+                    miixContentMgr.generateMiixMoive(ugcProjectID, ugcInfo.ownerId._id, ugcInfo.ownerId.fbUserId, ugcInfo.title);
+                    callback(null);
+                }
+                else {
+                    callback("Cannot generate UGC because some or all user contents are missing.");
                 }
             }
             else {
-                allUserContentExist = fs.existsSync( path.join( userDataDir, "_"+customizableObjects.content) );
-            }
-
-            if ( allUserContentExist ) {
-                logger.info('Start generating movie '+ ugcProjectID +'!');
-                miixContentMgr.generateMiixMoive(ugcProjectID, ugcInfo.ownerId._id, ugcInfo.ownerId.fbUserId, ugcInfo.title);
                 callback(null);
-            }
-            else {
-                callback("Cannot generate UGC because some or all user contents are missing.");
             }
         }
     ],

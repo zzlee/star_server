@@ -143,6 +143,7 @@ FM.DB = (function(){
             doohPlayedTimes: {type: Number, min: 0, default: 0},    //JF
             timesOfPlaying: {type: Number},     //JF
             mustPlay: {type: Boolean, default: false},
+            allUserContentExist: {type: Boolean, default: false},
             rating: {type: String},//range A~E      kaiser
             fb_postId: [{
                 postId: String,

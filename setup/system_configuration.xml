@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <systemConfiguration>
     <HOST_STAR_COORDINATOR_URL>http://localhost:3000</HOST_STAR_COORDINATOR_URL> <!-- The full URL of host star_coordinator -->
-    <IS_STAND_ALONE>YES</IS_STAND_ALONE> <!-- Set it to "NO" if there are multiple instances of star_server due to auto-scaling of AWS -->
-    <DEFAULT_AE_SERVER>AE_Server_Gance_PC</DEFAULT_AE_SERVER> <!-- The fallback AE Server to use when star_server is not able to choose the AE Server with lowest load -->
+    <IS_STAND_ALONE>NO</IS_STAND_ALONE> <!-- Set it to "NO" if there are multiple instances of star_server due to auto-scaling of AWS -->
+    <DEFAULT_AE_SERVER>AE_Server_250333438_PC</DEFAULT_AE_SERVER> <!-- The fallback AE Server to use when star_server is not able to choose the AE Server with lowest load -->
+    <RENDER_MIIX_MOVIE_IMMEDIATELY_AFTER_GETTING_USER_CONTENT>YES</RENDER_MIIX_MOVIE_IMMEDIATELY_AFTER_GETTING_USER_CONTENT>
 </systemConfiguration>
