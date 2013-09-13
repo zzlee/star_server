@@ -44,8 +44,8 @@ miixContentMgr.generateMiixMoive = function(movieProjectID, ownerStdID, ownerFbI
     
     aeServerMgr.createMiixMovie( movieProjectID, ownerStdID, ownerFbID, movieTitle, mediaType, function(responseParameters){
         
-        console.log('[aeServerMgr.createMiixMovie()] responseParameters=');
-        console.dir(responseParameters);
+        //console.log('[aeServerMgr.createMiixMovie()] responseParameters=');
+        //console.dir(responseParameters);
         
         if ( responseParameters ) {
             var aeServerID = responseParameters.ae_server_id;
