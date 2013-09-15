@@ -8,7 +8,8 @@ var memberDB = require("../member.js"),
     scheduleDB = require("../schedule.js"),
     UGCDB = require("../UGC.js"),
     tokenMgr = require("../token_mgr.js"),
-    fbMgr = require("../facebook_mgr.js");
+    fbMgr = require("../facebook_mgr.js"),
+    globalConnectionMgr = require("../global_connection_mgr.js");
     
 
 
@@ -1148,8 +1149,8 @@ FM.api.codeGenerate = function(req, res){
                 res.send({error: 'Internal Server Error'});
                 return;
             }
-            var smsMgr = require("../sms_mgr.js");
-            smsMgr.sendMessageToMobile(phoneNum, code, function(err, result){
+            
+            globalConnectionMgr.sendMessageToMobileByRemote(phoneNum, code, function(err, result){
                 if (err){
                     res.send(401, {message:"手機認證碼發送失敗"});
                 }

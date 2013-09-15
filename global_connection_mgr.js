@@ -97,6 +97,28 @@ FM.globalConnectionMgr = (function(){
                     });
 
                 }
+            },
+            
+            sendMessageToMobileByRemote: function( phoneNum, code, cbOfSendMessageToMobileByRemote ) {
+                
+                    request({
+                        method: 'POST',
+                        uri: config.HOST_STAR_COORDINATOR_URL + '/internal/send_message_to_mobile_by_remote',
+                        body: {"phoneNum": phoneNum, "code": code},
+                        json: true,
+                        timeout: 60*60*1000
+                        
+                    }, function(error, response, body){
+                    
+                        if (body) {
+                            cbOfSendMessageToMobileByRemote(body.responseParameters);    
+                        }
+                        else {
+                            cbOfSendMessageToMobileByRemote({err: "Failed to send request to remote: "+error});  //TODO: check the content of error parameters
+                        }
+                                
+                    });
+
             }
             
                 
