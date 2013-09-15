@@ -13,21 +13,26 @@ var fs = require('fs'),
     request = require('request');
 var async = require('async');
 var awsS3 = require('../aws_s3.js');
+var facebookMgr = require('../facebook_mgr.js');
+var pushMgr = require('../push_mgr.js');
 var db = require('../db.js');
 var UGCDB = require(process.cwd()+'/ugc.js');
 var programTimeSlotModel = db.getDocModel("programTimeSlot");
 var ugcModel = db.getDocModel("ugc");
+var memberModel = db.getDocModel("member");
 var execFile = require('child_process').execFile;
+var recordTime = '';
 var savePath = '';
 var fileList = [];
 var ownerList = [];
 var awsS3List = [];
+var doohPreviewList = [];
     
 //POST /internal/story_cam_controller/available_story_movie
 FM.storyCamControllerHandler.availableStoryMovie_post_cb = function(req, res) {
 
     if ( req.headers.miix_movie_project_id ) {
-        storyContentMgr.generateStoryMV( req.headers.miix_movie_project_id );
+        storyContentMgr.generateStoryMV( req.headers.miix_movie_project_id, req.headers.record_time );
         res.send(200);
     }
 	else {
@@ -40,7 +45,7 @@ FM.storyCamControllerHandler.availableStreetMovies = function(req, res){
 
     logger.info('get story cam report: ' + req.params.playTime);
     
-    var recordTime = req.params.playTime;
+    recordTime = req.params.playTime;
     
     async.waterfall([
         //step.1 : get video file by aws s3
@@ -107,7 +112,7 @@ FM.storyCamControllerHandler.availableStreetMovies = function(req, res){
                 projectId = projectId[projectId.length-1].split('__');
                 //callback(null, type, 'done');
                 var url = 'http://127.0.0.1/internal/story_cam_controller/available_story_movie';
-                var headers = { 'miix_movie_project_id' : projectId };
+                var headers = { 'miix_movie_project_id' : projectId, 'record_time' : recordTime };
                 request.post({ url: url, headers: headers }, function (e, r, body) {
                     callback(null, type, 'done');
                 });
@@ -130,6 +135,7 @@ FM.storyCamControllerHandler.availableStreetMovies = function(req, res){
         fileList = [];
         ownerList = [];
         awsS3List = [];
+        doohPreviewList = [];
     });
     
     res.end();
@@ -215,8 +221,8 @@ var imageNaming = function(ugcInfo, naming_cb){
     //[contentGenre]-[ownerId._id]-[time stamp]
     var name = '';
     ugcModel.find({"_id": ugcInfo.content._id}).exec(function (_err, result) {
-        //console.log(result[0].ownerId._id);
         ownerList.push(result[0].ownerId);
+        doohPreviewList.push({ doohPreviewUrl: result[0].doohPreviewUrl, url: result[0].url.s3 });
         name = ugcInfo.contentGenre + '-' + 
                result[0].ownerId._id + '-' + 
                ugcInfo.timeStamp + '.jpg';
@@ -235,11 +241,11 @@ var uploadToAwsS3 = function(awsS3_cb){
         if((filetype[filetype.length-1] == 'jpg')||(filetype[filetype.length-1] == 'png')) {
             projectFolder = filetype[0].split('\\');
             s3Path = '/user_project/' + projectFolder[projectFolder.length-1] + '/' + projectFolder[projectFolder.length-1] + '.' + filetype[filetype.length-1];
-            awsS3List.push(s3Path);
+            awsS3List.push('https://s3.amazonaws.com/miix_content' + s3Path);
             awsS3.uploadToAwsS3(fileList[i], s3Path, '', function(err,result){
                 if (!err){
                     logger.info('Live content image was successfully uploaded to S3 '+s3Path);
-                 }
+                }
                 else {
                     logger.info('Live content image failed to be uploaded to S3 '+s3Path);
                 }
@@ -258,23 +264,34 @@ var updateToUGC = function(updateUGC_cb){
     var update = function(){
         var projectId = awsS3List[i].split('/');
         projectId = projectId[projectId.length-1].split('.');
-      //TODO 'longPhoto'&'liveTime' need to implement
         var vjson = {
             "ownerId": { '_id': ownerList[i]._id, 
                          'fbUserId': ownerList[i].userID,
                          'userID': ownerList[i].userID },
-            'url': { 's3': awsS3List[i],'longPhoto' :'https://s3.amazonaws.com/miix_content/user_project/mood-512de6f7989cfc240300000e-20130815T091253591Z/mood-512de6f7989cfc240300000e-20130815T091253591Z.png' },
+            'url': { 's3': awsS3List[i], 'longPhoto': doohPreviewList[i].url },
             'genre': 'miix_image_live_photo',
             'projectId': projectId[0],
-            'liveTime':1371962000000
+            'liveTime': parseInt(recordTime)
         };
-      //TODO To use db.js function addUserLiveContent
-        UGCDB.addUGC(vjson, function(err, result){
-            //if(err) console.log(err);
-            //else console.log(result);
-            //if(!err) fmapi._fbPostUGCThenAdd(vjson);
-            i++;
-            (i < ownerList.length)?update():updateUGC_cb(null, 'done');
+        var photoUrl = 
+        {
+            preview: doohPreviewList[i].url,
+            simulate: doohPreviewList[i].doohPreviewUrl,
+            play: awsS3List[i]
+        };
+        postMessageAndPicture(ownerList[i].userID, photoUrl, function(err, res){
+            if(err)
+                logger.info('Post message and pictrue to user is Error: ' + err);
+            else
+                logger.info('Post message and pictrue to user is Success: ' + res);
+            
+            db.addUserLiveContent(vjson, function(err, result){
+                //if(err) console.log(err);
+                //else console.log(result);
+                //if(!err) fmapi._fbPostUGCThenAdd(vjson);
+                i++;
+                (i < ownerList.length)?update():updateUGC_cb(null, 'done');
+            });
         });
     };
     update();
@@ -317,12 +334,12 @@ var uploadVideoToAwsS3 = function(programInterval, awsS3_cb){
         ugcModel.find({"_id": contentId}).exec(function (_err, result) {
             var name = result[0].projectId + '__story.avi';
             s3Path = '/user_project/' + result[0].projectId + '/' + name;
-            awsS3List.push(s3Path);
+            awsS3List.push('https://s3.amazonaws.com/miix_content' + s3Path);
             awsS3.uploadToAwsS3(fileList[0], s3Path, 'video/x-msvideo', function(err,result){
                 if (!err){
                     logger.info('Live content video was successfully uploaded to S3 '+s3Path);
                     awsS3_cb(null, 'success');
-                 }
+                }
                 else {
                     logger.info('Live content video failed to be uploaded to S3 '+s3Path);
                     awsS3_cb(null, 'failed');
@@ -351,10 +368,9 @@ var updateVideoToUGC = function(programInterval, updateVideoToUGC_cb){
                 'url': { 's3': awsS3List[0]},
                 'genre': 'miix_story',
                 'projectId': projectId[0],
-                'liveTime':1371962000000
+                'liveTime': parseInt(recordTime)
             };
-            //TODO To use db.js function addUserLiveContent
-            UGCDB.addUGC(vjson, function(err, result){
+            db.addUserLiveContent(vjson, function(err, result){
                 //if(err) console.log(err);
                 //else console.log(result);
                 updateVideoToUGC_cb(null, 'done');
@@ -366,6 +382,78 @@ var updateVideoToUGC = function(programInterval, updateVideoToUGC_cb){
         if(programInterval.list[i].type == 'UGC')
             update(programInterval.list[i].content._id);
     }
+};
+
+var postMessageAndPicture = function(fb_id, photoUrl, postPicture_cb){
+    
+    var access_token;
+    var fb_name, playTime, start, link;
+    
+    var pushPhotosToUser = function(albumId, pushPhotos_cb){
+        async.series([
+            /*function(simulate){
+                message = fb_name + '於' + playTime + '，登上台北天幕LED，上大螢幕APP特此感謝他精采的作品！\n' + 
+                          '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
+                facebookMgr.postPhoto(access_token, message, photoUrl.simulate, albumId, simulate);
+            },*/
+            function(preview){
+                var message = fb_name + '於' + playTime + '，登上台北天幕LED，，這是原始刊登素材，天幕尺寸：100公尺x16公尺。\n' + 
+                          '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
+                //facebookMgr.postPhoto(access_token, message, photoUrl.preview, albumId, preview);
+                facebookMgr.postMessage(access_token, message, photoUrl.preview, preview);
+            },
+            function(play){
+                var message = fb_name + '於' + playTime + '，登上台北天幕LED，特此感謝他精采的作品！\n' + 
+                          '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
+                //facebookMgr.postPhoto(access_token, message, photoUrl.play, albumId, play);
+                facebookMgr.postMessage(access_token, message, photoUrl.play, play);
+            },
+        ], function(err, res){
+            //(err)?console.log(err):console.dir(res);
+            if(!err){
+                logger.info('post message to user on facebook, fb id is ' + fb_id);
+                pushPhotos_cb(null, 'done');
+            }
+            else
+                pushPhotos_cb(err, null);
+        });
+    };
+    //
+    async.waterfall([
+        function(memberSearch){
+            memberModel.find({'fb.userID': fb_id}).exec(memberSearch);
+        },
+    ], function(err, member){
+        access_token = member[0].fb.auth.accessToken;
+        fb_name = member[0].fb.userName;
+        start = new Date(parseInt(recordTime));
+        if(start.getHours()>12)
+            playTime = start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日下午'+(start.getHours()-12)+':'+start.getMinutes();
+        else
+            playTime = start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日上午'+start.getHours()+':'+start.getMinutes();
+        
+        var album_name = '實況記錄：' + start.getFullYear()+'年'+(start.getMonth()+1)+'月'+start.getDate()+'日' + '登上台北天幕LED';
+        var album_message = '';
+        var message = fb_name + '於' + playTime + '，登上台北天幕LED，特此感謝您精采的作品！\n' + 
+                      '上大螢幕APP 粉絲團: https://www.facebook.com/OnDaScreen';
+        
+        async.waterfall([
+            function(push_cb){
+                pushMgr.sendMessageToDeviceByMemberId(member[0]._id, message, function(err, res){
+                    logger.info('push played notification to user, member id is ' + member[0]._id);
+                    push_cb(err, res);
+                });
+            }
+        ], function(err, res){
+            /*facebookMgr.createAlbum(access_token, album_name, album_message, function(err, res){
+                logger.info('create fb album for user, member id is ' + member[0]._id);
+                pushPhotosToUser(JSON.parse(res).id, postPicture_cb);
+            });*/
+            pushPhotosToUser('', postPicture_cb);
+            //postPicture_cb(err, res);
+        });
+        
+    });
 };
 
 module.exports = FM.storyCamControllerHandler;
