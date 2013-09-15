@@ -290,7 +290,7 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
         },
         function(callback){
             //Generate the Miix movie
-            if ( (config.RENDER_MIIX_MOVIE_IMMEDIATELY_AFTER_GETTING_USER_CONTENT=="yes")||(config.RENDER_MIIX_MOVIE_IMMEDIATELY_AFTER_GETTING_USER_CONTENT=="Yes")||(config.RENDER_MIIX_MOVIE_IMMEDIATELY_AFTER_GETTING_USER_CONTENT=="YES") ) {
+            if ( systemConfig.RENDER_MIIX_MOVIE_IMMEDIATELY_AFTER_GETTING_USER_CONTENT ) {
                 if ( allUserContentExist ) {
                     logger.info('Start generating movie '+ ugcProjectID +'!');
                     miixContentMgr.generateMiixMoive(ugcProjectID, ugcInfo.ownerId._id, ugcInfo.ownerId.fbUserId, ugcInfo.title);

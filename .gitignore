@@ -14,5 +14,6 @@ public/_test
 RemoteSystemsTempFiles/
 public/star_app_www
 public/contents/temp
-system_configuration.xml
+system_configuration.json
+!setup/system_configuration.json
 public/*.apk

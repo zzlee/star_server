@@ -32,7 +32,7 @@ connectionHandler.sendRequestToRemote = function( targetID, reqToRemote, cb ) {
 //POST /internal/command_responses
 connectionHandler.commandResponse_post_cb = function(req, res) {
 
-    if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
+    if ( systemConfig.IS_STAND_ALONE ) {
         var commandID = req.body._commandId;
         var remoteID = req.body._remote_id;
         var responseParameters = req.body;
@@ -46,7 +46,7 @@ connectionHandler.commandResponse_post_cb = function(req, res) {
     else { //star_server has multiple instances (due to auto-scale of AWS)
         request({
             method: 'POST',
-            uri: config.HOST_STAR_COORDINATOR_URL + '/internal/command_responses',
+            uri: systemConfig.HOST_STAR_COORDINATOR_URL + '/internal/command_responses',
             body: req.body,
             json: true
             
@@ -71,7 +71,7 @@ connectionHandler.command_get_cb = function(req, res) {
 	//console.log('['+ new Date() +']Got long-polling HTTP request from remote: '+ req.query.remoteId )
 	//console.dir(req);
 	
-	if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
+	if ( systemConfig.IS_STAND_ALONE ) {
         var messageToRemote = {};
 
         var callback = function(reqToRemote) {
@@ -108,7 +108,7 @@ connectionHandler.command_get_cb = function(req, res) {
         
         request({
             method: 'GET',
-            uri: config.HOST_STAR_COORDINATOR_URL + '/internal/commands',
+            uri: systemConfig.HOST_STAR_COORDINATOR_URL + '/internal/commands',
             qs: req.query,
             json: true
             

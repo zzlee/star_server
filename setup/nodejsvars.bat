@@ -1,16 +1,12 @@
 @echo off
 
-rem added by GZ
-set WORK_PATH=D:\nodejs_projects\star_ae_server
+set WORK_PATH=D:\nodejs_projects\star_server
 
-rem settings for star_ae_server
-
-set AE_BIN=C:\Program Files\Adobe\Adobe After Effects CS6\Support Files
 set FFMPEG_BIN=C:\ffmpeg\bin
 
 rem Ensure this Node.js and NPM are first in the PATH
 ::set PATH=%APPDATA%\npm;%~dp0;%PATH%
-set PATH=%APPDATA%\npm;%~dp0;%PATH%;%AE_BIN%;%FFMPEG_BIN%
+set PATH=%APPDATA%\npm;%~dp0;%PATH%;%FFMPEG_BIN%
 
 rem Figure out node version and architecture and print it.
 setlocal
