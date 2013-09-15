@@ -72,12 +72,10 @@ function scalaMgr( url, account ){
         var afterPlaylistItem = '';
         for(var i=0; i<playlistItemList.length; i++){
             if(target.id == playlistItemList[i].id){
-                afterPlaylistItem = playlistItemList.slice(0,i);
-                afterPlaylistItem = afterPlaylistItem.concat(playlistItemList.slice(i+1));
+                playlistItemList[i].deleteFlag = true;
             }
             if(i == playlistItemList.length-1){
-                (afterPlaylistItem == '')?afterPlaylistItem = playlistItemList:'';
-                cutOff_cb(afterPlaylistItem);
+                cutOff_cb(playlistItemList);
             }
         }
     };
@@ -317,10 +315,17 @@ function scalaMgr( url, account ){
     };
     
     /**
-     * Pull playlist item. (no work)
+     * Pull playlist item.
      */
     var pullPlaylistItem = function(option, pull_cb){
-        contractor.playlist.list({ search: option.playlist.name }, function(err, playlistInfo){
+    
+        var playlistName = '';
+        if(typeof(option.playlist) === 'undefined')
+            playlistName = 'OnDaScreen';
+        else
+            (typeof(option.playlist.name) === 'undefined')?playlistName = 'OnDaScreen':playlistName = option.playlist.name;
+            
+        contractor.playlist.list({ search: playlistName }, function(err, playlistInfo){
             if(err)
                 pull_cb(err, null);
             else {
@@ -359,6 +364,87 @@ function scalaMgr( url, account ){
                     clear_cb(null, res);
                 });
             }
+        });
+    };
+    
+    /**
+     * Valid program expired
+     *
+     */
+    var validProgramExpired = function( option, validExpired_cb ){
+        
+        var target, expired;
+        
+        if(typeof(option) === 'undefined')
+        {
+            validExpired_cb = option;
+            target = { search: 'OnDaScreen' };
+            expired = new Date().getTime();
+        }
+        else
+        {
+            (typeof(option.search) === 'undefined')?target = { search: 'OnDaScreen' }:target = { search: option.search };
+            (typeof(option.expired) === 'undefined')?expired = new Date().getTime():expired = new Date(option.expired).getTime();
+        }
+        
+        contractor.playlist.list(target, function(err, res)
+        {
+            //(err)?console.dir(err):console.dir(res);
+            if(err)
+            {
+                validExpired_cb(err, null);
+                return;
+            }
+            
+            var validPlaylistItems = function(playlist, valid_cb){
+
+                if(typeof(playlist.playlistItems) === 'undefined')
+                {
+                    valid_cb(null, { message: 'no item.' });
+                    return;
+                }
+                else
+                {
+                    for(var i=0; i<playlist.playlistItems.length; i++)
+                    {
+                        var programValidDate;
+                        if(playlist.playlistItems[i].useValidRange == false)
+                            continue;
+                        else if(playlist.playlistItems[i].timeSchedules.endTime == '24:00')
+                            programValidDate = new Date(playlist.playlistItems[i].endValidDate + ' 23:59:59').getTime();
+                        else
+                            programValidDate = new Date(playlist.playlistItems[i].endValidDate + ' ' + playlist.playlistItems[i].timeSchedules.endTime + ':00').getTime();
+                        if((typeof(programValidDate) !== 'undefined')&&(programValidDate < expired))
+                            playlist.playlistItems[i].deleteFlag = true;
+                    }
+                }
+                
+                contractor.playlist.update({
+                    playlist: { id: playlist.id, content: playlist },
+                }, function(report){
+                    valid_cb(null, report);
+                });
+            };
+            
+            var eventConsole = function(target, event){
+                event.push(function(callback){ validPlaylistItems(target, callback); });
+            };
+            
+            if(res.count == 0)
+                validExpired_cb(null, 'no playlist');
+            else
+            {
+                var execute = [];
+                for(var i=0; i<res.count; i++)
+                {
+                    eventConsole(res.list[i], execute);
+                }
+                async.series(execute, function(err, res){
+                    //(err)?console.dir(err):console.dir(res);
+                    (err)?validExpired_cb(err, null):validExpired_cb(null, 'done');
+                });
+            }
+            
         });
     };
     
@@ -429,6 +515,7 @@ function scalaMgr( url, account ){
         pushMediaToPlaylist: pushMediaToPlaylist,
         pullPlaylistItem: pullPlaylistItem,
         clearPlaylistItems: clearPlaylistItems,
+        validProgramExpired: validProgramExpired,
         contractor: contractor,   //test
     };
 }

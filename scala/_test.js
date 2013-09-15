@@ -2,10 +2,87 @@
 var scala = require('./scalaMgr');
 var scalaMgr = scala( 'http://192.168.5.189:8080', { username: 'administrator', password: '53768608' } );
 
+var async = require('async');
+
 setTimeout(function(){
+
+    var option =
+    {
+        search: 'lastModified'
+    }
+    scalaMgr.validProgramExpired(option, function(err, res){
+        (err)?console.log(err):console.log(res);
+    });
+    /*
+    var option =
+    {
+        search: 'lastModified',
+        //expired: new Date().getTime()
+    };
+    var expired = new Date().getTime();
+    
+    scalaMgr.contractor.playlist.list(option, function(err, res)
+    {
+        //(err)?console.dir(err):console.dir(res);
+        if(err)
+        {
+            valid_cb(err, null);
+            return;
+        }
+        
+        var validPlaylistItems = function(playlist, valid_cb){
+
+            if(typeof(playlist.playlistItems) === 'undefined')
+            {
+                valid_cb(null, { message: 'no item.' });
+                return;
+            }
+            else
+            {
+                for(var i=0; i<playlist.playlistItems.length; i++)
+                {
+                    var programValidDate;
+                    if(playlist.playlistItems[i].useValidRange == false)
+                        continue;
+                    else if(playlist.playlistItems[i].timeSchedules.endTime == '24:00')
+                        programValidDate = new Date(playlist.playlistItems[i].endValidDate + ' 23:59:59').getTime();
+                    else
+                        programValidDate = new Date(playlist.playlistItems[i].endValidDate + ' ' + playlist.playlistItems[i].timeSchedules.endTime + ':00').getTime();
+                    if((typeof(programValidDate) !== 'undefined')&&(programValidDate < expired))
+                        playlist.playlistItems[i].deleteFlag = true;
+                }
+            }
+            
+            scalaMgr.contractor.playlist.update({
+                playlist: { id: playlist.id, content: playlist },
+            }, function(report){
+                valid_cb(null, report);
+            });
+        };
+        
+        var eventConsole = function(target, event){
+            event.push(function(callback){ validPlaylistItems(target, callback); });
+        };
+        
+        if(res.count == 0)
+            console.log('no playlist');
+        else
+        {
+            var execute = [];
+            for(var i=0; i<res.count; i++)
+            {
+                eventConsole(res.list[i], execute);
+            }
+            async.series(execute, function(err, res){
+                (err)?console.dir(err):console.dir(res);
+            });
+        }
+        
+    });
+    */
     /*
     var option = {
-        playlistItem: { id: 379 },
+        playlistItem: { id: 35 },
         playlist: { name: 'lastModified' }
     };
     
@@ -13,17 +90,23 @@ setTimeout(function(){
         (err)?console.dir(err):console.dir(res);
     });
     */
-    
+    /*
+    scalaMgr.contractor.playlist.list(function(err, res){
+        //(err)?console.dir(err):console.dir(res);
+    });
+    */
+    /*
     var setting = {
-        media: { name: 'black' },
-        playlist:{ name: 'lastModified' },
+        media: { name: 'Maid' },
+        playlist:{ name: 'Audio' },
         playTime: { start: '2013-08-27 10:00:00', end: '2013-08-27 22:00:00', duration: 50 }
     };
     
     scalaMgr.pushMediaToPlaylist(setting, function(err, res){
         (err)?console.dir(err):console.dir(res);
+        process.exit(1);
     });
-    
+    */
     /*
     scalaMgr.clearPlaylistItems(function(err, res){
         if(err)
