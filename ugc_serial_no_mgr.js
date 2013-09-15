@@ -4,6 +4,7 @@ var ugcSerialNoMgr = (function(){
     function constructor(){
         var db = require('./db.js');
         var ugcModel = db.getDocModel("ugc");
+        var request = require("request");
 
         var ugcSerialNo = 0;
 
@@ -24,7 +25,30 @@ var ugcSerialNoMgr = (function(){
 
             getUgcSerialNo: function(cbOfGetUgcSerialNo) {
                 ugcSerialNo++;
-                cbOfGetUgcSerialNo(null, ugcSerialNo);
+                if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
+                    cbOfGetUgcSerialNo(null, ugcSerialNo);
+                }
+                else {
+                    request({
+                        method: 'GET',
+                        uri: config.HOST_STAR_COORDINATOR_URL + '/internal/ugc_serial_no',
+                        json: true
+                        
+                    }, function(error, response, body){
+                        
+                        console.log('body=');
+                        console.dir(body);
+                    
+                        if (body) {
+                            cbOfGetUgcSerialNo(null, body.ugcSerialNo);    
+                        }
+                        else {
+                            cbOfGetUgcSerialNo("Failed to get ugcSerialNo from star_coordinator: "+error, null);  
+                        }
+                                
+                    });
+
+                }
             }
         };
     }
