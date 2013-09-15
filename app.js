@@ -20,25 +20,14 @@ var http = require('http'),
     ssio = require('socket.io').listen(secureServer),
     globalConnectionMgr = require('./global_connection_mgr.js'),
     youtubeMgr = require('./youtube_mgr.js'),
-	winston = require('winston');
+	winston = require('winston'),
+    ugcSerialNoMgr = require('./ugc_serial_no_mgr.js');
+
 
 var workingPath = process.cwd();
+var async = require('async');
 
 
-require('./system_configuration.js').getInstance(function(_config){
-    
-    if ( (!_config.HOST_STAR_COORDINATOR_URL) || (!_config.IS_STAND_ALONE) ) {
-        console.log("ERROR: system_configuration.xml is not properly filled!");
-        process.exit(1);
-    }
-    
-    var routes = require('./routes');
-    global.config = _config;   
-    global.routes = routes;
-    global.app = app;
-
-    require('./restful_api').init();
-});
 
 
 var logDir = path.join(workingPath,'log');
@@ -113,10 +102,51 @@ app.configure('production', function(){
 
 youtubeMgr.refreshToken();
 
+async.waterfall([
+    function(callback){
+        require('./system_configuration.js').getInstance(function(_config){
+            if ( (!_config.HOST_STAR_COORDINATOR_URL) || (!_config.IS_STAND_ALONE) ) {
+                callback("ERROR: system_configuration.xml is not properly filled!");
+                process.exit(1);
+            }
+            else {
+                global.config = _config;   
+                callback(null);
+            }
+        });
+    },
+    function(callback){
+        //Initialize ugcSerialNoMgr
+        ugcSerialNoMgr.init(function(err) {
+            if (!err){
+                callback(null);
+            }
+            else {
+                callback("Failed to initialize ugcSerialNoMgr: "+err);
+            }
+        });
+    },
+    function(callback){
+        //Defiene the RESTful APIs
+        var routes = require('./routes');
+        global.routes = routes;
+        global.app = app;
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log("Express server listening on port " + app.get('port'));
+        require('./restful_api').init();
+        
+        http.createServer(app).listen(app.get('port'), function(){
+            console.log("Express server listening on port " + app.get('port'));
+            callback(null);
+        });
+    }
+], function (err) {
+    if (err){
+        console.log('app.js initializes with errors: '+err);
+    }
 });
+
+
+
 
 
 //var globalConnectionMgr = require('./global_connection_mgr.js');

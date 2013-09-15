@@ -12,7 +12,8 @@ FM.UGC = (function(){
 		var FMDB = require('./db.js'),
 			memberDB = require('./member.js'),
 			youtubeInfo = require('./youtube_mgr.js'),
-		    fbMgr = require('./facebook_mgr.js'),
+            fbMgr = require('./facebook_mgr.js'),
+		    ugcSerialNoMgr = require('./ugc_serial_no_mgr.js'),
 			UGCs = FMDB.getDocModel("ugc");
         
         return {
@@ -142,17 +143,22 @@ FM.UGC = (function(){
             
             
             /*  ownerId must be included in vjson. [callback]  */
-			addUGC: function(vjson, cb){
-			    if(vjson.ownerId){
-			        UGCs.count({}, function(err, count){
-			        vjson.no = parseInt(count)+1;
-			        FMDB.createAdoc(UGCs, vjson, cb);
-			        });
-
-			    }else{
-			        var err = {error: "ownerId is MUST-HAVE!"};
-			        cb(err, null);
-			    }
+            addUGC: function(vjson, cb){
+                if(vjson.ownerId){
+                    ugcSerialNoMgr.getUgcSerialNo(function(err, ugcSerialNo) {
+                        if (!err) {
+                            vjson.no = ugcSerialNo;
+                            FMDB.createAdoc(UGCs, vjson, cb);
+                        }
+                        else {
+                            cb({error: "Failed to get the serial No of UGC"}, null);
+                        }
+                    });
+            
+                }else{
+                    var err = {error: "ownerId is MUST-HAVE!"};
+                    cb(err, null);
+                }
 			},
             
 			getCommentsLikesSharesOnFB: function( v_id, owner_id, fb_postId, cb){
@@ -242,7 +248,7 @@ FM.UGC = (function(){
                 query.ne("doohTimes.submited_time", null).sort({"doohTimes.submited_time": 1}).limit(1).exec(cb);
             },
             
-            _updateCounter: function(cb){
+            _updateCounter: function(cb){  //DEPRECATED  (Not being called by anyone
                 var query = UGCs.find({});
                 query.sort({createdOn:1}).exec(function(err, result){
                     if(err) return;
