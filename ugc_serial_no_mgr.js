@@ -36,9 +36,6 @@ var ugcSerialNoMgr = (function(){
                         
                     }, function(error, response, body){
                         
-                        console.log('body=');
-                        console.dir(body);
-                    
                         if (body) {
                             cbOfGetUgcSerialNo(null, body.ugcSerialNo);    
                         }
