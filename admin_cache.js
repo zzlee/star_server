@@ -348,9 +348,10 @@ FM.ADMINCACHE = (function(){
 //      setTimeout(deleteCacheDB,3000000);
 
     };
-    deleteCacheDB();
-
-    retrieveDataAndUpdateCacheDB();
+    //TODO use config to control
+//    deleteCacheDB();
+//
+//    retrieveDataAndUpdateCacheDB();
 
 
     function constructor(){
