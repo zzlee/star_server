@@ -522,29 +522,29 @@ miixContentMgr.addMiixImage = function(imgBase64, imgDoohPreviewBase64, ugcProje
 //                
 //            });
 //        }
-        function(callback){
-            var projectDir = path.join( workingPath, 'public/contents/user_project', ugcProjectID);
-            async.waterfall([
-                function(callbackOfWaterfall){
-                    //check if project dir exists
-                    fs.exists(projectDir, function (exists) {
-                        callbackOfWaterfall(null, exists);
-                    });
-                },
-                function(projectDirExists, callbackOfWaterfall){
-                    //if exists, delete one
-                    if (projectDirExists) {
-                        rmDirectory(projectDir);
-                        callbackOfWaterfall(null);
-                    }
-                    else {
-                        callbackOfWaterfall(null);
-                    }
-                }        
-                ], function (err, result) {
-                callback(err);    
-            });
-        }
+//        function(callback){
+//            var projectDir = path.join( workingPath, 'public/contents/user_project', ugcProjectID);
+//            async.waterfall([
+//                function(callbackOfWaterfall){
+//                    //check if project dir exists
+//                    fs.exists(projectDir, function (exists) {
+//                        callbackOfWaterfall(null, exists);
+//                    });
+//                },
+//                function(projectDirExists, callbackOfWaterfall){
+//                    //if exists, delete one
+//                    if (projectDirExists) {
+//                        rmDirectory(projectDir);
+//                        callbackOfWaterfall(null);
+//                    }
+//                    else {
+//                        callbackOfWaterfall(null);
+//                    }
+//                }        
+//                ], function (err, result) {
+//                callback(err);    
+//            });
+//        }
 
     ],
     function(err, results){
