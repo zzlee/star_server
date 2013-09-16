@@ -1,5 +1,5 @@
 ﻿
-var MONGO_DB_SERVER_ADDRESS = '192.168.5.189';
+var MONGO_DB_SERVER_ADDRESS = '54.238.49.46';
 
 //Module dependencies.
 var http = require('http'),
