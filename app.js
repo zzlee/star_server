@@ -1,5 +1,9 @@
-﻿
-var MONGO_DB_SERVER_ADDRESS = '192.168.5.189';
+﻿var systemConfig = require('./system_configuration.js').getInstance();
+if ( (systemConfig.HOST_STAR_COORDINATOR_URL===undefined) || (systemConfig.IS_STAND_ALONE===undefined) ) {
+	console.log("ERROR: system_configuration.json is not properly filled!");
+	process.exit(1);
+}
+global.systemConfig = systemConfig;
 
 //Module dependencies.
 var http = require('http'),
@@ -8,7 +12,7 @@ var http = require('http'),
     crypto = require('crypto'),
     Db = require('mongodb').Db,
     dbserver = require('mongodb').Server,
-    dbserver_config = new dbserver(MONGO_DB_SERVER_ADDRESS, 27017, {auto_reconnect: true, native_parser: true} ),
+    dbserver_config = new dbserver(systemConfig.MONGO_DB_SERVER_ADDRESS, 27017, {auto_reconnect: true, native_parser: true} ),
     fmdb = new Db('feltmeng', dbserver_config, {}),
     mongoStore = require('connect-mongodb'),
     app = express(),
@@ -38,10 +42,10 @@ if (!fs.existsSync(logDir) ){
 require('winston-mongodb').MongoDB;
 var logger = new(winston.Logger)({
 	transports: [ 
-		new winston.transports.MongoDB({host:MONGO_DB_SERVER_ADDRESS, db: 'feltmeng', level: 'info'}),
+		new winston.transports.MongoDB({host:systemConfig.MONGO_DB_SERVER_ADDRESS, db: 'feltmeng', level: 'info'}),
 		new winston.transports.File({ filename: './log/winston.log'})	
 	],
-	exceptionHandlers: [new winston.transports.MongoDB({host:MONGO_DB_SERVER_ADDRESS, db: 'feltmeng', level: 'info'}),
+	exceptionHandlers: [new winston.transports.MongoDB({host:systemConfig.MONGO_DB_SERVER_ADDRESS, db: 'feltmeng', level: 'info'}),
                     new winston.transports.File({filename: './log/exceptions.log'})
 	]
 	
@@ -103,18 +107,18 @@ app.configure('production', function(){
 youtubeMgr.refreshToken();
 
 async.waterfall([
-    function(callback){
-        require('./system_configuration.js').getInstance(function(_config){
-            if ( (!_config.HOST_STAR_COORDINATOR_URL) || (!_config.IS_STAND_ALONE) ) {
-                callback("ERROR: system_configuration.xml is not properly filled!");
-                process.exit(1);
-            }
-            else {
-                global.config = _config;   
-                callback(null);
-            }
-        });
-    },
+//    function(callback){
+//        require('./system_configuration.js').getInstance(function(_config){
+//            if ( (!_systemConfig.HOST_STAR_COORDINATOR_URL) || (!_systemConfig.IS_STAND_ALONE) ) {
+//                callback("ERROR: system_configuration.xml is not properly filled!");
+//                process.exit(1);
+//            }
+//            else {
+//                global.config = _config;   
+//                callback(null);
+//            }
+//        });
+//    },
     function(callback){
         //Initialize ugcSerialNoMgr
         ugcSerialNoMgr.init(function(err) {

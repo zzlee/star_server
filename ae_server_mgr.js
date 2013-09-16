@@ -16,7 +16,7 @@ var youtubeTokenMgr = require( './youtube_mgr.js' );
 //use long polling to ask AE Server to create Miix movie
 aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, movieTitle, mediaType, createMovie_cb) {
 
-	var starAeServerID = config.DEFAULT_AE_SERVER;
+	var starAeServerID = systemConfig.DEFAULT_AE_SERVER;
 	
 	//getAeServerWithLowestLoad(function(aeServerWithLowestLoad, err){
 	globalConnectionMgr.getConnectedRemoteWithLowestLoad('AE_SERVER', function(err, aeServerWithLowestLoad){
@@ -62,7 +62,7 @@ aeServerMgr.createMiixMovie = function(movieProjectID, ownerStdID, ownerFbID, mo
 //use long polling to ask AE Server to create Story movie
 aeServerMgr.createStoryMV = function(movieProjectID, miixMovieFileExtension, ownerStdID, ownerFbID, movieTitle, createMovie_cb) {
 
-	var starAeServerID = config.DEFAULT_AE_SERVER;
+	var starAeServerID = systemConfig.DEFAULT_AE_SERVER;
 	
     //getAeServerWithLowestLoad(function(aeServerWithLowestLoad, err){
 	globalConnectionMgr.getConnectedRemoteWithLowestLoad('AE_SERVER', function(err, aeServerWithLowestLoad){
@@ -117,7 +117,7 @@ aeServerMgr.uploadMovieToMainServer = function(movieProjectID, uploadMovie_cb) {
             starAeServerID = _aeID;
         }
         else{
-            starAeServerID = config.DEFAULT_AE_SERVER;
+            starAeServerID = systemConfig.DEFAULT_AE_SERVER;
         }
     
         var commandParameters = {
@@ -147,7 +147,7 @@ aeServerMgr.downloadStoryMovieFromMainServer = function(movieProjectID, download
             starAeServerID = _aeID;
         }
         else{
-            starAeServerID = config.DEFAULT_AE_SERVER;
+            starAeServerID = systemConfig.DEFAULT_AE_SERVER;
         }
 
         var commandParameters = {
@@ -178,7 +178,7 @@ aeServerMgr.downloadStoryMovieFromS3 = function(movieProjectID, downloadMovie_cb
             starAeServerID = _aeID;
         }
         else{
-            starAeServerID = config.DEFAULT_AE_SERVER;
+            starAeServerID = systemConfig.DEFAULT_AE_SERVER;
         }
         var commandParameters = {
             movieProjectID: movieProjectID
@@ -198,7 +198,7 @@ aeServerMgr.downloadStoryMovieFromS3 = function(movieProjectID, downloadMovie_cb
             starAeServerID = _aeID;
         }
         else{
-            starAeServerID = config.DEFAULT_AE_SERVER;
+            starAeServerID = systemConfig.DEFAULT_AE_SERVER;
         }
 
         var commandParameters = {
@@ -228,7 +228,7 @@ aeServerMgr.downloadMiixMovieFromS3 = function(miixMovieProjectID, miixMovieFile
             starAeServerID = _aeID;
         }
         else{
-            starAeServerID = config.DEFAULT_AE_SERVER;
+            starAeServerID = systemConfig.DEFAULT_AE_SERVER;
         }
         var commandParameters = {
             miixMovieProjectID: miixMovieProjectID,
@@ -249,7 +249,7 @@ aeServerMgr.downloadMiixMovieFromS3 = function(miixMovieProjectID, miixMovieFile
             starAeServerID = _aeID;
         }
         else{
-            starAeServerID = config.DEFAULT_AE_SERVER;
+            starAeServerID = systemConfig.DEFAULT_AE_SERVER;
         }
     
         var commandParameters = {

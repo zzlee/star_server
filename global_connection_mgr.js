@@ -24,7 +24,7 @@ FM.globalConnectionMgr = (function(){
                         
             getConnectedRemoteWithLowestLoad: function(type, cbOfGetConnectedRemoteWithLowestLoad){
                 
-                if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
+            	if ( systemConfig.IS_STAND_ALONE ) {
                     for (anId in connectedRemotes){
                         var lowestLoadIndex = 1000000;
                         var connectedRemoteWithLowestLoad = null;
@@ -47,7 +47,7 @@ FM.globalConnectionMgr = (function(){
                 else { //star_server has multiple instances (due to auto-scale of AWS)
                     request({
                         method: 'GET',
-                        uri: config.HOST_STAR_COORDINATOR_URL + '/internal/connected_remote_with_lowest_load',
+                        uri: systemConfig.HOST_STAR_COORDINATOR_URL + '/internal/connected_remote_with_lowest_load',
                         qs: {"type": type},
                         json: true
                         
@@ -74,13 +74,13 @@ FM.globalConnectionMgr = (function(){
             },
             
             sendRequestToRemote: function( targetedRemoteID, reqToRemote, cbOfSendRequestToRemote ) {
-                if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
+            	if ( systemConfig.IS_STAND_ALONE ) {
                     connectionHandler.sendRequestToRemote( targetedRemoteID, reqToRemote, cbOfSendRequestToRemote );
                 }
                 else { //star_server has multiple instances (due to auto-scale of AWS)
                     request({
                         method: 'POST',
-                        uri: config.HOST_STAR_COORDINATOR_URL + '/internal/requests_to_remote',
+                        uri: systemConfig.HOST_STAR_COORDINATOR_URL + '/internal/requests_to_remote',
                         body: {"targetedRemoteID": targetedRemoteID, "reqToRemote": reqToRemote},
                         json: true,
                         timeout: 60*60*1000

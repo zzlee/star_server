@@ -25,13 +25,13 @@ var ugcSerialNoMgr = (function(){
 
             getUgcSerialNo: function(cbOfGetUgcSerialNo) {
                 ugcSerialNo++;
-                if ( (config.IS_STAND_ALONE=="yes")||(config.IS_STAND_ALONE=="Yes")||(config.IS_STAND_ALONE=="YES") ) {
+                if ( systemConfig.IS_STAND_ALONE ) {
                     cbOfGetUgcSerialNo(null, ugcSerialNo);
                 }
                 else {
                     request({
                         method: 'GET',
-                        uri: config.HOST_STAR_COORDINATOR_URL + '/internal/ugc_serial_no',
+                        uri: systemConfig.HOST_STAR_COORDINATOR_URL + '/internal/ugc_serial_no',
                         json: true
                         
                     }, function(error, response, body){
