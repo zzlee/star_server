@@ -20,6 +20,7 @@ FM.confuguration = (function(){
             console.log( 'Fail to read configuration.xml:');
             console.dir(e);
             console.log( 'If it does not exist, copy from a template in /setup folder ');
+            process.exit(1);
         }
         
         return JSON.parse(configData);
@@ -39,7 +40,7 @@ FM.confuguration = (function(){
     
 })();
 
-console.dir(FM.confuguration.getInstance());
+//console.dir(FM.confuguration.getInstance());
 
 
 module.exports = FM.confuguration;

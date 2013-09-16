@@ -1,6 +1,6 @@
 ﻿var systemConfig = require('./system_configuration.js').getInstance();
-if ( (!systemConfig.HOST_STAR_COORDINATOR_URL) || (!systemConfig.IS_STAND_ALONE) ) {
-	console.log("ERROR: system_configuration.xml is not properly filled!");
+if ( (systemConfig.HOST_STAR_COORDINATOR_URL===undefined) || (systemConfig.IS_STAND_ALONE===undefined) ) {
+	console.log("ERROR: system_configuration.json is not properly filled!");
 	process.exit(1);
 }
 global.systemConfig = systemConfig;
