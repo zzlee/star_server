@@ -375,7 +375,7 @@ function scalaMgr( url, account ){
         
         var target, expired;
         
-        if(typeof(option) === 'undefined')
+        if(typeof(validExpired_cb) === 'undefined')
         {
             validExpired_cb = option;
             target = { search: 'OnDaScreen' };
