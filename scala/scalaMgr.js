@@ -285,7 +285,7 @@ function scalaMgr( url, account ){
             });
         };
         
-        async.parallel([
+        async.series([
             function(step1){
                 //step.1 - get media info
                 contractor.media.list({search: setting.media.name}, function(err, res){ 
@@ -488,7 +488,7 @@ function scalaMgr( url, account ){
      */
     var pushEvent = function( option, reportPush_cb ){
         //if(!pushFlag) console.log(pushFlag);
-        async.parallel([
+        async.series([
             function(callback){
                 contractor.playlist.list( { sort: 'id', fields: 'id,name,playlistItems', search: option.playlist.search }, function(err, playlist){
                     callback(null, playlist);
@@ -500,6 +500,15 @@ function scalaMgr( url, account ){
                 });
             },
         ], function(err, result){
+            
+            if(typeof(result[0]) === 'undefined') {
+                reportPush_cb('no find "search" playlist');
+                return;
+            }
+            if(typeof(result[1]) === 'undefined') {
+                reportPush_cb('no find "play" playlist');
+                return;
+            }
             
             var pushSubplaylist = { subplaylist: { id: result[1].list[0].id, name: result[1].list[0].name } };
             
