@@ -13,6 +13,9 @@ var db = require('./db.js');
 //var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://server-pc:8080', { username: 'administrator', password: '53768608' } );
 var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://192.168.5.189:8080', { username: 'administrator', password: '53768608' } );
 
+//NOVA - Scala!!
+//var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://220.128.120.51:8080', { username: 'administrator', password: '28469434' } );
+
 //var scalaMgr = require('./scala/scalaMgr.js')();
 
 var programTimeSlotModel = db.getDocModel("programTimeSlot");
@@ -906,7 +909,7 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
                     },
                     function(ugc, memberSearch){
                         memberModel.find({'fb.userID': ugc[0].ownerId.userID}).exec(function(err, member){ memberSearch(null, {ugc: ugc, member: member}); });
-                    },
+                    }
                 ], function(err, res){
                     access_token = res.member[0].fb.auth.accessToken;
                     fb_name = res.member[0].fb.userName;
@@ -1073,8 +1076,8 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
                                 callbackIterator(null);
                             }
                             else{
-                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + web.uri );
-                                //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + web.uri );
+                                logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + aProgram.content.name );
+                                //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Fail to push to Scala: ' + aProgram.content.name );
                                 callbackIterator('Failed to push content to Scala :'+errScala);
                             }
                         });
@@ -1096,7 +1099,8 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
         },
         function(cb4){
             //Ask ScalaMgr to push content to player
-            scalaMgr.pushEvent( {playlist: {search:'FM', play:'OnDaScreen'}}, function(res){
+            //NOVA - Player name: nova-sge-001
+            scalaMgr.pushEvent( {playlist: {search:'FM', play:'OnDaScreen'}, player: {name: 'feltmeng'}}, function(res){
                 cb4(null, res);
             });
         }
