@@ -4,7 +4,7 @@ exports.init = function() {
 
    // Internal
 
-    app.get('/internal/oauth2callback', routes.YoutubeOAuth2_cb );
+    app.get('/oauth2callback', routes.YoutubeOAuth2_cb );
     app.get('/internal/commands', routes.connectionHandler.command_get_cb);
     app.post('/internal/command_responses', routes.connectionHandler.commandResponse_post_cb); 
 
