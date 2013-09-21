@@ -5,7 +5,6 @@
 // HTC ONE device_token = "APA91bFNoc98ei3m6mcRdNQFyBY34i4TjNd_Sqw7B5C3XKYqNeHcycE8MzJ9ONJTE79NI9d57RX9rUQiumzDXOfxT6tXSs8Xr_nZD7tN_qy4yo-62RxV06ZNJHfAuPipuLJmdl3CcuBH"
 
 var memberDB = require("../member.js"),
-    scheduleDB = require("../schedule.js"),
     UGCDB = require("../UGC.js"),
     tokenMgr = require("../token_mgr.js"),
     fbMgr = require("../facebook_mgr.js");
@@ -838,122 +837,6 @@ FM.api.signup = function(req, res){
 
  
 
-// POST
-FM.api.addEvent = function(req, res){
-    FM_LOG("addEvent Req: " + JSON.stringify(req.body) );
-    if(req.body.event){
-    
-        var event = req.body.event;
-        /*var yearday = event.date,   
-            time = event.time, 
-            year = parseInt(yearday.substring(0, 4), 10),
-            mon = parseInt(yearday.substring(5, 7), 10),
-            date = parseInt(yearday.substring(8), 10),
-            hr = parseInt(time.substring(0, 2), 10),
-            min = parseInt(time.substring(2), 10);
-        //FM_LOG("Select " + event.idx);
-        var idx = parseInt(event.idx, 10);
-            
-        FM_LOG("Year "+year+" Mon "+mon+" Date "+date+" Hr "+hr+ " Min "+min);
-        var slot = new Date(year, mon-1, date, hr, min);    // month: 0~11
-        var start = slot.getTime();
-        //slot.setMinutes(min+5);
-        var end = slot.getTime() + 5*60*1000;   //  Duration 5 mins
-        var ownerId = req.session.user.userId;
-        
-        var evt = {
-                    "videoId": videoWorks[idx]._id,
-                    "projectId": videoWorks[idx].projectId,
-                    "ownerId": ownerId,
-                    "start": start,
-                    "end": end,
-                    "videoUrl": videoWorks[idx].url.youtube,
-                    "location": "小巨蛋",
-                    "status": "waiting"
-                  };
-                  
-        FM_LOG("addEvent: " + start.toLocaleString()+ " to " + end.toLocaleString());*/
-                 
-        scheduleDB.reserve(event, function(err, result){
-            if(err){ 
-                res.send({"error": err});
-            }else{
-                res.send({"\nReserve Event": result});
-            }
-        });
-        
-    }else{
-        FM_LOG("\n List Events....\n");
-        
-    }
-};
-
-
- //DEPRECATED
-FM.api.reject = function(req, res){
-
-    var evtid = req.body.event.oid;
-    
-    FM_LOG("\nReject " + JSON.stringify(evtid) );
-    
-    scheduleDB.reject(evtid, function(err, result){
-    
-        if(err){
-            res.send( {"error":err} );
-        }else{
-            res.send( {"Reject Event": result} );
-        }
-    });
-};
-
- //DEPRECATED
-FM.api.prove = function(req, res){
-
-    var evtid = req.body.event.oid;
-    FM_LOG("\nProve " + JSON.stringify(evtid) );
-    scheduleDB.prove(evtid, function(err, result){
-    
-        if(err){
-            res.send( {"error":err} );
-        }else{
-            res.send( {"Prove Event": result} );
-        }
-    });
-};
-
-// GET
-FM.api.eventsOfWaiting = function(req, res){
-    
-    scheduleDB.listOfWaiting(function(err, result){
-    
-        if(err){
-            res.send( {"error":err} );
-        }else{
-            res.send( {"waitingEvents": result} );
-        }
-    });
-};
-
-// GET
-FM.api.eventsOfPeriod = function(req, res){
-    
-    if(req.body && req.body.period){
-    
-        var range = null,
-            start = period.start,
-            end = period.end;
-        
-        range = { "start": start.getTime(), "end": end.getTime() };
-        
-        scheduleDB.listOfReservated(range, function(err, result){
-            if(err) throw err;
-            if(result){
-                FM_LOG("from " +start.getTime()+ " to " + end.getTime() + " \nevents: " + result);
-                res.send(result);
-            }
-        });
-    }
-};
 
 
 // GET

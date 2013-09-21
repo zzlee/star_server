@@ -5,34 +5,45 @@ if ( (systemConfig.HOST_STAR_COORDINATOR_URL===undefined) || (systemConfig.IS_ST
 }
 global.systemConfig = systemConfig;
 
-//Module dependencies.
-var http = require('http'),
-    https = require('https'),
-    express = require('express'),
-    crypto = require('crypto'),
-    Db = require('mongodb').Db,
-    dbserver = require('mongodb').Server,
-    dbserver_config = new dbserver(systemConfig.MONGO_DB_SERVER_ADDRESS, 27017, {auto_reconnect: true, native_parser: true} ),
-    fmdb = new Db('feltmeng', dbserver_config, {}),
-    mongoStore = require('connect-mongodb'),
-    app = express(),
-	fs = require('fs'),
-	path = require('path'),
-    server = http.createServer(app),
-    secureServer = https.createServer(app),
-    sio = require('socket.io').listen(server),
-    ssio = require('socket.io').listen(secureServer),
-    globalConnectionMgr = require('./global_connection_mgr.js'),
-    youtubeMgr = require('./youtube_mgr.js'),
-	winston = require('winston'),
-    ugcSerialNoMgr = require('./ugc_serial_no_mgr.js');
-
-
-var workingPath = process.cwd();
+/**
+ * Module dependencies.
+ */
+var express = require('express');
+var routes = require('./routes');
+var http = require('http');
+var https = require('https');
+var path = require('path');
+var crypto = require('crypto');
+var Db = require('mongodb').Db;
+var dbserver = require('mongodb').Server;
+var mongoStore = require('connect-mongodb');
+var fs = require('fs');
+var path = require('path');
+var url = require('url');
+var winston = require('winston');
 var async = require('async');
 
+/**
+ * File dependencies.
+ */
+var globalConnectionMgr = require('./global_connection_mgr.js');
+var youtubeMgr = require('./youtube_mgr.js');
+var ugcSerialNoMgr = require('./ugc_serial_no_mgr.js');
 
+var app = express();
 
+var workingPath = process.cwd();
+
+var mongoDbServerUrlObj = url.parse(systemConfig.HOST_MONGO_DB_SERVER_URL);
+var mongoDbServerPort;
+if ( mongoDbServerUrlObj.port  ){
+    mongoDbServerPort = Number(mongoDbServerUrlObj.port);
+}
+else {
+    mongoDbServerPort = 27017;
+}
+var dbserver_config = new dbserver(mongoDbServerUrlObj.hostname, mongoDbServerPort, {auto_reconnect: true, native_parser: true} );
+var fmdb = new Db('feltmeng', dbserver_config, {});
 
 var logDir = path.join(workingPath,'log');
 if (!fs.existsSync(logDir) ){
@@ -50,6 +61,11 @@ var logger = new(winston.Logger)({
 	]
 	
 });  
+
+//var logger = {
+//info: function(){},
+//error: function(){}
+//};
 
 global.logger = logger;  
   
@@ -72,24 +88,9 @@ app.configure(function(){
   app.use(express.favicon());
   //app.use(express.logger('dev'));
   app.use(express.bodyParser());
- 
-//  //GL
-//  app.use(express.query());
-//  app.use(express.cookieParser('kooBkooCedoN'));
-//  app.use(express.session({
-//    secret: "thesecretoffeltmeng",
-//    maxAge: 24 * 60 * 60 * 1000 ,
-//    store: new mongoStore({ db: fmdb })
-//  }));  // sessionID save as "_id" of session doc in MongoDB.
 
   app.use(express.methodOverride());
   
-//  /* Must put this before app.router. */
-//  app.use( function (req, res, next) {
-//    res.locals.user = req.session.user;
-//    next(); // Please Don't forget next(), otherwise suspending;
-//  });  
-
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
 
@@ -107,18 +108,6 @@ app.configure('production', function(){
 youtubeMgr.refreshToken();
 
 async.waterfall([
-//    function(callback){
-//        require('./system_configuration.js').getInstance(function(_config){
-//            if ( (!_systemConfig.HOST_STAR_COORDINATOR_URL) || (!_systemConfig.IS_STAND_ALONE) ) {
-//                callback("ERROR: system_configuration.xml is not properly filled!");
-//                process.exit(1);
-//            }
-//            else {
-//                global.config = _config;   
-//                callback(null);
-//            }
-//        });
-//    },
     function(callback){
         //Initialize ugcSerialNoMgr
         ugcSerialNoMgr.init(function(err) {
