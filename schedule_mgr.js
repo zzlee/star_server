@@ -11,7 +11,7 @@ var fs = require('fs');
 var awsS3 = require('./aws_s3.js');
 var db = require('./db.js');
 //var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://server-pc:8080', { username: 'administrator', password: '53768608' } );
-var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://192.168.5.189:8080', { username: 'administrator', password: '53768608' } );
+var scalaMgr = (require('./scala/scalaMgr.js'))( systemConfig.HOST_SCALA_URL , { username: systemConfig.HOST_SCALA_USER_NAME, password: systemConfig.HOST_SCALA_PASSWORD } );
 
 //NOVA - Scala!!
 //var scalaMgr = (require('./scala/scalaMgr.js'))( 'http://220.128.120.51:8080', { username: 'administrator', password: '28469434' } );
@@ -998,17 +998,22 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
                         function(fileToPlay, timeslot, callback){
                             //debugger;
                             //push content to Scala
-                            var file = {
-                                    name : path.basename(fileToPlay),
-                                    path : path.dirname(fileToPlay),
-                                    savepath : ''
-                                };
-                            var playTime = {
+                            var option = 
+                            {
+                                playlist: { name: 'OnDaScreen' },
+                                playTime: {
                                     start: timeslot.start,
                                     end: timeslot.end,
                                     duration: timeslot.playDuration/1000  //sec    
+                                },
+                                file: {
+                                    name : path.basename(fileToPlay),
+                                    path : path.dirname(fileToPlay),
+                                    savepath : ''
+                                }
                             };
-                            scalaMgr.setItemToPlaylist( file, playTime, function(errScala, resultScala){
+                            
+                            scalaMgr.setItemToPlaylist( option, function(errScala, resultScala){
                                 if (!errScala){
                                     logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + fileToPlay );
                                     //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + fileToPlay );
@@ -1038,13 +1043,18 @@ scheduleMgr.pushProgramsTo3rdPartyContentMgr = function(sessionId, pushed_cb) {
                     
                     if (aProgram.content.uri){
                         
-                        var web = { name: aProgram.content.name , uri: aProgram.content.uri };
-                        var playTime = {
+                        var option = 
+                        {
+                            playlist: { name: 'OnDaScreen' },
+                            playTime: {
                                 start: aProgram.timeslot.start,
                                 end: aProgram.timeslot.end,
                                 duration: aProgram.timeslot.playDuration/1000  //sec    
+                            },
+                            webpage: { name: aProgram.content.name , uri: aProgram.content.uri }
                         };
-                        scalaMgr.setWebpageToPlaylist( web, playTime, function(errScala, resultScala){
+                        
+                        scalaMgr.setWebpageToPlaylist( option, function(errScala, resultScala){
                             if (!errScala){
                                 logger.info('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + web.uri );
                                 //console.log('[scheduleMgr.pushProgramsTo3rdPartyContentMgr()] Successfully push to Scala: ' + web.uri );
