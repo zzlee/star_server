@@ -73,22 +73,22 @@ app.configure(function(){
   //app.use(express.logger('dev'));
   app.use(express.bodyParser());
  
-  //GL
-  app.use(express.query());
-  app.use(express.cookieParser('kooBkooCedoN'));
-  app.use(express.session({
-    secret: "thesecretoffeltmeng",
-    maxAge: 24 * 60 * 60 * 1000 ,
-    store: new mongoStore({ db: fmdb })
-  }));  // sessionID save as "_id" of session doc in MongoDB.
+//  //GL
+//  app.use(express.query());
+//  app.use(express.cookieParser('kooBkooCedoN'));
+//  app.use(express.session({
+//    secret: "thesecretoffeltmeng",
+//    maxAge: 24 * 60 * 60 * 1000 ,
+//    store: new mongoStore({ db: fmdb })
+//  }));  // sessionID save as "_id" of session doc in MongoDB.
 
   app.use(express.methodOverride());
   
-  /* Must put this before app.router. */
-  app.use( function (req, res, next) {
-    res.locals.user = req.session.user;
-    next(); // Please Don't forget next(), otherwise suspending;
-  });  
+//  /* Must put this before app.router. */
+//  app.use( function (req, res, next) {
+//    res.locals.user = req.session.user;
+//    next(); // Please Don't forget next(), otherwise suspending;
+//  });  
 
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
