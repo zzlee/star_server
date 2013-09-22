@@ -1,3 +1,0 @@
-STATUS: undefined
-HEADERS: {"server":"HTTP Upload Server Built on Sep 5 2012 17:14:59 (1346890499)","x-gdata-user-country":"TW","content-type":"text/xml; charset=UTF-8","x-guploader-uploadid":"AEnB2UrWi3aHiLo1PAb0fEkl7-99jmduK9hBPna3bFoDs8H9nmiK5vpm0UoUGc3lItnnrrlYjm_sLfmSodDBRgPgBz0Z437iag","date":"Tue, 18 Sep 2012 03:14:21 GMT","pragma":"no-cache","expires":"Fri, 01 Jan 1990 00:00:00 GMT","cache-control":"no-cache, no-store, must-revalidate","content-length":"138"}
-BODY: <?xml version='1.0' encoding='UTF-8'?><errors><error><domain>yt:service</domain><code>disabled_in_maintenance_mode</code></error></errors>
