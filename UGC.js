@@ -151,13 +151,12 @@ FM.UGC = (function(){
                             FMDB.createAdoc(UGCs, vjson, cb);
                         }
                         else {
-                            cb({error: "Failed to get the serial No of UGC"}, null);
+                            cb("Failed to get the serial No of UGC", null);
                         }
                     });
             
                 }else{
-                    var err = {error: "ownerId is MUST-HAVE!"};
-                    cb(err, null);
+                    cb("ownerId is MUST-HAVE!", null);
                 }
 			},
             
