@@ -10,7 +10,7 @@ exports.init = function() {
     app.get('/members/fb_token_validity', routes.authorizationHandler.checkAuth, routes.member.isFBTokenValid);
     app.post('/members/fb_info', routes.api.signupwithFB);
     app.get('/connectStarServer', routes.api.connection);  //Make sure client side connect connect star_server
-
+    app.post('/api/codeVerification', routes.api.codeVerify);
 
     //PUT /members/{_id}/device_tokens 
     app.put('/members/:memberId/device_tokens', routes.authorizationHandler.checkAuth, routes.authorizationHandler.updateDeviceToken);
