@@ -100,21 +100,21 @@ FM.globalConnectionMgr = (function(){
             },
             
             sendMessageToMobileByRemote: function( phoneNum, code, cbOfSendMessageToMobileByRemote ) {
-                
+					logger.info("[globalConnectionMgr.sendMessageToMobileByRemote] start phoneNum:"+phoneNum+"code"+code);
                     request({
                         method: 'POST',
-                        uri: config.HOST_STAR_COORDINATOR_URL + '/internal/send_message_to_mobile_by_remote',
+                        uri: systemConfig.HOST_STAR_COORDINATOR_URL + '/internal/send_message_to_mobile_by_remote',
                         body: {"phoneNum": phoneNum, "code": code},
                         json: true,
-                        timeout: 60*60*1000
+                        // timeout: 60*60*1000
                         
                     }, function(error, response, body){
                     
                         if (body) {
-                            cbOfSendMessageToMobileByRemote(body.responseParameters);    
+                            cbOfSendMessageToMobileByRemote(null, body.responseParameters);    
                         }
                         else {
-                            cbOfSendMessageToMobileByRemote({err: "Failed to send request to remote: "+error});  //TODO: check the content of error parameters
+                            cbOfSendMessageToMobileByRemote({err: "Failed to send request to remote: "+error}, null);  //TODO: check the content of error parameters
                         }
                                 
                     });

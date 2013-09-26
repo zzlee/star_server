@@ -820,7 +820,7 @@ miixContentMgr.putFbPostIduserLiveContents = function(userLiveContentProjectID, 
     
     async.waterfall([
         function(callback){
-            userLiveContentModel.find({ "projectId": userLiveContentProjectID}).sort({"createdOn":-1}).exec(function (err, userLiveContentObj) {
+            userLiveContentModel.find({ "projectId": userLiveContentProjectID, "state":"correct"}).sort({"createdOn":-1}).exec(function (err, userLiveContentObj) {
                 if (!err)
                     callback(null, userLiveContentObj);
                 else

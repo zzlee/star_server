@@ -742,11 +742,14 @@ FM.api.codeGenerate = function(req, res){
                 res.send(200, {message:"手機認證碼已發送"});
             }
             else{
+				logger.info("[codeGenerate.sendMessageToMobileByRemote] start phoneNum:"+phoneNum+"code"+code);
 				globalConnectionMgr.sendMessageToMobileByRemote(phoneNum, code, function(err, result){
                 if (err){
+				    logger.error("[globalConnectionMgr.sendMessageToMobileByRemote] error: ", err);
                     res.send(401, {message:"手機認證碼發送失敗"});
                 }
                 else{
+				    logger.info("[globalConnectionMgr.sendMessageToMobileByRemote] result: ", result);
                     res.send(200, {message:"手機認證碼已發送"});
                 }
             });
