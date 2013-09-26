@@ -627,7 +627,7 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
     var newlyUgcHighlights = [];
     
     //TODO: change to query to meet the requirements
-    ugcModel.find({ "rating": "A", $or: [ { "contentGenre":"miix_it" }, { "contentGenre": "mood"} ] }).sort({"createdOn":-1}).limit(limit).exec(function (err, ugcHighlights) {
+    ugcModel.find({ "highlight": "true"}).sort({"createdOn":-1}).limit(limit).exec(function (err, ugcHighlights) {
         if (!err){
             
             var UGCListInfo = function(ownerId, fb_userName, genre, url, arr) {
