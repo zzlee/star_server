@@ -622,12 +622,13 @@ miixContentMgr.getUserUploadedImageUrls = function( miixMovieProjectID, gotUrls_
 miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
     
     var ugcModel = db.getDocModel("ugc");
+	var userLiveContentModel = db.getDocModel("userLiveContent");
     var listLimit = 0;
     var next = 0;
     var newlyUgcHighlights = [];
     
     //TODO: change to query to meet the requirements
-    ugcModel.find({ "highlight": "true"}).sort({"createdOn":-1}).limit(limit).exec(function (err, ugcHighlights) {
+    ugcModel.find({ "highlight": true}).sort({"createdOn":-1}).limit(limit).exec(function (err, ugcHighlights) {
         if (!err){
             
             var UGCListInfo = function(ownerId, fb_userName, genre, url, arr) {
@@ -642,14 +643,30 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
                 listLimit = data.length;
                 
                 var toDo = function(err, result){
+					if(err) set_cb("NO UGC highlights from DB", newlyUgcHighlights);
+					   
+					//TODO need implement in client
+				    var genre; 
+				    if(data[next].genre != "miix_image")
+				        genre = data[next].genre;
+					else
+					    genre = "miix_image_live_photo";
+					if(result[1]){	
+						var url;
+						s3 = result[1].replace("https://s3.amazonaws.com/miix_content", "");
+						// s3 = data[next].userRawContent[0].content.replace("https://s3.amazonaws.com/miix_content", "");
+						url = {s3: s3};
+						}
+
+					
                     if(next == listLimit - 1) {
-                        UGCListInfo(data[next].ownerId, result[0], data[next].genre, data[next].url, newlyUgcHighlights);
+                        UGCListInfo(data[next].ownerId, result[0], genre, url, newlyUgcHighlights);
                         set_cb(null, newlyUgcHighlights); 
                         next = 0;
                         UGCList = [];
                     }
                     else{
-                        UGCListInfo(data[next].ownerId, result[0], data[next].genre, data[next].url, newlyUgcHighlights);
+                        UGCListInfo(data[next].ownerId, result[0], genre, url, newlyUgcHighlights);
                         next += 1;
                         mappingUgcHighlightsList(data, set_cb);
                     }
@@ -663,8 +680,18 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
                                             else if(result === null) callback(null, 'No User');
                                             else callback(null, result.fb.userName);
                                         });
-
-                                    }
+                                    },
+									function(callback){
+										 userLiveContentModel.find({"sourceId": data[next].projectId, "state":"correct"}).sort({'createdOn': -1}).exec(function(err, result){
+										 // console.log(err, result);
+											if(err) callback(err, null);
+											else if(!result) callback('No Live Content', null);
+											else if(!result[0]) callback('No Live Content', null);
+											else{
+												callback(null, result[0].url.highlight);
+											}
+										});
+									}
                                     ], toDo);
                 }
 
@@ -672,7 +699,7 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
             if(ugcHighlights.length > 0){
                 mappingUgcHighlightsList(ugcHighlights, function(err, docs){
                     if (!err){
-//                       console.log('newlyUgcHighlights',newlyUgcHighlights);
+                       // console.log('newlyUgcHighlights',newlyUgcHighlights);
                        cbOfGetUgcHighlights(null, newlyUgcHighlights);
 //                       cbOfGetUgcHighlights(null, ugcHighlights);
                     }else{
@@ -809,7 +836,7 @@ miixContentMgr.pushRandomMessage = function(memberId, ugcProjectID, cbOfPushRand
 miixContentMgr.getUserLiveContentList = function(memberId, limit, skip, cbOfGetLiveContent){
     var userLiveContentModel = db.getDocModel("userLiveContent");
     
-    userLiveContentModel.find({"ownerId._id": memberId}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(cbOfGetLiveContent);
+    userLiveContentModel.find({"ownerId._id": memberId, "state":"correct"}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(cbOfGetLiveContent);
     
     
 };
