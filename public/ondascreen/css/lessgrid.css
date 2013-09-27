@@ -18,7 +18,7 @@ menu, footer, header, nav, section, summary, time, mark, audio, video {
 	padding: 0;
 	border: 0;
 
-	color: #fff;
+	/*color: #fff;*/
 }
 
 article, aside, canvas, figure, figure img, figcaption, hgroup,
@@ -61,7 +61,7 @@ a img {border: 0;}
 }
 
 body {
-	font: 13px/1.5em Helvetica, Arial, sans-serif;
+	font-family: "DFKai-SB"
 }
 
 .small, small {
@@ -198,7 +198,7 @@ px      68    160    252    344    436    528    620    712    */
 	.featured figure{
 	width: 344px;
 	margin-left: 24px;
-	font-family: "TypeLand 康熙字典體";
+	font-family: "DFKai-SB"
 	}
 	
 	/*text posts */
@@ -344,7 +344,7 @@ px      68    160    252    */
 	}
 	
 	#masthead .head{
-	font-family: helvetica, arial, sans-serif;
+	font-family:"kaiu";
 	font-size: 16px;
 	}
 	
@@ -418,14 +418,14 @@ px      68    160    252    */
 	/* headline */
 	
 	.headline{
-		font-family: Helvetica, arial, sans-serif;
+		font-family:"kaiu";
 		font-size: 16px;
 	}
 	
 	/* portfolio */
 	
 	.project-heading h1{ 
-		font-family: helvetica, arial, sans-serif;
+		font-family: "DFKai-SB"
 		font-size: 16px;
 	}
 	
@@ -480,7 +480,7 @@ px      68    160    252    344    436    */
 	.home-block-heading{
 	margin-left: 24px;
 	margin-right: 24px;
-	font-family: "TypeLand 康熙字典體";
+	font-family: "DFKai-SB"
 	}
 	
 	

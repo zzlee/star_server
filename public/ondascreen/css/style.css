@@ -6,7 +6,17 @@
 
 
 /* GENERAL ------------------------------------------------------------*/
+@font-face {
+    font-family: "標楷體, BiauKai, DFKai-SB";
+    /*src: url("../font/DFKai-SB.ttf");*/
+    text-shadow: none;
+} 
 
+@font-face {
+    font-family: "DFKai-SB";
+	/*src: url("../font/DFKai-SB.eot");/** 設定IE使用的EOT字型檔位置 **/
+    text-shadow: none;
+} 
 
 .clearfix{ clear:both; }
 
@@ -24,11 +34,12 @@ body{
 }
 
 body p{
-	margin-bottom: 21px;
-	font-family: arial;
-	font-size: 15px;
+	/*margin-bottom: 21px;*/
+	font-family: "DFKai-SB";
+	font-size: 16px;
 	color: #CCC;
 	line-height: 24px;
+	margin-top: 20px;
 }
 
 body a{
@@ -42,7 +53,8 @@ body a{
 }
 
 body a:hover{
-	font-family: helvetica, arial, sans-serif;
+	font-family: "DFKai-SB";
+	color: #dcd586;
 	
 }
 
@@ -55,7 +67,7 @@ body a:hover{
 #logo:hover{ opacity: 0.8;}
 
 .headline{
-	font-family: helvetica, arial, sans-serif;
+	font-family: "DFKai-SB";
 	font-size: 36px;
 	line-height: 1.5em;
 	text-align: center;
@@ -90,7 +102,7 @@ body a:hover{
 	margin-left: 24px;
 	margin-right: 24px;
 	margin-bottom: 32px;
-	font-family: helvetica, arial, sans-serif;
+	font-family: "DFKai-SB";
 }
 
 .h-heading{
@@ -102,7 +114,7 @@ body a:hover{
 
 .h-margin{
 	margin-bottom: 32px;
-	font-family: helvetica, arial, sans-serif;
+	font-family: "DFKai-SB";
 	color: #FFF;
 }
 
@@ -121,7 +133,7 @@ body a:hover{
 	position: relative;
 	margin-top: -38px;
 	background: #1c1d1d;
-	
+	font-family: "DFKai-SB";
 	padding-left: 24px;
 	
 	-webkit-box-shadow: 0px 0px 4px rgba(0,0,0,.5); 
@@ -136,13 +148,13 @@ body a:hover{
 }
 
 #masthead .head{
-	font-family: helvetica, arial, sans-serif;
+	font-family: "DFKai-SB";
 	font-size: 21px;
 	color: #ddd;
 }
 
 #masthead .subhead{
-	font-family: helvetica, arial, sans-serif;
+	font-family: "DFKai-SB";
 	font-size: 13px;
 	color: #888;
 	margin-left: 21px;
@@ -161,7 +173,7 @@ body a:hover{
 #masthead .breadcrumbs a{
 	text-decoration: none;
 	color: #888;
-	
+	font-family: "DFKai-SB";
 	-webkit-transition: all 0.3s ease;
 	-moz-transition: all 0.3s ease;
 	-o-transition: all 0.3s ease;
@@ -179,20 +191,21 @@ body a:hover{
 /* HEADINGS ------------------------------------------------------------*/
 
 h1, h2, h3, h4, h5, h6{
-	font-family: helvetica, arial, sans-serif;
-	color: #888;
+	font-family: "DFKai-SB";
 	font-weight:normal;
 }
 
-h1{ font-size: 24px; }
+h1{ font-size: 36px;
+color: #e0d988; }
 
 h2{ font-size: 24px; }
 
 h3{ font-size: 21px; }
 
-h4{ font-size: 18px; }
+h4{ font-size: 18px;
+color: #fff; }
 
-h5{ font-size: 14px; }
+h5{ font-size: 16px; }
 
 h6{ font-size: 12px; }
 
@@ -242,7 +255,7 @@ nav a{
 	padding: 5px 10px 0px 10px;
 	color: #f5f5f5;
 	background: rgba(0,0,0,.0);
-	
+	font-family: "DFKai-SB";
 	text-shadow: 0 -1px rgba(0, 0, 0, 0.5);
 	
 	-webkit-transition: all 0.3s ease;
@@ -257,7 +270,7 @@ nav a{
 	background: #f5f5f5;
 	background: rgba(0,0,0,.2);
 	border-bottom: solid #1c1d1d 5px;
-	font-family: helvetica, arial, sans-serif;
+	font-family: "DFKai-SB";
 	
 }
 
@@ -298,6 +311,7 @@ nav a{
 	font-size: 11px;
 	color: #717171;
 	text-decoration: none;
+	font-family: "DFKai-SB";
 }
 
 #nav>li ul li a span{
@@ -307,7 +321,7 @@ nav a{
 #nav>li ul li a:hover{
 	background: #717171;
 	color: #f5f5f5;
-	font-family: helvetica, arial, sans-serif;
+	font-family: "DFKai-SB";
 }
 
 
@@ -323,6 +337,7 @@ nav a{
 	display: none;
     padding-top: 20px;
     padding-bottom: 30px;
+	font-family: "DFKai-SB";
 }
 
 #mobile-nav-holder a{
@@ -330,7 +345,7 @@ nav a{
 	padding: 7px 14px;
 	text-decoration: none;
 	color: #f5f5f5;
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: lighter;
 	
 	-webkit-transition: all  0.3s ease;
@@ -346,6 +361,7 @@ nav a{
 #mobile-nav-holder li:last-child a,
 #mobile-nav-holder li > ul a{
 	border: none;
+	font-family: "標楷體";
 }
 
 #mobile-nav-holder li > ul a{
@@ -366,14 +382,14 @@ nav a{
 	background: #3D2E2B; 
 	position: absolute;
 	right: 0px;
-	
+	font-family: "DFKai-SB";
 	z-index: 2000;
 }
 
 #mobile-nav-holder #nav-open a{
 	display: block;
 	padding: 7px 14px;
-	
+	font-family: "DFKai-SB";
 		
 }
 
@@ -802,6 +818,7 @@ aside.retractil #sidebar-content a:hover{
 .text-posts{
 	overflow: hidden;
 	padding-bottom: 70px;
+	font-family: "DFKai-SB";
 }
 
 .text-posts li{
@@ -810,6 +827,7 @@ aside.retractil #sidebar-content a:hover{
 	margin-left: 24px;
 	margin-bottom: 21px;
 	width: 252px;
+	font-family: "DFKai-SB";
 }
 
 .text-posts .heading{
@@ -818,7 +836,7 @@ aside.retractil #sidebar-content a:hover{
 	font-size: 13px;
 	color: #444;
 	text-decoration: none;
-	
+	font-family: "DFKai-SB";
 	-webkit-transition: all 0.3s ease;
 	-moz-transition: all 0.3s ease;
 	-o-transition: all 0.3s ease;
@@ -846,9 +864,14 @@ aside.retractil #sidebar-content a:hover{
 }
 
 #posts-list article{
-	margin-bottom: 80px;
+	margin-bottom: 60px;
 }
-
+.format-standard-nav{
+	position:rabsolute;
+	/*z-index:1;*/
+	margin-bottom: 30px;
+	margin-top:40px;
+}
 
 #posts-list .feature-image,
 #post-content .feature-image{
@@ -857,6 +880,14 @@ aside.retractil #sidebar-content a:hover{
 	/*background: url(../img/plus.png) center center no-repeat;*/
 	line-height: 0em;
 }
+#posts-list .feature-video,
+#post-content .feature-video{
+	width: 100%;
+	margin-bottom: 21px;
+	/*background: url(../img/plus.png) center center no-repeat;*/
+	line-height: 0em;
+}
+
 
 #posts-list .feature-image img,
 #post-content .feature-image img{
@@ -876,20 +907,20 @@ aside.retractil #sidebar-content a:hover{
 #post-content .post-heading{
 	display: block;
 	text-decoration: none;
-	color: #e0d988;
+	/*color: #e0d988;*/
 	line-height: 1em;
-	font-family: helvetica, arial, sans-serif;
+	font-family: "DFKai-SB";
 	/*margin-bottom:20px;*/
 	-webkit-transition: all 0.3s ease;
 	-moz-transition: all 0.3s ease;
 	-o-transition: all 0.3s ease;
 	transition: all 0.3s ease;
-	font-size:36px;
+	/*font-size:36px;*/
 }
 
 #posts-list .post-heading:hover{
-	color: #e0d988;
-	font-family: helvetica, arial, sans-serif;
+	/*color: #e0d988;*/
+	font-family:"DFKai-SB";
 
 
 }
@@ -1167,4 +1198,9 @@ footer #to-top:hover{ opacity: 0.7 }
 .script{
 	width: 15%;
 	vertical-align: middle;
+	margin-right:10px;
+}
+
+.movie-dummy{
+	padding-top: 60%; /* 16:9 aspect ratio */
 }
