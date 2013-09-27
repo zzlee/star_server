@@ -144,7 +144,8 @@ exports.init = function() {
      * @name GET /miix/ugc_hightlights
      * @memberof miix
      */
-    app.get('/miix/ugc_hightlights', routes.authorizationHandler.checkAuth, routes.miixHandler.getUgcHighlights_cb);
+    app.get('/miix/ugc_hightlights', routes.authorizationHandler.checkAuth, routes.miixHandler.getUgcHighlights_cb);//TODO deprecated
+    app.get('/miix/ugc_highlights', routes.authorizationHandler.checkAuth, routes.miixHandler.getUgcHighlights_cb);
     /*
     app.get('/miix/ugc_hightlights', function(req, res){
         var db = require('./db.js');
