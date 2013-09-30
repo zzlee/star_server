@@ -643,29 +643,31 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
             };
             var mappingUgcHighlightsList = function(data, set_cb){
                 listLimit = data.length;
-                
+
                 var toDo = function(err, result){
                     var liveContentUrl=null;
                     var youtubeUrl=null;
                     var fbUserId=null;
-                    
+
                     if(err && next <= listLimit - 1){
                         next += 1;
                         mappingUgcHighlightsList(data, set_cb);
                     }else if(err) set_cb("NO UGC highlights from DB", newlyUgcHighlights);
-					
-					if(data[next].genre == "miix_image")
-                        liveContentUrl = result[1];
-                    if(data[next].genre == "miix" || data[next].genre == "miix_story")
+
+                    if(data[next].genre == "miix_image")
+                        liveContentUrl = result[1].s3;
+                    if(data[next].genre == "miix" || data[next].genre == "miix_story"){
                         youtubeUrl = data[next].url.youtube;
-	                if(data[next].ownerId){
-	                    if(data[next].ownerId.fbUserId)
-	                        fbUserId = data[next].ownerId.fbUserId;
-	                    else if(data[next].ownerId.userID)
-	                        fbUserId = data[next].ownerId.userID;
-	                }
-	                
-					
+                        liveContentUrl = result[1].youtube;
+                    }
+                    if(data[next].ownerId){
+                        if(data[next].ownerId.fbUserId)
+                            fbUserId = data[next].ownerId.fbUserId;
+                        else if(data[next].ownerId.userID)
+                            fbUserId = data[next].ownerId.userID;
+                    }
+
+
                     if(next == listLimit - 1) {
                         UGCListInfo(fbUserId, result[0], data[next].genre, data[next].url.s3, liveContentUrl, youtubeUrl, newlyUgcHighlights);
                         set_cb(null, newlyUgcHighlights); 
@@ -688,16 +690,16 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
                                             else callback(null, result.fb.userName);
                                         });
                                     },
-									function(callback){
-										 userLiveContentModel.find({"sourceId": data[next].projectId, "state":"correct"}).sort({'createdOn': -1}).exec(function(err, result){
-											if(err) callback(err, null);
-											else if(!result) callback(null, 'No Live Content');
-											else if(!result[0]) callback(null, 'No Live Content');
-											else{
-												callback(null, result[0].url.s3);
-											}
-										});
-									}
+                                    function(callback){
+                                        userLiveContentModel.find({"sourceId": data[next].projectId, "state":"correct"}).sort({'createdOn': -1}).exec(function(err, result){
+                                            if(err) callback(err, null);
+                                            else if(!result) callback(null, 'No Live Content');
+                                            else if(!result[0]) callback(null, 'No Live Content');
+                                            else{
+                                                callback(null, result[0].url);
+                                            }
+                                        });
+                                    }
                                     ], toDo);
                 }
 
