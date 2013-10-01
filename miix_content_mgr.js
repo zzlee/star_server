@@ -631,42 +631,51 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
     ugcModel.find({ "highlight": true}).sort({"createdOn":-1}).limit(limit).exec(function (err, ugcHighlights) {
         if (!err){
             
-            var UGCListInfo = function(ownerId, fb_userName, genre, url, arr) {
+            var UGCListInfo = function(fbUserId, fb_userName, genre, longPhotoUrl, liveContentUrl, youtubeUrl, arr) {
                 arr.push({
-                    ownerId: ownerId,
+                    fbUserId: fbUserId,
                     fb_userName: fb_userName,
                     genre: genre,
-                    url: url
+                    longPhotoUrl: longPhotoUrl,
+                    liveContentUrl: liveContentUrl,
+                    youtubeUrl: youtubeUrl
                 });
             };
             var mappingUgcHighlightsList = function(data, set_cb){
                 listLimit = data.length;
-                
-                var toDo = function(err, result){
-					if(err) set_cb("NO UGC highlights from DB", newlyUgcHighlights);
-					   
-					//TODO need implement in client
-				    var genre; 
-				    if(data[next].genre != "miix_image")
-				        genre = data[next].genre;
-					else
-					    genre = "miix_image_live_photo";
-					if(result[1]){	
-						var url;
-						s3 = result[1].replace("https://s3.amazonaws.com/miix_content", "");
-						// s3 = data[next].userRawContent[0].content.replace("https://s3.amazonaws.com/miix_content", "");
-						url = {s3: s3};
-						}
 
-					
+                var toDo = function(err, result){
+                    var liveContentUrl=null;
+                    var youtubeUrl=null;
+                    var fbUserId=null;
+
+                    if(err && next <= listLimit - 1){
+                        next += 1;
+                        mappingUgcHighlightsList(data, set_cb);
+                    }else if(err) set_cb("NO UGC highlights from DB", newlyUgcHighlights);
+
+                    if(data[next].genre == "miix_image")
+                        liveContentUrl = result[1].s3;
+                    if(data[next].genre == "miix" || data[next].genre == "miix_story"){
+                        youtubeUrl = data[next].url.youtube;
+                        liveContentUrl = result[1].youtube;
+                    }
+                    if(data[next].ownerId){
+                        if(data[next].ownerId.fbUserId)
+                            fbUserId = data[next].ownerId.fbUserId;
+                        else if(data[next].ownerId.userID)
+                            fbUserId = data[next].ownerId.userID;
+                    }
+
+
                     if(next == listLimit - 1) {
-                        UGCListInfo(data[next].ownerId, result[0], genre, url, newlyUgcHighlights);
+                        UGCListInfo(fbUserId, result[0], data[next].genre, data[next].url.s3, liveContentUrl, youtubeUrl, newlyUgcHighlights);
                         set_cb(null, newlyUgcHighlights); 
                         next = 0;
                         UGCList = [];
                     }
                     else{
-                        UGCListInfo(data[next].ownerId, result[0], genre, url, newlyUgcHighlights);
+                        UGCListInfo(fbUserId, result[0], data[next].genre, data[next].url.s3, liveContentUrl, youtubeUrl, newlyUgcHighlights);
                         next += 1;
                         mappingUgcHighlightsList(data, set_cb);
                     }
@@ -681,17 +690,16 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
                                             else callback(null, result.fb.userName);
                                         });
                                     },
-									function(callback){
-										 userLiveContentModel.find({"sourceId": data[next].projectId, "state":"correct"}).sort({'createdOn': -1}).exec(function(err, result){
-										 // console.log(err, result);
-											if(err) callback(err, null);
-											else if(!result) callback('No Live Content', null);
-											else if(!result[0]) callback('No Live Content', null);
-											else{
-												callback(null, result[0].url.highlight);
-											}
-										});
-									}
+                                    function(callback){
+                                        userLiveContentModel.find({"sourceId": data[next].projectId, "state":"correct"}).sort({'createdOn': -1}).exec(function(err, result){
+                                            if(err) callback(err, null);
+                                            else if(!result) callback(null, 'No Live Content');
+                                            else if(!result[0]) callback(null, 'No Live Content');
+                                            else{
+                                                callback(null, result[0].url);
+                                            }
+                                        });
+                                    }
                                     ], toDo);
                 }
 
@@ -699,9 +707,8 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
             if(ugcHighlights.length > 0){
                 mappingUgcHighlightsList(ugcHighlights, function(err, docs){
                     if (!err){
-                       // console.log('newlyUgcHighlights',newlyUgcHighlights);
+//                        console.log('newlyUgcHighlights',newlyUgcHighlights);
                        cbOfGetUgcHighlights(null, newlyUgcHighlights);
-//                       cbOfGetUgcHighlights(null, ugcHighlights);
                     }else{
                        cbOfGetUgcHighlights("Fail to mapping UGC highlights from DB: "+err, newlyUgcHighlights); 
                     }
