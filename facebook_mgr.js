@@ -20,9 +20,16 @@ FM.facebookMgr = (function(){
 //    var app_access_token = "116813818475773|d9EXxXNwTt2eCbSkIWYs9dJv-N0", 
 //        app_id = "116813818475773",
 //        app_secret = "b8f94311a712b98531b292165884124a";
-        var app_access_token = "430008873778732|99f7c401c399ce8caaa90cc79a29f795", 
-        app_id = "430008873778732",
-        app_secret = "99f7c401c399ce8caaa90cc79a29f795";
+        
+//        //for OnDaScreen        
+//        var app_access_token = "430008873778732|99f7c401c399ce8caaa90cc79a29f795", 
+//        app_id = "430008873778732",
+//        app_secret = "99f7c401c399ce8caaa90cc79a29f795";
+        
+        // for WowTaipeiarena 
+        var app_access_token = "154438938098663|1ee57dc3fd8c7596781bbd1c986bf6b0", 
+        app_id = "154438938098663",
+        app_secret = "1ee57dc3fd8c7596781bbd1c986bf6b0";
   
     
     /** for feltmeng.idv.tw @ Local */
