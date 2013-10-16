@@ -51,10 +51,10 @@ FM.MEMBER = (function(){
                 FMDB.updateOne(members, condition, {'mPhone.verified': true, 'mPhone.code': null}, {select: 'mPhone.number'}, cb)
             },
             
-            isFBValid: function(userID, cb){
+            isFBValid: function(userID, appGenre, cb){
                 
                 var field = { "_id":1, "fb": 1, "deviceToken":1, "mPhone":1 };
-                FMDB.getValueOf(members, {"fb.userID":userID}, field, cb);
+                FMDB.getValueOf(members, {"fb.userID":userID, "app":appGenre}, field, cb);
             },
             
 			getDeviceTokenById: function(oid, cb){

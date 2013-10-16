@@ -262,6 +262,7 @@ FM.api.signupwithFB = function(req, res){
     
     var sid = req.sessionID;
     FM_LOG("\n[signupwithFB] sessionID: " + sid);
+    var appGenre = "ondascreen";
     
     if(req.body && req.body.authResponse){
     
@@ -290,11 +291,13 @@ FM.api.signupwithFB = function(req, res){
             email = authRes.email;
             member.email = email;
         }
-            
+        if(req.body.appGenre){
+            appGenre = req.body.appGenre;
+        }    
             
         
         /* New FB User or Exsited User */
-        memberDB.isFBValid( userID, function(err, result){
+        memberDB.isFBValid( userID, appGenre, function(err, result){
         
             if(err){
                 res.send(500, { error: "Valid User/Password"});
