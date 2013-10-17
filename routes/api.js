@@ -103,7 +103,7 @@ FM.api._fbPostUGCThenAdd = function(vjson){
                             for( var devicePlatform in result.deviceToken){
                                 if(result.deviceToken[devicePlatform] != 'undefined'){
                                 	var pushMgr = require("../push_mgr.js");
-                                	pushMgr.sendMessageToDevice(devicePlatform, result.deviceToken[devicePlatform], "您有一個新影片！");
+                                	pushMgr.sendMessageToDevice(devicePlatform, result.deviceToken[devicePlatform], result.app, "您有一個新影片！");
                                 }
                             }
                         }
@@ -291,8 +291,9 @@ FM.api.signupwithFB = function(req, res){
             email = authRes.email;
             member.email = email;
         }
-        if(req.body.appGenre){
-            appGenre = req.body.appGenre;
+        if(authRes.appGenre){
+            appGenre =authRes.appGenre;
+            member.app = appGenre;
         }    
             
         
@@ -324,7 +325,7 @@ FM.api.signupwithFB = function(req, res){
                     
                 }
                 
-                fbMgr.isTokenValid(accessToken, function(err, result){
+                fbMgr.isTokenValid(accessToken, appGenre, function(err, result){
                     
                     if(err){
                         res.send(500, { error: "Valid User/Password"});
@@ -332,7 +333,7 @@ FM.api.signupwithFB = function(req, res){
                     
                     // Extending new/short access_token replaces invalid existed access_token.
                     else if(!result.is_valid){
-                        fbMgr.extendToken(accessToken, function(err, response){
+                        fbMgr.extendToken(accessToken, appGenre, function(err, response){
                             if(err){
                                 //res.send( {"data":{"_id": oid.toHexString(), "accessToken": accessToken, "expiresIn": expiresIn, "verified": mPhone_verified  }, "message":"success"} );
                                 tokenMgr.getToken(oid, function(err, miixToken){
@@ -365,7 +366,7 @@ FM.api.signupwithFB = function(req, res){
                         // existed access_token is valid. Check if expire within 20days, then renew it.
                         if( parseInt(fb.auth.expiresIn) - Date.now() < 20*86400*1000 || isNaN(fb.auth.expiresIn) || fb.auth.expiresIn === null){
                     
-                            fbMgr.extendToken(authRes.accessToken, function(err, response){
+                            fbMgr.extendToken(authRes.accessToken, appGenre, function(err, response){
                                 if(err){
                                     //res.send( {"data":{"_id": oid.toHexString(), "accessToken": existed_access_token, "verified": mPhone_verified  }, "message":"success"} );
                                     tokenMgr.getToken(oid, function(err, miixToken){
@@ -426,7 +427,7 @@ FM.api.signupwithFB = function(req, res){
                     member.deviceToken= deviceToken;
                 }
                 
-                fbMgr.extendToken(authRes.accessToken, function(err, response){
+                fbMgr.extendToken(authRes.accessToken, appGenre, function(err, response){
 
                     
                     if(err){
@@ -454,12 +455,13 @@ FM.api.signupwithFB = function(req, res){
                                 var ack = { "data":{"sessionID": sid, "accessToken": accessToken, "userID": userID, "_id": oid} };
                                 FM.api._fbStatusAck(ack);
                                 */
-                                
-                                req.session.user = {
-                                    userID: member.fb.userID,
-                                    _id: oid,
-                                    accessToken: member.fb.auth.accessToken
-                                };
+                                if(req.session){
+                                    req.session.user = {
+                                        userID: userID,
+                                        _id: oid,
+                                        accessToken: member.fb.auth.accessToken
+                                    };
+                                }
                                 
                                 //res.send( {"data":{ "_id": oid.toHexString(), "accessToken": member.fb.auth.accessToken, "expiresIn": member.fb.auth.expiresIn}, "message":"success"} );
                                 tokenMgr.getToken(oid, function(err, miixToken){
