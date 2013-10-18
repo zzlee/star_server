@@ -237,8 +237,8 @@ FM.MEMBER = (function(){
                 var user_token = null;
                 var expiresIn = 0;
                 var appGenre = "ondascreen";
-                if(req.body.appGenre){
-                    appGenre = req.body.appGenre;
+                if(req.query.appGenre){
+                    appGenre = req.query.appGenre;
                 }  
                 
                 // Do not use "this" here, it's in differenct closure since "async callback".
