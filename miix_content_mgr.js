@@ -631,14 +631,15 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
     ugcModel.find({ "highlight": true}).sort({"createdOn":-1}).limit(limit).exec(function (err, ugcHighlights) {
         if (!err){
             
-            var UGCListInfo = function(fbUserId, fb_userName, genre, longPhotoUrl, liveContentUrl, youtubeUrl, arr) {
+            var UGCListInfo = function(fbUserId, fb_userName, genre, longPhotoUrl, liveContentUrl, youtubeUrl, liveTime, arr) {
                 arr.push({
                     fbUserId: fbUserId,
                     fb_userName: fb_userName,
                     genre: genre,
                     longPhotoUrl: longPhotoUrl,
                     liveContentUrl: liveContentUrl,
-                    youtubeUrl: youtubeUrl
+                    youtubeUrl: youtubeUrl,
+                    liveTime: liveTime
                 });
             };
             var mappingUgcHighlightsList = function(data, set_cb){
@@ -655,10 +656,10 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
                     }else if(err) set_cb("NO UGC highlights from DB", newlyUgcHighlights);
 
                     if(data[next].genre == "miix_image")
-                        liveContentUrl = result[1].s3;
+                        liveContentUrl = result[1].url.s3;
                     if(data[next].genre == "miix" || data[next].genre == "miix_story"){
                         youtubeUrl = data[next].url.youtube;
-                        liveContentUrl = result[1].youtube;
+                        liveContentUrl = result[1].url.youtube;
                     }
                     if(data[next].ownerId){
                         if(data[next].ownerId.fbUserId)
@@ -667,15 +668,15 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
                             fbUserId = data[next].ownerId.userID;
                     }
 
-
                     if(next == listLimit - 1) {
-                        UGCListInfo(fbUserId, result[0], data[next].genre, data[next].url.s3, liveContentUrl, youtubeUrl, newlyUgcHighlights);
+                        UGCListInfo(fbUserId, result[0], data[next].genre, data[next].url.s3, liveContentUrl, youtubeUrl, result[1].liveTime, newlyUgcHighlights);
                         set_cb(null, newlyUgcHighlights); 
                         next = 0;
-                        UGCList = [];
+//                        console.log(newlyUgcHighlights);
+                        newlyUgcHighlights = [];
                     }
                     else{
-                        UGCListInfo(fbUserId, result[0], data[next].genre, data[next].url.s3, liveContentUrl, youtubeUrl, newlyUgcHighlights);
+                        UGCListInfo(fbUserId, result[0], data[next].genre, data[next].url.s3, liveContentUrl, youtubeUrl, result[1].liveTime, newlyUgcHighlights);
                         next += 1;
                         mappingUgcHighlightsList(data, set_cb);
                     }
@@ -691,12 +692,12 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
                                         });
                                     },
                                     function(callback){
-                                        userLiveContentModel.find({"sourceId": data[next].projectId, "state":"correct"}).sort({'createdOn': -1}).exec(function(err, result){
+                                        userLiveContentModel.find({"sourceId": data[next].projectId}).sort({'createdOn': -1}).exec(function(err, result){
                                             if(err) callback(err, null);
                                             else if(!result) callback(null, 'No Live Content');
                                             else if(!result[0]) callback(null, 'No Live Content');
                                             else{
-                                                callback(null, result[0].url);
+                                                callback(null, result[0]);
                                             }
                                         });
                                     }
