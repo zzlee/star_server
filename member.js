@@ -246,6 +246,9 @@ FM.MEMBER = (function(){
                     if(err){
                         res.send({error: "Internal Server Error"});
                         
+                    }else if(!result){
+                        res.send({error: "get FB Access Token Error"});
+                        
                     }else if(result.fb){
                         user_token = result.fb.auth.accessToken;
                         var is_valid = null;
