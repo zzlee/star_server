@@ -823,7 +823,7 @@ miixContentMgr.pushRandomMessage = function(memberId, ugcProjectID, cbOfPushRand
 //                                 callback("Fail to get random message: "+err, null);
 //                             }
 //                         });
-                         callback(null, "你目前是第"+ugcObj.no+"位投稿者。排定時段後，你會收到APP通知與facebook預告，通知播出日期時間");
+                         callback(null, "你目前是第"+ugcObj.no+"位投稿者。排定時段後，你會收到APP通知與facebook預告，通知播出日期時間。");
                      },
                      function(randomMessage, callback){
                          pushMgr.sendMessageToDeviceByMemberId( memberId, randomMessage, function(err, result){
@@ -909,7 +909,7 @@ miixContentMgr.getUserUploadedImageUrls('greeting-50c99d81064d2b841200000a-20130
 //    console.dir(putFbPostIdUgcs);
 //});
 
-//miixContentMgr.pushRandomMessage( '52201b3999f24f9809000006', 'miix_it-522022ad2ca7ced40600000e-20130830T052614052Z', function(err, result){
+//miixContentMgr.pushRandomMessage( '526107a409900bbc02000005', 'wow_pic-526107a409900bbc02000005-20131018T102216893Z', function(err, result){
 //    console.log(err, result);
 //});
 
