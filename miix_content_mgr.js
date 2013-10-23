@@ -692,7 +692,7 @@ miixContentMgr.getUgcHighlights = function(limit, cbOfGetUgcHighlights){
                                         });
                                     },
                                     function(callback){
-                                        userLiveContentModel.find({"sourceId": data[next].projectId}).sort({'createdOn': -1}).exec(function(err, result){
+                                        userLiveContentModel.find({"sourceId": data[next].projectId, "state":"correct"}).sort({'createdOn': -1}).exec(function(err, result){
                                             if(err) callback(err, null);
                                             else if(!result) callback(null, 'No Live Content');
                                             else if(!result[0]) callback(null, 'No Live Content');
@@ -816,13 +816,14 @@ miixContentMgr.pushRandomMessage = function(memberId, ugcProjectID, cbOfPushRand
                          });
                      },
                      function(ugcObj, callback){
-                         getRandomMessage(ugcObj.no, function(err, randomMessage){
-                             if (!err)
-                                 callback(null, randomMessage);
-                             else{
-                                 callback("Fail to get random message: "+err, null);
-                             }
-                         });
+//                         getRandomMessage(ugcObj.no, function(err, randomMessage){
+//                             if (!err)
+//                                 callback(null, randomMessage);
+//                             else{
+//                                 callback("Fail to get random message: "+err, null);
+//                             }
+//                         });
+                         callback(null, "你目前是第"+ugcObj.no+"位投稿者。排定時段後，你會收到APP通知與facebook預告，通知播出日期時間");
                      },
                      function(randomMessage, callback){
                          pushMgr.sendMessageToDeviceByMemberId( memberId, randomMessage, function(err, result){
