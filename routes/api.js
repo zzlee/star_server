@@ -87,7 +87,14 @@ FM.api._fbPostUGCThenAdd = function(vjson){
 //                    vjsonData.fb_id = fb_id;
 //                    
 //                }
-                UGCDB.updateOne({"projectId":pid}, vjsonData, {"upsert": true}, function(err, vdoc){
+            
+                var vjsonToUpdate = {
+                        "url": vjsonData.url,
+                        "aeId": vjsonData.aeId,
+                        "mediaType": vjsonData.mediaType,
+                        "fileExtension": vjsonData.fileExtension
+                        };
+                UGCDB.updateOne({"projectId":pid}, vjsonToUpdate, {"upsert": true}, function(err, vdoc){
                     if(err)
                         logger.error(err);
                     
