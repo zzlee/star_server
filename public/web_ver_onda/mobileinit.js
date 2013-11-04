@@ -77,12 +77,10 @@ $(document).bind("mobileinit", function(){
                  //$.mobile.page.prototype.options.addBackBtn = true;
                  
                  /* pageinit executed after pagebeforecreate */
-                 $("#cropperTestPg").live("pageinit", FmMobile.cropperTestPg.load);
-                 $("#cropperTestPg").live("pageshow", FmMobile.cropperTestPg.show);
+                // $("#cropperTestPg").live("pageinit", FmMobile.cropperTestPg.load);
+                // $("#cropperTestPg").live("pageshow", FmMobile.cropperTestPg.show);
                  
-                 $("#ohohshit").live('click',function(){
-                                     alert("humm....");
-                                     });
+                 
                  $("map > #mapAreaBack").live("click",FmMobile.orientationPg.swiperight);
                  $("map > #mapAreaNext").live("click",FmMobile.orientationPg.swipeleft);
                  
@@ -299,6 +297,11 @@ onBodyLoad: function(){
 //                              FmMobile.apn.getPendingNotification();
                               //alert(event);
     });
+	
+	
+	
+	
+	
 //    localStorage.pixelRatio = window.devicePixelRatio;
     //TODO:
     //document.addEventListener("touchmove", function(e){ e.preventDefault(); }, true);

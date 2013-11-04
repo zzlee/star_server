@@ -29,7 +29,7 @@ FmMobile.myUgcPg = {
         
         FM_LOG("[myUgcPg] pageshow");
         $("#btnMiixMovie").click(function(){
-        	FmMobile.analysis.trackPage("/myUgcPg/myContents");
+        	//FmMobile.analysis.trackPage("/myUgcPg/myContents");
              $("#btnMiixMovie>img").attr({src: "images/tab_ugc_active.png"});
              $("#btnLiveMovie>img").attr({src: "images/tab_live.png"});
              
@@ -38,17 +38,17 @@ FmMobile.myUgcPg = {
          
          });
         $("#btnLiveMovie").click(function(){
-        	FmMobile.analysis.trackPage("/myUgcPg/myLiveContents");
+        	//FmMobile.analysis.trackPage("/myUgcPg/myLiveContents");
              $("#btnLiveMovie>img").attr({src: "images/tab_live_active.png"});
              $("#btnMiixMovie>img").attr({src: "images/tab_ugc.png"});
              
              //API : /miix/members/:memberId/live_contents
              FmMobile.myUgcPg.myLiveContents = [];
-             var urlLiveContents = remotesite + "/miix/members/" + localStorage._id + "/live_contents";
+             var urlLiveContents = remotesite + "/miix/members/" + "525fc0afe29857685c000005" + "/live_contents";
              $.ajax({
                     url: urlLiveContents,
                     dataType: 'json',
-                    data:{ miixToken: localStorage.miixToken },
+                    data:{ miixToken: "53768608" },
                     success: function(response){
                                     if(response){
                     console.dir(response);
@@ -76,7 +76,7 @@ FmMobile.myUgcPg = {
         if(FmMobile.checkNetwork()){
         
             //(the code originally in init() )
-            var url = starServerURL + "/miix/members/" + localStorage._id + "/ugcs";
+            var url = starServerURL + "/miix/members/" + "525fc0afe29857685c000005"+ "/ugcs";
             //    FmMobile.myUgcPg.myContents = new Array();
             if(FmMobile.myUgcPg.Type == "live"){
 //                FmMobile.myUgcPg.Type = "";
@@ -91,7 +91,7 @@ FmMobile.myUgcPg = {
                 $.ajax({
                        url: url,
                        dataType: 'json',
-                       data:{ miixToken: localStorage.miixToken },
+                       data:{ miixToken: "53768608" },
                        success: function(response){
                                        if(response){
                                            $.each(response, function(i, item){
