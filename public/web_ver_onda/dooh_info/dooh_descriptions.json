@@ -1,0 +1,20 @@
+{
+    "taipei_arena":{
+        "name":"台北小巨蛋",
+        "screenResolution":{
+            "width":"1743",
+            "height":"260"
+        },
+        "preview":{
+            "coverImageUrl":"fence-small.png"
+        },
+        "viewingZones":[
+            {
+                "latitude_min":"",
+                "latitude_max":"",
+                "longitude_min":"",
+                "longitude_max":""
+            }
+        ]
+    }
+}

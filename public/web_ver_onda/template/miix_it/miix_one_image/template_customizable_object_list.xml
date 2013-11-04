@@ -1,0 +1,10 @@
+<customizable_object_list>
+  <customizable_object>
+    <ID>greeting_photo</ID>
+    <format>image</format>
+    <description>一張用來問候的的相片</description>
+    <key_frame>keyframe_greeting_photo.jpg</key_frame>
+    <original_width>1280</original_width>
+    <original_height>722</original_height>
+  </customizable_object>
+</customizable_object_list>

@@ -1,0 +1,101 @@
+<!DOCTYPE html> 
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="./css/jquery-ui.css"/>
+    <link rel="stylesheet" href="./css/jquery.mobile-1.2.0.css"/>
+    <!-- CUSTOM INITIALIZATION CODE -->
+    <script src="./lib/cordova-2.2.0.js" type="text/javascript" charset="utf-8"></script>
+    <script src="./lib/jquery-1.8.2.min.js"></script>
+    <script src="./lib/jquery-ui.js"></script>
+    <script src="./lib/ChildBrowser.js"></script>
+    <script src="./lib/json2.js"></script>
+    <script src="./lib/jstorage.min.js"></script>
+    <script src="./lib/kinetic-v4.0.5.min.js"></script>
+    <script src="./lib/lufylegend-1.6.1.js"></script>
+    <script src="./lib/GAPlugin.js"></script>
+    <script src="./lib/PushNotification.js"></script>
+    <script src="./lib/exif.js"></script>
+    <script src="./lib/binaryajax.js"></script>
+    <script src="./lib/quojs-2.3.1/quo.js"></script>
+    <!-- CUSTOM INITIALIZATION CODE -->
+    <script src="common.js"></script>
+    <script src="megapix-image-gz.js"></script>
+    <script src="photo_cropper.js"></script>
+    <script src="simple_analytics.js"></script>
+    <script src="fm_widgets.js"></script>
+    <script src="fb_connect.js"></script>
+    <script src="authentication.js"></script>
+    <script src="fb_login_pg.js"></script>
+    <script src="index_pg.js"></script>
+    <script src="booking_choose_movie_pg.js"></script>
+    <script src="my_video_pg.js"></script>
+    <script src="orientation_pg.js"></script>
+    <script src="setting_pg.js"></script>
+    <script src="toc_pg.js"></script>
+    <script src="movie_create_pg.js"></script>
+    <script src="photo_cropper_pg.js"></script>
+    <script src="mobileinit.js"></script>
+    <script src="mobileinit_movie_gen.js"></script>
+    <script src="./lib/jquery.mobile-1.2.0.js"></script>
+    <link rel="stylesheet" href="./css/fm.css"/>
+    <link rel="stylesheet" href="./css/fm2.css"/>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<div data-role="page" id="setting_MainPg">
+    
+	<div class="header">
+        <p class="header-text">設定</p>
+    </div>
+       <div class="header_bg" >
+           <img class="header_bg_img" src="images/header_bg1.png"></img>
+       </div>
+	<div class="container" data-role="content">
+       <!-- <div class="setting"> -->
+       <div class="setting-content">
+       <ul id="settingList">
+            <li><a id="itemOrientation" href="#" class="setting_list" style="color:#000">使用方式</a></li>
+           <li><a id="itemToc" href="#" class="setting_list" style="color:#000">登場須知</a></li>
+           <li><a id="itemTerm" href="#" class="setting_list" style="color:#000">包檔服務</a></li>
+
+            <li><a id="itemFAQ" href="#" class="setting_list" style="color:#000">FAQ</a></li>
+            <li><a id="itemAboutMiixIt" href="#" class="setting_list" style="color:#000">關於我們</a></li>
+           <!--
+           <li id="contentAboutMiixIt" style="text-align:center" class="setting_list" style="color:#000">上大螢幕 V1.0 build130813</li>
+            -->
+            <li><a id="itemMailUs" href="#" class="setting_list" style="color:#000">客戶服務</a></li>
+        <!--
+           <li><a id="ugcTest" href="#" class="setting_list" style="color:#000">UGC Test</a></li>
+         -->
+            <li><a id="itemLogout" href="#" class="setting_list" style="color:#000">登出</a></li>
+        </ul>
+    
+       </div>
+        <!-- </div>  -->
+    </div>
+</div>
+
+<div id="nav-bar" class="nav-bar-background3">
+    <div id="btnTemplate" class="ui-menu-inactive">
+        <img class="menu-img" src="images/m1-active.png">
+        <div class="menu-text">主題模板</div>
+    </div>
+    <div id="btnMyUgc" class="ui-menu-inactive">
+        <img class="menu-img" src="images/m2.png">
+        <div class="menu-text">我的影片</div>
+    </div>
+    <div id="btnScreen" class="ui-menu-inactive">
+        <img class="menu-img" src="images/m3.png">
+        <div class="menu-text">大螢幕</div>
+    </div>
+    <div id="btnSetting" class="ui-menu-active">
+        <img class="menu-img" src="images/m4.png">
+        <div class="menu-text">設定</div>
+    </div>
+</div>
+
+</body>
+</html>
