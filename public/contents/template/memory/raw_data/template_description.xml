@@ -1,0 +1,7 @@
+<template_raw_data>
+  <ID>memory</ID>
+  <name>回憶</name>
+  <description>一段喚起人回憶的影片</description>
+  <composition>test_compo</composition>
+  <raw_video>memory.avi</raw_video>
+</template_raw_data>
