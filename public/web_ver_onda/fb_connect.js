@@ -10,10 +10,10 @@ function FBConnect()
 {
     
     //  Dedicated to iOS.
-	if(window.plugins.childBrowser == null)
-	{
-		ChildBrowser.install();
-	}
+//	if(window.plugins.childBrowser == null)
+//	{
+//		ChildBrowser.install();
+//	}
 }
 
 FBConnect.prototype.onConnect;
@@ -25,27 +25,31 @@ FBConnect.prototype.connect = function(client_id, redirect_uri, display)
 	this.redirect_uri = redirect_uri;
 	
 	var authorize_url  = "https://graph.facebook.com/oauth/authorize?";
+//	var authorize_url  = "https://graph.facebook.com/dialog/oauth?";
 		authorize_url += "client_id=" + client_id;
 		authorize_url += "&redirect_uri=" + redirect_uri;
 		authorize_url += "&display="+ ( display ? display : "touch" );
 		authorize_url += "&type=user_agent";
         authorize_url += "&scope=read_stream,publish_stream,user_location,email,user_likes,publish_checkins";
-    
-	window.plugins.childBrowser.showWebPage(authorize_url);
-	var self = this;
-    
-	window.plugins.childBrowser.onLocationChange = function(loc){
-        //The scope of 'this' here is the event.
-        self.onLocationChange(loc);
-    };
-    window.plugins.childBrowser.onClose = function(){
-        self.onClose();
-    };
+//	var authorize_url = "https://www.facebook.com/dialog/oauth?client_id=" + client_id + "&redirect_uri=" + redirect_uri;
+	
+//	window.plugins.childBrowser.showWebPage(authorize_url);
+    window.open(authorize_url, "_self");
+//    window.location.href = authorize_url;
+//	var self = this;
+	
+//	window.plugins.childBrowser.onLocationChange = function(loc){
+//        //The scope of 'this' here is the event.
+//        self.onLocationChange(loc);
+//    };
+//    window.plugins.childBrowser.onClose = function(){
+//        self.onClose();
+//    };
 };
 
 
 FBConnect.prototype.Logout = function() {
-    window.plugins.childBrowser.LogOut();
+//    window.plugins.childBrowser.LogOut();
 };
 
 

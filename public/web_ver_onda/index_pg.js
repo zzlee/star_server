@@ -18,7 +18,7 @@ FmMobile.indexPg = {
     show: function(){
         FM_LOG("[indexPg.show]");
         //localStorage.fb_userID
-        if(true){
+        if(localStorage.fb_userID){
             $.mobile.changePage("template-main_template.html");
         }
         else {

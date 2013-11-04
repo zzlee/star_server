@@ -88,7 +88,7 @@ $(document).bind("mobileinit", function(){
                  
                  $('#goOrientation2').live("click",function(){
                                            $.mobile.changePage("orientation_2.html");
-                                           FmMobile.analysis.trackPage("/orientation2");
+//                                           FmMobile.analysis.trackPage("/orientation2");
 
                                            });
                  $('#goOrientation1').live("click",function(){
@@ -118,10 +118,11 @@ $(document).bind("mobileinit", function(){
                  });
                  
                  $("a").live("click", function(event){
-                    event.preventDefault();
+                    event.defaultPrevented();
                     var url = document.getElementsByTagName("a")[0].getAttribute("url");
                     if(url != null){
-                        FmMobile.openBrowser.showPage(url);
+//                        FmMobile.openBrowser.showPage(url);
+                    	window.open(url);
                     }
                 });
 
@@ -281,9 +282,9 @@ onBodyLoad: function(){
     
     FM_LOG("[Init.onDeviceReady]");
     document.addEventListener("deviceready", FmMobile.init.platformRotate, true);
-    document.addEventListener("deviceready", FmMobile.analysis.init, true);
-    document.addEventListener("deviceready", FmMobile.gcm.init, true);
-    document.addEventListener("deviceready", FmMobile.apn.init, true);
+//    document.addEventListener("deviceready", FmMobile.analysis.init, true);
+//    document.addEventListener("deviceready", FmMobile.gcm.init, true);
+//    document.addEventListener("deviceready", FmMobile.apn.init, true);
     document.addEventListener("deviceready", FmMobile.init.isFBTokenValid, true);
     
     document.addEventListener("resume", FmMobile.init.onResume, false);
@@ -685,26 +686,40 @@ FmMobile.analysis = {
 FmMobile.authPopup = {
 PAGE_ID: "authPg",
     
-    
+loginFB: function(){
+	FB.login(function(response) {
+           if (response.authResponse) {
+//                getUserInfo();
+        	   console.dir(response);
+            }else{
+             console.log('User cancelled login or did not fully authorize.');
+            }
+         },{scope: 'read_stream,publish_stream,user_location,email,user_likes,publish_checkins'});
+},
 init: function(){
     FM_LOG("[authPopup Init]");
     if(FmMobile.checkNetwork()){
     //miixcard metadata
-    var client_id = "430008873778732";
+    	
+    	var client_id = "430008873778732";
     //var redir_url = ["http://www.miix.tv/welcome.html", "https://www.miix.tv/welcome.html"];
     
     
-    var redir_url = ["http://www.ondascreen.com/welcome.html"];
+    	var redir_url = ["http://127.0.0.1/welcome.html"];
     // watasistar metadata
     /*
      var client_id = "243619402408275";
      var redir_url = ["http://www.feltmeng.idv.tw/welcome.html", "https://www.feltmeng.idv.tw/welcome.html"];
      */
-    var fb = FBConnect.install();
-    fb.connect(client_id, redir_url[0], "touch");
-    fb.onConnect = FmMobile.authPopup.onFBConnected;
+    	var fb = FBConnect.install();
+    	fb.connect(client_id, redir_url[0], "touch");
+//    	fb.onConnect = FmMobile.authPopup.onFBConnected;
+    
+    
     }
+
 },
+
     
     onFBConnected: function(){
         FM_LOG("[onFBConnected]: ");

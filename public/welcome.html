@@ -1,3 +1,38 @@
 <html>
-<body><img src="images/welcome.png" width="100%"></img></body>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="json2.js"></script>
+<script>
+	function init(){
+		var getUrlHash = location.hash.split["#"];
+		if(getUrlHash){
+			//get access token
+			localStorage.fb_accessToken = getUrlHash[1].split("&")[0].split("=")[1];
+			var expiresIn = Date.now() + parseInt(getUrlHash[1].split("&")[1].split("=")[1]);
+			
+			var url = "https://graph.facebook.com/me?access_token=" + localStorage.fb_accessToken;
+			var req = new XMLHttpRequest();
+			req.onreadystatechange = function(e){
+			        
+			        if(req.readyState == 4 && req.status == 200){
+			            
+			            var res = JSON.parse(e.target.responseText);
+			            FM_LOG("[fb_profile]: " + JSON.stringify(res));
+			            localStorage.fb_userID = res.id;
+			            localStorage.fb_name = res.name;
+			            if(res.email)
+			                localStorage.email = res.email;
+			            
+			        }
+			};
+			
+			req.open("GET", url);
+			
+			 window.location.href("http://jean.ondascreen.com/web_ver_onda/index.html");
+		}
+	}
+	
+</script>
+<body onLoad="init()">
+	<img src="images/welcome.png" width="100%"></img>
+</body>
 </html>
