@@ -11,6 +11,7 @@ PAGE_ID: "template_mainTemplatePg",
     },
         
     init: function(){
+	delete localStorage.imgForCropper;
        // FmMobile.dummyDiv();
         FmMobile.myUgcScroll_y=0;
             TemplateMgr.getInstance(function(err, _templateMgr){

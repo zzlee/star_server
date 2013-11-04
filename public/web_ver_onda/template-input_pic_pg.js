@@ -66,10 +66,13 @@ FmMobile.template_pic_pg = {
 							  
 							  
 							   $("#go_cropper").click(function(){
+							      if(localStorage.imgForCropper == undefined){
+								  alert("妳什麼都沒選...");
+								  return false;
+								  }
 							   
-							   
-							   fileProcessedForCropperURI = localStorage.img;
-							   FmMobile.userContent.picture.urlOfOriginal = localStorage.img;
+							   fileProcessedForCropperURI = localStorage.imgForCropper;
+							   FmMobile.userContent.picture.urlOfOriginal = localStorage.imgForCropper;
                                 $.mobile.changePage("template-photo_cropper.html");
                               });
 							  
@@ -120,9 +123,9 @@ FmMobile.template_pic_pg = {
           span.innerHTML = ['<img class="thumb" src="', e.target.result,
                             '" title="', escape(theFile.name), '"/>'].join('');
             
-            alert("ww");
-          localStorage.setItem('img', e.target.result);
-                      document.getElementById('list').src= localStorage.img;
+            //alert("ww");
+          localStorage.setItem('imgForCropper', e.target.result);
+                      document.getElementById('list').src= localStorage.imgForCropper;
 
         };
       })(files[0]);
@@ -134,16 +137,16 @@ FmMobile.template_pic_pg = {
 
   document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
-
-  if(localStorage.img) { 
+/*
+  if(localStorage.imgForCropper) { 
  
          var span = document.createElement('span');
-          span.innerHTML = ['<img class="thumb" src="', localStorage.img,
+          span.innerHTML = ['<img class="thumb" src="', localStorage.imgForCropper,
                             '" title="test"/>'];
 
           //document.getElementById('list').insertBefore(span, null);
     
-    }
+    }*/
 		//------------------------------------------------------------------
         
         var buttonClick_cb = function(event, ui) {

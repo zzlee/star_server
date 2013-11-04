@@ -56,7 +56,7 @@ FmMobile.template_checkinPg = {
         
         
         //--------------------------------
-		$('#nav-bar').hide();
+		$('#nav-bar').show();
         
        
         
@@ -158,9 +158,7 @@ FmMobile.template_checkinPg = {
                                    //------- end of processing-------------------
                               });
 							  
-			$('#back_main').click(function(){
-			       $.mobile.changePage("template-main_template.html");    
-			   });				  
+					  
         /*
         
         var a=templateMgr.getTemplateList();
