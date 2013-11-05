@@ -10,5 +10,6 @@
 //var starServerURL = "http://192.168.5.105";
 
 //var starServerURL = "http://192.168.5.103"
-var starServerURL = "http://127.0.0.1";
+//var starServerURL = "http://127.0.0.1";
+var starServerURL = "http://jean.ondascreen.com";
 

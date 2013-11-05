@@ -349,15 +349,15 @@ platformRotate:function(){
 onResume: function(){
     FM_LOG("[Init.onResume]");
 //    FmMobile.checkNetwork();
-    if(localStorage.fb_userID && FmMobile.checkNetwork()){
-      if(false){
-    	  FmMobile.isResume = true;
-      	FmMobile.apn.getPendingNotification();
-      }else{
-          
-      }
-        FmMobile.init.isFBTokenValid();
-    }
+//    if(localStorage.fb_userID && FmMobile.checkNetwork()){
+//      if(false){
+//    	  FmMobile.isResume = true;
+//      	FmMobile.apn.getPendingNotification();
+//      }else{
+//          
+//      }
+//        FmMobile.init.isFBTokenValid();
+//    }
 },
     
 onPause: function(){
@@ -369,14 +369,15 @@ onPause: function(){
         if(FmMobile.checkNetwork()){
             if(!localStorage.fb_userID)
                 return;
-            
-            var url = remotesite + "/members/fb_token_validity";
-            var data = {
-                "_id": localStorage._id,
-                "fb_id": localStorage.fb_userID,
-                "miixToken": localStorage.miixToken,
-                "timestamp": Date.now(),
-            };
+
+                var url = remotesite + "/members/fb_token_validity";
+                var data = {
+                    "appGenre":"ondascreen",
+                    "_id": localStorage._id,
+                    "fb_id": localStorage.fb_userID,
+                    "miixToken": localStorage.miixToken,
+                    "timestamp": Date.now()
+                    };
             
             
             $.get(url, data, function(response){
@@ -686,16 +687,6 @@ FmMobile.analysis = {
 FmMobile.authPopup = {
 PAGE_ID: "authPg",
     
-loginFB: function(){
-	FB.login(function(response) {
-           if (response.authResponse) {
-//                getUserInfo();
-        	   console.dir(response);
-            }else{
-             console.log('User cancelled login or did not fully authorize.');
-            }
-         },{scope: 'read_stream,publish_stream,user_location,email,user_likes,publish_checkins'});
-},
 init: function(){
     FM_LOG("[authPopup Init]");
     if(FmMobile.checkNetwork()){
@@ -705,7 +696,7 @@ init: function(){
     //var redir_url = ["http://www.miix.tv/welcome.html", "https://www.miix.tv/welcome.html"];
     
     
-    	var redir_url = ["http://127.0.0.1/welcome.html"];
+    	var redir_url = ["http://jean.ondascreen.com/welcome.html"];
     // watasistar metadata
     /*
      var client_id = "243619402408275";
@@ -713,7 +704,7 @@ init: function(){
      */
     	var fb = FBConnect.install();
     	fb.connect(client_id, redir_url[0], "touch");
-//    	fb.onConnect = FmMobile.authPopup.onFBConnected;
+//    	FmMobile.authPopup.onFBConnected();
     
     
     }
@@ -760,7 +751,7 @@ init: function(){
                     $.mobile.changePage("cellphone_login.html");
                 }
 
-                window.plugins.childBrowser.close();
+//                window.plugins.childBrowser.close();
                
     //           FmMobile.analysis.setVariable("Facebook_ID", localStorage.fb_userID, 1);
 //                   recordUserAction("successfully logs in with FB");
@@ -774,7 +765,7 @@ init: function(){
     FBLogout: function() {
         //FmMobile.analysis.trackEvent("Button", "Click", "Logout", 5);
         //recordUserAction("log out");
-        var fb = FBConnect.install();
+//        var fb = FBConnect.install();
         delete localStorage._id;
         delete localStorage.miixToken;
         delete localStorage.fb_userID;
@@ -786,7 +777,7 @@ init: function(){
 //        $.jStorage.set("processingWorks", {});
 //        $.jStorage.set("streetVideos", []);
 //        $.jStorage.set("fb_profile", null);
-        fb.Logout();
+//        fb.Logout();
         $.mobile.changePage("fb_login.html");
         
     },
@@ -1355,17 +1346,17 @@ FmMobile.changeBackground = function(){
 //Handle status bar position in iOS 7
 FmMobile.headerCSS = function(){
     FM_LOG("[headerCSS]");
-    if(FmMobile.addDivFor7 && (device.platform != "Android")){
-        if(device.version >= "7"){
-            var addDiv=$("<div>").attr({id:"forStatusTest",style: "margin-top:17px"});
-            addDiv.prependTo( $('[data-role="page"]'));
-            $('[class="header_bg"]').attr({style: "top: -5px;"});
-            //fbLoginPg,fbLogoutPg
-            if(($.mobile.activePage.attr('id') != "fbLoginPg") || ($.mobile.activePage.attr('id') != "fbLogoutPg")
-               || ($.mobile.activePage.attr('id') !="facebookSharePg")){
-                $('[class="setting-content"]').attr({style: "top: 16%; padding-top: 0%;"});
-            }
-        }
-        
-    }
+//    if(FmMobile.addDivFor7 && (device.platform != "Android")){
+//        if(device.version >= "7"){
+//            var addDiv=$("<div>").attr({id:"forStatusTest",style: "margin-top:17px"});
+//            addDiv.prependTo( $('[data-role="page"]'));
+//            $('[class="header_bg"]').attr({style: "top: -5px;"});
+//            //fbLoginPg,fbLogoutPg
+//            if(($.mobile.activePage.attr('id') != "fbLoginPg") || ($.mobile.activePage.attr('id') != "fbLogoutPg")
+//               || ($.mobile.activePage.attr('id') !="facebookSharePg")){
+//                $('[class="setting-content"]').attr({style: "top: 16%; padding-top: 0%;"});
+//            }
+//        }
+//        
+//    }
 };
