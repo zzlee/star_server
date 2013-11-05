@@ -77,12 +77,10 @@ $(document).bind("mobileinit", function(){
                  //$.mobile.page.prototype.options.addBackBtn = true;
                  
                  /* pageinit executed after pagebeforecreate */
-                 $("#cropperTestPg").live("pageinit", FmMobile.cropperTestPg.load);
-                 $("#cropperTestPg").live("pageshow", FmMobile.cropperTestPg.show);
+                // $("#cropperTestPg").live("pageinit", FmMobile.cropperTestPg.load);
+                // $("#cropperTestPg").live("pageshow", FmMobile.cropperTestPg.show);
                  
-                 $("#ohohshit").live('click',function(){
-                                     alert("humm....");
-                                     });
+                 
                  $("map > #mapAreaBack").live("click",FmMobile.orientationPg.swiperight);
                  $("map > #mapAreaNext").live("click",FmMobile.orientationPg.swipeleft);
                  
@@ -265,7 +263,7 @@ FmMobile.userContent = {
 			crop: {_x:0, _y:0, _w:0, _h:0},  // _x=x_crop/width_picture; _y=y_crop/height_picture; _w=width_crop/width_picture;  _h=height_crop/height_picture
 		},
 		thumbnail:{
-			url:'https://graph.facebook.com/'+localStorage.fb_userID+'/picture?width=200&height=200' //Android
+			url:'https://graph.facebook.com/'+ localStorage.fb_userID+'/picture?width=200&height=200' //Android
     
 		}
 };
@@ -300,6 +298,11 @@ onBodyLoad: function(){
 //                              FmMobile.apn.getPendingNotification();
                               //alert(event);
     });
+	
+	
+	
+	
+	
 //    localStorage.pixelRatio = window.devicePixelRatio;
     //TODO:
     //document.addEventListener("touchmove", function(e){ e.preventDefault(); }, true);
@@ -1299,7 +1302,7 @@ FmMobile.dummyDiv = function(){
                 //alert("a");
                 var addDiv=$("<div>").attr({id:"forStatusTest",style: "margin-top:20px"});
                 addDiv.prependTo( $('[data-role="page"]'));
-                paddingBottomDiv = paddingBottomDiv;
+//                paddingBottomDiv = paddingBottomDiv;
             }
         }
     }

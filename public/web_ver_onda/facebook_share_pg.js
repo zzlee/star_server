@@ -14,7 +14,7 @@ init: function(){
         $("#nav-bar").hide();
         $('#youtubePlay').hide();
         $('#shareFbPhoto').hide();
-        FmMobile.hideBack();
+//        FmMobile.hideBack();
     
         if(FmMobile.shareFbType=="video"){
         	if(FmMobile.myUgcPg.Type == "live"){

@@ -39,7 +39,7 @@ ImageUgc = (function(){
              * @param cbOfUploadToServer
              */
             uploadToServer:function(ugcInfo, cbOfUploadToServer){
-                var ugcProjectId = mainTemplateId +'-'+ "100006239742920" +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
+                var ugcProjectId = mainTemplateId +'-'+ ugcInfo.ownerId._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
                 var reultURI = ugcCanvas.toDataURL('image/png').replace('image/octet-stream');
                 var doohPreviewResultURI = doohPreview.getPreviewImageUrl().replace('image/octet-stream');
                 var dataJsonFile = null;
@@ -129,12 +129,12 @@ ImageUgc = (function(){
                             data: {
                                 imgBase64: reultURI,
                                 imgDoohPreviewBase64: doohPreviewResultURI,
-                                ownerId: "5260a61b74b753c009000005",
-                                ownerFbUserId: "100006239742920",
+                                ownerId: ugcInfo.ownerId._id,
+                                ownerFbUserId: ugcInfo.ownerId.fbUserId,
                                 contentGenre: mainTemplateId,
                                 title: ugcInfo.title,
                                 customizableObjects: JSON.stringify(customizableObjects),
-                                miixToken: "53768608",
+                                miixToken: localStorage.miixToken,
                                 time: (new Date()).getTime()
                             },
                             success: function(data, textStatus, jqXHR ){

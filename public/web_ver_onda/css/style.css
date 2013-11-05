@@ -188,6 +188,7 @@ background: #000000;
     z-index: 0;
     display:block !improtant;
     overflow: auto;
+	margin-bottom: 22%;
 }
 .container_withheader{
 	background-size:100% 100%;

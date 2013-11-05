@@ -13,13 +13,10 @@ FmMobile.template_checkinPg = {
         if (navigator.geolocation) {
             
             function errorHandler (error) {
-                if(device.platform != "Android"){
-                    $.mobile.changePage("template-main_template.html");
-                    FmMobile.showNotification("gpsDeny");
-                }else{
-                    $.mobile.changePage("template-main_template.html");
-                    FmMobile.showNotification("gpsDenyAndroid");
-                }
+               
+				
+				$.mobile.changePage("template-main_template.html");
+                   alert("no~");
                
 
 
@@ -160,6 +157,8 @@ FmMobile.template_checkinPg = {
                                    //------- end of processing-------------------                              
                                    //------- end of processing-------------------
                               });
+							  
+					  
         /*
         
         var a=templateMgr.getTemplateList();

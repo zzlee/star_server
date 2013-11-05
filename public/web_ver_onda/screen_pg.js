@@ -190,7 +190,7 @@ FmMobile.screenPg = {
                         Thumbnail.appendTo(widget);
                         
                         dummyLong.appendTo(subContent);
-                        if(device.platform != "Android"){
+                        if(true){
                             longPhoto = $("<img>").attr({
                                                         id: "longPhoto_" + arryHighlight[i].Id,
                                                         src: arryHighlight[i].LongPhotoUrl,
@@ -277,7 +277,7 @@ FmMobile.screenPg = {
                     var ytVideoID = tempUrlArray[tempUrlArray.length-2];
                     var isMiix = divID.split('-').pop();
                     if(isMiix != "miix"){//Check the video type (miix or miix_story)
-                    	if(device.platform != "Android"){
+                    	if(true){
                     		var videoFrame = $("<iframe>").attr({
                                                   id: ytVideoID,
                                                   src: "http://www.youtube.com/embed/" +ytVideoID + "?rel=0&showinfo=0&autoplay=1",
@@ -300,7 +300,7 @@ FmMobile.screenPg = {
                         
                        
                     }else{
-                    	if(device.platform != "Android"){
+                    	if(true){
                     		var videoFrame = $("<iframe>").attr({
                                                            id: ytVideoID,
                                                            src: "http://www.youtube.com/embed/" +ytVideoID + "?rel=0&showinfo=0&modestbranding=1&controls=0&autoplay=1",

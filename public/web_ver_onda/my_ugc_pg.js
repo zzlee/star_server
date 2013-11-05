@@ -29,7 +29,7 @@ FmMobile.myUgcPg = {
         
         FM_LOG("[myUgcPg] pageshow");
         $("#btnMiixMovie").click(function(){
-        	FmMobile.analysis.trackPage("/myUgcPg/myContents");
+        	//FmMobile.analysis.trackPage("/myUgcPg/myContents");
              $("#btnMiixMovie>img").attr({src: "images/tab_ugc_active.png"});
              $("#btnLiveMovie>img").attr({src: "images/tab_live.png"});
              
@@ -38,7 +38,7 @@ FmMobile.myUgcPg = {
          
          });
         $("#btnLiveMovie").click(function(){
-        	FmMobile.analysis.trackPage("/myUgcPg/myLiveContents");
+        	//FmMobile.analysis.trackPage("/myUgcPg/myLiveContents");
              $("#btnLiveMovie>img").attr({src: "images/tab_live_active.png"});
              $("#btnMiixMovie>img").attr({src: "images/tab_ugc.png"});
              
