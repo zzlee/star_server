@@ -29,14 +29,14 @@ FmMobile.template_previewPg = {
         /* preview page title bar text 影片根其他不一樣*/
         if(FmMobile.selectedTemplate == 'miix_it'){
             $('.header-text').html("劇照模擬預覽");
-            $('#afterSendText').html('按下確定投件後,您將會收到APP的推播,通知您是目前第幾位試鏡者。若導演決定刊登您的作品,您會收到APP的推播與facebook預告,通知登場日期時間。名額稀少,導演優先挑選創意作品。');
+            $('#afterSendText').html('若導演決定刊登您的作品,您會收到facebook預告,通知登場日期時間。名額稀少,導演優先挑選創意作品。');
         }else if(FmMobile.selectedTemplate == 'check_in'){
             $('#clickImgEffect').html("點擊可放大");
-            $('#afterSendText').html('按下確定投件後,這張作品將會發佈於您的facebook。此外您將會收到APP的推播,通知您 是目前第幾位試鏡者。若導演決定刊登您的作品, 您會收到APP的推播與facebook預告,通知登場日 期時間。名額稀少,導演優先挑選創意作品。');
+            $('#afterSendText').html('按下確定投件後,這張作品將會發佈於您的facebook。若導演決定刊登您的作品, 您會收到facebook預告,通知登場日 期時間。名額稀少,導演優先挑選創意作品。');
         }
         else{
             $('#clickImgEffect').html('點擊可放大');
-             $('#afterSendText').html('按下確定投件後,您將會收到APP的推播,通知您是目前第幾位試鏡者。若導演決定刊登您的作品,您會收到APP的推播與facebook預告,通知登場日期時間。名額稀少,導演優先挑選創意作品');
+             $('#afterSendText').html('若導演決定刊登您的作品,您會收到facebook預告,通知登場日期時間。名額稀少,導演優先挑選創意作品');
         }
        /* ends of preview page title bar text 影片根其他不一樣*/
         

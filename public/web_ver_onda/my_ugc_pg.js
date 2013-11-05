@@ -190,32 +190,32 @@ FmMobile.myUgcPg = {
                                                       });
                             Thumbnail.appendTo(widget);
                             
-                            shareYoutubeDiv = $("<img>").attr({
-                                                               id: "copyUrl_" + ytVideoID,
-                                                               class: "share",
-                                                               src: "images/youtube.png",
-                                                              title:number
-                                                               });
-                            shareYoutubeDiv.appendTo(info);
+//                            shareYoutubeDiv = $("<img>").attr({
+//                                                               id: "copyUrl_" + ytVideoID,
+//                                                               class: "share",
+//                                                               src: "images/youtube.png",
+//                                                              title:number
+//                                                               });
+//                            shareYoutubeDiv.appendTo(info);
                             
-                            shareFbDiv = $("<img>").attr({
-                                                          id: "shareFb_" + ytVideoID,
-                                                          class: "share",
-                                                          src: "images/facebook.png",
-                                                         title:number,
-                                                          "time":arryHighlightContents[i].LiveTime,
-                                                         "liveType":arryHighlightContents[i].Genre,
-                                                         "youtubeLink":arryHighlightContents[i].Url.youtube,
-                                                         "forPostId":arryHighlightContents[i].ProjectId
-                                                          });
-                            shareFbDiv.appendTo(info);
+//                            shareFbDiv = $("<img>").attr({
+//                                                          id: "shareFb_" + ytVideoID,
+//                                                          class: "share",
+//                                                          src: "images/facebook.png",
+//                                                         title:number,
+//                                                          "time":arryHighlightContents[i].LiveTime,
+//                                                         "liveType":arryHighlightContents[i].Genre,
+//                                                         "youtubeLink":arryHighlightContents[i].Url.youtube,
+//                                                         "forPostId":arryHighlightContents[i].ProjectId
+//                                                          });
+//                            shareFbDiv.appendTo(info);
                             numberDiv.html("演出編號：" + number);
                             numberDiv.appendTo(info);
                             
                             hr = $("<hr>").attr({style:"margin-top:27%;"});
                             hr.appendTo(divhr);
 
-                            info.appendTo(widget);
+//                            info.appendTo(widget);
                             divhr.appendTo(widget);
                             widget.appendTo(parent);
 
@@ -241,24 +241,24 @@ FmMobile.myUgcPg = {
                                                       });
                         
                         Thumbnail.appendTo(widget);
-                        shareYoutubeDiv = $("<img>").attr({
-                                                           id: "copyUrlS3_" + projectId,
-                                                           class: "share",
-                                                           src: "images/youtube.png"
-                                                           });
-                        shareYoutubeDiv.appendTo(info);
-                        
-                        shareFbDiv = $("<img>").attr({
-                                                      id: "shareImgFb_" + projectId,
-                                                      class: "share",
-                                                      src: "images/facebook.png",
-                                                      title:number,
-                                                      "time":arryHighlightContents[i].LiveTime,
-                                                     "long":arryHighlightContents[i].Url.longPhoto,
-                                                     "liveType":arryHighlightContents[i].Genre,
-                                                     "forPostId":arryHighlightContents[i].ProjectId
-                                                      });
-                        shareFbDiv.appendTo(info);
+//                        shareYoutubeDiv = $("<img>").attr({
+//                                                           id: "copyUrlS3_" + projectId,
+//                                                           class: "share",
+//                                                           src: "images/youtube.png"
+//                                                           });
+//                        shareYoutubeDiv.appendTo(info);
+//                        
+//                        shareFbDiv = $("<img>").attr({
+//                                                      id: "shareImgFb_" + projectId,
+//                                                      class: "share",
+//                                                      src: "images/facebook.png",
+//                                                      title:number,
+//                                                      "time":arryHighlightContents[i].LiveTime,
+//                                                     "long":arryHighlightContents[i].Url.longPhoto,
+//                                                     "liveType":arryHighlightContents[i].Genre,
+//                                                     "forPostId":arryHighlightContents[i].ProjectId
+//                                                      });
+//                        shareFbDiv.appendTo(info);
                         numberDiv.html("演出編號：" + number);
                         
                         numberDiv.appendTo(info);
@@ -266,7 +266,7 @@ FmMobile.myUgcPg = {
                         hr = $("<hr>").attr({style:"margin-top:27%;"});
                         hr.appendTo(divhr);
                         
-                        info.appendTo(widget);
+//                        info.appendTo(widget);
                         divhr.appendTo(widget);
                         widget.appendTo(parent);
 
@@ -345,29 +345,29 @@ FmMobile.myUgcPg = {
 //                                                        title:number
                                                         });
                 Thumbnail.appendTo(widgetPreview);
-                infoPreview.attr({style:"margin-bottom:26%;"});
+//                infoPreview.attr({style:"margin-bottom:26%;"});
                 //var ytVideoID = i;
-                shareYoutubeDiv = $("<img>").attr({
-                                                       id: "copyPreUrl_" + projectId,
-                                                       class: "share",
-                                                       src: "images/youtube.png",
-                                                  title:number
-                                                       });
-                shareYoutubeDiv.appendTo(infoPreview);
-                
-                shareFbDiv = $("<img>").attr({
-                                                  id: "sharePreFb_" + projectId,
-                                                  class: "share",
-                                                  src: "images/facebook.png",
-                                             title:number
-                                                  });
-                shareFbDiv.appendTo(infoPreview);
-                if(typeof(arryContents[i].Url) == "undefined"){
-                    FM_LOG("number: " + number);
-                    numberDiv.html("試鏡編號：" + number);
-                    numberDiv.appendTo(infoPreview);
-                }
-                infoPreview.appendTo(widgetPreview);
+//                shareYoutubeDiv = $("<img>").attr({
+//                                                       id: "copyPreUrl_" + projectId,
+//                                                       class: "share",
+//                                                       src: "images/youtube.png",
+//                                                  title:number
+//                                                       });
+//                shareYoutubeDiv.appendTo(infoPreview);
+//                
+//                shareFbDiv = $("<img>").attr({
+//                                                  id: "sharePreFb_" + projectId,
+//                                                  class: "share",
+//                                                  src: "images/facebook.png",
+//                                             title:number
+//                                                  });
+//                shareFbDiv.appendTo(infoPreview);
+//                if(typeof(arryContents[i].Url) == "undefined"){
+//                    FM_LOG("number: " + number);
+//                    numberDiv.html("試鏡編號：" + number);
+//                    numberDiv.appendTo(infoPreview);
+//                }
+//                infoPreview.appendTo(widgetPreview);
                 widgetPreview.appendTo(parent);
 
             }else{
@@ -398,22 +398,22 @@ FmMobile.myUgcPg = {
                                                               });
                         
                         Thumbnail.appendTo(widget);
-                        shareYoutubeDiv = $("<img>").attr({
-                                                               id: "copyUrl_" + ytVideoID,
-                                                               class: "share",
-                                                               src: "images/youtube.png",
-                                                           title:number
-                                                               });
-                        shareYoutubeDiv.appendTo(info);
-                        
-                        shareFbDiv = $("<img>").attr({
-                                                          id: "shareFb_" + ytVideoID,
-                                                          class: "share",
-                                                          src: "images/facebook.png",
-                                                      title:number
-                                                          });
-                        shareFbDiv.appendTo(info);
-                        
+//                        shareYoutubeDiv = $("<img>").attr({
+//                                                               id: "copyUrl_" + ytVideoID,
+//                                                               class: "share",
+//                                                               src: "images/youtube.png",
+//                                                           title:number
+//                                                               });
+//                        shareYoutubeDiv.appendTo(info);
+//                        
+//                        shareFbDiv = $("<img>").attr({
+//                                                          id: "shareFb_" + ytVideoID,
+//                                                          class: "share",
+//                                                          src: "images/facebook.png",
+//                                                      title:number
+//                                                          });
+//                        shareFbDiv.appendTo(info);
+//                        
                         
                         numberDiv.html("試鏡編號：" + number);
                         numberDiv.appendTo(info);
@@ -437,7 +437,7 @@ FmMobile.myUgcPg = {
                     break;
                 case "miix_image":
                     if(typeof(arryContents[i].Url) != "undefined"){
-                        widget = $("<div>").attr({id: projectId, class: "content-movie-long"});
+                        widget = $("<div>").attr({id: projectId, class: "content-movie-long",style:"margin-top:10%;margin-bottom:18%"});
                         dummyDivLong.appendTo(widget);
                         var divHight = $("#my-video-list>div").height() / 17;
                         var s3Url = arryContents[i].Url.s3;
@@ -450,21 +450,21 @@ FmMobile.myUgcPg = {
                         
                         Thumbnail.appendTo(widget);
                         tanmuSize.appendTo(info);
-                        shareYoutubeDiv = $("<img>").attr({
-                                                               id: "copyUrlS3_" + projectId,
-                                                               class: "share",
-                                                               src: "images/youtube.png",
-                                                           title:number
-                                                               });
-                        shareYoutubeDiv.appendTo(info);
-                        
-                        shareFbDiv = $("<img>").attr({
-                                                          id: "shareImgFb_" + projectId,
-                                                          class: "share",
-                                                          src: "images/facebook.png",
-                                                      title:number
-                                                          });
-                        shareFbDiv.appendTo(info);
+//                        shareYoutubeDiv = $("<img>").attr({
+//                                                               id: "copyUrlS3_" + projectId,
+//                                                               class: "share",
+//                                                               src: "images/youtube.png",
+//                                                           title:number
+//                                                               });
+//                        shareYoutubeDiv.appendTo(info);
+//                        
+//                        shareFbDiv = $("<img>").attr({
+//                                                          id: "shareImgFb_" + projectId,
+//                                                          class: "share",
+//                                                          src: "images/facebook.png",
+//                                                      title:number
+//                                                          });
+//                        shareFbDiv.appendTo(info);
                         
                         var numberDiv = $("<div>").attr({class: "my-video-number"});
                         numberDiv.html("試鏡編號：" + number);
