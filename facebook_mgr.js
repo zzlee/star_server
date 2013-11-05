@@ -13,8 +13,8 @@ FM.facebookMgr = (function(){
     //this is User Token,not app token
     var test_token = 
     	"CAABqPdYntP0BAMlhDdqmJloWQvcTmIhKVtJN7kzsVxs0Ymsmo7OCVhZCmINNjcIHrchNbAbItBmRlofaO6605u7GQ9NjV7W9CEQp1CKt7fSHrw93ZBc6tkrQDofAXZBr6qnr5hkAHjxrnhb6YRROUFCZAqoCYnYZD";
-    var my_message="hello!"
-    var s_link="www.google.com"
+    var my_message="hello!";
+    var s_link="www.google.com";
     
     /**  for miix.tv @ AWS */
 //    var app_access_token = "116813818475773|d9EXxXNwTt2eCbSkIWYs9dJv-N0", 

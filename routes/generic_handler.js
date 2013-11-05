@@ -17,7 +17,7 @@ FM_LOG = (DEBUG) ? function(str){ logger.info( typeof(str)==='string' ? str : JS
 genericHandler.getFbProfilePhoto = function(req, res){
 	logger.info('[GET ' + req.path + '] is called');
 	if(req){
-		fbMgr.getUserProfilePicture(req.params.memberId, function(err, result){
+		fbMgr.getUserProfilePicture(req.params.memberId, "ondascreen", function(err, result){
 			if(!err){
 				logger.info("[genericHandler.getFbProfilePhoto result]" + result);
 				
