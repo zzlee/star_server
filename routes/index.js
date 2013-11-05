@@ -23,5 +23,6 @@ exports.api = require("./api.js");
 exports.member = require("../member.js");
 
 
-
+//Jean
+exports.genericHandler = require("./generic_handler.js");
 

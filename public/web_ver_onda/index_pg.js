@@ -43,7 +43,7 @@ FmMobile.indexPg = {
                      localStorage.miixToken = response.data.miixToken;
                      localStorage.fb_accessToken = response.data.accessToken;
                      localStorage.verified = (response.data.verified) ? response.data.verified : 'false';
-                     FmMobile.userContent.thumbnail.url='https://graph.facebook.com/'+localStorage.fb_userID+'/picture/';
+                     
                     
                      FmMobile.userContent.fb_name=localStorage.fb_name;
                     //localStorage.verified='true';//此行為了測試電話認證！
@@ -60,9 +60,12 @@ FmMobile.indexPg = {
                         FM_LOG("[Sinup with FB failed!]");
                  }
              });
+             FmMobile.indexPg.getProfilePhoto(localStorage.fb_userID);
              $.mobile.changePage("template-main_template.html");
         }else if(localStorage.fb_userID && localStorage._id){
+        	FmMobile.indexPg.getProfilePhoto(localStorage.fb_userID);
        	 	$.mobile.changePage("template-main_template.html");
+       	 
         }else {
        		$.mobile.changePage("orientation_1.html");	
         }
@@ -90,6 +93,39 @@ FmMobile.indexPg = {
         FM_LOG("[indexPg.beforeshow]");
         //uploadingMgr.showAll($("#index_contentArea"));
         
+    },
+    
+    
+    getProfilePhoto: function(fbId){
+    	FM_LOG("[indexPg.getProfilePhoto]");
+		var img64url = remotesite + "/members/" + fbId + "/thumbnail";
+
+		$.ajax({
+			type: 'GET',
+			url: img64url,
+			async: true,
+			success: function(res){
+				if(res){
+					FmMobile.userContent.thumbnail.url = res;
+				}
+			},
+      		error: function(jqXHR, textStatus, errorThrown ){
+ 	   			//FM_LOG("[error]jqXHR : " + JSON.stringify(jqXHR));
+ 	   			//FM_LOG("[error]textStatus : " + JSON.stringify(textStatus));
+ 	   			//FM_LOG("[error]errorThrown : " + errorThrown);
+ 	   			console.log("error");
+ 	   
+    		}
+		});
+//    	var img64url = "/members/" + localStorage + "/thumbnail";
+//    	img64Loader = function(imgURL, img64load_cb){
+//            $.ajax({
+//                url: 'http://img64.com/?q=' + encodeURIComponent(imgURL),
+//                dataType: 'json'
+//            }).then(function (image) {
+//                img64load_cb(image.data);
+//            });
+//        };
     },
         
     

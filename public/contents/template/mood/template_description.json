@@ -91,6 +91,20 @@
                     "height":"223.243",
                     "angle":"0",
                     "description":"心情照片"
+                },
+                {
+                    "id":"thumbnail0",
+                    "type":"thumbnail",
+                    "x":"1385",
+                    "y":"49",
+                    "width":"150",
+                    "height":"162",
+                    "angle":"5",
+                    "description":"大頭貼",
+                    "fb_x":"1195",
+                    "fb_y":"160",
+                    "fb_angle":"0",
+                    "fb_color":"#603913"
                 }
 
             ]

@@ -423,22 +423,22 @@ FM.facebookMgr = (function(){
             
           //kaiser
             getUserProfilePicture: function(fb_id, app, cb){
-                
                 var path = "/"+fb_id+"/?fields=picture&width=240&height=240";
 //                if(app == "wowtaipeiarena"){    
 //                    var qs = { "access_token": app_access_token_WowTaipeiarena};
 //                }else{
 //                    var qs = { "access_token": app_access_token_OnDaScreen};
 //                }
+                var qs = null;
                 switch(app){
                 case "wowtaipeiarena":
-                    var qs = { "access_token": app_access_token_WowTaipeiarena};
+                    qs = { "access_token": app_access_token_WowTaipeiarena};
                     break;
                 default:
-                    var qs = { "access_token": app_access_token_OnDaScreen};
+                    qs = { "access_token": app_access_token_OnDaScreen};
                 break;
                 }
-                
+
                 request({
                     method: 'GET',
                     uri:  fb_url + path,
