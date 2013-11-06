@@ -35,7 +35,7 @@
                    //alert("");
                     rightLocation=true;
                 }else{
-                    alert("要道小巨蛋天幕才能使用這個功能唷!\n"+location.coords.longitude.toFixed(5)+"\n"+location.coords.latitude.toFixed(5));
+                    alert("要到小巨蛋天幕才能使用這個功能唷!\n"+location.coords.longitude.toFixed(5)+"\n"+location.coords.latitude.toFixed(5));
                     $.mobile.changePage("template-main_template.html");
                     rightLocation=false;
                 }
