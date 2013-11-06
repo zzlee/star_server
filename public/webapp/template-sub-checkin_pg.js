@@ -1,4 +1,4 @@
-FmMobile.template_checkinPg = {
+﻿FmMobile.template_checkinPg = {
     PAGE_ID: "template_checkinPg",
         
     show: function(){
@@ -16,7 +16,7 @@ FmMobile.template_checkinPg = {
                
 				
 				$.mobile.changePage("template-main_template.html");
-                   alert("no~");
+                   alert("抓不到您的位置，請確認您在空曠處或app對於gps的設定，謝謝。");
                
 
 
@@ -28,14 +28,15 @@ FmMobile.template_checkinPg = {
                 var longitude_g=location.coords.longitude;
                 var latitude_g=location.coords.latitude;
                 
-                //alert(location.coords.longitude.toFixed(5)+"\n"+location.coords.latitude.toFixed(5));
+                console.log(location.coords.longitude.toFixed(5)+"\n"+location.coords.latitude.toFixed(5));
                 //alert("longitude : "+longitude_g+"\nlatitude : "+latitude_g);
 
                 if((121.5475<longitude_g && longitude_g<121.5530) && (25.0485<latitude_g && latitude_g<25.0535)){
-                   // alert("�夢);
+                   //alert("");
                     rightLocation=true;
                 }else{
-                    //alert("不�夢蝶");
+                    alert("要道小巨蛋天幕才能使用這個功能唷!\n"+location.coords.longitude.toFixed(5)+"\n"+location.coords.latitude.toFixed(5));
+                    $.mobile.changePage("template-main_template.html");
                     rightLocation=false;
                 }
                 
@@ -130,7 +131,7 @@ FmMobile.template_checkinPg = {
                                    return false;
                                    }
                                    
-                                   
+                                  /* 
                                    if(rightLocation==true){
                                    $.mobile.changePage("template-main_template.html");
 
@@ -138,6 +139,7 @@ FmMobile.template_checkinPg = {
                                                                       //alert("你���..");
                                    return false;
                                    }
+                                   */
            var finalTextOfCheckin=$('#checkin_text_1').val()+"<n>路經貴寶地<n>"+$('#checkin_text_2').val();
             FmMobile.checkinTextForFB=$('#checkin_text_1').val()+"\n路經貴寶地\n"+$('#checkin_text_2').val();
                                 //   alert(finalTextOfCheckin);
