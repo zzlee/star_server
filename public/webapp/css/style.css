@@ -201,7 +201,8 @@ background: #000000;
 	/*background-image: url(../images/bg.png);*/
 	background-size:100% 100%;
 	background-repeat:no-repeat;
-	top:10%;
+	/* top:10%; */
+	margin-top: 15%;
 	width: 100%;
 	padding: 0px;
 	position: absolute;
@@ -396,7 +397,7 @@ padding:5% 5%;
 	border:15px solid transparent;
 	border-image:url(../images/border.jpg) 30 30 round;
 	overflow:auto;
-	height:65.5%;
+	height:60%;
 	font-size: 120%;
 	font-family:"kaiu";
     text-shadow: none;
@@ -412,8 +413,7 @@ padding:5% 5%;
 	}
  
 .apply_account_button_login_toc{
-	/* top:89%; */
-	bottom: 6%;
+	top:89%; 
 	position:absolute;
 }
 
@@ -430,7 +430,7 @@ padding:5% 5%;
 	}
     
 .apply_account_text_login_toc{
-	/* top:90%; */
+	top:90%; 
 	position:absolute;
 	width:100%;
 	text-align:center;
@@ -438,7 +438,6 @@ padding:5% 5%;
 	font-family:"kaiu";
     text-shadow: none;
 	color:#dcd586;
-	bottom: 5%;
 	}    
 
 .login{
