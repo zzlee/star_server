@@ -11,7 +11,7 @@ FmMobile.orientationPg = {
             "if(localStorage._id)", 
             */
             //if (!localStorage._id)
-            if(!(localStorage.fb_userID && localStorage.verified=='true'))
+            if(!localStorage.fb_userID)
               {
                 $.mobile.changePage("login_toc.html", {transition: "slide"});
             }
