@@ -411,10 +411,11 @@ padding:5% 5%;
 	position:absolute;
 	}
  
-    .apply_account_button_login_toc{
-	top:89%;
+.apply_account_button_login_toc{
+	/* top:89%; */
+	bottom: 6%;
 	position:absolute;
-	}
+}
 
         	
 .apply_account_text{
@@ -429,7 +430,7 @@ padding:5% 5%;
 	}
     
 .apply_account_text_login_toc{
-	top:90%;
+	/* top:90%; */
 	position:absolute;
 	width:100%;
 	text-align:center;
@@ -437,6 +438,7 @@ padding:5% 5%;
 	font-family:"kaiu";
     text-shadow: none;
 	color:#dcd586;
+	bottom: 5%;
 	}    
 
 .login{
