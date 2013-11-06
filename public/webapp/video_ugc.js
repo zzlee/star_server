@@ -62,7 +62,7 @@ VideoUgc = (function(){
                 async.series([
                     function(callback){
                         //upload original image user content file to server
-                        var options = new FileUploadOptions();
+                        var options = {};
                         options.fileKey = "file";
                         options.fileName = imageFileName;
                         options.mimeType = "image/jpeg"; //TODO: to have mimeType customizable? 
@@ -91,29 +91,48 @@ VideoUgc = (function(){
                         options.params = params;
                         options.chunkedMode = true;
                         
-                        var ft = new FileTransfer();
-                        
-                        ft.onprogress = function(progressEvent) {
-                            if (progressEvent.lengthComputable) {
-                                var uploadPercentage = progressEvent.loaded / progressEvent.total * 100;
-                                console.log("uploadPercentage=" + uploadPercentage.toString());
-                            } else {
-                                console.log("upload some chunk....");
-                            }
-                        };
-                        
-                        var uploadSuccess_cb = function(r) {
-                            callback(null);
-                        };
-                        
-                        var uploadFail_cb = function(error) {
-//                            FmMobile.showNotification("uploadFailed");
-                            console.log("upload error source " + error.source);
-                            console.log("upload error target " + error.target);
-                            callback("Failed to uplaod user content file to server: "+error.code);
-                        };
-                        
-                        ft.upload(imageUri, starServerURL+"/miix/videos/user_content_files", uploadSuccess_cb, uploadFail_cb, options);
+//                        var ft = new FileTransfer();
+//                        
+//                        ft.onprogress = function(progressEvent) {
+//                            if (progressEvent.lengthComputable) {
+//                                var uploadPercentage = progressEvent.loaded / progressEvent.total * 100;
+//                                console.log("uploadPercentage=" + uploadPercentage.toString());
+//                            } else {
+//                                console.log("upload some chunk....");
+//                            }
+//                        };
+//                        
+//                        var uploadSuccess_cb = function(r) {
+//                            callback(null);
+//                        };
+//                        
+//                        var uploadFail_cb = function(error) {
+////                            FmMobile.showNotification("uploadFailed");
+//                            console.log("upload error source " + error.source);
+//                            console.log("upload error target " + error.target);
+//                            callback("Failed to uplaod user content file to server: "+error.code);
+//                        };
+//                        
+//                        ft.upload(imageUri, starServerURL+"/miix/videos/user_content_files", uploadSuccess_cb, uploadFail_cb, options);
+                        $.post( starServerURL+"/miix/videos/user_content_files", { options })
+                        .done(function( data ) {
+//                          alert( "Data Loaded: " + data );
+                        });
+                        $.ajax({
+                        	  type: "POST",
+                        	  url: starServerURL+"/miix/videos/user_content_files",
+                        	  data: "image/jpeg",
+                        	  success: function(data, textStatus, jqXHR){
+                        		  FM_LOG("Upload Successfully ");
+                        		  callback(null);
+                        	  },
+                        	  error: function(jqXHR, textStatus, errorThrown){
+                              	//console.log(jqXHR);
+                              	//console.log(textStatus);
+                                  callback(errorThrown);
+                              }
+                        	  
+                        	});
                     },
                     function(callback){
                         //ask server to render the Miix vidoe

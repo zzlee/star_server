@@ -67,7 +67,7 @@ FmMobile.template_pic_pg = {
 							  
 							   $("#go_cropper").click(function(){
 							      if(localStorage.imgForCropper == undefined){
-								  alert("妳什麼都沒選...");
+								  alert("你沒有選擇照片。");
 								  return false;
 								  }
 							   
@@ -91,14 +91,6 @@ FmMobile.template_pic_pg = {
         }
          */
 
-        
-        
-        
-        var url = $(this).data('url');
-        
-        
-        
-        var itemContentIsReady;
         
         //-------------------------------------------------------------------
 		

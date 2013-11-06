@@ -39,21 +39,50 @@ load: function(event, data){
      $("#template_name_2").html('').append(templateMgr.getTemplateList()[3].name);
      }
      */
+
+    $("#go_cropper").click(function(){
+	      if(localStorage.imgForCropper == undefined){
+	    	  alert("你沒有選擇照片。");
+	    	  return false;
+		  }
+	   
+	      fileProcessedForCropperURI = localStorage.imgForCropper;
+	      FmMobile.userContent.picture.urlOfOriginal = localStorage.imgForCropper;
+	      $.mobile.changePage("template-photo_cropper.html");
+    });
+	  
+
+
+    $('#template_top_img_pic').attr({src:FmMobile.selectedTemplateBarImg});        
     
     
-    
-    
-    
-    var itemContentIsReady;
+    function handleFileSelect(evt) {
+        var files = evt.target.files; // FileList object
+
+        var reader = new FileReader();
+
+          // Closure to capture the file information.
+        reader.onload = (function(theFile) {
+        	return function(e) {
+              // Render thumbnail.
+        		var span = document.createElement('span');
+        		span.innerHTML = ['<img class="thumb" src="', e.target.result,
+                                '" title="', escape(theFile.name), '"/>'].join('');
+                
+              localStorage.setItem('imgForCropper', e.target.result);
+              document.getElementById('list').src= localStorage.imgForCropper;
+
+            };
+          })(files[0]);
+
+          // Read in the image file as a data URL.
+          reader.readAsDataURL(files[0]);
+      }
+      document.getElementById('files').addEventListener('change', handleFileSelect, false);
     
     
     
     var buttonClick_cb = function(event, ui) {
-        
-        
-        
-        
-        
         
     };
     
