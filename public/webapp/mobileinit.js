@@ -93,13 +93,12 @@ $(document).bind("mobileinit", function(){
                                            $.mobile.changePage("orientation_1.html");
                                            });
                  $('#goVerifyPage').live("click",function(){
-                                         if(!(localStorage.fb_userID && localStorage.verified=='true'))
-                                         {
-                                         $.mobile.changePage("login_toc.html", {transition: "slide"});
+                                         if(!localStorage.fb_userID){
+                                        	 $.mobile.changePage("login_toc.html", {transition: "slide"});
+                                         }else {
+                                        	 $.mobile.changePage("setting-main.html");
                                          }
-                                         else {
-                                         $.mobile.changePage("setting-main.html");
-                                         }                                         });
+                 });
 
                                   /*
                  $('#mapArea').live('pagebeforeshow',function(){
