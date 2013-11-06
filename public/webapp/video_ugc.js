@@ -51,12 +51,13 @@ VideoUgc = (function(){
                 var imageFileName = null;
                 ugcProjectId = mainTemplateId +'-'+ ugcInfo.ownerId._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
                 var imageUri = userContent.picture.urlOfOriginal;
-                if ( userContent.picture.urlOfOriginalIsFromAndroidAlbum){ //for photo from Android album 
-                    imageFileName = imageUri.substr(imageUri.lastIndexOf('/')+1) + ".jpg";
-                }
-                else {
-                    imageFileName = imageUri.substr(imageUri.lastIndexOf('/')+1);
-                }
+//                if ( userContent.picture.urlOfOriginalIsFromAndroidAlbum){ //for photo from Android album 
+//                    imageFileName = imageUri.substr(imageUri.lastIndexOf('/')+1) + ".jpg";
+//                }
+//                else {
+//                    imageFileName = imageUri.substr(imageUri.lastIndexOf('/')+1);
+//                }
+                imageFileName = localStorage.fileName;
                 var doohPreviewResultURI = doohPreview.getPreviewImageUrl().replace('image/octet-stream');
                 
                 async.series([
@@ -65,7 +66,7 @@ VideoUgc = (function(){
                         var options = {};
                         options.fileKey = "file";
                         options.fileName = imageFileName;
-                        options.mimeType = "image/jpeg"; //TODO: to have mimeType customizable? 
+//                        options.mimeType = "image/jpeg"; //TODO: to have mimeType customizable? 
                         options.chunkedMode = true;
                         
                         var ImageCustomizableObjectId = null;
@@ -86,53 +87,47 @@ VideoUgc = (function(){
                         //for server side to zoom the user content image to the same size as original footage image
                         params.obj_OriginalWidth = customizableObjectDimensions[ImageCustomizableObjectId].width;
                         params.obj_OriginalHeight = customizableObjectDimensions[ImageCustomizableObjectId].height;
-                        params.miixToken = localStorage.miixToken;
+//                        params.miixToken = localStorage.miixToken;
                         params.croppedArea_rotate=FmMobile.rotateValue;
                         options.params = params;
-                        options.chunkedMode = true;
+//                        options.chunkedMode = true;
                         
-//                        var ft = new FileTransfer();
-//                        
-//                        ft.onprogress = function(progressEvent) {
-//                            if (progressEvent.lengthComputable) {
-//                                var uploadPercentage = progressEvent.loaded / progressEvent.total * 100;
-//                                console.log("uploadPercentage=" + uploadPercentage.toString());
-//                            } else {
-//                                console.log("upload some chunk....");
-//                            }
-//                        };
-//                        
-//                        var uploadSuccess_cb = function(r) {
-//                            callback(null);
-//                        };
-//                        
-//                        var uploadFail_cb = function(error) {
-////                            FmMobile.showNotification("uploadFailed");
-//                            console.log("upload error source " + error.source);
-//                            console.log("upload error target " + error.target);
-//                            callback("Failed to uplaod user content file to server: "+error.code);
-//                        };
-//                        
-//                        ft.upload(imageUri, starServerURL+"/miix/videos/user_content_files", uploadSuccess_cb, uploadFail_cb, options);
-                        $.post( starServerURL+"/miix/videos/user_content_files", { options })
-                        .done(function( data ) {
-//                          alert( "Data Loaded: " + data );
+                        //Get photo by base64
+                        var canvas = document.createElement("canvas");  
+                        var img = new Image();
+                        img.src = imageUri;
+                        canvas.width = img.width;  
+                        canvas.height = img.height;  
+                        var ctx = canvas.getContext("2d");  
+                        ctx.drawImage(img, 0, 0);  
+                        localStorage.tmp = canvas.toDataURL("image/jpeg");  
+                        
+                        
+                        $.ajax( starServerURL+"/miix/videos/user_content_files", {
+                            type: "POST",
+                            data: {
+                                imgDoohPreviewBase64: canvas.toDataURL("image/jpeg").replace('image/octet-stream'),
+//                                ownerId: ugcInfo.ownerId._id,
+//                                ownerFbUserId: ugcInfo.ownerId.fbUserId,
+//                                contentGenre: mainTemplateId,
+//                                ugcProjectId: ugcProjectId,
+                                fileKey: "file",
+                                fileName: imageFileName,
+                                params: params,
+//                                options: options,
+//                                customizableObjects: JSON.stringify(customizableObjects),
+                                miixToken: localStorage.miixToken,
+                                time: (new Date()).toISOString() //only for avoiding Safari's cache mechanism
+                            },
+                            success: function(data, textStatus, jqXHR ){
+                                callback(null);
+                            },
+                            error: function(jqXHR, textStatus, errorThrown){
+                            	//console.log(jqXHR);
+                            	//console.log(textStatus);
+                                callback(errorThrown);
+                            }
                         });
-                        $.ajax({
-                        	  type: "POST",
-                        	  url: starServerURL+"/miix/videos/user_content_files",
-                        	  data: "image/jpeg",
-                        	  success: function(data, textStatus, jqXHR){
-                        		  FM_LOG("Upload Successfully ");
-                        		  callback(null);
-                        	  },
-                        	  error: function(jqXHR, textStatus, errorThrown){
-                              	//console.log(jqXHR);
-                              	//console.log(textStatus);
-                                  callback(errorThrown);
-                              }
-                        	  
-                        	});
                     },
                     function(callback){
                         //ask server to render the Miix vidoe

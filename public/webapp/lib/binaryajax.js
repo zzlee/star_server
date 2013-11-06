@@ -204,7 +204,6 @@ var BinaryAjax = (function() {
 				}
 			}
 			oHTTP.open("GET", strURL, true);
-
 			if (oHTTP.overrideMimeType) oHTTP.overrideMimeType('text/plain; charset=x-user-defined');
 
 			if (aRange && bAcceptRanges) {
