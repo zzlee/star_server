@@ -70,10 +70,31 @@ FmMobile.template_pic_pg = {
 								  alert("你沒有選擇照片。");
 								  return false;
 								  }
-							   
 							   fileProcessedForCropperURI = localStorage.imgForCropper;
 							   FmMobile.userContent.picture.urlOfOriginal = localStorage.imgForCropper;
-                                $.mobile.changePage("template-photo_cropper.html");
+							   
+							   
+							   //Here is the workaround for iOS 6.0 and 6.0.1 subsampling issue (when drawing from a more-than-2M jpg to canvas)
+                    var tempImg = new Image();
+                    tempImg.src = localStorage.imgForCropper;
+                    tempImg.onload = function() {
+                        EXIF.getData( tempImg, function(){
+                                    // var orientation = EXIF.getTag(tempImg, "Orientation");
+                                     //alert(orientation);
+                                     subsamplingResize(localStorage.imgForCropper, { maxWidth: 960, maxHeight: 960 }, function(resultURI){
+                                                       fileProcessedForCropperURI = resultURI;
+                                                       $.mobile.changePage("template-photo_cropper.html");
+                                                       });
+                                     });
+                        
+                    };
+							   
+							   
+							   
+							   /*
+							   fileProcessedForCropperURI = localStorage.imgForCropper;
+							   FmMobile.userContent.picture.urlOfOriginal = localStorage.imgForCropper;
+                                $.mobile.changePage("template-photo_cropper.html");*/
                               });
 							  
         
@@ -128,6 +149,11 @@ FmMobile.template_pic_pg = {
   }
 
   document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+  
+  
+  //var image = "http://flask.pocoo.org/static/logo.png";
+
 
 /*
   if(localStorage.imgForCropper) { 
