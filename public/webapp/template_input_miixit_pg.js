@@ -68,9 +68,9 @@ load: function(event, data){
         		var span = document.createElement('span');
         		span.innerHTML = ['<img class="thumb" src="', e.target.result,
                                 '" title="', escape(theFile.name), '"/>'].join('');
-                
-              localStorage.setItem('imgForCropper', e.target.result);
-              document.getElementById('list').src= localStorage.imgForCropper;
+        		localStorage.setItem("fileName", theFile.name);  
+        		localStorage.setItem('imgForCropper', e.target.result);
+        		document.getElementById('list').src= localStorage.imgForCropper;
 
             };
           })(files[0]);

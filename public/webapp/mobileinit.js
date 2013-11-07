@@ -1188,80 +1188,80 @@ FmMobile.showNotification = function(fun){
     FM_LOG("[showNotification] :" + fun );
     var appName = "上大螢幕";
     
-    switch(fun){
-        case "uploadUgc"://Deprecated
-            navigator.notification.confirm("上傳完成！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "copyUrl":
-            navigator.notification.confirm("已複製連結！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "error":
-            navigator.notification.confirm("錯誤發生，請通知我們！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "moreWords":
-            navigator.notification.confirm("超過每行限制字數!", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "moreLines":
-            navigator.notification.confirm("超過3行囉！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "nullText":
-            navigator.notification.confirm("請輸入文字！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "newUgc":
-            navigator.notification.confirm("您有一個新影片！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "informLiveTime":
-            navigator.notification.confirm("您的投件即將上映！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "settingQaSend":
-            navigator.notification.confirm("問題已送出！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "gpsDeny":
-            navigator.notification.confirm("完全沒有定位, 想通時請至\n設定->隱私->定位服務\n交出你的坐標！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "gpsDenyAndroid":
-            navigator.notification.confirm("I can't see you...\n 麻煩開啓一下GPS,或到空曠陰涼處,多謝！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "wrongPlace":
-            navigator.notification.confirm("其實你不在小巨蛋對吧...\n臺北市松山區南京東路4段2號\n歡迎來打卡！\n(請移動到眼睛看得到天幕的地方)", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "inAreaTextOver":
-            navigator.notification.confirm("超過三行囉！第四行在天幕上看不到啦！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "enableNetwork":
-            navigator.notification.confirm("本服務必須連接網路，請檢查您的網路環境。", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "uploadFailed":
-            navigator.notification.confirm("上傳失敗，請重新再試。", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "share":
-            navigator.notification.confirm("分享完成！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "checkIn":
-            navigator.notification.confirm("已成功在小巨蛋打卡！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "sendCode":
-            navigator.notification.confirm("認證碼已送出。", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "reSendCode":
-            navigator.notification.confirm("請於三分鐘後再發送一次認證碼請求,謝謝！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "wrongPhoneNumber":
-            navigator.notification.confirm("手機號碼好像不是長這樣喔...請重新輸入", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "inputWrongCode":
-            navigator.notification.confirm("手機認證碼不太對喔...請重新輸入", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "waitForCode":
-            navigator.notification.confirm("手機號碼合格！即將發送認證碼4碼\n請稍候謝謝！", FmMobile.Confirm(), appName, "確定");
-            break;
-        case "codeVerifySuccess":
-            navigator.notification.confirm("恭喜電話認證成功！\n準備上大螢幕吧！！", FmMobile.Confirm(), appName, "確定");
-            break;
-        default:
-//            console.log("ShowNotification is not worked");
-            navigator.notification.confirm(fun, FmMobile.Confirm(), appName, "確定");
-    }
+//    switch(fun){
+//        case "uploadUgc"://Deprecated
+//            navigator.notification.confirm("上傳完成！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "copyUrl":
+//            navigator.notification.confirm("已複製連結！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "error":
+//            navigator.notification.confirm("錯誤發生，請通知我們！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "moreWords":
+//            navigator.notification.confirm("超過每行限制字數!", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "moreLines":
+//            navigator.notification.confirm("超過3行囉！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "nullText":
+//            navigator.notification.confirm("請輸入文字！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "newUgc":
+//            navigator.notification.confirm("您有一個新影片！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "informLiveTime":
+//            navigator.notification.confirm("您的投件即將上映！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "settingQaSend":
+//            navigator.notification.confirm("問題已送出！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "gpsDeny":
+//            navigator.notification.confirm("完全沒有定位, 想通時請至\n設定->隱私->定位服務\n交出你的坐標！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "gpsDenyAndroid":
+//            navigator.notification.confirm("I can't see you...\n 麻煩開啓一下GPS,或到空曠陰涼處,多謝！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "wrongPlace":
+//            navigator.notification.confirm("其實你不在小巨蛋對吧...\n臺北市松山區南京東路4段2號\n歡迎來打卡！\n(請移動到眼睛看得到天幕的地方)", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "inAreaTextOver":
+//            navigator.notification.confirm("超過三行囉！第四行在天幕上看不到啦！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "enableNetwork":
+//            navigator.notification.confirm("本服務必須連接網路，請檢查您的網路環境。", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "uploadFailed":
+//            navigator.notification.confirm("上傳失敗，請重新再試。", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "share":
+//            navigator.notification.confirm("分享完成！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "checkIn":
+//            navigator.notification.confirm("已成功在小巨蛋打卡！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "sendCode":
+//            navigator.notification.confirm("認證碼已送出。", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "reSendCode":
+//            navigator.notification.confirm("請於三分鐘後再發送一次認證碼請求,謝謝！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "wrongPhoneNumber":
+//            navigator.notification.confirm("手機號碼好像不是長這樣喔...請重新輸入", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "inputWrongCode":
+//            navigator.notification.confirm("手機認證碼不太對喔...請重新輸入", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "waitForCode":
+//            navigator.notification.confirm("手機號碼合格！即將發送認證碼4碼\n請稍候謝謝！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        case "codeVerifySuccess":
+//            navigator.notification.confirm("恭喜電話認證成功！\n準備上大螢幕吧！！", FmMobile.Confirm(), appName, "確定");
+//            break;
+//        default:
+////            console.log("ShowNotification is not worked");
+//            navigator.notification.confirm(fun, FmMobile.Confirm(), appName, "確定");
+//    }
     
 };
 

@@ -128,11 +128,9 @@ FmMobile.template_pic_pg = {
           var span = document.createElement('span');
           span.innerHTML = ['<img class="thumb" src="', e.target.result,
                             '" title="', escape(theFile.name), '"/>'].join('');
-          localStorage.setItem("fileName", theFile.name);
-//            localStroage.result(target.result);
-            //alert("ww");
+          
           localStorage.setItem('imgForCropper', e.target.result);
-                      document.getElementById('list').src= localStorage.imgForCropper;
+          document.getElementById('list').src= localStorage.imgForCropper;
 
         };
       })(files[0]);

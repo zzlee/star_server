@@ -12,8 +12,8 @@ var miixContentMgr = require(workingPath+'/miix_content_mgr.js');
 //POST /miix/videos/user_content_files
 userContentHandler.uploadUserContentFile_cb = function(req, res){
     var awsS3 = require('../aws_s3.js');
-console.log("req =");
-console.dir(req);
+//    console.log("req =");
+//    console.dir(req);
     var processFile = function( _userDataDir, _imageFileToProcess, _areaToCrop, _resizeTo, _callback1 ) {
         //var fileNameBody = _imageFileToProcess.substring(0, _imageFileToProcess.lastIndexOf(".") )
         var fileNameExt = _imageFileToProcess.substr( _imageFileToProcess.lastIndexOf('.')+1 );

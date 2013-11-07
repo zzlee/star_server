@@ -106,7 +106,7 @@ VideoUgc = (function(){
                         $.ajax( starServerURL+"/miix/videos/user_content_files", {
                             type: "POST",
                             data: {
-                                imgDoohPreviewBase64: canvas.toDataURL("image/jpeg").replace('image/octet-stream'),
+                                imgUserBase64: canvas.toDataURL("image/jpeg").replace('image/octet-stream'),
 //                                ownerId: ugcInfo.ownerId._id,
 //                                ownerFbUserId: ugcInfo.ownerId.fbUserId,
 //                                contentGenre: mainTemplateId,
