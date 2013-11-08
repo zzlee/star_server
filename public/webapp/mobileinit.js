@@ -699,71 +699,15 @@ init: function(){
     //var redir_url = ["http://www.miix.tv/welcome.html", "https://www.miix.tv/welcome.html"];
     
     
-    	var redir_url = ["http://jean.ondascreen.com/welcome.html"];
-    // watasistar metadata
-    /*
-     var client_id = "243619402408275";
-     var redir_url = ["http://www.feltmeng.idv.tw/welcome.html", "https://www.feltmeng.idv.tw/welcome.html"];
-     */
+    	var redir_url = ["http://jean.ondascreen.com/webapp/welcome.html"];
     	var fb = FBConnect.install();
     	fb.connect(client_id, redir_url[0], "touch");
-//    	FmMobile.authPopup.onFBConnected();
     
     
     }
 
 },
 
-    
-    onFBConnected: function(){
-        FM_LOG("[onFBConnected]: ");
-        // if(!localStorage.fb_userID)
-        var url = remotesite + "/members/fb_info";
-        data = {"authResponse": {
-            "userID": localStorage.fb_userID,
-            "userName": localStorage.fb_name,
-            "email": localStorage.email,
-            "accessToken": localStorage.fb_accessToken,
-            "expiresIn":  localStorage.expiresIn,
-            "deviceToken": localStorage.deviceToken,
-            "devicePlatform": device.platform,
-            "device": device.uuid,
-            "timestamp": Date.now()
-            }
-        };
-        FM_LOG(JSON.stringify(data));
-        
-        $.post(url, data, function(response){
-            FM_LOG("[SignUp with FB]: ");
-            if(response.data){
-                localStorage._id = response.data._id;
-                localStorage.miixToken = response.data.miixToken;
-                //localStorage.fb_user_pic=response.data.fb_user_pic;
-                localStorage.fb_accessToken = response.data.accessToken;
-                localStorage.verified = (response.data.verified) ? response.data.verified : 'false';
-                FmMobile.userContent.thumbnail.url='https://graph.facebook.com/'+localStorage.fb_userID+'/picture/';
-               
-                FmMobile.userContent.fb_name=localStorage.fb_name;
-               //localStorage.verified='true';//此行為了測試電話認證！
-                FM_LOG("localStorage" + JSON.stringify(localStorage));
-               
-                if(localStorage.verified == 'true'){
-                    $.mobile.changePage("template-main_template.html");
-               
-                }else{
-                    $.mobile.changePage("cellphone_login.html");
-                }
-
-//                window.plugins.childBrowser.close();
-               
-    //           FmMobile.analysis.setVariable("Facebook_ID", localStorage.fb_userID, 1);
-//                   recordUserAction("successfully logs in with FB");
-            }else{
-                   FM_LOG("[Sinup with FB failed!]");
-            }
-        });
-        
-    },
     
     FBLogout: function() {
         //FmMobile.analysis.trackEvent("Button", "Click", "Logout", 5);
@@ -784,25 +728,6 @@ init: function(){
         $.mobile.changePage("fb_login.html");
         
     },
-//deprecated
-sendDeviceToken: function(){
-    FM_LOG("[sendDeviceToken] ");
-    var url = domain + "/members/device_tokens";
-    var query = {"user":{
-        "_id": localStorage._id,
-        "accessToken": localStorage.fb_accessToken,
-        "userID": localStorage.fb_userID,
-        "deviceToken": localStorage.deviceToken,
-        "devicePlatform": device.platfom,
-        "device": device.uuid,
-        "miixToken": localStorage.miixToken,
-        "timestamp": Date.now()
-    }};
-    
-    $.post(url, query, function(response){
-           FM_LOG("[From Server]: " + response.message);
-           });
-},
 
   
 postFbMessage:function(){
@@ -844,7 +769,6 @@ postFbMessage:function(){
            });
 },
   
-    
     
     
     
@@ -1177,117 +1101,15 @@ FmMobile.pushNotificationHandler = function(pushMsg){
     
 },
 
-FmMobile.Confirm = function(){
-    //Just for FmMobile.showNotification
-    //Do nothing.
-};
-
-
 
 FmMobile.showNotification = function(fun){
     FM_LOG("[showNotification] :" + fun );
     var appName = "上大螢幕";
     
-//    switch(fun){
-//        case "uploadUgc"://Deprecated
-//            navigator.notification.confirm("上傳完成！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "copyUrl":
-//            navigator.notification.confirm("已複製連結！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "error":
-//            navigator.notification.confirm("錯誤發生，請通知我們！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "moreWords":
-//            navigator.notification.confirm("超過每行限制字數!", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "moreLines":
-//            navigator.notification.confirm("超過3行囉！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "nullText":
-//            navigator.notification.confirm("請輸入文字！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "newUgc":
-//            navigator.notification.confirm("您有一個新影片！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "informLiveTime":
-//            navigator.notification.confirm("您的投件即將上映！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "settingQaSend":
-//            navigator.notification.confirm("問題已送出！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "gpsDeny":
-//            navigator.notification.confirm("完全沒有定位, 想通時請至\n設定->隱私->定位服務\n交出你的坐標！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "gpsDenyAndroid":
-//            navigator.notification.confirm("I can't see you...\n 麻煩開啓一下GPS,或到空曠陰涼處,多謝！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "wrongPlace":
-//            navigator.notification.confirm("其實你不在小巨蛋對吧...\n臺北市松山區南京東路4段2號\n歡迎來打卡！\n(請移動到眼睛看得到天幕的地方)", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "inAreaTextOver":
-//            navigator.notification.confirm("超過三行囉！第四行在天幕上看不到啦！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "enableNetwork":
-//            navigator.notification.confirm("本服務必須連接網路，請檢查您的網路環境。", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "uploadFailed":
-//            navigator.notification.confirm("上傳失敗，請重新再試。", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "share":
-//            navigator.notification.confirm("分享完成！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "checkIn":
-//            navigator.notification.confirm("已成功在小巨蛋打卡！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "sendCode":
-//            navigator.notification.confirm("認證碼已送出。", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "reSendCode":
-//            navigator.notification.confirm("請於三分鐘後再發送一次認證碼請求,謝謝！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "wrongPhoneNumber":
-//            navigator.notification.confirm("手機號碼好像不是長這樣喔...請重新輸入", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "inputWrongCode":
-//            navigator.notification.confirm("手機認證碼不太對喔...請重新輸入", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "waitForCode":
-//            navigator.notification.confirm("手機號碼合格！即將發送認證碼4碼\n請稍候謝謝！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        case "codeVerifySuccess":
-//            navigator.notification.confirm("恭喜電話認證成功！\n準備上大螢幕吧！！", FmMobile.Confirm(), appName, "確定");
-//            break;
-//        default:
-////            console.log("ShowNotification is not worked");
-//            navigator.notification.confirm(fun, FmMobile.Confirm(), appName, "確定");
-//    }
     
 };
 
-FmMobile.changePageToMyUgc = function(buttonIndex){
-	//For FmMobile.showNotification to change page
-	//In Cordova 2.2 navigator.notification.confirm has the bug
-	
-//	localStorage.button = button;
-	alert('You selected ' + buttonIndex);
-//	FM_LOG("[changePageToMyUgc] :" + buttonIndex);
-//	if(button == "undefined"){
-//		$.mobile.changePage("my_ugc.html");
-//	}
-};
 
-
-//Open external website
-FmMobile.openBrowser = {
-	showPage: function(url){
-		window.plugins.childBrowser.showWebPage(url);
-	},
-	
-	openExternal: function(url){
-		window.plugins.childBrowser.openExternal(url);
-	}
-};
 
 
 
@@ -1311,55 +1133,8 @@ FmMobile.dummyDiv = function(){
     $('[data-role="content"]').attr({style:"padding-bottom:" + paddingBottomDiv + "px;"});
 };
 
-//Hide keyboard for Android
-FmMobile.hideKeyboard = function(){
-	document.addEventListener("hidekeyboard", function() {
-		if(false){
-			$("#nav-bar").show();
-		}
-	}, false);
-};
-
-//Show keyboard for Android
-FmMobile.showKeyboard = function(){
-	document.addEventListener("showkeyboard", function() {
-		if(false){
-			$("#nav-bar").hide();
-		}
-	}, false);
-};
-/*
-//Hide back button for Android
-FmMobile.hideBack = function(){
-	if(device.platform == "Android"){
-		$("#back_setting").hide();
-	}
-};*/
-/*
-//Change setting background for Android
-FmMobile.changeBackground = function(){
-	if(device.platform == "Android"){
-		$("div[class^='setting-content']").attr({class:"setting-content-android"});
-	}
-};*/
-
-//Change introduce background for Android
-
 
 //Handle status bar position in iOS 7
 FmMobile.headerCSS = function(){
     FM_LOG("[headerCSS]");
-//    if(FmMobile.addDivFor7 && (device.platform != "Android")){
-//        if(device.version >= "7"){
-//            var addDiv=$("<div>").attr({id:"forStatusTest",style: "margin-top:17px"});
-//            addDiv.prependTo( $('[data-role="page"]'));
-//            $('[class="header_bg"]').attr({style: "top: -5px;"});
-//            //fbLoginPg,fbLogoutPg
-//            if(($.mobile.activePage.attr('id') != "fbLoginPg") || ($.mobile.activePage.attr('id') != "fbLogoutPg")
-//               || ($.mobile.activePage.attr('id') !="facebookSharePg")){
-//                $('[class="setting-content"]').attr({style: "top: 16%; padding-top: 0%;"});
-//            }
-//        }
-//        
-//    }
 };
