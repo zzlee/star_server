@@ -699,7 +699,7 @@ init: function(){
     //var redir_url = ["http://www.miix.tv/welcome.html", "https://www.miix.tv/welcome.html"];
     
     
-    	var redir_url = ["http://www.ondascreen.com/webapp/welcome.html"];
+    	var redir_url = [remotesite +"/webapp/welcome.html"];
     	var fb = FBConnect.install();
     	fb.connect(client_id, redir_url[0], "touch");
     
