@@ -377,19 +377,9 @@ userContentHandler.uploadUserContentFileFromWebApp_cb = function(req, res){
                             rotate: req.body.params.croppedArea_rotate};
                                 
             resizeTo = { width: req.body.params.obj_OriginalWidth, height: req.body.params.obj_OriginalHeight};
-//            var base64Data = req.body.imgUserBase64.replace(/^data:image\/png;base64,/,"");
-//            
-//            imageUgcFile = path.join(workingPath,"public/contents/user_project", req.body.params.projectID, req.body.fileName);
-//
-//            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
-//                if (errOfWriteFile){
-//                	logger.info("User fs.writeFile error");
-//                }
-//                
-//            });
             
-            var base64Data = req.body.imgUserBase64.replace(/^data:image\/png;base64,/,"");
-            imageUgcFile = path.join(workingPath,"public/contents/user_project", req.body.params.projectID, req.body.fileName + ".png");
+            var base64Data = req.body.imgUserBase64.replace(/^data:image\/jpeg;base64,/,"");
+            imageUgcFile = path.join(workingPath,"public/contents/user_project/", req.body.params.projectID, "/user_data/" +req.body.fileName);
 
             fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
                 if (!errOfWriteFile){
@@ -405,8 +395,8 @@ userContentHandler.uploadUserContentFileFromWebApp_cb = function(req, res){
                 processFile( userDataDir, req.body.fileName, areaToCrop, resizeTo, function() {
                     //save to S3
                     var localPath = path.join( userDataDir, "_" + req.body.fileName);
-                    var s3Path =  '/user_project/' + req.body.projectID + '/user_data/_'+ req.body.fileName;
-                    //console.log('s3Path = %s', s3Path);
+                    var s3Path =  '/user_project/' + req.body.params.projectID + '/user_data/_'+ req.body.fileName;
+//                    console.log('s3Path = %s', s3Path);
                     awsS3.uploadToAwsS3(localPath, s3Path, 'image/jpeg', function(err,result){
                         if (!err){
                             logger.info('User content file is successfully saved to S3 '+s3Path);
@@ -438,7 +428,8 @@ userContentHandler.uploadUserDataInfo_cb = function(req, res) {
     var userDataDir = path.join( movieProjectDir, 'user_data');
     var userContentDescriptionFilePath = path.join( userDataDir, 'customized_content.xml');
     var customizableObjects = JSON.parse(req.body.customizableObjects);
-    
+    console.log("uploadUserDataInfo req : ");
+    console.dir(req.body);
     var saveToS3_cb = function (err) {
         if (!err) {
             logger.info('customized_content.xml is successfully saved to S3.');

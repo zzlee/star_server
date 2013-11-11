@@ -236,12 +236,12 @@ TemplateMgr = (function(){
 		//-- end of class TemplateGroup --
 		
 		var localTemplateGroup = null;
-		var remoteTemplateGroup = null;
+//		var remoteTemplateGroup = null;
 		
 		async.series([
             function(callback){
                 //load local templates
-                localTemplateGroup = new TemplateGroup('template/', false);
+                localTemplateGroup = new TemplateGroup(starServerURL + '/webapp/template/', false);
                 localTemplateGroup.load(function(err){
                     if (!err){
                         callback(null);
@@ -253,7 +253,7 @@ TemplateMgr = (function(){
             },
             function(callback){
                 //load remote templates
-                remoteTemplateGroup = new TemplateGroup(starServerURL+'/contents/template/', true);
+                remoteTemplateGroup = new TemplateGroup(starServerURL+'/webapp/template/', true);
                 remoteTemplateGroup.load(function(err){
                     callback(null);
                 });

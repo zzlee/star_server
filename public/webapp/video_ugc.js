@@ -100,7 +100,7 @@ VideoUgc = (function(){
                         canvas.height = img.height;  
                         var ctx = canvas.getContext("2d");  
                         ctx.drawImage(img, 0, 0);  
-                        localStorage.tmp = canvas.toDataURL("image/jpeg");  
+//                        localStorage.tmp = canvas.toDataURL("image/jpeg");  
                         
                         
                         $.ajax( starServerURL+"/miix/videos/webapp/user_content_files", {
