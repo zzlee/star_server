@@ -95,7 +95,7 @@
                 {
                     "id":"thumbnail0",
                     "type":"thumbnail",
-                    "x":"1385",
+                    "x":"1435",
                     "y":"49",
                     "width":"150",
                     "height":"162",
@@ -105,6 +105,22 @@
                     "fb_y":"160",
                     "fb_angle":"0",
                     "fb_color":"#603913"
+                },
+                {
+                	"id":"thumbnail1",
+                    "type":"thumbnail",
+                    "x":"320",
+                    "y":"57",
+                    "width":"160",
+                    "height":"160",
+                    "angle":"-4.5",
+                    "description":"大頭貼",
+                    "fb_x":"560.435",
+                    "fb_y":"127.324",
+                    "fb_angle":"0",
+                    "fb_color":"#603913",
+                    "fbNameWidth":"245",
+                    "lineHeight":"50"
                 }
 
             ]

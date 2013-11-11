@@ -46,7 +46,7 @@
             var options = {
             enableHighAccuracy: true,
             maximumAge: 0,
-            timeout: 8000
+            timeout: 4000
             };
             
             navigator.geolocation.getCurrentPosition(successHandler, errorHandler, options);

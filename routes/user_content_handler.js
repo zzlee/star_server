@@ -380,14 +380,14 @@ userContentHandler.uploadUserContentFileFromWebApp_cb = function(req, res){
             resizeTo = { width: req.body.params.obj_OriginalWidth, height: req.body.params.obj_OriginalHeight};
             var base64Data = req.body.imgUserBase64.replace(/^data:image\/png;base64,/,"");
             
-//            imageUgcFile = path.join(workingPath,"public/contents/user_project", req.body.fileName, req.body.fileName+".png");
-//
-//            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
-//                if (errOfWriteFile){
-//                	logger.info("User fs.writeFile error");
-//                }
-//                
-//            });
+            imageUgcFile = path.join(workingPath,"public/contents/user_project", "/user_data/_", req.body.params.projectID, req.body.fileName);
+
+            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
+                if (errOfWriteFile){
+                	logger.info("User fs.writeFile error");
+                }
+                
+            });
 //            moveFile( tmp_path, target_path, function() { 
                 processFile( userDataDir, req.body.fileName, areaToCrop, resizeTo, function() {
                     //save to S3

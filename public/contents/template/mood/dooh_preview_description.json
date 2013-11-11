@@ -52,6 +52,27 @@
                         "x_lr":"681",
                         "y_lr":"455"
                     }
+                },
+                {
+                    "id":"thumbnail0",
+                    "type":"thumbnail",
+                    "quadrilateral":{
+                        "x_ul":"948",
+                        "y_ul":"246",
+                        "x_ur":"1098",
+                        "y_ur":"261",
+                        "x_ll":"931",
+                        "y_ll":"403",
+                        "x_lr":"1076",
+                        "y_lr":"413"
+                    },
+                    "fb_x":"730",
+                    "fb_y":"339",
+                    "fb_angle":"0",
+                    "fb_color":"#603913",
+                    "fb_font":"30pt AdobeFanHeitiStd-Bold",
+                   "width":"150",
+                    "lineHeight":"60"
                 }
             ]
         },
