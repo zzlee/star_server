@@ -9,7 +9,7 @@
     },
     "subTemplate":{
         "miix_one_image":{
-            "representingImageUrlSub":"template_resource/choose_movie.jpg",
+            "representingImageUrlSub":"template_resource/choose_movie.png",
             "selected":"miix_one_image",
             "name":"合成影片",
             "outputType":"video",
