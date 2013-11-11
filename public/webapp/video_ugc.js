@@ -103,7 +103,7 @@ VideoUgc = (function(){
                         localStorage.tmp = canvas.toDataURL("image/jpeg");  
                         
                         
-                        $.ajax( starServerURL+"/miix/videos/user_content_files", {
+                        $.ajax( starServerURL+"/miix/videos/webapp/user_content_files", {
                             type: "POST",
                             data: {
                                 imgUserBase64: canvas.toDataURL("image/jpeg").replace('image/octet-stream'),
@@ -115,7 +115,7 @@ VideoUgc = (function(){
                                 fileName: imageFileName,
                                 params: params,
 //                                options: options,
-//                                customizableObjects: JSON.stringify(customizableObjects),
+                                customizableObjects: JSON.stringify(customizableObjects),
                                 miixToken: localStorage.miixToken,
                                 time: (new Date()).toISOString() //only for avoiding Safari's cache mechanism
                             },
