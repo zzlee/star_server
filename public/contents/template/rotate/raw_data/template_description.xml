@@ -1,0 +1,9 @@
+<template_raw_data>
+  <ID>photo</ID>
+  <name>轉動</name>
+  <description>轉動相片</description>
+  <composition>test_compo</composition>
+  <composition_width>1280</composition_width>
+  <composition_height>720</composition_height>
+  <raw_video>photo.avi</raw_video>
+</template_raw_data>

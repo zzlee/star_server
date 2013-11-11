@@ -1,0 +1,8 @@
+<customizable_object_list>
+  <customizable_object>
+    <ID>video1</ID>
+    <format>video</format>
+    <description>陪襯的影片</description>
+    <key_frame>keyframe_video1.png</key_frame>
+  </customizable_object>
+</customizable_object_list>

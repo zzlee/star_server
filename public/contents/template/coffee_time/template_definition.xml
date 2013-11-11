@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<template_definition>
+	<ID>coffee_time</ID> 
+	<name>咖啡時間</name> <!--template的簡短命名-->
+	<description>一段關於咖啡時間的影片</description> <!--template的描述-->
+	<composition>main_compo</composition> <!--要輸出的composition-->
+	<customizable_object_list>
+		<customizable_object>
+			<ID>video1</ID> <!-- 在.aep中的footage ID-->
+			<format>video</format> <!--video, image, sound, text-->
+			<description>陪襯的影片</description> <!--這個"洞"的描述-->
+			<key_frame_time>6.18</key_frame_time><!--出現在第幾秒的畫面-->
+		</customizable_object>
+	</customizable_object_list>
+</template_definition>

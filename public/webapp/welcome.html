@@ -1,0 +1,41 @@
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="./lib/json2.js"></script>
+<script src="./lib/jquery-1.8.2.min.js"></script>
+<script>
+	function init(){
+		var getUrlHash = location.hash.split("#");
+		if(getUrlHash){
+			//get access token
+			localStorage.fb_accessToken = getUrlHash[1].split("&")[0].split("=")[1];
+			localStorage.expiresIn = Date.now() + parseInt(getUrlHash[1].split("&")[1].split("=")[1]);
+			
+			var url = "https://graph.facebook.com/me?access_token=" + localStorage.fb_accessToken;
+			var req = new XMLHttpRequest();
+			req.onreadystatechange = function(e){
+			        
+			        if(req.readyState == 4 && req.status == 200){
+			            
+			            var res = JSON.parse(e.target.responseText);
+			            console.log("[fb_profile]: " + JSON.stringify(res));
+			            localStorage.fb_userID = res.id;
+			            localStorage.fb_name = res.name;
+			            if(res.email)
+			                localStorage.email = res.email;
+			            window.open("http://www.ondascreen.com/webapp/index.html", "_self");
+			        }
+			        console.log(e);
+			};
+			
+			req.open("GET", url);
+			req.send({"timestamp": Date.now()});
+			
+			 
+		}
+	}
+	
+</script>
+<body onload="init();">
+	<img src="images/welcome.png" width="100%"></img>
+</body>
+</html>
