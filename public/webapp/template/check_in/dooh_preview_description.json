@@ -1,0 +1,40 @@
+{
+    "taipei_arena":{
+        "text_only":{
+            "backgroundImageUrl":"template_resource/taipei_arena-checkin_text.jpg",
+            "customizableObjects":[
+                {
+                    "id":"text0",
+                    "type":"text",
+                    "x":"265",
+                    "y":"265",
+                    "width":"296",
+                    "lineHeight":"68",
+                    "angle":"0",
+                    "font":"36pt JT1-47U"
+                },
+                {
+                    "id":"thumbnail0",
+                    "type":"thumbnail",
+                    "quadrilateral":{
+                        "x_ul":"790",
+                        "y_ul":"300",
+                        "x_ur":"990",
+                        "y_ur":"300",
+                        "x_ll":"805",
+                        "y_ll":"435",
+                        "x_lr":"980",
+                        "y_lr":"435"
+                    },
+                    "fb_x":"1060",
+                    "fb_y":"346",
+                    "fb_angle":"0",
+                    "fb_color":"white",
+                    "fb_font":"30pt AdobeFanHeitiStd-Bold",
+                                   "width":"185",
+                                   "lineHeight":"60"
+                }
+            ]
+        }
+    }
+}

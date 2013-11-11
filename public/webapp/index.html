@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://ogp.me/ns/fb#">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta http-equiv="Access-Control-Allow-Origin" content="*">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"> 
+        <link rel="stylesheet" href="./css/jquery-ui.css"/> 
+        <link rel="stylesheet" href="./css/jquery.mobile-1.2.0.css"/>
+        
+        <!-- PLATFORM DEPENDENCY LIBS -->
+        
+        <!-- CUSTOM INITIALIZATION CODE -->
+        <script src="./lib/jquery-1.8.2.min.js"></script>
+        <script src="./lib/jquery-ui.js"></script>
+        <script src="./lib/json2.js"></script>
+        <script src="./lib/jstorage.min.js"></script>
+        <script src="./lib/kinetic-v4.0.5.min.js"></script>
+        <script src="./lib/lufylegend-1.6.1.js"></script>
+        <script src="./lib/exif.js"></script>
+        <script src="./lib/binaryajax.js"></script>
+        <script src="./lib/quojs-2.3.1/quo.js"></script>
+        <script src="./lib/async.js"></script>
+        <script src="./lib/CanvasText-0.4.1.js"></script>
+        <!-- IPHONE LIBS -->
+        <script src="./lib/PushNotification.js"></script>
+        <script src="./lib/clipboardPlugin.js"></script>
+        <!-- ANDROID LIBS -->
+        <script src="./lib/GCMPlugin.js"></script>
+        <script src="./lib/clipboardmanager.js"></script>
+        <!-- CUSTOM INITIALIZATION CODE -->
+        <script src="common.js"></script>
+        <script src="mobileinit.js"></script>
+        <script src="megapix-image-gz.js"></script>
+        <script src="fb_connect.js"></script>
+        <script src="authentication.js"></script>
+        <script src="orientation_pg.js"></script>
+        <script src="fb_login_pg.js"></script>
+        <script src="index_pg.js"></script>
+        <script src="toc_pg.js"></script>            
+        <script src="login_toc_pg.js"></script>
+        <script src="cellphone_login_pg.js"></script>
+        <script src="code_input_pg.js"></script>
+        <script src="my_ugc_pg.js"></script>
+        <script src="screen_pg.js"></script>
+        <script src="setting-main_pg.js"></script>
+        <script src="setting-customer_pg.js"></script>
+        <script src="template-input_text_pg.js"></script>
+        <script src="template-main_template_pg.js"></script>
+        <script src="template-sub_template_pg.js"></script>
+        <script src="template-photo_cropper_pg.js"></script>
+        <script src="verification_pg.js"></script>
+        <script src="phone_num_input_pg.js"></script>
+        <script src="code_input_pg.js"></script>
+		<script src="template-input_pic_pg.js"></script>
+		<script src="login_success_pg.js"></script>
+        <script src="cellphone_login_pg.js"></script>
+        <script src="template-preview_pg.js"></script>
+        <script src="template-input_text_pg.js"></script>
+            
+            <script src="setting_about_pg.js"></script>
+            <script src="fb_logout_pg.js"></script>
+
+             <script src="imgZoomViewer_pg.js"></script>
+
+              
+        <script src="template_mgr.js"></script>
+        <script src="ugc_utility.js"></script>
+        <script src="dooh_info.js"></script>
+            <script src="template-sub-miixit_pg.js"></script>
+        <script src="dooh_preview.js"></script>
+        <script src="image_ugc.js"></script>
+        <script src="video_ugc.js"></script>
+        <script src="template-sub-checkin_pg.js"></script>
+        <script src="template_pic_text_pg.js"></script>
+        <script src="template_input_miixit_pg.js"></script>
+        <script src="image_test_pg.js"></script> <!-- for test -->
+        <script src="setting-toc_pg.js"></script>
+        <script src="setting-term_pg.js"></script>
+        <script src="setting-faq_pg.js"></script>
+            <script src="cropper_test_pg.js"></script>
+            <script src="facebook_share_pg.js"></script>
+        <script src="simple_analytics.js"></script> <!-- DEPRECATED -->
+        <script src="./lib/jquery.mobile-1.2.0.js"></script>
+        <link rel="stylesheet" href="./css/style.css">
+    </head>
+    <body onload="FmMobile.init.onBodyLoad();">
+        <div data-role="page" id="indexPg" class="fm_page" style='background-image: url("./images/bg/fb_login_bg.png");'>
+            <!--
+            <div data-role="content" id="index_contentArea">
+                <a href="#" data-role="button" class="fm_fbBtn" onclick="FmMobile.authPopup.init();">雿輻FaceBook撣唾��餃</a>
+                <a href="#" onclick="FmMobile.tocPg.buttonClicked();" class="fm_toc">瘣餃�颲行�</a>
+            </div>
+            -->
+        </div>
+        
+        <div id="nav-bar" class="nav-bar-background3">
+	        <div id="btnTemplate" class="ui-menu-inactive">
+	            <img class="menu-img" src="images/m1-active.png">
+	        </div>
+	        <div id="btnMyUgc" class="ui-menu-inactive">
+	            <img class="menu-img" src="images/m2.png">
+	        </div>
+	        <div id="btnScreen" class="ui-menu-inactive">
+	            <img class="menu-img" src="images/m3.png">
+	        </div>
+	        <div id="btnSetting" class="ui-menu-active">
+	            <img class="menu-img" src="images/m4.png">
+	        </div>
+	    </div>
+        
+    </body>
+</html>

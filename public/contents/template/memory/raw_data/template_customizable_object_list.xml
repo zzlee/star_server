@@ -1,0 +1,14 @@
+<customizable_object_list>
+  <customizable_object>
+    <ID>photo1</ID>
+    <format>image</format>
+    <description>最浪漫的一張相片</description>
+    <key_frame>keyframe_photo1.png</key_frame>
+  </customizable_object>
+  <customizable_object>
+    <ID>photo2</ID>
+    <format>image</format>
+    <description>最好笑的一張相片</description>
+    <key_frame>keyframe_photo2.png</key_frame>
+  </customizable_object>
+</customizable_object_list>

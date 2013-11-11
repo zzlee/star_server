@@ -29,6 +29,27 @@ exports.init = function() {
     app.post('/miix/videos/user_content_files', routes.uploadUserContentFile_cb ); //v1.2
 
     /**
+     * Upload/add an user content file of a specific video or image UGC from web app<br>
+     * 
+     * <h5>Path parameters</h5>
+     * <ul>
+     * <li>ugcProjectId: the project ID of the UGC
+     * </ul>
+     * 
+     * <h5>Query parameters</h5>
+     * None
+     * 
+     * <h5>Request body</h5>
+     * (to be elaborated later)
+     * 
+     * <h5>Response body</h5>
+     * 
+     * @name POST /miix/ugcs/:ugcProjectId/user_content_files
+     * @memberof miix
+     */
+    app.post('/miix/videos/webapp/user_content_files', routes.uploadUserContentFileFromWebApp_cb ); //v1.2
+    
+    /**
      * Create an user content description of a specific video UGC<br>
      * 
      * <h5>Path parameters</h5>

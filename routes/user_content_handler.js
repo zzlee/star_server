@@ -12,7 +12,6 @@ var miixContentMgr = require(workingPath+'/miix_content_mgr.js');
 //POST /miix/videos/user_content_files
 userContentHandler.uploadUserContentFile_cb = function(req, res){
     var awsS3 = require('../aws_s3.js');
-
     var processFile = function( _userDataDir, _imageFileToProcess, _areaToCrop, _resizeTo, _callback1 ) {
         //var fileNameBody = _imageFileToProcess.substring(0, _imageFileToProcess.lastIndexOf(".") )
         var fileNameExt = _imageFileToProcess.substr( _imageFileToProcess.lastIndexOf('.')+1 );
@@ -226,7 +225,211 @@ userContentHandler.uploadUserContentFile_cb = function(req, res){
 
 };
 
+//POST /miix/videos/webapp/user_content_files
+userContentHandler.uploadUserContentFileFromWebApp_cb = function(req, res){
+    var awsS3 = require('../aws_s3.js');
+//    console.dir(req.body);
+    var processFile = function( _userDataDir, _imageFileToProcess, _areaToCrop, _resizeTo, _callback1 ) {
+        //var fileNameBody = _imageFileToProcess.substring(0, _imageFileToProcess.lastIndexOf(".") )
+        var fileNameExt = _imageFileToProcess.substr( _imageFileToProcess.lastIndexOf('.')+1 );
+        var fileToProcess = path.join( _userDataDir, _imageFileToProcess);
+        var fileAutoOrinted = path.join( _userDataDir, "temp_auto_orient."+fileNameExt );
+        var fileCropped = path.join( _userDataDir, "temp_cropped."+fileNameExt );
+        var fileResized = path.join( _userDataDir, "_"+_imageFileToProcess );
+        var imgWidth=0, imgHeight=0;
+        
+        var gm = require('gm');
+        var cropAndResize = function( _fileToProcess, _callback2 ) {
+        
+            var resize = function() {
+                gm( fileCropped )
+                .resize(_resizeTo.width, _resizeTo.height)
+                .write(fileResized, function (err) {
+                    if (!err) {
+                        logger.info('File cropping/resizing done');
+                        fs.unlink(fileCropped);
+                        if ( _callback2 )
+                            _callback2();
+                    }
+                    else  {
+                        logger.info(err);
+                        res.send( {err:'Fail to resize the image file: '+err } );
+                    }
+                });
+            };
+        
+            var crop = function() {
+                gm( fileAutoOrinted )
+                .crop(	imgWidth*_areaToCrop.width, 
+                        imgHeight*_areaToCrop.height, 
+                        imgWidth*_areaToCrop.x, 
+                        imgHeight*_areaToCrop.y )
+                .write( fileCropped, function (err) {
+                    if (!err) {
+                        resize();
+                        fs.unlink(fileAutoOrinted);
+                    }
+                    else  {
+                        logger.info(err);
+                        res.send( {err:'Fail to crop the image file: '+err } );
+                    }
+                });
+            };
 
+            var getSize = function() {
+                gm( fileAutoOrinted ).size(function(err, value){
+                    imgWidth = value.width;
+                    imgHeight = value.height;
+                    crop();
+                });
+            };
+            
+            var autoOrient = function() {
+                gm( _fileToProcess )
+                .autoOrient()
+                .write(fileAutoOrinted, function (err) {
+                    if (!err) {
+                        getSize();
+                    }
+                    else  {
+                        logger.info(err);
+                        res.send( {err:'Fail to auto orient the image file: '+err } );
+                    }
+                });
+            };
+            
+            var rotate = function(angle) {
+                gm( _fileToProcess )
+                .rotate('white', angle)
+                .write(fileAutoOrinted, function (err) {
+                    if (!err) {
+                        getSize();
+                    }
+                    else  {
+                        logger.info('[user_content_handler.rotate error=]'+err);
+                        res.send( {err:'Fail to rotate the image file: '+err } );
+                    }
+                });
+            };
+            
+            if(!_areaToCrop.rotate){
+                autoOrient();
+            }else{
+                rotate(_areaToCrop.rotate);    
+            }
+            
+        };
+        
+        
+        cropAndResize( fileToProcess, function() {
+            if (_callback1) {
+                _callback1();
+            }
+        });
+        
+    };
+
+    var target_path;
+    
+    logger.info('req.body.fileObjectID= '+ req.body.params.projectID);
+    
+    
+    if ( req.body.params.projectID ) {
+        var projectDir = path.join( workingPath, 'public/contents/user_project', req.body.params.projectID);
+        var userDataDir = path.join( projectDir, 'user_data');
+        if ( !fs.existsSync(projectDir) ) {
+            fs.mkdirSync( projectDir );  //TODO: check if this is expensive... 
+        }
+        if ( !fs.existsSync(userDataDir) ) {
+            fs.mkdirSync( userDataDir );  //TODO: check if this is expensive... 
+        }
+        target_path = path.join( userDataDir, req.body.fileName);
+        
+        if (req.body.format == "video"){
+            moveFile( tmp_path, target_path, function() { 
+                var newPath = path.join( userDataDir, "_" + req.body.fileName );
+                fs.rename(target_path, newPath, function(){
+                    //save to S3
+                    var s3Path =  '/user_project/' + req.body.params.projectID + '/user_data/_'+ req.body.fileName;
+                    //console.log('s3Path = %s', s3Path);
+                    //TODO: check for file extension to set proper content type
+                    awsS3.uploadToAwsS3(newPath, s3Path, 'video/quicktime', function(err,result){
+                        if (!err){
+                            logger.info('User content file is successfully saved to S3 '+s3Path);
+                            res.send(200, {message: "User content file is succesfully uploaded."});
+                        }
+                        else {
+                            logger.info('User content file is failed to be saved to S3 '+s3Path);
+                            res.send(500 , {message: "Failed to saved to S3"});
+                        }
+                    });
+                    
+                    
+                });
+            });
+        }else {  //req.body.format == "image"
+        
+            var areaToCrop, resizeTo;        
+            areaToCrop = {  x: req.body.params.croppedArea_x,
+                            y: req.body.params.croppedArea_y,
+                            width: req.body.params.croppedArea_width,
+                            height: req.body.params.croppedArea_height,
+                            rotate: req.body.params.croppedArea_rotate};
+                                
+            resizeTo = { width: req.body.params.obj_OriginalWidth, height: req.body.params.obj_OriginalHeight};
+//            var base64Data = req.body.imgUserBase64.replace(/^data:image\/png;base64,/,"");
+//            
+//            imageUgcFile = path.join(workingPath,"public/contents/user_project", req.body.params.projectID, req.body.fileName);
+//
+//            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
+//                if (errOfWriteFile){
+//                	logger.info("User fs.writeFile error");
+//                }
+//                
+//            });
+            
+            var base64Data = req.body.imgUserBase64.replace(/^data:image\/png;base64,/,"");
+            imageUgcFile = path.join(workingPath,"public/contents/user_project", req.body.params.projectID, req.body.fileName + ".png");
+
+            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
+                if (!errOfWriteFile){
+                	logger.info("User fs.writeFile successful");
+                }else {
+                	logger.info("User fs.writeFile error");
+
+                }
+                
+            });
+            
+//            moveFile( tmp_path, target_path, function() { 
+                processFile( userDataDir, req.body.fileName, areaToCrop, resizeTo, function() {
+                    //save to S3
+                    var localPath = path.join( userDataDir, "_" + req.body.fileName);
+                    var s3Path =  '/user_project/' + req.body.projectID + '/user_data/_'+ req.body.fileName;
+                    //console.log('s3Path = %s', s3Path);
+                    awsS3.uploadToAwsS3(localPath, s3Path, 'image/jpeg', function(err,result){
+                        if (!err){
+                            logger.info('User content file is successfully saved to S3 '+s3Path);
+                            res.send(200, {message: "User content file is succesfully uploaded."});
+                        }
+                        else {
+                            logger.info('User content file is failed to be saved to S3 '+s3Path);
+                            res.send(500 , {message: "Failed to saved to S3"});
+                        }
+                    });
+                    
+                });
+//            });
+        }
+        
+    }
+    else {
+        target_path = path.join( workingPath, 'public/uploads', req.body.fileName);  
+    }
+    
+    
+
+};
 //POST /miix/videos/user_content_description
 userContentHandler.uploadUserDataInfo_cb = function(req, res) {
     var awsS3 = require('../aws_s3.js');
@@ -244,6 +447,7 @@ userContentHandler.uploadUserDataInfo_cb = function(req, res) {
             var allUserContentExist = true;
             if( Object.prototype.toString.call( customizableObjects ) === '[object Array]' ) {
                 for (var i in customizableObjects) {
+                	
                     allUserContentExist = allUserContentExist && fs.existsSync( path.join( userDataDir, "_"+customizableObjects[i].content) );
                 }
             }

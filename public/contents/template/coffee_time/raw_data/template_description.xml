@@ -1,0 +1,7 @@
+<template_raw_data>
+  <ID>coffee_time</ID>
+  <name>咖啡時間</name>
+  <description>一段關於咖啡時間的影片</description>
+  <composition>main_compo</composition>
+  <raw_video>coffee_time.avi</raw_video>
+</template_raw_data>

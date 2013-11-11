@@ -12,6 +12,7 @@ exports.init = function() {
     app.get('/connectStarServer', routes.api.connection);  //Make sure client side connect connect star_server
     app.post('/api/codeVerification', routes.api.codeVerify);
 
+    app.get('/members/:memberId/thumbnail', routes.genericHandler.getFbProfilePhoto);
     //PUT /members/{_id}/device_tokens 
     app.put('/members/:memberId/device_tokens', routes.authorizationHandler.checkAuth, routes.authorizationHandler.updateDeviceToken);
 
