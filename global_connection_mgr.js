@@ -25,9 +25,9 @@ FM.globalConnectionMgr = (function(){
             getConnectedRemoteWithLowestLoad: function(type, cbOfGetConnectedRemoteWithLowestLoad){
                 
             	if ( systemConfig.IS_STAND_ALONE ) {
+            	    var connectedRemoteWithLowestLoad = null;
                     for (anId in connectedRemotes){
-                        var lowestLoadIndex = 1000000;
-                        var connectedRemoteWithLowestLoad = null;
+                        var lowestLoadIndex = 1000000;                        
                         //console.log('%s %s', anId, connectedRemotes[anId]);
                         if (type){
                             if (connectedRemotes[anId].type==type){

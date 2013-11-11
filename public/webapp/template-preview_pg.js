@@ -68,7 +68,7 @@ FmMobile.template_previewPg = {
                                             $.mobile.changePage("my_ugc.html");
                                          }else{
                                              alert(err);
-                                             FmMobile.showNotification("uploadFailed");
+//                                             FmMobile.showNotification("uploadFailed");
                                              $('#clickImgEffect').show("normal");
                                              $('#afterClickBack').show("normal");
                                              $('#afterClickSent').show("normal");

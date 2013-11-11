@@ -367,8 +367,7 @@ userContentHandler.uploadUserContentFileFromWebApp_cb = function(req, res){
                     
                 });
             });
-        }
-        else {  //req.body.format == "image"
+        }else {  //req.body.format == "image"
         
             var areaToCrop, resizeTo;        
             areaToCrop = {  x: req.body.params.croppedArea_x,
@@ -378,9 +377,9 @@ userContentHandler.uploadUserContentFileFromWebApp_cb = function(req, res){
                             rotate: req.body.params.croppedArea_rotate};
                                 
             resizeTo = { width: req.body.params.obj_OriginalWidth, height: req.body.params.obj_OriginalHeight};
-            var base64Data = req.body.imgUserBase64.replace(/^data:image\/png;base64,/,"");
-            
-//            imageUgcFile = path.join(workingPath,"public/contents/user_project", req.body.fileName, req.body.fileName+".png");
+//            var base64Data = req.body.imgUserBase64.replace(/^data:image\/png;base64,/,"");
+//            
+//            imageUgcFile = path.join(workingPath,"public/contents/user_project", req.body.params.projectID, req.body.fileName);
 //
 //            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
 //                if (errOfWriteFile){
@@ -388,6 +387,20 @@ userContentHandler.uploadUserContentFileFromWebApp_cb = function(req, res){
 //                }
 //                
 //            });
+            
+            var base64Data = req.body.imgUserBase64.replace(/^data:image\/png;base64,/,"");
+            imageUgcFile = path.join(workingPath,"public/contents/user_project", req.body.params.projectID, req.body.fileName + ".png");
+
+            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
+                if (!errOfWriteFile){
+                	logger.info("User fs.writeFile successful");
+                }else {
+                	logger.info("User fs.writeFile error");
+
+                }
+                
+            });
+            
 //            moveFile( tmp_path, target_path, function() { 
                 processFile( userDataDir, req.body.fileName, areaToCrop, resizeTo, function() {
                     //save to S3
@@ -434,6 +447,7 @@ userContentHandler.uploadUserDataInfo_cb = function(req, res) {
             var allUserContentExist = true;
             if( Object.prototype.toString.call( customizableObjects ) === '[object Array]' ) {
                 for (var i in customizableObjects) {
+                	
                     allUserContentExist = allUserContentExist && fs.existsSync( path.join( userDataDir, "_"+customizableObjects[i].content) );
                 }
             }
