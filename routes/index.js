@@ -4,6 +4,7 @@ exports.YoutubeOAuth2_cb = youtube.YoutubeOAuth2_cb;
 
 var userContentHandler = require('./user_content_handler.js');
 exports.uploadUserContentFile_cb = userContentHandler.uploadUserContentFile_cb;
+exports.uploadUserContentFileFromWebApp_cb = userContentHandler.uploadUserContentFileFromWebApp_cb;
 exports.uploadUserDataInfo_cb = userContentHandler.uploadUserDataInfo_cb;
 
 exports.connectionHandler = require('./connection_handler.js');
