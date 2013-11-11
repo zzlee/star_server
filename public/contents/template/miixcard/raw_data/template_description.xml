@@ -1,9 +1,0 @@
-<template_raw_data>
-  <ID>photo</ID>
-  <name>相片</name>
-  <description>牆上相片</description>
-  <composition>test_compo</composition>
-  <composition_width>720</composition_width>
-  <composition_height>480</composition_height>
-  <raw_video>photo.avi</raw_video>
-</template_raw_data>
