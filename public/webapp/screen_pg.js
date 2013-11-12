@@ -277,7 +277,7 @@ FmMobile.screenPg = {
                     var ytVideoID = tempUrlArray[tempUrlArray.length-2];
                     var isMiix = divID.split('-').pop();
                     if(isMiix != "miix"){//Check the video type (miix or miix_story)
-                    	if(true){
+//                    	if(true){
                     		var videoFrame = $("<iframe>").attr({
                                                   id: ytVideoID,
                                                   src: "http://www.youtube.com/embed/" +ytVideoID + "?rel=0&showinfo=0&autoplay=1",
@@ -294,13 +294,13 @@ FmMobile.screenPg = {
                         
                         	$('#'+divID).prepend(videoFrame);
                         	$('#'+this.id).remove();
-                        }else{
-                        	FmMobile.openBrowser.openExternal("http://www.youtube.com/embed/" +ytVideoID + "?rel=0&showinfo=0");	
-                        }
+//                        }else{
+//                        	FmMobile.openBrowser.openExternal("http://www.youtube.com/embed/" +ytVideoID + "?rel=0&showinfo=0");	
+//                        }
                         
                        
                     }else{
-                    	if(true){
+//                    	if(true){
                     		var videoFrame = $("<iframe>").attr({
                                                            id: ytVideoID,
                                                            src: "http://www.youtube.com/embed/" +ytVideoID + "?rel=0&showinfo=0&modestbranding=1&controls=0&autoplay=1",
@@ -318,9 +318,9 @@ FmMobile.screenPg = {
                          
                     	   	$('#'+divID).prepend(videoFrame);
                        		$('#'+this.id).remove();
-                       }else{
-                    	   FmMobile.openBrowser.openExternal("http://www.youtube.com/embed/" +ytVideoID + "?rel=0&showinfo=0");
-                       }
+//                       }else{
+//                    	   FmMobile.openBrowser.openExternal("http://www.youtube.com/embed/" +ytVideoID + "?rel=0&showinfo=0");
+//                       }
                    }
 
 
