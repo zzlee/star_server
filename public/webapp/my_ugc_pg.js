@@ -394,7 +394,7 @@ FmMobile.myUgcPg = {
                                                         id: 'imgYouTube_'+ytVideoID,
                                                         src: "http://img.youtube.com/vi/"+ytVideoID+"/mqdefault.jpg",
                                                         class: "content-movie-img",
-                                                        style: "margin-top:4.5%;height:93%;"
+                                                        style: "margin-top:3%;height:90%;"
                                                               });
                         
                         Thumbnail.appendTo(widget);
