@@ -21,7 +21,7 @@ FmMobile.indexPg = {
         if(localStorage.fb_userID && !localStorage._id){
 
         	 
-        	 var url = "http://jean.ondascreen.com/members/fb_info";
+        	 var url =  remotesite + "/members/fb_info";
              data = {"authResponse": {
              	"appGenre":"ondascreen",
                  "userID": localStorage.fb_userID,
