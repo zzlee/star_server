@@ -394,7 +394,7 @@ FmMobile.myUgcPg = {
                                                         id: 'imgYouTube_'+ytVideoID,
                                                         src: "http://img.youtube.com/vi/"+ytVideoID+"/mqdefault.jpg",
                                                         class: "content-movie-img",
-                                                        style: "margin-top:4.5%;height:93%;"
+                                                        style: "margin-top:3%;height:90%;"
                                                               });
                         
                         Thumbnail.appendTo(widget);
@@ -518,11 +518,11 @@ FmMobile.myUgcPg = {
 
                 var ytVideoID = tempUrlArray[tempUrlArray.length-2];
                 console.log("divId :" + divID);
-                if(device.platform != "Android"){
                 	var videoFrame = $("<iframe>").attr({
                                                   id: ytVideoID,
                                                   src: "http://www.youtube.com/embed/" +ytVideoID + "?rel=0&showinfo=0&modestbranding=1&controls=0&autoplay=1",
                                                   class: "content-movie-img",
+                                                  style: "margin-top: 3%; height: 90%;",
                                                   frameborder: "0"
                                                   }).load(function(){
                                                           //TODO: find a better way to have callPlayer() called after videoFrame is prepended
@@ -552,10 +552,6 @@ FmMobile.myUgcPg = {
 
                 	$('#'+divID).prepend(videoFrame);
                 	$('#'+this.id).remove();
-                }else{
-                	FmMobile.openBrowser.openExternal("http://www.youtube.com/embed/" +ytVideoID + "?rel=0&showinfo=0");
-                }
-                break;
                 break;
             case "imgError":
                 console.log("you chosse the error item or the image");
@@ -581,138 +577,138 @@ FmMobile.myUgcPg = {
             var tmpID = this.id.substring(this.id.split('_')[0].length + 1, this.id.length);
             console.log("getID : " + this.id.substring(this.id.split('_')[0].length+1, this.id.length));
 
-            var s3Url = "https://s3.amazonaws.com/miix_content/user_project/" + tmpID + "/" + tmpID;
+//            var s3Url = "https://s3.amazonaws.com/miix_content/user_project/" + tmpID + "/" + tmpID;
 
             switch(imgType){
-                case "copyUrl":
-                    if(device.platform != "Android"){
-                        /**iOS Plugin */
-                        window.clipboardPluginCopy("https://www.youtube.com/watch?feature=player_embedded&v=" + tmpID,
-                                                   function() {FmMobile.showNotification("copyUrl");},
-                                                   function(e){alert(e);}
-                                                   );
-                    }else{
-                        /** Android Plugin */
-                        window.clipboardManagerCopy(
-                                        "https://www.youtube.com/watch?feature=player_embedded&v=" + tmpID,
-                                        function(r){ FmMobile.showNotification("copyUrl");},
-                                        function(e){alert(e);}
-                                        );
-                    }
-                    break;
-                case "shareFb":
-                                        
-                                        FmMobile.liveType=$(this).attr("liveType");
-                                        
-                                        FmMobile.liveTime=$(this).attr("time");
-                                        FmMobile.srcForMyUgcViewer=$(this).attr("youtubeLink");
-                                        
-                                         FmMobile.finishNumber=this.title;
-                                        
-                                        if(FmMobile.myUgcPg.Type == "live"){
-                                        FmMobile.shareProjectID=$(this).attr("forPostId");
-                                        }else{
-                                        FmMobile.shareProjectID=this.parentElement.parentElement.id;
-                                        }
-                    
-                    
-                    FmMobile.shareFbType="video";
-                    FmMobile.srcForMyUgcViewer="http://img.youtube.com/vi/" + tmpID +"/mqdefault.jpg";
-                    FmMobile.youtubeVideoUrl="http://www.youtube.com/embed/" + tmpID + "?rel=0&showinfo=0&modestbranding=1&controls=0&autoplay=1";
-                                         FmMobile.myUgcScroll_y=e.pageY;
-
-                                        
-                                        
-                                
-                                       $.mobile.changePage('facebook_share.html');
-
-                    break;
-                case "shareImgFb":
-                                        FmMobile.finishNumber=this.title;
-                    FmMobile.shareFbType="image";
-                                        
-               FmMobile.shareProjectID=tmpID;
-
-                    if(FmMobile.myUgcPg.Type == "content"){
-                        FmMobile.srcForMyUgcViewer= s3Url + ".png";
-                    }else if(FmMobile.myUgcPg.Type == "live"){
-                                        FmMobile.shareProjectID=$(this).attr("forPostId");
-                                  FmMobile.liveType=$(this).attr("liveType");
-                                        if(FmMobile.liveType=="miix_story"){
-                                         FmMobile.liveTime=$(this).attr("time");
-                                         FmMobile.srcForMyUgcViewer=$(this).attr("youtubeLink");
-                                        }else{
-                                        FmMobile.srcForMyUgcViewer= s3Url + ".jpg";
-                                        FmMobile.longPhoto=$(this).attr("long");
-                                        FmMobile.liveTime=$(this).attr("time");
-
-                                        }
-                                        
-                        
-                    }
-                                        FmMobile.myUgcScroll_y=e.pageY;
-
-                    $.mobile.changePage('facebook_share.html');
-                    break;
-                case "sharePreFb":
-                                        FmMobile.finishNumber=this.title;
-                    FmMobile.shareProjectID=tmpID;
-                                        
-                    FmMobile.shareFbType="image";
-                    FmMobile.srcForMyUgcViewer= s3Url + "_dooh_preview.png";
-                                        FmMobile.myUgcScroll_y=e.pageY;
-
-                    $.mobile.changePage('facebook_share.html');
-                    break;
-            case "copyUrlS3":
-
-//                console.log("S3 URL " + tmpID);
-                if(FmMobile.myUgcPg.Type == "content"){
-                    if(device.platform != "Android"){
-                        window.clipboardPluginCopy(s3Url + ".png",
-                                                   function() { FmMobile.showNotification("copyUrl");},
-                                                   function(e){ FmMobile.showNotification("error");
-                                                               console.log('clipboardPlugin error: ' + e);}
-                                                   );
-                    }else{
-                        window.clipboardManagerCopy(s3Url+ ".png",
-                                                    function(r){ FmMobile.showNotification("copyUrl");},
-                                                    function(e){FmMobile.showNotification("error");
-                                                                console.log('clipboardPlugin error: ' + e);}
-                                                    );
-                    }
-                }else if(FmMobile.myUgcPg.Type == "live"){
-                    if(device.platform != "Android"){
-                        window.clipboardPluginCopy(s3Url + ".jpg",
-                                                   function(){ FmMobile.showNotification("copyUrl");},
-                                                   function(e){FmMobile.showNotification("error");
-                                                               console.log('clipboardPlugin error: ' + e);}
-                                                   );
-                    }else{
-                        window.clipboardManagerCopy(s3Url + ".jpg",
-                                                    function(r){FmMobile.showNotification("copyUrl");},
-                                                    function(e){FmMobile.showNotification("error");
-                                                                console.log('clipboardPlugin error: ' + e);}
-                                                    );
-                    }
-                }
-                break;
-            case "copyPreUrl":
-                if(device.platform != "Android"){
-                    window.clipboardPluginCopy(s3Url + "_dooh_preview.png" ,
-                                               function() { FmMobile.showNotification("copyUrl"); },
-                                               function(e){FmMobile.showNotification("error");
-                                                           console.log('clipboardPlugin error: ' + e);}
-                                               );
-                }else{
-                    window.clipboardManagerCopy(s3Url + "_dooh_preview.png",
-                                                function(r){FmMobile.showNotification("copyUrl");},
-                                                function(e){FmMobile.showNotification("error");
-                                                            console.log('clipboardPlugin error: ' + e);}
-                                                );
-                }
-
-                break;
+//                case "copyUrl":
+//                    if(device.platform != "Android"){
+//                        /**iOS Plugin */
+//                        window.clipboardPluginCopy("https://www.youtube.com/watch?feature=player_embedded&v=" + tmpID,
+//                                                   function() {FmMobile.showNotification("copyUrl");},
+//                                                   function(e){alert(e);}
+//                                                   );
+//                    }else{
+//                        /** Android Plugin */
+//                        window.clipboardManagerCopy(
+//                                        "https://www.youtube.com/watch?feature=player_embedded&v=" + tmpID,
+//                                        function(r){ FmMobile.showNotification("copyUrl");},
+//                                        function(e){alert(e);}
+//                                        );
+//                    }
+//                    break;
+//                case "shareFb":
+//                                        
+//                                        FmMobile.liveType=$(this).attr("liveType");
+//                                        
+//                                        FmMobile.liveTime=$(this).attr("time");
+//                                        FmMobile.srcForMyUgcViewer=$(this).attr("youtubeLink");
+//                                        
+//                                         FmMobile.finishNumber=this.title;
+//                                        
+//                                        if(FmMobile.myUgcPg.Type == "live"){
+//                                        FmMobile.shareProjectID=$(this).attr("forPostId");
+//                                        }else{
+//                                        FmMobile.shareProjectID=this.parentElement.parentElement.id;
+//                                        }
+//                    
+//                    
+//                    FmMobile.shareFbType="video";
+//                    FmMobile.srcForMyUgcViewer="http://img.youtube.com/vi/" + tmpID +"/mqdefault.jpg";
+//                    FmMobile.youtubeVideoUrl="http://www.youtube.com/embed/" + tmpID + "?rel=0&showinfo=0&modestbranding=1&controls=0&autoplay=1";
+//                                         FmMobile.myUgcScroll_y=e.pageY;
+//
+//                                        
+//                                        
+//                                
+//                                       $.mobile.changePage('facebook_share.html');
+//
+//                    break;
+//                case "shareImgFb":
+//                                        FmMobile.finishNumber=this.title;
+//                    FmMobile.shareFbType="image";
+//                                        
+//               FmMobile.shareProjectID=tmpID;
+//
+//                    if(FmMobile.myUgcPg.Type == "content"){
+//                        FmMobile.srcForMyUgcViewer= s3Url + ".png";
+//                    }else if(FmMobile.myUgcPg.Type == "live"){
+//                                        FmMobile.shareProjectID=$(this).attr("forPostId");
+//                                  FmMobile.liveType=$(this).attr("liveType");
+//                                        if(FmMobile.liveType=="miix_story"){
+//                                         FmMobile.liveTime=$(this).attr("time");
+//                                         FmMobile.srcForMyUgcViewer=$(this).attr("youtubeLink");
+//                                        }else{
+//                                        FmMobile.srcForMyUgcViewer= s3Url + ".jpg";
+//                                        FmMobile.longPhoto=$(this).attr("long");
+//                                        FmMobile.liveTime=$(this).attr("time");
+//
+//                                        }
+//                                        
+//                        
+//                    }
+//                                        FmMobile.myUgcScroll_y=e.pageY;
+//
+//                    $.mobile.changePage('facebook_share.html');
+//                    break;
+//                case "sharePreFb":
+//                                        FmMobile.finishNumber=this.title;
+//                    FmMobile.shareProjectID=tmpID;
+//                                        
+//                    FmMobile.shareFbType="image";
+//                    FmMobile.srcForMyUgcViewer= s3Url + "_dooh_preview.png";
+//                                        FmMobile.myUgcScroll_y=e.pageY;
+//
+//                    $.mobile.changePage('facebook_share.html');
+//                    break;
+//            case "copyUrlS3":
+//
+////                console.log("S3 URL " + tmpID);
+//                if(FmMobile.myUgcPg.Type == "content"){
+//                    if(device.platform != "Android"){
+//                        window.clipboardPluginCopy(s3Url + ".png",
+//                                                   function() { FmMobile.showNotification("copyUrl");},
+//                                                   function(e){ FmMobile.showNotification("error");
+//                                                               console.log('clipboardPlugin error: ' + e);}
+//                                                   );
+//                    }else{
+//                        window.clipboardManagerCopy(s3Url+ ".png",
+//                                                    function(r){ FmMobile.showNotification("copyUrl");},
+//                                                    function(e){FmMobile.showNotification("error");
+//                                                                console.log('clipboardPlugin error: ' + e);}
+//                                                    );
+//                    }
+//                }else if(FmMobile.myUgcPg.Type == "live"){
+//                    if(device.platform != "Android"){
+//                        window.clipboardPluginCopy(s3Url + ".jpg",
+//                                                   function(){ FmMobile.showNotification("copyUrl");},
+//                                                   function(e){FmMobile.showNotification("error");
+//                                                               console.log('clipboardPlugin error: ' + e);}
+//                                                   );
+//                    }else{
+//                        window.clipboardManagerCopy(s3Url + ".jpg",
+//                                                    function(r){FmMobile.showNotification("copyUrl");},
+//                                                    function(e){FmMobile.showNotification("error");
+//                                                                console.log('clipboardPlugin error: ' + e);}
+//                                                    );
+//                    }
+//                }
+//                break;
+//            case "copyPreUrl":
+//                if(device.platform != "Android"){
+//                    window.clipboardPluginCopy(s3Url + "_dooh_preview.png" ,
+//                                               function() { FmMobile.showNotification("copyUrl"); },
+//                                               function(e){FmMobile.showNotification("error");
+//                                                           console.log('clipboardPlugin error: ' + e);}
+//                                               );
+//                }else{
+//                    window.clipboardManagerCopy(s3Url + "_dooh_preview.png",
+//                                                function(r){FmMobile.showNotification("copyUrl");},
+//                                                function(e){FmMobile.showNotification("error");
+//                                                            console.log('clipboardPlugin error: ' + e);}
+//                                                );
+//                }
+//
+//                break;
             case "error":
                 FmMobile.showNotification("error");
                 console.log("[FmMobile.myUgcPg.ClickEvent] error :" + "Your Url is not available.");
