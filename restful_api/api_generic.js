@@ -9,7 +9,7 @@ exports.init = function() {
     app.post('/members/authentication_code_validity', routes.authorizationHandler.checkAuth, routes.api.codeVerify);  //TODO: better use GET
     app.get('/members/fb_token_validity', routes.authorizationHandler.checkAuth, routes.member.isFBTokenValid);
     app.post('/members/fb_info', routes.api.signupwithFB);
-    app.get('/connectStarServer', routes.api.connection);  //Make sure client side connect connect star_server
+    app.get('/connectStarServer', routes.authorizationHandler.connectServerStatus);  //Make sure client side connect connect star_server
     app.post('/api/codeVerification', routes.api.codeVerify);
 
     app.get('/members/:memberId/thumbnail', routes.genericHandler.getFbProfilePhoto);
