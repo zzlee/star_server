@@ -48,4 +48,12 @@ FM.authorizationHandler.updateDeviceToken = function(req, res) {
 	
 };
 
+//GET /connectStarServer
+FM.authorizationHandler.connectServerStatus = function(req, res){
+	//Make sure the client side can connect star_server
+	logger.info('[GET ' + req.path + '] is called');
+	res.send({"message":"Successful"});
+};
+
+
 module.exports = FM.authorizationHandler;
