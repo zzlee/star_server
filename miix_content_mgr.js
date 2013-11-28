@@ -892,6 +892,25 @@ miixContentMgr.putFbPostIduserLiveContents = function(userLiveContentProjectID, 
     });
 };
 
+miixContentMgr.getMessageList = function(memberId, limit, skip, cbOfGetMessageList){
+    var messageModel = db.getDocModel("message");
+    
+    messageModel.find({"ownerId._id": memberId, "read": false}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(cbOfGetMessageList);
+    
+    
+};
+
+miixContentMgr.updateMessage = function(messageId, vjson, cbOfUpdateMessage){
+    var messageModel = db.getDocModel("message");
+    
+    db.updateAdoc(messageModel, messageId, vjson, function(errOfUpdateMessage, resOfUpdateMessage){
+        if (!errOfUpdateMessage){
+            callback(null, "done");
+        }else
+            callback("Fail to update userLiveContent Obj from DB: "+errOfUpdateMessage, resOfUpdateMessage);
+    });
+    
+};
 
 
 module.exports = miixContentMgr;
