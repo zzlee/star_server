@@ -191,5 +191,56 @@ miixHandler.putFbPostIdUserLiveContents_cb = function(req, res) {
     
 };
 
+//GET /miix/members/:memberId/message
+miixHandler.getMessageList_cb = function(req, res) {
+    logger.info('[GET '+req.path+'] is called');
+    if (req.params.memberId){
+        var ugcInfo = req.body.fb_postId;
+        var limit = 0;
+        if (req.query.limit){
+            limit = req.query.limit;
+        }
+        else {
+            limit = 10;
+        }
+        
+        miixContentMgr.getMessageList( req.params.memberId, limit, 0, function(err){
+            if (!err){
+                res.send(200);
+            }
+            else {
+                logger.error('[GET /miix/members/:memberId/message] failed: '+ err);
+                res.send(400, {error: err});
+            }
+        });
+    }
+    else {
+        res.send(400, {error: "Not all needed data are sent."});
+    }
+    
+};
+
+//PUT /miix/message/:messageId
+miixHandler.updateMessage_cb = function(req, res) {
+    logger.info('[PUT '+req.path+'] is called');
+    if (req.params.messageId){
+        var vjson = req.body.vjson;
+        
+        miixContentMgr.updateMessage( req.params.messageId, vjson, function(err){
+            if (!err){
+                res.send(200);
+            }
+            else {
+                logger.error('[PUT /miix/message/:messageId] failed: '+ err);
+                res.send(400, {error: err});
+            }
+        });
+    }
+    else {
+        res.send(400, {error: "Not all needed data are sent."});
+    }
+    
+};
+
 
 module.exports = miixHandler;

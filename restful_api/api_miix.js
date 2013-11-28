@@ -272,5 +272,48 @@ exports.init = function() {
      */
     app.put('/miix/fb_userLiveContents/:ugcProjectId', routes.authorizationHandler.checkAuth, routes.miixHandler.putFbPostIdUserLiveContents_cb);
 
+    /**
+     * Get a list of message <br>
+     * <h5>Path parameters</h5>
+     * <ul>
+     * <li>memberId: Member ID (_id of 24 character hex string)
+     * </ul>
+     * 
+     * <h5>Query parameters</h5>
+     * <ul>
+     * <li>limit: the number of message items to return
+     * </ul>
+     * 
+     * <h5>Request body</h5>
+     * None
+     * 
+     * <h5>Response body</h5>
+     * @name GET /miix/members/:memberId/message
+     * @memberof miix
+     */
+    app.get('/miix/members/:memberId/message', routes.authorizationHandler.checkAuth, routes.miixHandler.getMessageList_cb);
     
+    /**
+     * Update a message of a specific message ID<br>
+     * 
+     * <h5>Path parameters</h5>
+     * <ul>
+     * <li>messageId: Message ID (_id of 24 character hex string)
+     * </ul>
+     * 
+     * <h5>Query parameters</h5>
+     * None
+     * 
+     * <h5>Request body</h5>
+     * <ul>
+     * <li>result:"done" 
+     * </ul>
+     * 
+     * <h5>Response body</h5>
+     * 
+     * @name PUT /miix/members/:memberId/message/:messageId
+     * @memberof miix
+     */
+    app.put('/miix/message/:messageId', routes.authorizationHandler.checkAuth, routes.miixHandler.updateMessage_cb);
+
 };
