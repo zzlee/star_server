@@ -2,12 +2,12 @@
 { 
 "name":"wow_pic",
 "genre":"wow",
-"ver":"1"
+"ver":"1.0.00"
 },
 { 
 "name":"wow_pic_text",
 "genre":"wow",
-"ver":"1"
+"ver":"1.0.00"
 }
 
 ]
