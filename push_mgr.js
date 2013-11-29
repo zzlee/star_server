@@ -233,11 +233,12 @@ FM.pushMgr = (function() {
 						cbOfCreateMessage("new message save to db error: "+err, null);
 					}
 				});
-		           console.log(err, res);
+		           //console.log(err, res);
 					
-				});
+				},
+            //);
 			
-			},
+			//},
 			
 			updateMessage : function(messageId,  vjson, cbOfUpdateMessage){
 				
@@ -261,7 +262,7 @@ FM.pushMgr = (function() {
                 var memberId = '5254fd20df0ff4b00e00000e';
                 var message = '您目前是第'+userNo+'位試鏡者，等候通告期間，您可以先到客棧打個工。';
                 this.sendMessageToDeviceByMemberId( memberId, message, function(err, result){
-                        console.log(err, result);
+                       // console.log(err, result);
                 });
 				// this.saveMessageToDataBase( memberId, message, function(err, result){
 					// console.log(err, result);

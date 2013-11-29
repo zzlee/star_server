@@ -204,9 +204,9 @@ miixHandler.getMessageList_cb = function(req, res) {
             limit = 10;
         }
         
-        miixContentMgr.getMessageList( req.params.memberId, limit, 0, function(err){
+        miixContentMgr.getMessageList( req.params.memberId, limit, 0, function(err, messageList){
             if (!err){
-                res.send(200);
+                res.send(messageList);
             }
             else {
                 logger.error('[GET /miix/members/:memberId/message] failed: '+ err);
