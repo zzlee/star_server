@@ -905,9 +905,9 @@ miixContentMgr.updateMessage = function(messageId, vjson, cbOfUpdateMessage){
     
     db.updateAdoc(messageModel, messageId, vjson, function(errOfUpdateMessage, resOfUpdateMessage){
         if (!errOfUpdateMessage){
-            callback(null, "done");
+        	cbOfUpdateMessage(null, "done");
         }else
-            callback("Fail to update userLiveContent Obj from DB: "+errOfUpdateMessage, resOfUpdateMessage);
+        	cbOfUpdateMessage("Fail to update userLiveContent Obj from DB: "+errOfUpdateMessage, resOfUpdateMessage);
     });
     
 };
