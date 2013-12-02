@@ -5,6 +5,8 @@ var fs = require('fs');
 var path = require('path');
 var xml2js = require('xml2js');
 var async = require('async');
+var request = require('request');
+var gm = require('gm');
 
 var workingPath = process.cwd();
 var aeServerMgr = require(workingPath+'/ae_server_mgr.js');
@@ -15,6 +17,7 @@ var memberDB = require("./member.js");
 var awsS3 = require('./aws_s3.js');
 var fmapi = require(workingPath+'/routes/api.js');   //TODO:: find a better name
 var db = require('./db.js');
+var memberModel = db.getDocModel("member");
 var fbMgr = require('./facebook_mgr.js');
 var pushMgr = require('./push_mgr.js');
 
@@ -139,6 +142,26 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
     var customizableObjects = ugcInfo.customizableObjects;
     var ugcDoohPreviewS3Path = null;
     var allUserContentExist = true;
+    var fbProfilePictureUrl = null;
+    
+    var download = function( uri, filename, cb ){
+        request.head(uri, function(err, res, body){
+            // console.log( 'content-type:', res.headers['content-type'] );
+            // logger.info( 'content-type: ' + res.headers['content-type'] );
+            // console.log( 'content-length:', res.headers['content-length'] );
+            // logger.info( 'content-length: ' + res.headers['content-length'] );
+            logger.info( 
+                         'target: ' + uri + ', ' + 
+                         'content-type: ' + res.headers['content-type'] + ', ' + 
+                         'content-length: ' + res.headers['content-length']
+                       );
+
+            var r = request(uri).pipe(fs.createWriteStream(filename));
+            r.on( 'close', function() { 
+                cb('ok');
+            } );
+        });
+    };
 
     async.series([
         function(callback){
@@ -224,6 +247,83 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
                 }
             });
         },
+        
+        function(callback){
+        
+            async.waterfall( [
+                function( member_cb ){
+                    memberModel.findById( ugcInfo.ownerId._id, 'app fb', function (err, doc) {
+                        if( !err ) {
+                            logger.info( 'Member search is successfully, user _id: ' + ugcInfo.ownerId._id );
+                            member_cb( null, doc );
+                        }
+                        else {
+                            logger.info( 'Member search is failed, user _id: ' + ugcInfo.ownerId._id );
+                            member_cb( 'Member search is failed, user _id: ' + ugcInfo.ownerId._id, null );
+                        }
+                    } );
+                },
+                function( member, fb_picture_cb ){
+                    fbMgr.getUserProfilePicture( member.fb.userID, member.app, function(err, res){
+                        if ( !err ){
+                            var pictureUrl = res.picture.data.url.toString().replace('_q.','_n.');
+                            logger.info('Get user FB profile picture is successfully, user FB ID: ' + member.fb.userID);
+                            fb_picture_cb( null, pictureUrl );
+                        }
+                        else {
+                            logger.info( 'Get user FB profile picture is failed, user FB ID: ' + member.fb.userID );
+                            fb_picture_cb( 'Get user FB profile picture is failed, user FB ID: ' + member.fb.userID, null );
+                        }
+                    } );
+                },
+                function( picture, download_cb ){
+                    
+                    var filename = picture.toString().split('/');
+                    filename = path.join(__dirname, filename[filename.length - 1]);
+                    
+                    download( picture, filename, function(status){
+                        logger.info( 'Save user FB profile picture is successfully.' );
+                        download_cb( null, filename );
+                    });
+                },
+                // function( file, resize_cb ){
+                    // gm( file )
+                    // .resize( 162, 162 )
+                    // .write( file, function( err ) {
+                        // if (!err) logger.info( 'Resize user FB profile picture is successfully.' );
+                        // resize_cb( null, file );
+                    // });
+                // },
+                function( filepath, uploadS3_cb ){
+                    
+                    var S3Path = filepath.toString().split('\\');
+                    S3Path = S3Path[S3Path.length - 1];
+                    S3Path = '/user_project/' + ugcProjectID + '/user_data/' + S3Path;
+                    
+                    awsS3.uploadToAwsS3( filepath, S3Path, 'image/jpeg', function(err,result){
+                        if ( !err ) {
+                            logger.info( 'User FB profile picture is successfully uploaded to S3 ' + S3Path );
+                            fbProfilePictureUrl = 'https://s3.amazonaws.com/miix_content' + S3Path;
+                            uploadS3_cb( null, filepath );
+                        }
+                        else {
+                            logger.info( 'User FB profile picture is failed to be uploaded to S3 ' + S3Path );
+                            uploadS3_cb( 'User FB profile picture is failed to be uploaded to S3 ' + S3Path, null );
+                        }
+                    });
+                }
+            ], function( err, filepath ){
+                if( !err ) {
+                    fs.unlinkSync( filepath );
+                    logger.info( 'Get user FB profile picture is successfully' );
+                    callback(null);
+                }
+                else {
+                    logger.info( 'Get user FB profile picture is failed' );
+                    callback( 'Get user FB profile picture is failed', null );
+                }
+            } );
+        },
 
         function(callback){
             //Add UGC info to UGC db 
@@ -247,7 +347,8 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
                     "contentGenre": ugcInfo.contentGenre,
                     "title": ugcInfo.title,
                     "doohPreviewUrl": ugcDoohPreviewS3Url,
-                    "allUserContentExist": allUserContentExist
+                    "allUserContentExist": allUserContentExist,
+                    "fbProfilePicture": fbProfilePictureUrl //
                 };
 
             UGCDB.addUGC(vjson, function(errOfAddUGC, newlyAddedUgc){
