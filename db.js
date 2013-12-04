@@ -211,7 +211,8 @@ FM.DB = (function(){
             planner: {type: String}, //The id of planner who plans this session of creating program timeslots
             state: {type: String, enum: programTimeSlotState, default: 'not_confirmed'}, //The state of the program timeslot
             contentGenre: {type: String, enum: ugcContentGenre},  //miix_it, cultural_and_creative, mood, or check_in
-            liveState: {type: String, enum: liveContentState, default: 'not_checked'}
+            liveState: {type: String, enum: liveContentState, default: 'not_checked'},
+            upload: {type: Boolean, default: false}
         }); 
         
         var CandidateUgcCacheSchema = new Schema({
@@ -360,7 +361,8 @@ FM.DB = (function(){
 		var MessageSchema = new Schema({
             content: {type: String},
 			ownerId: {_id: ObjectID},
-            read: {type: Boolean, default: false}
+            read: {type: Boolean, default: false},
+            showInCenter: {type: Boolean, default: false}
         }); //  MyMember collection
 		
         /****************** End of DB Schema ******************/
