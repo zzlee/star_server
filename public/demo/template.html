@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-	<title>Codester | Home</title>
+	<title>Demo | Select Template</title>
 	<meta charset="utf-8">
 	<link rel="icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon">
     <link rel="shortcut icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon" />
@@ -36,6 +36,9 @@
 				
 	</script>
 
+	<!-- CUSTOM CODE -->
+	<script src="js/template.js"></script>
+	
 	<!--[if lt IE 8]>
   		<div style='text-align:center'><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx?ocid=ie6_countdown_bannercode"><img src="http://www.theie6countdown.com/img/upgrade.jpg"border="0"alt=""/></a></div>  
  	<![endif]-->
@@ -49,7 +52,7 @@
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'>
   <![endif]-->
   
-  <!--Google analytics code-->	  
+  <!--Google analytics code	  
 	  <script type="text/javascript">
            var _gaq = _gaq || [];
           _gaq.push(['_setAccount', 'UA-29231762-1']);
@@ -62,6 +65,7 @@
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
           })();
       </script>
+      -->
 </head>
 
 	<body>
@@ -94,9 +98,10 @@
         
         <span id="responsiveFlag"></span>
         <div class="block-slogan">
-              
-              
-            <p style="text-align:right; padding-top:20px;"><a href="preview.html" class="btn btn-1">上傳圖片</a></p>
+            <p style="text-align:right; padding-top:20px;">
+            	<input id="wow_pic" type="file" accept=".jpg" alt=" " onsubmit="return template.checkFile(uploadPhoto);" />
+            	<!-- <a href="preview.html" class="btn btn-1">上傳圖片</a> -->
+            </p>
           </div>
             </div>
       </div>
@@ -112,7 +117,10 @@
         <div class="block-slogan">
               
               
-            <p style="text-align:right; padding-top:20px;"><a href="upload_text.html" class="btn btn-1">上傳圖片與文字</a></p>
+            <p style="text-align:right; padding-top:20px;">
+	            <input id="wow_pic_text" type="file" accept=".jpg" alt=" " />
+             	<!--<a href="upload_text.html" class="btn btn-1">上傳圖片與文字</a> -->
+			</p>
           </div>
           </div>
         
