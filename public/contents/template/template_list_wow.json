@@ -1,13 +1,23 @@
 [
 { 
+"name":"xmas_pic",
+"genre":"wow",
+"ver":"1.0.01"
+},
+{ 
+"name":"xmas_pic_text",
+"genre":"wow",
+"ver":"1.0.01"
+},
+{ 
 "name":"wow_pic",
 "genre":"wow",
-"ver":"1.0.00"
+"ver":"1.0.01"
 },
 { 
 "name":"wow_pic_text",
 "genre":"wow",
-"ver":"1.0.00"
+"ver":"1.0.01"
 }
 
 ]
