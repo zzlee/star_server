@@ -196,12 +196,12 @@ miixHandler.getMessageList_cb = function(req, res) {
     logger.info('[GET '+req.path+'] is called');
     if (req.params.memberId){
         var ugcInfo = req.body.fb_postId;
-        var limit = 3;
+        var limit = 0;
         if (req.query.limit){
             limit = req.query.limit;
         }
         else {
-            limit = 10;
+            limit = 3;
         }
         
         miixContentMgr.getMessageList( req.params.memberId, limit, 0, function(err, messageList){
