@@ -43,7 +43,7 @@ FM.DB = (function(){
                 //web_page
                 //media_item: the media item that has already stored in Media of Scala's Content Manager
             programTimeSlotState = 'not_confirmed confirmed'.split(' '),
-            liveContentState = 'not_checked correct incorrect'.split(' '),
+            liveContentState = 'not_checked correct source_not_played not_generated incorrect bad_exposure other_fail'.split(' '),
             appGenre = 'ondascreen wowtaipeiarena'.split(' '),
             
             adminRole = 'SUPER_ADMINISTRATOR FELTMENG_ADMINISTRATOR FELTMENG_DEMO OPERATOR'.split(' '),
@@ -211,6 +211,7 @@ FM.DB = (function(){
             planner: {type: String}, //The id of planner who plans this session of creating program timeslots
             state: {type: String, enum: programTimeSlotState, default: 'not_confirmed'}, //The state of the program timeslot
             contentGenre: {type: String, enum: ugcContentGenre},  //miix_it, cultural_and_creative, mood, or check_in
+            canBeFoundInPlayerLog: {type: String},
             liveState: {type: String, enum: liveContentState, default: 'not_checked'},
             upload: {type: Boolean, default: false}
         }); 
@@ -423,11 +424,10 @@ FM.DB = (function(){
             
         function connectDB(){
                 try{
-					var options = {
-						user: systemConfig.HOST_MONGO_DB_USER_NAME,
-						pass: systemConfig.HOST_MONGO_DB_PASSWORD
-					}
-					console.log(options);
+                    var options = {
+                        user: systemConfig.HOST_MONGO_DB_USER_NAME,
+                        pass: systemConfig.HOST_MONGO_DB_PASSWORD
+                    }
                     mongoose.connect(systemConfig.HOST_MONGO_DB_SERVER_URL+'/'+DB, options);
                     return mongoose.connection;
                 }catch(err){
