@@ -1,75 +1,100 @@
 var ConnectFacebook = {};
-var serverUrl = "http://jean.ondascreen.com";
+var remoteUrl = "http://jean.ondascreen.com/demo/";
+var accessToken = null;
+var expiresIn = null;
+var userID = null;
 ConnectFacebook.init = function(){
-	var client_id = "430008873778732";
-    //var redir_url = ["http://www.miix.tv/welcome.html", "https://www.miix.tv/welcome.html"];
-    
-    
-    var redir_url = [serverUrl +"/demo/template.html"];
-    var fb = FBConnect.install();
-    fb.connect(client_id, redir_url[0], "touch");
+	window.fbAsyncInit = function() {
+		FB.init({
+		    	appId      : '154438938098663',	//WowTaipeiArena FB ID
+		    	status     : true, // check login status
+		    	cookie     : true, // enable cookies to allow the server to access the session
+		    	xfbml      : true  // parse XFBML
+		  	});
+	};
+	// Load the SDK asynchronously
+	(function(d){
+	   var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+	   if (d.getElementById(id)) {return;}
+	   js = d.createElement('script'); js.id = id; js.async = true;
+	   js.src = "//connect.facebook.net/zh_TW/all.js";
+	   ref.parentNode.insertBefore(js, ref);
+	}(document));
 	
 };
 
-ConnectFacebook.connect = function(){
-	 window.fbAsyncInit = function() {
-		  FB.init({
-		    appId      : '154438938098663',
-		    //appId      : '430008873778732',
-		    status     : true, // check login status
-		    cookie     : true, // enable cookies to allow the server to access the session
-		    xfbml      : true  // parse XFBML
-		  });
+ConnectFacebook.logIn = function(){
+	async.series([
+	              function(callback){
+	            	  FB.login(function(response){
+	            	  	  
+	            	  	  if(response.authResponse){
+	            	  		  console.log("logIn success ");
+//	            	  		  console.dir(response);
+	            	  		  accessToken = response.authResponse.accessToken;
+	            	  		  expiresIn = Date.now() + response.authResponse.expiresIn;
+	            	  		  userID = response.authResponse.userID;
+//	            	  		window.location = remoteUrl + "template.html?" + 
+//	            	  				"accessToken=" + accessToken + "&" +
+//	            	  				"expireIn=" + expiresIn + "&" +
+//	            	  				"userId=" + userID;
+	            	  		  callback(null);
+	            	  	  }else{
+	            	  		  console.log("logIn :");
+	            	  		  console.dir(response);
+	            	  		  callback("Log In not successfully");
+	            	  	  }
+	            	  	
+	            	    }, {scope: "read_stream,publish_stream,user_location,email,user_likes,publish_checkins"});
+	            	  
+	              },
+	              function(callback){
+	            		FB.api('/me', function(response) {
+	            			console.dir(response);
+	      		   
+	              
+	            			data = {"authResponse": {
+	            					"appGenre":"wowtaipeiarena", 
+	            					"userID": userID,
+	            					"userName": response.name,
+	            					"email": response.email,
+	            					"accessToken": accessToken,
+	            					"expiresIn":  expiresIn,
+	            					"timestamp": Date.now()
+	            				}
+	            			};
 
-		  // Here we subscribe to the auth.authResponseChange JavaScript event. This event is fired
-		  // for any authentication related change, such as login, logout or session refresh. This means that
-		  // whenever someone who was previously logged out tries to log in again, the correct case below 
-		  // will be handled. 
-		  FB.Event.subscribe('auth.authResponseChange', function(response) {
-		    // Here we specify what we do with the response anytime this event occurs. 
-		    if (response.status === 'connected') {
-		      // The response object is returned with a status field that lets the app know the current
-		      // login status of the person. In this case, we're handling the situation where they 
-		      // have logged in to the app.
-		      testAPI();
-		    } else if (response.status === 'not_authorized') {
-		      // In this case, the person is logged into Facebook, but not into the app, so we call
-		      // FB.login() to prompt them to do so. 
-		      // In real-life usage, you wouldn't want to immediately prompt someone to login 
-		      // like this, for two reasons:
-		      // (1) JavaScript created popup windows are blocked by most browsers unless they 
-		      // result from direct interaction from people using the app (such as a mouse click)
-		      // (2) it is a bad experience to be continually prompted to login upon page load.
-		      FB.login();
-		    } else {
-		      // In this case, the person is not logged into Facebook, so we call the login() 
-		      // function to prompt them to do so. Note that at this stage there is no indication
-		      // of whether they are logged into the app. If they aren't then they'll see the Login
-		      // dialog right after they log in to Facebook. 
-		      // The same caveats as above apply to the FB.login() call here.
-		      FB.login();
-		    }
-		  });
-		  };
+	            			console.log(JSON.stringify(data));
+	            	  		window.location = remoteUrl + "template.html?" + 
+//        	  				"accessToken=" + accessToken + "&" +
+//        	  				"expireIn=" + expiresIn + "&" +
+//        	  				"userId=" + userID;
+	            	  		localStorage.fbId = userID;
+//	            			$.post(url, data, function(response){
+//	                     
+//	            				if(response.data){
+//	            					console.log(response.data);
+//	            					localStorage._id = response.data._id;
+//	            					localStorage.miixToken = response.data.miixToken;
+//	            					localStorage.fb_accessToken = response.data.accessToken;
+//	            					localStorage.verified = (response.data.verified) ? response.data.verified : 'false';
+//	            					FM_LOG("localStorage" + JSON.stringify(localStorage));
+//	                     
+//	            				}else{
+//	            					
+//	            				}
+//	            			});//End of post
+	            		});//End of FB.api
+	            	  callback(null);
+	              }],
+	              function(err){
+					if(err){
+						
+					}else{
+						
+					}
+				});
+	//});
 
-		  // Load the SDK asynchronously
-		  (function(d){
-		   var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
-		   if (d.getElementById(id)) {return;}
-		   js = d.createElement('script'); js.id = id; js.async = true;
-		   js.src = "//connect.facebook.net/zh_TW/all.js";
-		   ref.parentNode.insertBefore(js, ref);
-		  }(document));
-
-		  // Here we run a very simple test of the Graph API after login is successful. 
-		  // This testAPI() function is only called in those cases. 
-		  function testAPI() {
-		    console.log('Welcome!  Fetching your information.... ');
-		    
-		    FB.api('/me', function(response) {
-		    	console.log(response);
-		      console.log('Good to see you, ' + response.name + '.');
-		      
-		    });
-		  }
 };
+

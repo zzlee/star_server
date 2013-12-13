@@ -1,0 +1,1 @@
+var serverUrl = "http://jean.ondascreen.com/demo/";
