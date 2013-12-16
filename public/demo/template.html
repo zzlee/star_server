@@ -35,8 +35,9 @@
   		  }); 
 				
 	</script>
-
+	
 	<!-- CUSTOM CODE -->
+	<script src="js/common.js"></script>
 	<script src="js/template.js"></script>
 	<script src="http://connect.facebook.net/zh_TW/all.js"></script>
 	
@@ -99,12 +100,14 @@
         
         <span id="responsiveFlag"></span>
         <div class="block-slogan">
+            <p style="height:0px;overflow:hidden">
+			<input id="wow_pic" type="file" accept=".jpg" alt=" " onsubmit="return template.checkFile(uploadPhoto);" />
+           	</p>
             <p style="text-align:right; padding-top:20px;">
-            	<input id="wow_pic" type="file" accept=".jpg" alt=" " onsubmit="return template.checkFile(uploadPhoto);" />
-            	<!-- <a href="preview.html" class="btn btn-1">上傳圖片</a> -->
+            <button id="chossePic" class="btn btn-1" onclick="chooseFile();">上傳圖片</button>
             </p>
           </div>
-            </div>
+          </div>
       </div>
       <div class="row">
         <div class="span12"> 

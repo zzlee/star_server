@@ -1,5 +1,5 @@
 var ConnectFacebook = {};
-var remoteUrl = "http://jean.ondascreen.com/demo/";
+var remoteUrl = "http://jean.ondascreen.com/demo";
 var accessToken = null;
 var expiresIn = null;
 var userID = null;
@@ -27,21 +27,13 @@ ConnectFacebook.logIn = function(){
 	async.series([
 	              function(callback){
 	            	  FB.login(function(response){
-	            	  	  
 	            	  	  if(response.authResponse){
-	            	  		  console.log("logIn success ");
-//	            	  		  console.dir(response);
-	            	  		  accessToken = response.authResponse.accessToken;
-	            	  		  expiresIn = Date.now() + response.authResponse.expiresIn;
+//	            	  		  accessToken = response.authResponse.accessToken;
+//	            	  		  expiresIn = Date.now() + response.authResponse.expiresIn;
 	            	  		  userID = response.authResponse.userID;
-//	            	  		window.location = remoteUrl + "template.html?" + 
-//	            	  				"accessToken=" + accessToken + "&" +
-//	            	  				"expireIn=" + expiresIn + "&" +
-//	            	  				"userId=" + userID;
 	            	  		  callback(null);
 	            	  	  }else{
 	            	  		  console.log("logIn :");
-	            	  		  console.dir(response);
 	            	  		  callback("Log In not successfully");
 	            	  	  }
 	            	  	
@@ -51,8 +43,6 @@ ConnectFacebook.logIn = function(){
 	              function(callback){
 	            		FB.api('/me', function(response) {
 	            			console.dir(response);
-	      		   
-	              
 	            			data = {"authResponse": {
 	            					"appGenre":"wowtaipeiarena", 
 	            					"userID": userID,
@@ -64,37 +54,58 @@ ConnectFacebook.logIn = function(){
 	            				}
 	            			};
 
-	            			console.log(JSON.stringify(data));
-	            	  		window.location = remoteUrl + "template.html?" + 
-//        	  				"accessToken=" + accessToken + "&" +
-//        	  				"expireIn=" + expiresIn + "&" +
-//        	  				"userId=" + userID;
 	            	  		localStorage.fbId = userID;
-//	            			$.post(url, data, function(response){
-//	                     
-//	            				if(response.data){
+	            	  		localStorage.name = response.name;
+	            	  		var url = "http://jean.ondascreen.com" + "/members/fb_info";
+	            			$.post(url, data, function(response){
+	                     
+	            				if(response.data){
 //	            					console.log(response.data);
-//	            					localStorage._id = response.data._id;
-//	            					localStorage.miixToken = response.data.miixToken;
+	            					localStorage._id = response.data._id;
+	            					localStorage.miixToken = response.data.miixToken;
 //	            					localStorage.fb_accessToken = response.data.accessToken;
 //	            					localStorage.verified = (response.data.verified) ? response.data.verified : 'false';
-//	            					FM_LOG("localStorage" + JSON.stringify(localStorage));
-//	                     
-//	            				}else{
-//	            					
-//	            				}
-//	            			});//End of post
+	            					console.log("localStorage" + JSON.stringify(localStorage));
+	            					
+	            					callback(null);
+	            				}else{
+	            					callback("[ConnectFacebook.logIn]Get facebook infor falied");
+	            				}
+	            			});//End of post
 	            		});//End of FB.api
-	            	  callback(null);
+	            	  
+	              },
+	              function(callback){
+	            	  //Get user's fb profile photo
+	            	  var url = domianUrl + "/members/" + localStorage.fbId + "/thumbnail";
+	            	  $.ajax({
+	      					type : 'GET',
+	      					url : url,
+	      					async : true,
+	      					success : function(res){
+	      						if(res){
+	      							localStorage.profilePhoto = res;
+	      							window.location = remoteUrl + "/template.html";
+	      							callback(null);
+	      						}else{
+//	      							alert("抓取Facebook資料發生錯誤。");
+	      							callback("Get facebook data failed");
+	      						}
+	      					},
+	      					error : function(jqXHR, textStatus, errorThrown ){
+//	      						alert("抓取Facebook資料發生錯誤。");
+	      						callback("Get facebook data failed");
+	      					}
+	      				});
+	      				        
+	            	  
 	              }],
 	              function(err){
 					if(err){
-						
-					}else{
-						
+						alert('登入時發生錯誤，請重新再試');
 					}
+						
 				});
-	//});
 
 };
 
