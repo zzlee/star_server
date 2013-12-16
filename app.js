@@ -53,10 +53,10 @@ if (!fs.existsSync(logDir) ){
 require('winston-mongodb').MongoDB;
 var logger = new(winston.Logger)({
 	transports: [ 
-		new winston.transports.MongoDB({host:systemConfig.MONGO_DB_SERVER_ADDRESS, db: 'feltmeng', level: 'info'}),
+		new winston.transports.MongoDB({host:systemConfig.MONGO_DB_SERVER_ADDRESS, db: 'feltmeng', level: 'info', username: systemConfig.HOST_MONGO_DB_USER_NAME, password: systemConfig.HOST_MONGO_DB_PASSWORD}),
 		new winston.transports.File({ filename: './log/winston.log'})	
 	],
-	exceptionHandlers: [new winston.transports.MongoDB({host:systemConfig.MONGO_DB_SERVER_ADDRESS, db: 'feltmeng', level: 'info'}),
+	exceptionHandlers: [new winston.transports.MongoDB({host:systemConfig.MONGO_DB_SERVER_ADDRESS, db: 'feltmeng', level: 'info', username: systemConfig.HOST_MONGO_DB_USER_NAME, password: systemConfig.HOST_MONGO_DB_PASSWORD}),
                     new winston.transports.File({filename: './log/exceptions.log'})
 	]
 	
