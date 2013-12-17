@@ -28,8 +28,8 @@ ConnectFacebook.logIn = function(){
 	              function(callback){
 	            	  FB.login(function(response){
 	            	  	  if(response.authResponse){
-//	            	  		  accessToken = response.authResponse.accessToken;
-//	            	  		  expiresIn = Date.now() + response.authResponse.expiresIn;
+	            	  		  accessToken = response.authResponse.accessToken;
+	            	  		  expiresIn = Date.now() + response.authResponse.expiresIn;
 	            	  		  userID = response.authResponse.userID;
 	            	  		  callback(null);
 	            	  	  }else{
@@ -58,15 +58,10 @@ ConnectFacebook.logIn = function(){
 	            	  		localStorage.name = response.name;
 	            	  		var url = "http://jean.ondascreen.com" + "/members/fb_info";
 	            			$.post(url, data, function(response){
-	                     
 	            				if(response.data){
-//	            					console.log(response.data);
 	            					localStorage._id = response.data._id;
 	            					localStorage.miixToken = response.data.miixToken;
-//	            					localStorage.fb_accessToken = response.data.accessToken;
-//	            					localStorage.verified = (response.data.verified) ? response.data.verified : 'false';
-	            					console.log("localStorage" + JSON.stringify(localStorage));
-	            					
+//	            					console.log("localStorage" + JSON.stringify(localStorage));
 	            					callback(null);
 	            				}else{
 	            					callback("[ConnectFacebook.logIn]Get facebook infor falied");
@@ -77,7 +72,7 @@ ConnectFacebook.logIn = function(){
 	              },
 	              function(callback){
 	            	  //Get user's fb profile photo
-	            	  var url = domianUrl + "/members/" + localStorage.fbId + "/thumbnail";
+	            	  var url = "http://jean.ondascreen.com/members/" + localStorage.fbId + "/thumbnail";
 	            	  $.ajax({
 	      					type : 'GET',
 	      					url : url,
@@ -88,17 +83,13 @@ ConnectFacebook.logIn = function(){
 	      							window.location = remoteUrl + "/template.html";
 	      							callback(null);
 	      						}else{
-//	      							alert("抓取Facebook資料發生錯誤。");
 	      							callback("Get facebook data failed");
 	      						}
 	      					},
 	      					error : function(jqXHR, textStatus, errorThrown ){
-//	      						alert("抓取Facebook資料發生錯誤。");
 	      						callback("Get facebook data failed");
 	      					}
 	      				});
-	      				        
-	            	  
 	              }],
 	              function(err){
 					if(err){

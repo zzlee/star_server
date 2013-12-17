@@ -37,9 +37,41 @@
 	</script>
 	
 	<!-- CUSTOM CODE -->
+	<script src="js/async.js"></script>
 	<script src="js/common.js"></script>
 	<script src="js/template.js"></script>
+	<script src="js/image_ugc.js"></script>
+	<script src="js/template_mgr.js"></script>
+	<script src="js/ugc_utility.js"></script>
+	<script src="js/dooh_info.js"></script>
+	<script src="js/dooh_preview.js"></script>
+	
 	<script src="http://connect.facebook.net/zh_TW/all.js"></script>
+	
+	<script>
+		function init(){
+			var btnChoosePhoto = $("#chossePic");
+			btnChoosePhoto.click(function(){
+				template.choosePicFile();
+			});
+			
+			var btnChoosePhotoText = $("#chossePicText");
+			btnChoosePhotoText.click(function(){
+				template.choosePicTextFile();
+			})
+			
+			var btnWowPic = $("#wow_pic");
+			var btnWowPicText = $("#wow_pic_text");
+			btnWowPic.click(function(){
+				document.getElementById('wow_pic').addEventListener('change', template.handleFileSelected, true);
+			});
+			
+			btnWowPicText.click(function(){
+				document.getElementById('wow_pic_text').addEventListener('change', template.handleFileSelected, true);	
+			});
+			
+		}
+	</script>
 	
 	<!--[if lt IE 8]>
   		<div style='text-align:center'><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx?ocid=ie6_countdown_bannercode"><img src="http://www.theie6countdown.com/img/upgrade.jpg"border="0"alt=""/></a></div>  
@@ -70,7 +102,7 @@
       -->
 </head>
 
-	<body>
+	<body onload="init();">
      <div class="spinner"></div> 
 <!-- header start -->
 <header>
@@ -80,7 +112,6 @@
         <div class="navbar navbar_">
               <div class="container">
             <h1 class="brand brand_"><a href="index.html"><img alt="" src="img/logo.png"> </a></h1>
-
             <div class="nav-collapse nav-collapse_  collapse"></div>
           </div>
             </div>
@@ -100,11 +131,12 @@
         
         <span id="responsiveFlag"></span>
         <div class="block-slogan">
-            <p style="height:0px;overflow:hidden">
-			<input id="wow_pic" type="file" accept=".jpg" alt=" " onsubmit="return template.checkFile(uploadPhoto);" />
+            <!--  <p style="height:0px;overflow:hidden"> -->
+            <p>
+			<input id="wow_pic" type="file" accept=".jpg" alt=" "/>
            	</p>
             <p style="text-align:right; padding-top:20px;">
-            <button id="chossePic" class="btn btn-1" onclick="chooseFile();">上傳圖片</button>
+            <button id="chossePic" class="btn btn-1">上傳圖片</button>
             </p>
           </div>
           </div>
@@ -119,12 +151,13 @@
         
         <span id="responsiveFlag"></span>
         <div class="block-slogan">
-              
-              
+			<!--  <p style="height:0px;overflow:hidden"> -->
+			<p>
+			<input id="wow_pic_text" type="file" accept=".jpg" alt=" " />
+           	</p>
             <p style="text-align:right; padding-top:20px;">
-	            <input id="wow_pic_text" type="file" accept=".jpg" alt=" " />
-             	<!--<a href="upload_text.html" class="btn btn-1">上傳圖片與文字</a> -->
-			</p>
+            <button id="chossePicText" class="btn btn-1" >上傳圖片</button>
+            </p>
           </div>
           </div>
         

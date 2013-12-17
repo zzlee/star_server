@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-	<title>Demo | Upload Text and Photo</title>
+	<title>Demo | Input Text</title>
 	<meta charset="utf-8">
 	<link rel="icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon">
     <link rel="shortcut icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon" />
@@ -36,6 +36,42 @@
 				
 	</script>
 
+	<script src="js/common.js"></script>
+	<script src="js/async.js"></script>
+	<script src="js/template_mgr.js"></script>
+	<script src="js/image_ugc.js"></script>
+	<script src="js/template.js"></script>
+	<script src="js/ugc_utility.js"></script>
+	<script src="js/dooh_info.js"></script>
+	<script src="js/dooh_preview.js"></script>
+	
+	<script>
+		function init(){
+			var btnSend = $('#btnSend');
+			btnSend.click(function(){
+				var $text = $("#inputText");
+				var text = $text.val();
+				console.log(text);
+				if(text == '' || text.length==0){
+					alert("您沒有輸入任何的文字。");
+				}else{
+					var check_format = text.replace(/\<n\>/ig,"\n");
+					if(check_format > 3){
+						alert("請勿輸入超過三行！");
+					}else{
+						if((check_format[0].length > 8) || (check_format[1].length > 8) || (check_format[2].length >8)){
+							alert("一行最多輸入8個字");
+						}else{
+							template.genImage(localStorage.selectedTemplate, localStorage.selectedSubTemplate, text);
+						}
+						
+					}
+
+				}
+			});
+			
+		}
+	</script>
 	<!--[if lt IE 8]>
   		<div style='text-align:center'><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx?ocid=ie6_countdown_bannercode"><img src="http://www.theie6countdown.com/img/upgrade.jpg"border="0"alt=""/></a></div>  
  	<![endif]-->
@@ -65,7 +101,7 @@
       -->
 </head>
 
-	<body>
+	<body onload="init();">
      <div class="spinner"></div> 
 <!-- header start -->
 <header>
@@ -95,20 +131,16 @@
         </div>
         
         <span id="responsiveFlag"></span>
-        <div class="block-slogan">
-              
-              
-            <p style="text-align:left; padding-top:20px;"><a href="#" class="btn btn-1">上傳圖片</a></p>
-          </div>
           <form id="form-search" action="search.php" method="GET" accept-charset="utf-8" >
            	  <div class="clearfix">
-                <textarea name="s" rows="3" onFocus="if(this.value =='' ) this.value=''" onBlur="if(this.value=='') this.value=''">輸入24個文字</textarea>
+                <textarea id="inputText" rows="3" onFocus="if(this.value =='' ) this.value=''" onBlur="if(this.value=='') this.value=''">請分三行，輸入24個文字</textarea>
            	  </div>
             </form>
             <div class="block-slogan">
-              
-              
-            <p style="text-align:left; padding-top:20px;"><a href="preview.html" class="btn btn-1">送出</a></p>
+            	
+            	<p style="text-align:left; padding-top:20px;">
+            		<button id="btnSend" class="btn btn-1">送出</button>
+            	</p>
           </div>
             </div>
         

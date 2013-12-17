@@ -36,6 +36,22 @@
 				
 	</script>
 
+	<!-- CUSTOM CODES -->
+	<script src="js/common.js"></script>
+	<script src="js/image_ugc.js"></script>
+	<script src="js/template.js"></script>
+
+	<script>
+		function init(){
+			var preview = $('#imgPreview');
+			preview.attr({src:localStorage.doohPreviewImageUrl});
+			
+			var btnUpload = $("#btnUpload");
+			btnUpload.click(function(){
+				template.uploadToServer();
+			});
+		}
+	</script>
 	<!--[if lt IE 8]>
   		<div style='text-align:center'><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx?ocid=ie6_countdown_bannercode"><img src="http://www.theie6countdown.com/img/upgrade.jpg"border="0"alt=""/></a></div>  
  	<![endif]-->
@@ -65,7 +81,7 @@
       -->
 </head>
 
-	<body>
+	<body onload="init()">
      <div class="spinner"></div> 
 <!-- header start -->
 <header>
@@ -76,7 +92,7 @@
               <div class="container">
             <h1 class="brand brand_"><a href="index.html"><img alt="" src="img/logo.png"> </a></h1>
 
-            <div class="nav-collapse nav-collapse_  collapse"></div>
+            <div class="nav-collapse nav-collapse_collapse"></div>
           </div>
             </div>
       </div>
@@ -89,7 +105,7 @@
           <div class="span12"> 
         <!-- slider -->
         <div class="slide">
-        <img src="img/preview.jpg">
+        <img id="imgPreview" src="img/preview.jpg">
         </div>
         
         <span id="responsiveFlag"></span>
@@ -98,7 +114,10 @@
               <div>
             <p>(1)送出後我們會經由您的facebook，發送播放通知。<br>
               (2)我們會將您的播放內容利用攝影機拍攝下來，傳送到您的facebook!</p>
-            <p style="text-align:right; padding-top:20px;"><a href="#" class="btn btn-1">送出!</a></p>
+              
+            <p style="text-align:right; padding-top:20px;">
+	            <button id="btnUpload" class="btn btn-1">送出！</button>
+            </p>
           </div>
             </div>
       </div>

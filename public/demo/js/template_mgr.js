@@ -127,7 +127,7 @@ TemplateMgr = (function(){
 								callback(errorThrown);
 							}						
 					};
-					$.ajax(_this.path+'template_list.json',settings);
+					$.ajax(_this.path+'template_list_wow.json',settings);
 				},
 				function(callback){
 					//read template_description.json of each template
@@ -241,7 +241,7 @@ TemplateMgr = (function(){
 		async.series([
             function(callback){
                 //load local templates
-                localTemplateGroup = new TemplateGroup(starServerURL + '/webapp/template/', false);
+                localTemplateGroup = new TemplateGroup(serverUrl + '/template/', false);
                 localTemplateGroup.load(function(err){
                     if (!err){
                         callback(null);
@@ -253,7 +253,7 @@ TemplateMgr = (function(){
             },
             function(callback){
                 //load remote templates
-                remoteTemplateGroup = new TemplateGroup(starServerURL+'/webapp/template/', true);
+                remoteTemplateGroup = new TemplateGroup(serverUrl + '/template/', true);
                 remoteTemplateGroup.load(function(err){
                     callback(null);
                 });

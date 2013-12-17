@@ -47,94 +47,99 @@ ugcUtility.drawFbNameText = function(context, text, x, y, maxWidth, lineHeight, 
 };
 
 ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight, angle, fontColor, font) {
-    x = Number(x);
-    y = Number(y);
-    maxWidth = Number(maxWidth);
-    lineHeight = Number(lineHeight);
-    angle = Number(angle);
-    
-    var cursorX = 0;
-    var cursorY = 0;
-    var words = text; //In Chinese, a character is a word..
-    var line = '';
-    
-    context.save();
-    context.translate(x,y);
-    context.rotate(angle*Math.PI/180);
-    if (font){
-       // context.font = font;
-    context.font = '36px 華康歐陽詢體W5';
-    }
-    else {
-      // context.font = '36px';
-         context.font = '36px 華康歐陽詢體W5';
-    }
-    
-    for(var n = 0; n < words.length; n++) {
-        var testLine = line + words[n];
-        var metrics = context.measureText(testLine);
-        var testWidth = metrics.width;
-        
-        
-        if(FmMobile.selectedTemplate=="check_idn"){
-            if (testWidth > maxWidth && n > 0) {
-                //context.textAlign="center";
+	   x = Number(x);
+	    y = Number(y);
+	    maxWidth = Number(maxWidth);
+	    lineHeight = Number(lineHeight);
+	    angle = Number(angle);
+	    
+	    var cursorX = 0;
+	    var cursorY = 0;
+	    var words = text; //In Chinese, a character is a word..
+	    var line = '';
+	    var lineCount=1;
+	    
+	    context.save();
+	    context.translate(x,y);
+	    context.rotate(angle*Math.PI/180);
+	    if (font){
+	        //context.font = font;
+	    //context.font = '36px 華康歐陽詢體W5';
+	        context.font = '25pt 華康歐陽詢體W5';
+	    }
+	    else {
+	      // context.font = '36px';
+	         //context.font = '36px 華康歐陽詢體W5';
+	        context.font = '25pt 華康歐陽詢體W5';
+	        
+	    }
+	    
+	    for(var n = 0; n < words.length; n++) {
+	        var testLine = line + words[n];
+	        var metrics = context.measureText(testLine);
+	        var testWidth = metrics.width;
+	        
+	        if(true){
+	            if (testWidth > maxWidth && n > 0) {
+	                //line=line.replace("#","");
 
-                context.fillText(line, cursorX, cursorY);
-                line = words[n];
-                cursorY += lineHeight;
-            }
-            else {
-                line = testLine;
-            }
-        }else{
-            if(true) {
-                line = testLine;
-                var changePerLine=testLine.split("<n>");
-                if(changePerLine.length>1){
-                    for(var i=0;i<changePerLine.length;i++){
-                        line=changePerLine[i];
-                        if(FmMobile.selectedTemplate=="check_in"){
-                            context.textAlign="center";
-                            context.fillText(line, cursorX+228, cursorY);
+	                console.log(testLine);
+	                
+	                if(lineCount>3){
+	                    console.log("-----text errrrer------");
+	                }else{
+	                    context.fillText(line, cursorX, cursorY);
+	                }
+	                
+	                line = words[n];
+	                if(line.search("#") != -1){
+	                }else{
+	                    cursorY += lineHeight;
+	                }
+	                
+	                if(line.search("#") != -1){
+	                }else{
+	                    lineCount++;
+	                }
 
-                        }else{
-                             
-                        context.fillText(line, cursorX, cursorY);
-                        }
-                       
-                    }
-                    cursorY += lineHeight;
-                }else{
-                    line = testLine;
-                }
-            }
-        }
-        //var changePerLine=testLine.split("<n>");
-        //&& changePerLine.length<1
-        /*
-        if (testWidth > maxWidth && n > 0  ) {
-            context.fillText(line, cursorX, cursorY);
-            line = words[n];
-            cursorY += lineHeight;
-        }else
-         */
-        // ctx.fillText("textAlign=center",300,120);
-        context.fillStyle = fontColor;
-    }
-    
-    
-    if(FmMobile.selectedTemplate=="check_in"){
-        //context.textAlign="center";
-        context.fillText(line, cursorX+228, cursorY);
-        
-    }else{
-        
-        context.fillText(line, cursorX, cursorY);
-    }
-    
-    
-    context.restore();
+	                console.log("alineCount:"+lineCount);
+
+	            }
+	            else {
+	                console.log("------"+testLine);
+	                if(testLine.search("#") != -1){
+	                    line=line.replace("#","");
+	                    
+	                    if(lineCount>3){
+	                        console.log("-----text errrrer------");
+	                    }else{
+	                        context.fillText(line, cursorX, cursorY);
+	                    }
+	                    
+	                    line = words[n];
+	                    cursorY += lineHeight;
+	                    lineCount++;
+	                    line=line.replace("#","");
+
+	                    console.log("blineCount:"+lineCount);
+	                    
+	                }else{
+	                    line = testLine;
+	                }
+
+	            }
+	        }
+	        
+	        context.fillStyle = fontColor;
+	    }
+	    
+	    if(lineCount>3){
+	        console.log("-----text errrrer------");
+	    }else{
+	        context.fillText(line, cursorX, cursorY);
+	    }
+
+	    context.restore();
 };
 
 ugcUtility.drawImage = function(context, imageUrl, x, y, width, height, angle, cbOfDrawImage, alpha){
