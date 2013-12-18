@@ -48,28 +48,50 @@
 	<script>
 		function init(){
 			var btnSend = $('#btnSend');
+			var btnWowPicText = $("#wow_pic_text");
+			var btnChoosePic = $("#chossePic");
+			localStorage.selectedTemplate = "wow_pic_text";
+			localStorage.selectedSubTemplate = "picture_plus_text";
+			
+			btnChoosePic.click(function(){
+				btnWowPicText.click();
+			});
+			
+			btnWowPicText.click(function(){
+				document.getElementById('wow_pic_text').addEventListener('change', template.handleFileSelected, true);
+			});
+			
 			btnSend.click(function(){
 				var $text = $("#inputText");
-				var text = $text.val();
-				console.log(text);
+				var text = $text.val().replace(/\n/g,"<n>").split("<n>");
+				//console.log(text);
 				if(text == '' || text.length==0){
 					alert("您沒有輸入任何的文字。");
 				}else{
-					var check_format = text.replace(/\<n\>/ig,"\n");
+					var check_format = text.length;
 					if(check_format > 3){
 						alert("請勿輸入超過三行！");
 					}else{
-						if((check_format[0].length > 8) || (check_format[1].length > 8) || (check_format[2].length >8)){
-							alert("一行最多輸入8個字");
-						}else{
-							template.genImage(localStorage.selectedTemplate, localStorage.selectedSubTemplate, text);
-						}
-						
+							for(var i = 0 ; i < check_format; i++){
+								if(!check(text[i])){
+									alert("一行最多輸入8個字");
+									break;
+								}
+								if(i == check_format -1){
+									template.genImage(localStorage.selectedTemplate, localStorage.selectedSubTemplate, text);
+								}
+							}
 					}
 
 				}
 			});
 			
+		}
+		function check(words){
+			if(words.length > 8)
+				return false;
+			else
+				return true;
 		}
 	</script>
 	<!--[if lt IE 8]>
@@ -131,14 +153,22 @@
         </div>
         
         <span id="responsiveFlag"></span>
+        <div class="block-slogan">
+        	<p style="text-align:left; padding-top:20px;">
+            	<button id="chossePic" class="btn btn-1">選擇圖片</button>
+           	</p>
+		</div>
           <form id="form-search" action="search.php" method="GET" accept-charset="utf-8" >
            	  <div class="clearfix">
                 <textarea id="inputText" rows="3" onFocus="if(this.value =='' ) this.value=''" onBlur="if(this.value=='') this.value=''">請分三行，輸入24個文字</textarea>
            	  </div>
             </form>
             <div class="block-slogan">
-            	
-            	<p style="text-align:left; padding-top:20px;">
+			<p style="height:0px;overflow:hidden">
+				<input id="wow_pic_text" type="file" accept=".jpg" alt=" "/>
+           	</p>
+
+			<p style="text-align:left; padding-top:20px;">
             		<button id="btnSend" class="btn btn-1">送出</button>
             	</p>
           </div>

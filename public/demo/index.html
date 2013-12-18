@@ -37,10 +37,16 @@
      jQuery('.magnifier').touchTouch();			
     jQuery('.spinner').animate({'opacity':0},1000,'easeOutCubic',function (){jQuery(this).css('display','none')});	
   		  }); 
-				
+		
+		//$("span[class^='trigger']").hide();
 	</script>
 	<!-- CUSTOM CODE -->
 	<script src="js/common.js"></script>
+	<script>
+		function init(){
+			$("#panel").hide();
+		}
+	</script>
 
 
 	<!--[if lt IE 8]>
@@ -72,7 +78,7 @@
       -->
 </head>
 
-	<body>
+	<body onload="init();">
      <div class="spinner"></div> 
 <!-- header start -->
 <header>

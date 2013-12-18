@@ -15,8 +15,7 @@ template.choosePicFile = function(){
 
 /** Choose photo and text template */
 template.choosePicTextFile = function(){
-	localStorage.selectedTemplate = "wow_pic_text";
-	localStorage.selectedSubTemplate = "picture_plus_text";
+
 	window.location = serverUrl + "/upload_text.html";
 	
 };
@@ -35,15 +34,15 @@ template.handleFileSelected = function(event){
 				})(files[0]);
 	            //Read in the image file as a data URL.
 	reader.readAsDataURL(files[0]);
-	if(localStorage.selectedPhoto == undefined){
-		alert("請重新選擇圖片。");
-	}
+//	if(localStorage.selectedPhoto == undefined){
+//		alert("請重新選擇圖片。");
+//	}
 	
 };
 
 /** Start to generate Image */
 template.genImage = function(selectedTemplate, selectedSubTemplate, text){
-	console.log("[template.genImage]");
+//	console.log("[template.genImage]");
 	var userContent = {
 			text: text,
 			picture: {
@@ -58,8 +57,8 @@ template.genImage = function(selectedTemplate, selectedSubTemplate, text){
 	    
 			}
 	};
-	console.log("userContent: ");
-	console.dir(userContent);
+//	console.log("userContent: ");
+//	console.dir(userContent);
 	localStorage.longImageUrl = null;
 	localStorage.doohPreviewImageUrl = null;
 	//wow_pic, wow_pic_text 
@@ -71,7 +70,7 @@ template.genImage = function(selectedTemplate, selectedSubTemplate, text){
             localStorage.customizableObjects = imageUgcInstance.getCustomizableObjects();
             window.location = remotesite + "/preview.html";
          }else{
-        	 console.log(err);
+        	 alert(err);
          }
 	});
 	

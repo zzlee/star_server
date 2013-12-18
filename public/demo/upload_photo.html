@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-	<title>Codester | Home</title>
+	<title>Demo | Select Template</title>
 	<meta charset="utf-8">
 	<link rel="icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon">
     <link rel="shortcut icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon" />
@@ -35,7 +35,44 @@
   		  }); 
 				
 	</script>
-
+	
+	<!-- CUSTOM CODE -->
+	<script src="js/async.js"></script>
+	<script src="js/common.js"></script>
+	<script src="js/template.js"></script>
+	<script src="js/image_ugc.js"></script>
+	<script src="js/template_mgr.js"></script>
+	<script src="js/ugc_utility.js"></script>
+	<script src="js/dooh_info.js"></script>
+	<script src="js/dooh_preview.js"></script>
+	
+	<script src="http://connect.facebook.net/zh_TW/all.js"></script>
+	
+	<script>
+		function init(){
+			var btnChoosePhoto = $("#chossePic");
+			var btnSubmit = $('#btnSubmit');
+			var btnWowPic = $("#wow_pic");
+			//var selectedPhoto = $("#selectedPhoto");
+			
+			
+			btnChoosePhoto.click(function(){
+				btnWowPic.click();
+			});
+			
+			btnWowPic.click(function(){
+				document.getElementById('wow_pic').addEventListener('change', template.handleFileSelected, true);
+				//console.log(localStorage.selectedPhoto);
+				//selectedPhoto.css("src", localStorage.selectedPhoto);
+			});
+			
+			btnSubmit.click(function(){
+				template.choosePicFile();
+			});
+			
+		}
+	</script>
+	
 	<!--[if lt IE 8]>
   		<div style='text-align:center'><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx?ocid=ie6_countdown_bannercode"><img src="http://www.theie6countdown.com/img/upgrade.jpg"border="0"alt=""/></a></div>  
  	<![endif]-->
@@ -49,7 +86,7 @@
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'>
   <![endif]-->
   
-  <!--Google analytics code-->	  
+  <!--Google analytics code	  
 	  <script type="text/javascript">
            var _gaq = _gaq || [];
           _gaq.push(['_setAccount', 'UA-29231762-1']);
@@ -62,9 +99,10 @@
             var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
           })();
       </script>
+      -->
 </head>
 
-	<body>
+	<body onload="init();">
      <div class="spinner"></div> 
 <!-- header start -->
 <header>
@@ -74,7 +112,6 @@
         <div class="navbar navbar_">
               <div class="container">
             <h1 class="brand brand_"><a href="index.html"><img alt="" src="img/logo.png"> </a></h1>
-
             <div class="nav-collapse nav-collapse_  collapse"></div>
           </div>
             </div>
@@ -86,20 +123,24 @@
       <div class="container">
     <div class="row">
           <div class="span12"> 
+          <h3>版型一</h3>
         <!-- slider -->
         <div class="slide">
-        <img src="img/preview.jpg">
+        	<img src="img/t1.jpg">
         </div>
         
         <span id="responsiveFlag"></span>
         <div class="block-slogan">
-              <h2>模擬完成!</h2>
-              <div>
-            <p>(1)送出後我們會經由您的facebook，發送播放通知。<br>
-              (2)我們會將您的播放內容利用攝影機拍攝下來，傳送到您的facebook!</p>
-            <p style="text-align:right; padding-top:20px;"><a href="#" class="btn btn-1">送出!</a></p>
+            <p style="height:0px;overflow:hidden">
+				<input id="wow_pic" type="file" accept=".jpg" alt=" "/>
+           	</p>
+			<p style="text-align:right; padding-top:20px;">
+            	<button id="chossePic" class="btn btn-1">選擇圖片</button>
+            <p style="text-align:right; padding-top:20px;">
+            	<button id="btnSubmit" class="btn btn-1">上傳圖片</button>
+            </p>
           </div>
-            </div>
+          </div>
       </div>
         </div>
   </div>
@@ -124,6 +165,6 @@
     <div class="privacy pull-left">&copy; 2013 | <a href="http://www.dzyngiri.com">Dzyngiri : Online Design Magazine</a> |</div>
   </div>
     </footer>
-<script type="text/javascript" src="js/bootstrap.js"></script>
+	<script type="text/javascript" src="js/bootstrap.js"></script>
 </body>
 </html>
