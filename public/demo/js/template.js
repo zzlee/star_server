@@ -6,7 +6,6 @@ var url = domainUrl;
 
 /** Choose one image template */
 template.choosePicFile = function(){
-//	console.log("[template.choosePicFile]");
 	localStorage.selectedTemplate = "wow_pic";
 	localStorage.selectedSubTemplate = "picture_only";
 	localStorage.text = "";
@@ -19,28 +18,24 @@ template.choosePicTextFile = function(){
 	localStorage.selectedTemplate = "wow_pic_text";
 	localStorage.selectedSubTemplate = "picture_plus_text";
 	window.location = serverUrl + "/upload_text.html";
-//	$("#wow_pic_text").click(function(){
-//		document.getElementById('wow_pic_text').addEventListener('change', template.handleFileSelected, true);	
-//	});
 	
 };
 
 /** To catch photo selected from your local system. */
 template.handleFileSelected = function(event){
-	console.log("[template.handleFileSelected]");
 	var files = event.target.files; // FileList object
 	var reader = new FileReader();
 	// Closure to capture the file information.
 	reader.onload = (function(theFile) {
 	         			return function(e) {
 	            		// Render thumbnail.
-	            		console.log("selected photo : " + e.target.result);
+//	            		console.log("selected photo : " + e.target.result);
 	            		localStorage.setItem('selectedPhoto', e.target.result);
 	         			};
 				})(files[0]);
 	            //Read in the image file as a data URL.
 	reader.readAsDataURL(files[0]);
-	if(localStorage.selectedPhoto != undefined){
+	if(localStorage.selectedPhoto == undefined){
 		alert("請重新選擇圖片。");
 	}
 	
@@ -95,29 +90,80 @@ template.uploadToServer = function(){
     var ugcProjectId = localStorage.selectedTemplate +'-'+ ugcInfo.ownerId._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
     var reultURI = localStorage.longImageUrl.replace('image/octet-stream');
     var doohPreviewResultURI = localStorage.doohPreviewImageUrl.replace('image/octet-stream');
-	
-    //upload result image UGC to server
-    $.ajax( url+"/miix/base64_image_ugcs/" + ugcProjectId, {
-        type: "PUT",
-        data: {
-            imgBase64: reultURI,
-            imgDoohPreviewBase64: doohPreviewResultURI,
-            ownerId: ugcInfo.ownerId._id,
-            ownerFbUserId: ugcInfo.ownerId.fbUserId,
-            contentGenre: "mood",
-            title: ugcInfo.title,
-            customizableObjects: localStorage.customizableObjects,
-            miixToken: localStorage.miixToken,
-            time: (new Date()).getTime()
-        },
-        success: function(data, textStatus, jqXHR ){
-            console.log("Successfully upload result image UGC to server.");
-//            callback(null);
-        },
-        error: function(jqXHR, textStatus, errorThrown){
-            console.log("Failed to upload image UGC to server: "+errorThrown);
-//            callback("Failed to upload image UGC to server: "+errorThrown);
-        }
-    });
-	
-}
+    
+    async.series([
+                  function(callback){
+                	  //upload result image UGC to server
+                	    $.ajax( url+"/miix/base64_image_ugcs/" + ugcProjectId, {
+                	        type: "PUT",
+                	        data: {
+                	            imgBase64: reultURI,
+                	            imgDoohPreviewBase64: doohPreviewResultURI,
+                	            ownerId: ugcInfo.ownerId._id,
+                	            ownerFbUserId: ugcInfo.ownerId.fbUserId,
+                	            contentGenre: "mood",
+                	            title: ugcInfo.title,
+                	            customizableObjects: localStorage.customizableObjects,
+                	            miixToken: localStorage.miixToken,
+                	            time: (new Date()).getTime()
+                	        },
+                	        success: function(data, textStatus, jqXHR ){
+                	            callback(null);
+                	        },
+                	        error: function(jqXHR, textStatus, errorThrown){
+                	            callback("Failed to upload image UGC to server: "+errorThrown);
+                	        }
+                	    });
+                  },
+                  function(callback){
+	                  var settings_push_after_confirm = {
+	                          type: "PUT",
+	                          cache: false,
+	                          asycn:false,
+	                          data:{ 
+	                              miixToken: localStorage.miixToken,
+	                              vjson: {
+	                                  read: true
+	                              }
+	                          },
+	                          success: function(data, textStatus, jqXHR ){
+	                        	  //Do nothing
+	                          },
+	                          error: function(jqXHR, textStatus, errorThrown){
+	                        	  //Do Nothing
+	                          }                       
+	                  };
+	                  var settings_push_center = {
+	                          type: "GET",
+	                          cache: false,
+	                          data:{ miixToken: localStorage.miixToken },
+	                          success: function(data, textStatus, jqXHR ){
+	                              var iterator = function(aPush){
+                                      alert(aPush.content.substring(0,14) + "排定時段後，你會收到facebook預告，通知播出日期時間。");
+                                      //Let DB know user read the msg
+                                      $.ajax(url + "/miix/message/" + aPush._id ,settings_push_after_confirm);
+	                              };
+	                              async.eachSeries(data, iterator, function(err, results){
+	                                  if (!err){
+	                                      callback(null);
+	                                  }
+	                                  else {
+	                                	  callback('Failed to change the read value of db to true: '+err);
+	                                  }
+	                              });
+	                          },
+	                          error: function(jqXHR, textStatus, errorThrown){
+	                              callback("settings_push_center " + errorThrown);
+	                          }                       
+	                  };
+	                  
+	                  $.ajax(url + "/miix/members/" + localStorage._id + "/message", settings_push_center);
+                  }],
+                  function(err){
+    					if(err){
+    						alert(err);
+    					}
+    	
+    			});//end of async.series
+   
+};

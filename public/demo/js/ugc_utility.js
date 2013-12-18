@@ -83,10 +83,10 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
 	            if (testWidth > maxWidth && n > 0) {
 	                //line=line.replace("#","");
 
-	                console.log(testLine);
+//	                console.log(testLine);
 	                
 	                if(lineCount>3){
-	                    console.log("-----text errrrer------");
+//	                    console.log("-----text errrrer------");
 	                }else{
 	                    context.fillText(line, cursorX, cursorY);
 	                }
@@ -111,7 +111,7 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
 	                    line=line.replace("#","");
 	                    
 	                    if(lineCount>3){
-	                        console.log("-----text errrrer------");
+//	                        console.log("-----text errrrer------");
 	                    }else{
 	                        context.fillText(line, cursorX, cursorY);
 	                    }
@@ -121,7 +121,7 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
 	                    lineCount++;
 	                    line=line.replace("#","");
 
-	                    console.log("blineCount:"+lineCount);
+//	                    console.log("blineCount:"+lineCount);
 	                    
 	                }else{
 	                    line = testLine;
@@ -134,7 +134,7 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
 	    }
 	    
 	    if(lineCount>3){
-	        console.log("-----text errrrer------");
+//	        console.log("-----text errrrer------");
 	    }else{
 	        context.fillText(line, cursorX, cursorY);
 	    }
