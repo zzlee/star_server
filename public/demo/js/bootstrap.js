@@ -2029,14 +2029,18 @@
 /* panel */
 $(document).ready(function(){
 $('head').prepend('<link rel="stylesheet" href="css/docs.css" type="text/css" media="screen">');
-$('body').prepend('<div id="panel"><div class="navbar navbar-inverse navbar-fixed-top" id="advanced"><span class="trigger"><strong></strong><em></em></span><div class="navbar-inner"><div class="container"><button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-top-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><div class="nav-collapse collapse nav-top-collapse"><ul class="nav"><li class=""><img id="profile" src="img/img-profile.jpg" class="img-profile"/></li><li class=""><div id="name"></div><li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">TM add-ons <b class="caret"></b></a><ul class="dropdown-menu"><li><a href="404.html">logout</a><ul></ul></li></ul></li></ul></div></div></div></div></div>');
+$('body').prepend('<div id="panel"><div class="navbar navbar-inverse navbar-fixed-top" id="advanced"><span class="trigger"><strong></strong><em></em></span><div class="navbar-inner"><div class="container"><button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-top-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><div class="nav-collapse collapse nav-top-collapse"><ul class="nav"><img id="profile" src="" class="img-profile" /><li class=""><li class="dropdown"><a id="name"href="#" class="dropdown-toggle" data-toggle="dropdown">TM add-ons <b class="caret"></b></a><ul class="dropdown-menu"><li><a id="LogOut">Log Out</a></ul></div></div></div></div></div>');
 }); 
  $(window).scroll(function(){if ($(this).scrollTop() > 0) {$("#advanced").css({position:'fixed'});} else {$("#advanced").css({position:'relative'});}});  
 $(function(){  
     $.cookie("panel");  
   $.cookie("panel2"); 
-  $("#profile").attr({src: localStorage.profilePhoto, style: "width:5%;height:5%"});
+  $("#profile").attr({src: localStorage.profilePhoto});
   $("#name").html(localStorage.name);
+  $("#LogOut").click(function(){
+	 localStorage.clear();
+	 alert('您已經成功登出！');
+  });
   var strCookies = $.cookie("panel");	
   var strCookies2 = $.cookie("panel2");
   if(strCookies=='boo')
