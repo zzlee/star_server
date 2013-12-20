@@ -57,8 +57,8 @@ template.genImage = function(selectedTemplate, selectedSubTemplate, text){
 	    
 			}
 	};
-//	console.log("userContent: ");
-//	console.dir(userContent);
+	console.log("userContent: ");
+	console.dir(userContent);
 	localStorage.longImageUrl = null;
 	localStorage.doohPreviewImageUrl = null;
 	//wow_pic, wow_pic_text 
@@ -107,6 +107,7 @@ template.uploadToServer = function(){
                 	            time: (new Date()).getTime()
                 	        },
                 	        success: function(data, textStatus, jqXHR ){
+                	        	console.log("Upload result image UGC to server");
                 	            callback(null);
                 	        },
                 	        error: function(jqXHR, textStatus, errorThrown){
@@ -138,12 +139,14 @@ template.uploadToServer = function(){
 	                          data:{ miixToken: localStorage.miixToken },
 	                          success: function(data, textStatus, jqXHR ){
 	                              var iterator = function(aPush){
+//	                            	  console.log('push msg: ' + aPush.content);
                                       alert(aPush.content.substring(0,14) + "排定時段後，你會收到facebook預告，通知播出日期時間。");
                                       //Let DB know user read the msg
                                       $.ajax(url + "/miix/message/" + aPush._id ,settings_push_after_confirm);
 	                              };
 	                              async.eachSeries(data, iterator, function(err, results){
 	                                  if (!err){
+//	                                	  console.log("async.eachSeries no error");
 	                                      callback(null);
 	                                  }
 	                                  else {

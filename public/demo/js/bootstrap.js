@@ -2040,6 +2040,7 @@ $(function(){
   $("#LogOut").click(function(){
 	 localStorage.clear();
 	 alert('您已經成功登出！');
+	 window.location = serverUrl + "/index.html";
   });
   var strCookies = $.cookie("panel");	
   var strCookies2 = $.cookie("panel2");

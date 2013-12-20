@@ -104,7 +104,7 @@
     width: 1170px;
   }
   .span12 {
-    width: 1170px;
+    width: 100%;
   }
   .span11 {
     width: 1070px;
@@ -426,7 +426,7 @@
     width: 724px;
   }
   .span12 {
-    width: 724px;
+    width: 100%;
   }
   .span11 {
     width: 662px;
