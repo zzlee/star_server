@@ -14,11 +14,11 @@ template.choosePicFile = function(){
 };
 
 /** Choose photo and text template */
-template.choosePicTextFile = function(){
-
-	window.location = serverUrl + "/upload_text.html";
-	
-};
+//template.choosePicTextFile = function(){
+//
+//	window.location = serverUrl + "/upload_text.html";
+//	
+//};
 
 /** To catch photo selected from your local system. */
 template.handleFileSelected = function(event){
@@ -57,8 +57,8 @@ template.genImage = function(selectedTemplate, selectedSubTemplate, text){
 	    
 			}
 	};
-	console.log("userContent: ");
-	console.dir(userContent);
+//	console.log("userContent: ");
+//	console.dir(userContent);
 	localStorage.longImageUrl = null;
 	localStorage.doohPreviewImageUrl = null;
 	//wow_pic, wow_pic_text 

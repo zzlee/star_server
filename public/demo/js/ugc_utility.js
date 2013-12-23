@@ -102,7 +102,7 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
 	                    lineCount++;
 	                }
 
-	                console.log("alineCount:"+lineCount);
+//	                console.log("alineCount:"+lineCount);
 
 	            }
 	            else {
@@ -121,7 +121,7 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
 	                    lineCount++;
 //	                    line=line.replace("#","");
 
-	                    console.log("blineCount:"+lineCount);
+//	                    console.log("blineCount:"+lineCount);
 	                    
 	                }else{
 	                    line = testLine;

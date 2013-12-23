@@ -1,5 +1,6 @@
 var ConnectFacebook = {};
-var remoteUrl = "http://jean.ondascreen.com/demo";
+//domainUrl;
+//var remoteUrl = serverUrl;
 var accessToken = null;
 var expiresIn = null;
 var userID = null;
@@ -56,7 +57,7 @@ ConnectFacebook.logIn = function(){
 
 	            	  		localStorage.fbId = userID;
 	            	  		localStorage.name = response.name;
-	            	  		var url = "http://jean.ondascreen.com" + "/members/fb_info";
+	            	  		var url = domainUrl + "/members/fb_info";
 	            			$.post(url, data, function(response){
 	            				if(response.data){
 	            					localStorage._id = response.data._id;
@@ -72,7 +73,7 @@ ConnectFacebook.logIn = function(){
 	              },
 	              function(callback){
 	            	  //Get user's fb profile photo
-	            	  var url = "http://jean.ondascreen.com/members/" + localStorage.fbId + "/thumbnail";
+	            	  var url = domainUrl + "/members/" + localStorage.fbId + "/thumbnail";
 	            	  $.ajax({
 	      					type : 'GET',
 	      					url : url,
@@ -80,7 +81,7 @@ ConnectFacebook.logIn = function(){
 	      					success : function(res){
 	      						if(res){
 	      							localStorage.profilePhoto = res;
-	      							window.location = remoteUrl + "/template.html";
+	      							window.location = serverUrl + "/template.html";
 	      							callback(null);
 	      						}else{
 	      							callback("Get facebook data failed");
