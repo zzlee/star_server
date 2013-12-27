@@ -45,20 +45,63 @@
 	<script src="js/ugc_utility.js"></script>
 	<script src="js/dooh_info.js"></script>
 	<script src="js/dooh_preview.js"></script>
+	<script src="js/load-image.min.js"></script>
 	
-	<script src="http://connect.facebook.net/zh_TW/all.js"></script>
 	
 	<script>
 		function init(){
-
-			var btnChoosePhoto = $("#templatePic");
+			var btnChoosePhoto = $("#chossePic");
+			var btnSubmit = $('#btnSubmit');
+			var btnWowPic = $("#wow_pic");
+			
+			//var selectedPhoto = $("#selectedPhoto");
+//			$('input[type="file"]').change(function(){
+//		        var file = this.files[0];
+//		        console.dir(this.files);
+//       		$("#test").append('Filename : ' + file.name + '<br />Filesize : ' + file.size);
+//			});
+			
+			
 			btnChoosePhoto.click(function(){
-				window.location = serverUrl + "/upload_photo.html";
+				btnWowPic.click();
 			});
 			
-			var btnChoosePhotoText = $("#templatePicText");
-			btnChoosePhotoText.click(function(){
-				window.location = serverUrl + "/upload_text.html";
+			btnWowPic.click(function(){
+				//document.getElementById('wow_pic').addEventListener('change', template.handleFileSelected, true);
+				//console.log(localStorage.selectedPhoto);
+				//selectedPhoto.css("src", localStorage.selectedPhoto);			
+				
+				/*
+				$('input[type="file"]').change(function(e){
+					
+			        var file = this.files[0];
+			        //console.dir(this.files);
+	        		$("#test").append('Filename : ' + file.name + '<br />Filesize : ' + file.size);
+					var reader = new FileReader();
+					reader.readAsDataURL(file);
+					reader.onloadend = function(){
+
+				        //$("html").css("background-image", "url(" + this.result + ")");
+						console.log(this.result);
+						alert(this.result);
+				    }
+					
+
+					
+				});
+				*/
+			});
+			
+			btnSubmit.click(function(){
+				//template.choosePicFile();
+				$("form").submit(function(e){
+					$.ajax({
+						url: domainUrl + "/miix/videos/user_content_files",
+						type: "PUT",
+						formData: new FormData(this),
+						success:function(data,)
+					})
+				});
 			});
 			
 		}
@@ -117,33 +160,30 @@
           <h3>版型一</h3>
         <!-- slider -->
         <div class="slide">
-        <img src="img/t1.jpg">
+        	<img src="img/t1.jpg">
         </div>
         
         <span id="responsiveFlag"></span>
         <div class="block-slogan">
+            <!--  <p style="height:0px;overflow:hidden"> -->
+            <p>
+            	<!-- If let user only chosse CAMERA just use next line to do.-->
+				<!-- <input id="wow_pic" type="file" accept="image/*" capture="camera"/> -->
+				<div id="test" style="color:#FFF"></div>
+				<!--  <input type="file" accept="image/*"/>-->
+				<form action="/index.html" method="post">
+					<input id="wow_pic" type="file" accept="image/*" />
+					<input type="submit"/>
+				</form>
+				<img id="show" src="">
+           	</p>
+			<p style="text-align:right; padding-top:20px;">
+            	<button id="chossePic" class="btn btn-1">選擇圖片</button>
             <p style="text-align:right; padding-top:20px;">
-            <button id="templatePic" class="btn btn-1">選擇版型</button>
+            	<button id="btnSubmit" class="btn btn-1">上傳圖片</button>
             </p>
           </div>
           </div>
-      </div>
-      <div class="row">
-        <div class="span12"> 
-          <h3>版型二</h3>
-        <!-- slider -->
-        <div class="slide">
-        <img src="img/t2.jpg">
-        </div>
-        
-        <span id="responsiveFlag"></span>
-        <div class="block-slogan">
-            <p style="text-align:right; padding-top:20px;">
-            <button id="templatePicText" class="btn btn-1" >選擇版型</button>
-            </p>
-          </div>
-          </div>
-        
       </div>
         </div>
   </div>
@@ -169,9 +209,5 @@
   </div>
     </footer>
 	<script type="text/javascript" src="js/bootstrap.js"></script>
-	<script>
-		
-		
-	</script>
 </body>
 </html>

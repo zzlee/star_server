@@ -45,31 +45,35 @@
 	<script src="js/ugc_utility.js"></script>
 	<script src="js/dooh_info.js"></script>
 	<script src="js/dooh_preview.js"></script>
-	
-	<script src="http://connect.facebook.net/zh_TW/all.js"></script>
+	<script src="js/jquery.form.js"></script>
 	
 	<script>
 		function init(){
 			var btnChoosePhoto = $("#chossePic");
 			var btnSubmit = $('#btnSubmit');
 			var btnWowPic = $("#wow_pic");
-			//var selectedPhoto = $("#selectedPhoto");
+			
+			var btnUpload = $("#upload");
 			
 			
 			btnChoosePhoto.click(function(){
 				btnWowPic.click();
 			});
 			
-			btnWowPic.click(function(){
-				document.getElementById('wow_pic').addEventListener('change', template.handleFileSelected, true);
-				//console.log(localStorage.selectedPhoto);
-				//selectedPhoto.css("src", localStorage.selectedPhoto);
-			});
-			
 			btnSubmit.click(function(){
-				template.choosePicFile();
-			});
+			    var ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
+				var form = $("#imgform");
+				$("#ugcId").attr("value", ugcProjectId);
+				$("#userId").attr("value", localStorage._id);
+				$("#fbId").attr("value", localStorage.fbId);
+				$("#contentGenre").attr("value", localStorage.selectedTemplate);
+				action = "/miix/ugcInfo/"; 
+				
+				form.attr("action", action);
+				btnUpload.click();
 			
+			});
+				
 		}
 	</script>
 	
@@ -131,9 +135,21 @@
         
         <span id="responsiveFlag"></span>
         <div class="block-slogan">
-            <p style="height:0px;overflow:hidden">
-				<input id="wow_pic" type="file" accept=".jpg" alt=" "/>
-           	</p>
+            <div style="height:0px;overflow:hidden"> 
+            <!--<div>-->
+            	<!-- If let user only chosse CAMERA just use next line to do.-->
+				<!-- <input id="wow_pic" type="file" accept="image/*" capture="camera"/> -->
+				<!--  <input type="file" accept="image/*"/>-->
+				 <form id="imgform" method="post" action="#" enctype="multipart/form-data">  
+				<!--	<form name="uploadFiles" id="imgform" method="post" action="/miix/video/user_content_files"> -->
+					<input name="file" id="wow_pic" type="file" accept="image/*" />
+					<input name="projectId" id="ugcId" type="hidden"/>
+					<input name="_id" id="userId" type="hidden" />
+					<input name="fbUserId" id="fbId" type="hidden" />
+					<input name="genre" id="contentGenre" type="hidden" />
+					<input name="filesSubmit" id="upload" type="submit"/>
+				</form>
+           	</div>
 			<p style="text-align:right; padding-top:20px;">
             	<button id="chossePic" class="btn btn-1">選擇圖片</button>
             <p style="text-align:right; padding-top:20px;">

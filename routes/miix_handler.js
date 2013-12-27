@@ -6,10 +6,14 @@ var miixHandler = {};
 
 var miixContentMgr = require('../miix_content_mgr.js');
 var ugc = require('../UGC.js');
+var path = require('path');
+var fs = require('fs');
+var workingPath = process.cwd();
 
 //PUT /miix/base64_image_ugcs/:ugcProjectId
 miixHandler.putBase64ImageUgcs_cb = function(req, res) {
     logger.info('[PUT '+req.path+'] is called');
+    console.dir(req);
     var timeOfBeingCalled = (new Date()).getTime();
     
     var customizableObjects = JSON.parse(req.body.customizableObjects);
@@ -242,5 +246,56 @@ miixHandler.updateMessage_cb = function(req, res) {
     
 };
 
+//POST /miix/ugcInfo
+miixHandler.saveTmpImage_cb = function(req, res){
+	logger.info('[POST ' + req.path + '] is called');
+	if(req.body_id){
+		var tempPath = req.files.file.path;
+		console.log(req.body.projectId);
+		
+		 var projectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectId);
+	     var userDataDir = path.join( projectDir, 'user_data');
+	     if ( !fs.existsSync(projectDir) ) {
+	         fs.mkdirSync( projectDir );  //TODO: check if this is expensive... 
+	     }
+	     if ( !fs.existsSync(userDataDir) ) {
+	         fs.mkdirSync( userDataDir );  //TODO: check if this is expensive... 
+	     }
+	     target_path = path.join( userDataDir, req.files.file.name);
+		 
+	    
+	     var moveFile = function( _tmp_path, _target_path, _moveFile_cb )  {
+	    	 var util = require('util');
+		            
+	    	 var is = fs.createReadStream(_tmp_path);
+	    	 var os = fs.createWriteStream(_target_path);
+		        
+	    	 util.pump(is, os, function(err) {
+		            if (!err) {
+		                fs.unlink(_tmp_path, function() {
+		                    if (!err) {
+		                        logger.info( 'Finished uploading to ' + _target_path );
+		                        
+		                        if ( _moveFile_cb ) {
+		                            _moveFile_cb();
+		                        }
+		                    }
+		                    else {
+		                        logger.info('Fail to delete temporary uploaded file: '+err);
+		                        res.send( {err:'Fail to delete temporary uploaded file: '+err});
+		                    }
+		                });
+		            }else {
+		                logger.info('Fail to do util.pump(): '+err);
+		                res.send( {err:'Fail to do util.pump(): '+err } );
+		            }
+	    	 });			
+	     };
+		    
+		 moveFile(tempPath, target_path);
+	}else{
+		res.send(400, {error: "Not all needed data are sent."});
+	}
+};
 
 module.exports = miixHandler;
