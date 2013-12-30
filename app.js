@@ -215,25 +215,32 @@ app.post('/miix/ugcInfo/', function(req,res){
 	                	  }
 	                	  //console.dir(content);
 	                	  canvasMgr.genLongPhoto(content, function(err, res){
-	                		  if(err) console.log(err);
+	                		  if(err) logger.info( 'Finished genImageUGC Failed.');
 	                		  if(!err) {
+	                			  logger.info( 'Stat generate UGCs.');
 	                			  callback(null);
 	                		  }
 	                	  });
 	                  }
 	                  ],function(err){
+	    				if(err){
+	    					logger.info('Failed to upload and gen UGCs');
+	    				}else{
+	    					logger.info( 'Send redirect html to client side. ');
+	    				    res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+	    				    res.write('<html>');
+	    				    res.write('<script>');
+	    				    res.write('function init(){' +
+	    				    			'setTimeout(' +
+	    				    				"window.location = 'http://jean.ondascreen.com/demo/preview.html',15000);" +
+	    				    			'}');
+	    				    res.write('</script>');
+	    				    res.write("<body onload='init();'><h4>圖片合成中，請稍候......</h4></body></html>");
+	    				    res.end();
+	    				}
 	    	
 	    });
-	    res.writeHead(200, "OK", {'Content-Type': 'text/html'});
-	    res.write('<html>');
-	    res.write('<script>');
-	    res.write('function init(){' +
-	    			'setTimeout(' +
-	    				"window.location = 'http://jean.ondascreen.com/demo/preview.html',15000);" +
-	    			'}');
-	    res.write('</script>');
-	    res.write("<body onload='init();'><h4>圖片合成中，請稍候......</h4></body></html>");
-	    res.end();
+
 //	    res.send({message:'Upload successfully'});
 	    
 	

@@ -47,6 +47,67 @@ miixHandler.putBase64ImageUgcs_cb = function(req, res) {
     }
     
 };
+//PUT /miix/base64_image_ugcs_from_web/:ugcProjectId
+miixHandler.putBase64ImageUgcsFromWeb_cb = function(req, res){
+	logger.info('[PUT '+req.path+'] is called');
+//  console.dir(req.body);
+	var timeOfBeingCalled = (new Date()).getTime();
+  
+	var customizableObjects = JSON.parse(req.body.customizableObjects);
+	if (req.body.imgBase64 && req.body.ownerId && req.body.ownerFbUserId){
+
+		var ugcInfo = {
+              ownerId:{_id:req.body.ownerId, fbUserId: req.body.ownerFbUserId },
+              contentGenre: req.body.contentGenre,
+              title: req.body.title,
+              customizableObjects: customizableObjects
+		};
+      
+		miixContentMgr.addMiixTempImage(req.body.imgBase64, req.body.imgDoohPreviewBase64,  req.params.ugcProjectId, ugcInfo, function(err){
+			if (!err){
+				var elapseTime = (new Date()).getTime() - timeOfBeingCalled;
+				logger.info('[PUT '+req.path+'] responded in '+elapseTime+' ms');
+				res.send(200);
+			}else {
+				logger.error('[PUT /miix/base64_image_ugcs_from_web/:ugcProjectId]: '+ err);
+				res.send(400, {error: err});
+			}
+		});
+	}else {
+		res.send(400, {error: "Not all needed data are sent."});
+	}
+};
+
+//PUT /miix/web/ugcs_info/:ugcProjectId
+miixHandler.putImageUgcsInfo_cb = function(req, res){
+	logger.info('[PUT '+req.path+'] is called');
+	var timeOfBeingCalled = (new Date()).getTime();
+	  
+	if (req.body.ownerId && req.body.ownerFbUserId){
+
+		var ugcInfo = {
+              ownerId:{_id:req.body.ownerId, fbUserId: req.body.ownerFbUserId },
+              contentGenre: req.body.contentGenre,
+              title: req.body.title,
+		};
+      
+		miixContentMgr.uploadMiixTempImage(req.params.ugcProjectId, ugcInfo, function(err){
+			if (!err){
+				var elapseTime = (new Date()).getTime() - timeOfBeingCalled;
+				logger.info('[PUT '+req.path+'] responded in '+elapseTime+' ms');
+				res.send(200);
+			}else {
+				logger.error('[PUT /miix/web/ugcs_info/:ugcProjectId]: '+ err);
+				res.send(400, {error: err});
+			}
+		});
+	}else {
+		res.send(400, {error: "Not all needed data are sent."});
+	}
+};
+
+
+
 
 //PUT /miix/video_ugcs/:ugcProjectId
 miixHandler.putVideoUgcs_cb = function(req, res) {

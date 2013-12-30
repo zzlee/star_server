@@ -54,7 +54,7 @@ ImageUgc = (function(){
                 async.series([
                     function(callback){
                         //upload result image UGC to server
-                        $.ajax("/miix/base64_image_ugcs/" + ugcProjectId, {
+                        $.ajax("/miix/web/base64_image_ugcs/" + ugcProjectId, {
                             type: "PUT",
                             data: {
                                 imgBase64: reultURI,
