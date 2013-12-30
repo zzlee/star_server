@@ -7,7 +7,6 @@
     <!-- LIBLARIES -->
     <script src="js//jquery.js"></script>
     <script src="js/async.js"></script>
-    <script src="./libs/json2.js"></script>
     <!-- CUSTOM INITIALIZATION CODE -->
     <script src="js/image_ugc.js"></script>
     <script src="js/template_mgr.js"></script>
@@ -92,20 +91,22 @@
 				        ImageUgc.getInstance(template, aryPara["subTemplate"], userContent, function(err, _imageUgc) {
 				            if (!err) {
 				                imageUgc = _imageUgc;
-				                $("#show").attr("src", imageUgc.getImageUrl());
+				                $("#longPhoto").attr("src", imageUgc.getImageUrl());
+				                $("#doohPreview").attr("src", imageUgc.getDoohPreviewImageUrl());
 				                //$("#preview").attr("src", imageUgc.getDoohPreviewImageUrl());
 								//Need to upload to server
 								
 								
 								var ugcInfo = {
 											ownerId : {
-                                        		_id : "5260a61b74b753c009000005",
-												fbUserId : aryPara["id"]
+                                        		_id : aryPara["id"],
+												fbUserId : aryPara["fbId"]
 												},
 											contentGenre : template,
-											title : "today's mood"
+											title : "today's mood",
+											projectId : aryPara["projectId"]
 									};
-								/*
+								
 								imageUgc.uploadToServer(ugcInfo, function(err){
 									if(!err){
 										console.log("[imageUgc.uploadToServer] Success");
@@ -114,7 +115,7 @@
 										console.log("[imageUgc.uploadToServer] Failed");
 									}
 								});
-								*/
+								
 				            }else {
 				                console.log(err);
 				            }
@@ -135,16 +136,15 @@
 		}
 	}
 	
-	function uploadToServer(){
-		
-	}
 	
 	</script>
         
 </head>
 <body onLoad="init()">
 	<p>Long photo:</p>
-	<img src="" id="show">
+	<img src="" id="longPhoto">
+	<p>Dooh Preview :</p>
+	<img src="" id="doohPreview">
 		<!-- 
 <p>Image to use:</p>
 <img id="scream" src="" alt="The Scream" width="150" height="150"><p>Canvas:</p>

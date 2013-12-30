@@ -13,7 +13,7 @@ var workingPath = process.cwd();
 //PUT /miix/base64_image_ugcs/:ugcProjectId
 miixHandler.putBase64ImageUgcs_cb = function(req, res) {
     logger.info('[PUT '+req.path+'] is called');
-    console.dir(req);
+    console.dir(req.body);
     var timeOfBeingCalled = (new Date()).getTime();
     
     var customizableObjects = JSON.parse(req.body.customizableObjects);

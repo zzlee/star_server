@@ -45,22 +45,23 @@ ImageUgc = (function(){
              * @param cbOfUploadToServer
              */
             uploadToServer:function(ugcInfo, cbOfUploadToServer){
-                var ugcProjectId = mainTemplateId +'-'+ ugcInfo.ownerId._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
+//                var ugcProjectId = mainTemplateId +'-'+ ugcInfo.ownerId._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
+            	var ugcProjectId = ugcInfo.projectId;
                 var reultURI = ugcCanvas.toDataURL('image/png').replace('image/octet-stream');
                 var doohPreviewResultURI = doohPreview.getPreviewImageUrl().replace('image/octet-stream');
-                var dataJsonFile = null;
+//                var dataJsonFile = null;
                 
                 async.series([
                     function(callback){
                         //upload result image UGC to server
-                        $.ajax( starServerURL+"/miix/base64_image_ugcs/"+ugcProjectId, {
+                        $.ajax("/miix/base64_image_ugcs/" + ugcProjectId, {
                             type: "PUT",
                             data: {
                                 imgBase64: reultURI,
                                 imgDoohPreviewBase64: doohPreviewResultURI,
                                 ownerId: ugcInfo.ownerId._id,
                                 ownerFbUserId: ugcInfo.ownerId.fbUserId,
-                                contentGenre: mainTemplateId,
+                                contentGenre: "mood",
                                 title: ugcInfo.title,
                                 customizableObjects: JSON.stringify(customizableObjects),
                                 miixToken: localStorage.miixToken,
