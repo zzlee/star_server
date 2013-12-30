@@ -61,29 +61,38 @@
 				document.getElementById('wow_pic_text').addEventListener('change', template.handleFileSelected, true);
 			});
 			
-			btnSend.click(function(){
-				var $text = $("#inputText");
-				var text = $text.val().replace(/\n/g,"<n>").split("<n>");
-				//console.log(text);
-				if(text == '' || text.length==0){
-					alert("您沒有輸入任何的文字。");
+			$("#inputText").focus(function(){
+				if(localStorage.template_userText){
+					var text = localStorage.template_userText.replace("#",/\n/g);
+					$("#inputText").val(text);
 				}else{
-					var check_format = text.length;
-					if(check_format > 3){
-						alert("請勿輸入超過三行！");
-					}else{
-							for(var i = 0 ; i < check_format; i++){
-								if(!check(text[i])){
-									alert("一行最多輸入8個字");
-									break;
-								}
-								if(i == check_format -1){
-									template.genImage(localStorage.selectedTemplate, localStorage.selectedSubTemplate, text);
-								}
-							}
-					}
-
+					$("#inputText").val('');
 				}
+			});
+			btnSend.click(function(){
+				var inputContent = $("#inputText").val().replace(/\n/g,"#");
+				console.log(inputContent);
+				
+				async.series([
+				              function(callback){
+				            	  insertSpace(inputContent, function(res){
+				            		  console.log(res);
+				            		  inputContent = res;
+				            		  localStorage.template_userText = res;
+				            		  callback(null, 'one');
+				            	  
+				            	  });
+				                  
+				              },
+				              function(callback){
+				                  callback(null, 'two');
+				              }
+				          ],
+				          function(err, results){
+								template.genImage(localStorage.selectedTemplate, localStorage.selectedSubTemplate, inputContent);
+				          });
+
+				
 			});
 			
 		}
@@ -93,6 +102,52 @@
 			else
 				return true;
 		}
+		
+		var insertSpace = function(sourceText, cb_insertSpace){ 
+		    console.log(sourceText);
+		    
+		    String.prototype.splice = function( idx, rem, s ) {
+		        return (this.slice(0,idx) + s + this.slice(idx + Math.abs(rem)));
+		    };
+		    
+		    var getIndexNext = [];
+		    var getIndexPrevious = [];
+		    var regExp_English = /^[a-zA-Z]+$/;
+		    var regExp_Chinese = /[^\x00-\xff]/;
+		    var offSetNext = 0;
+		    var offSetPrevious = 0;
+		    
+		    for(var i = 0; i<sourceText.length; i++) {
+		        if(regExp_Chinese.test(sourceText[i]) && sourceText[i] != '#' && i != sourceText.length-1) {
+		            if(regExp_English.test(sourceText[i+1])) {
+		                getIndexNext.push(i);
+		            }
+		        }
+		    }
+		    
+		    for(var i = 0; i<getIndexNext.length; i++) {
+		    	sourceText = sourceText.splice(getIndexNext[i]+1+offSetNext, 0, " ");
+		        offSetNext++;
+		    }
+		    
+		    for(var i = 0; i<sourceText.length; i++) {
+		        if(regExp_Chinese.test(sourceText[i]) && sourceText[i] != '#' && i != 0) {
+		            if(regExp_English.test(sourceText[i-1])) {
+		                getIndexPrevious.push(i);
+		            }
+		        }
+		    }
+		    
+		    for(var i = 0; i<getIndexPrevious.length; i++) {
+		    	sourceText = sourceText.splice(getIndexPrevious[i]+offSetPrevious, 0, " ");
+		        offSetPrevious++;
+		    }
+		    
+		    console.log(sourceText);
+		    cb_insertSpace(sourceText);
+		    
+		}
+		
 	</script>
 	<!--[if lt IE 8]>
   		<div style='text-align:center'><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx?ocid=ie6_countdown_bannercode"><img src="http://www.theie6countdown.com/img/upgrade.jpg"border="0"alt=""/></a></div>  
