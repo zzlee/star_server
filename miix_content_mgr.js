@@ -557,7 +557,8 @@ miixContentMgr.uploadMiixTempImage = function(ugcProjectID, ugcInfo, cbOfUploadM
                 	  
                 	  UGCDB.addUGC(vjson, function(errAddUgc){
                 		  if (!errAddUgc){
-                			  logger.info('[miixContentMgr.uploadMiixTempImage()]Miix image info failed to saved to UGC db: '+ ugcProjectID);
+                			  logger.info('[miixContentMgr.uploadMiixTempImage()]Miix image info saved to UGC db: '+ ugcProjectID);
+                			  callback(null, ugcProjectID);
                 		  }else {
                 			  logger.info('[miixContentMgr.uploadMiixTempImage()]Miix image info failed to saved to UGC db: '+errAddUgc);
                 			  callback('Miix image info failed to saved to UGC db: '+errAddUgc);
