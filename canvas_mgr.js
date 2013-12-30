@@ -20,8 +20,6 @@ canvasMgr.genDoohPhoto = function(content, genPhoto_cb){
 
 canvasMgr.genLongPhoto = function(content, genPoto_cb){
 	logger.info("[canvasMgr.genLongPhoto]");
-	console.log("content");
-	console.dir(content);
 	_private.genLongPhoto(content.id, content.fbId, content.projectId, content.template, content.subTemplate, content.file, content.text, genPoto_cb);
 };
 
