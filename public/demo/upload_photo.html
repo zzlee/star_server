@@ -64,6 +64,7 @@
 			btnSubmit.click(function(){
 			    var ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
 				var form = $("#imgform");
+				localStorage.projectId = ugcProjectId;
 				$("#ugcId").attr("value", ugcProjectId);
 				$("#userId").attr("value", localStorage._id);
 				$("#fbId").attr("value", localStorage.fbId);
