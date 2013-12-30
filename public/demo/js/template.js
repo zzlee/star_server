@@ -108,7 +108,25 @@ template.uploadToServer = function(){
                 	        },
                 	        success: function(data, textStatus, jqXHR ){
                 	        	console.log("Upload result image UGC to server");
-                	            callback(null);
+                	        	var setting_updateVIP = {
+                                        type: "PUT",
+                                        cache: false,
+                                        data:{_id:localStorage.VIPCodeId},
+                                        success: function(data, textStatus, jqXHR ){
+                                        	delete localStorage.VIPCodeId;
+                                        	console.log('update the vip collection done');
+                                        	callback(null);
+                                        },
+                                        error: function(jqXHR, textStatus, errorThrown){
+                                            callback("setting_updateVIP " + errorThrown);
+                                        }                       
+                                };
+                                if(localStorage.VIPCodeId){
+                                	 $.ajax(domainUrl + "/miix/updateVIPStatus", setting_updateVIP);
+                                }else{
+                                	callback(null);
+                                }
+                	            
                 	        },
                 	        error: function(jqXHR, textStatus, errorThrown){
                 	            callback("Failed to upload image UGC to server: "+errorThrown);

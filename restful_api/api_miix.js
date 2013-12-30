@@ -315,5 +315,10 @@ exports.init = function() {
      * @memberof miix
      */
     app.put('/miix/message/:messageId', routes.authorizationHandler.checkAuth, routes.miixHandler.updateMessage_cb);
+    
+    app.get('/miix/getVIPStatus', routes.miixHandler.getVIPStatus_cb);
+    
+    app.put('/miix/updateVIPStatus', routes.miixHandler.updateVIPStatus_cb);
+
 
 };

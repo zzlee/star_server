@@ -46,6 +46,12 @@
 	<script src="js/dooh_preview.js"></script>
 	
 	<script>
+	$( document ).ready(function() {
+		if(localStorage.template_userText){
+			var text = localStorage.template_userText.replace("#",/\n/g);
+			$("#inputText").val(text);
+		}
+	});
 		function init(){
 			var btnSend = $('#btnSend');
 			var btnWowPicText = $("#wow_pic_text");

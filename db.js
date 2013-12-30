@@ -366,6 +366,11 @@ FM.DB = (function(){
             showInCenter: {type: Boolean, default: false}
         }); //  MyMember collection
 		
+		var VIPSchema = new Schema({
+			code: {type: String},
+			used: {type: Boolean, default: false}
+		});
+		
         /****************** End of DB Schema ******************/
 		
         var Member = connection.model('Member', MemberSchema, 'member'),
@@ -386,6 +391,7 @@ FM.DB = (function(){
             UserLiveContent = connection.model('UserLiveContent', UserLiveContentSchema, 'userLiveContent'),
             MyMember = connection.model('MyMember', MyMemberSchema, 'myMember'),
 			Message = connection.model('Message', MessageSchema, 'message');
+        	VIP = connection.model('VIP', VIPSchema, 'vip');
            
             
         var dbModels = [];
@@ -407,6 +413,7 @@ FM.DB = (function(){
         dbModels["userLiveContent"] = UserLiveContent;
         dbModels["myMember"] = MyMember;
 		dbModels["message"] = Message;
+		dbModels["vip"] = VIP;
         
         //???? nobody uses it, so this section can be removed? 
         var dbSchemas = [];
@@ -524,6 +531,9 @@ FM.DB = (function(){
                         break;
 					case 'message':
                         return Message;
+                        break;
+					case 'vip':
+                        return VIP;
                         break;
                     default:
                         throw new error('DB Cannot find this Collection: ' + collection);
