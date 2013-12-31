@@ -203,6 +203,7 @@ FM.pushMgr = (function() {
                          
                          FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
                          for( var devicePlatform in result.deviceToken){
+                        	 
                              var deviceTokenCheck = result.deviceToken[devicePlatform];
                              if(!deviceTokenCheck){
                                  logger.info("[push_mgr]deviceToken is null" + JSON.stringify(result.deviceToken)+"memberId="+memberId  );
@@ -211,9 +212,9 @@ FM.pushMgr = (function() {
                              else if(deviceTokenCheck == "undefined"){
                                  logger.info("[push_mgr]deviceToken is undefined" + JSON.stringify(result.deviceToken)+"memberId="+memberId );
                                  FM_LOG("[push_mgr]deviceToken is undefined" + JSON.stringify(result.deviceToken)+"memberId="+memberId ); 
-                             }
-                             else if(deviceTokenCheck){
-                                 FM.pushMgr.getInstance().sendMessageToDevice(devicePlatform, result.deviceToken[devicePlatform], result.app, message);
+                             }                            	 
+                             else if(deviceTokenCheck != "webapp"){
+                            		 FM.pushMgr.getInstance().sendMessageToDevice(devicePlatform, result.deviceToken[devicePlatform], result.app, message);
                              }else{
                                  logger.info("[push_mgr]deviceToken error" + JSON.stringify(result.deviceToken)+"memberId="+memberId );
                                  FM_LOG("[push_mgr]deviceToken error" + JSON.stringify(result.deviceToken)+"memberId="+memberId );

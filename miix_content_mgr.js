@@ -515,7 +515,7 @@ miixContentMgr.uploadMiixTempImage = function(ugcProjectID, ugcInfo, cbOfUploadM
     async.series([
                   function(callback){
                 	  //Upload the PNG file of original image UGC to S3
-                	  ugcS3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+".png";
+                	  ugcS3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID + ".png";
                 	  awsS3.uploadToAwsS3(imageUgcFile, ugcS3Path, 'image/png', function(err,result){
                 		  if (!err){
                 			  logger.info('[miixContentMgr.uploadMiixTempImage()]Miix image is successfully uploaded to S3 '+ugcS3Path);
@@ -528,7 +528,7 @@ miixContentMgr.uploadMiixTempImage = function(ugcProjectID, ugcInfo, cbOfUploadM
                   },
                   function(callback){
                 	  //Upload the PNG file of image UGC's DOOH preview to S3
-                	  ugcDoohPreviewS3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+"_dooh_preview.png";
+                	  ugcDoohPreviewS3Path = '/user_project/' + ugcProjectID + '/'+ ugcProjectID + "_dooh_preview.png";
                 	  awsS3.uploadToAwsS3(imageUgcDoohPreviewFile, ugcDoohPreviewS3Path, 'image/png', function(err,result){
                 		  if (!err){
                 			  logger.info('[miixContentMgr.uploadMiixTempImage()]DOOH preview of Miix image is successfully uploaded to S3 '+ugcDoohPreviewS3Path);

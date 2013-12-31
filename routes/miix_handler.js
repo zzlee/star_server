@@ -96,6 +96,10 @@ miixHandler.putImageUgcsInfo_cb = function(req, res){
 				var elapseTime = (new Date()).getTime() - timeOfBeingCalled;
 				logger.info('[PUT '+req.path+'] responded in '+elapseTime+' ms');
 				res.send(200);
+				 miixContentMgr.pushRandomMessage( ugcInfo.ownerId._id, req.params.ugcProjectId, function(err, result){
+	                    if(!err) logger.info('[miixHandler_pushRandomMessage] ownerId= '+ugcInfo.ownerId._id+' ugcProjectId'+req.params.ugcProjectId+'result ='+result);
+	                    else logger.error('[miixHandler_pushRandomMessage] ownerId= '+ugcInfo.ownerId._id+' ugcProjectId'+req.params.ugcProjectId+'err ='+err);
+	                });
 			}else {
 				logger.error('[PUT /miix/web/ugcs_info/:ugcProjectId]: '+ err);
 				res.send(400, {error: err});
