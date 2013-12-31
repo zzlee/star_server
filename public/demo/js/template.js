@@ -44,52 +44,6 @@ template.uploadToServer = function(){
                 	    });
                   },
                   function(callback){
-<<<<<<< HEAD
-	                  var settings_push_after_confirm = {
-	                          type: "PUT",
-	                          cache: false,
-	                          asycn:false,
-	                          data:{ 
-	                              miixToken: localStorage.miixToken,
-	                              vjson: {
-	                                  read: true
-	                              }
-	                          },
-	                          success: function(data, textStatus, jqXHR ){
-	                        	  //Do nothing
-	                          },
-	                          error: function(jqXHR, textStatus, errorThrown){
-	                        	  //Do Nothing
-	                          }                       
-	                  };
-	                  var settings_push_center = {
-	                          type: "GET",
-	                          cache: false,
-	                          data:{ miixToken: localStorage.miixToken },
-	                          success: function(data, textStatus, jqXHR ){
-	                              var iterator = function(aPush){
-//	                            	  console.log('push msg: ' + aPush.content);
-                                      alert(aPush.content.substring(0,14) + "排定時段後，你會收到facebook預告，通知播出日期時間。");
-                                      //Let DB know user read the msg
-                                      $.ajax(url + "/miix/message/" + aPush._id ,settings_push_after_confirm);
-	                              };
-	                              async.eachSeries(data, iterator, function(err, results){
-	                                  if (!err){
-	                                	  console.log("async.eachSeries no error");
-	                                      callback(null);
-	                                  }
-	                                  else {
-	                                	  callback('Failed to change the read value of db to true: '+err);
-	                                  }
-	                              });
-	                          },
-	                          error: function(jqXHR, textStatus, errorThrown){
-	                              callback("settings_push_center " + errorThrown);
-	                          }                       
-	                  };
-	                  
-	                  $.ajax(url + "/miix/members/" + localStorage._id + "/message", settings_push_center);
-=======
 //	                  var settings_push_after_confirm = {
 //	                          type: "PUT",
 //	                          cache: false,
@@ -135,7 +89,7 @@ template.uploadToServer = function(){
 //	                  
 //	                  $.ajax(url + "/miix/members/" + localStorage._id + "/message", settings_push_center);
                 	  callback(null);
->>>>>>> dbcbba6038b9c11ab06353b54441568d64386747
+
                   }],
                   function(err){
     					if(err){

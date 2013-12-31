@@ -38,7 +38,7 @@ var _private = {
 			/*
 			http://192.168.5.115/imageUgc.html?id=100004790103783&name=Jeff Chai&projectId=mood-521c19aeb4c146740f000005-20130830T094018567Z&file=_cdv_photo_016.jpg&template=cultural_and_creative&subTemplate=picture_only&word=test
 			*/
-			 var imageUgcUrl = 'http://jean.ondascreen.com/demo/imageUgc.html';
+			 var imageUgcUrl = 'http://internal.ondascreen.com/demo/imageUgc.html';
 			 var chrome = spawn('chrome.exe', 
                      [imageUgcUrl + 
                      '?id=' + Id +

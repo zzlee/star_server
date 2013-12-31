@@ -64,7 +64,7 @@ ImageUgc = (function(){
                                 contentGenre: "mood",
                                 title: ugcInfo.title,
                                 customizableObjects: JSON.stringify(customizableObjects),
-                                miixToken: localStorage.miixToken,
+                                miixToken: "53768608",
                                 time: (new Date()).getTime()
                             },
                             success: function(data, textStatus, jqXHR ){

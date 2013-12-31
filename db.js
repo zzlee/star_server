@@ -427,7 +427,6 @@ FM.DB = (function(){
                     var options = {
                         user: systemConfig.HOST_MONGO_DB_USER_NAME,
                         pass: systemConfig.HOST_MONGO_DB_PASSWORD,
-<<<<<<< HEAD
                         server:{
                             auto_reconnect: true,
                             poolSize: 10,
@@ -435,15 +434,6 @@ FM.DB = (function(){
                                 keepAlive: 1
                             }
                         }
-=======
-						server:{
-							auto_reconnect: true,
-							poolSize: 10,
-							socketOptions:{
-								keepAlive: 1
-							}
-						}
->>>>>>> dbcbba6038b9c11ab06353b54441568d64386747
                     }
                     mongoose.connect(systemConfig.HOST_MONGO_DB_SERVER_URL+'/'+DB, options);
                     return mongoose.connection;
