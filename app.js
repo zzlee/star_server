@@ -232,7 +232,7 @@ app.post('/miix/ugcInfo/', function(req,res){
 	    				    res.write('<script>');
 	    				    res.write('function init(){' +
 	    				    			'setTimeout(' +
-	    				    				"window.location = 'http://jean.ondascreen.com/demo/preview.html',15000);" +
+	    				    				"window.location = 'http://internal.ondascreen.com/demo/preview.html',15000);" +
 	    				    			'}');
 	    				    res.write('</script>');
 	    				    res.write("<body onload='init();'><h4>圖片合成中，請稍候......</h4></body></html>");
