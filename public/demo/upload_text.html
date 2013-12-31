@@ -72,7 +72,7 @@
 				if(btnWowPicText.val() == ""){
 					alert("您忘記選擇圖片！");
 				}else{
-					var inputContent = $("#inputText").val().replace(/\n/g,"#");
+					var inputContent = $("#inputText").val().replace(/\n/g,"_");
 					console.log(inputContent);
 				
 					async.series([

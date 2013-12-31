@@ -71,7 +71,7 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
     }
 
     context.fillStyle = fontColor;
-    var breakLineSign = text.split("#");
+    var breakLineSign = text.split("_");
     
     for(var breakLineCount = 0; breakLineCount < breakLineSign.length; breakLineCount++) {
         var line = "";
@@ -87,7 +87,7 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
                     var testWidth = metrics.width;
                     
                     if(testWidth > maxWidth){
-                    	if(cursorY < 137) {
+                    	if(true) {
                         	context.fillText(line, cursorX, cursorY);
                         }
                         line = words[wordCount][chWordCount];
@@ -103,7 +103,7 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
                 var testWidth = metrics.width;
                 
                 if(testWidth > maxWidth){
-                	if(cursorY < 137) {
+                	if(true) {
                     	context.fillText(line, cursorX, cursorY);
                     }
                     line = words[wordCount] + " ";
@@ -113,7 +113,7 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
                 }
             }
         }
-        if(cursorY < 137) {
+        if(true) {
         	context.fillText(line, cursorX, cursorY);
         }
         
