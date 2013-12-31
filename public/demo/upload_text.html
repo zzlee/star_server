@@ -69,10 +69,13 @@
 				}
 			});
 			btnSend.click(function(){
-				var inputContent = $("#inputText").val().replace(/\n/g,"#");
-				console.log(inputContent);
+				if(btnWowPicText.val() == ""){
+					alert("您忘記選擇圖片！");
+				}else{
+					var inputContent = $("#inputText").val().replace(/\n/g,"#");
+					console.log(inputContent);
 				
-				async.series([
+					async.series([
 				              function(callback){
 				            	  insertSpace(inputContent, function(res){
 				            		  console.log(res);
@@ -106,7 +109,7 @@
 							
 				          });
 
-				
+				}
 			});
 			
 		}
