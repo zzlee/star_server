@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-	<title>Demo | Preview</title>
+	<title>Demo | Select Template</title>
 	<meta charset="utf-8">
 	<link rel="icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon">
     <link rel="shortcut icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon" />
@@ -35,28 +35,78 @@
   		  }); 
 				
 	</script>
-
-	<!-- CUSTOM CODES -->
-	<script src="js/common.js"></script>
-	<script src="js/image_ugc.js"></script>
-	<script src="js/template.js"></script>
+	
+	<!-- CUSTOM CODE -->
 	<script src="js/async.js"></script>
-
+	<script src="js/common.js"></script>
+	<script src="js/template.js"></script>
+	<script src="js/image_ugc.js"></script>
+	<script src="js/template_mgr.js"></script>
+	<script src="js/ugc_utility.js"></script>
+	<script src="js/dooh_info.js"></script>
+	<script src="js/dooh_preview.js"></script>
+	<script src="js/load-image.min.js"></script>
+	
+	
 	<script>
 		function init(){
+			var btnChoosePhoto = $("#chossePic");
+			var btnSubmit = $('#btnSubmit');
+			var btnWowPic = $("#wow_pic");
 			
-			var preview = $('#imgPreview');
-			//wow_pic-529dafa950ceec4015000005-20131230T085843037Z_dooh_preview.png
-			var doohPreviewImageUrl = domainUrl + "/contents/user_project/" + localStorage.projectId + "/" + localStorage.projectId + "_dooh_preview.png";
-			preview.attr({src:doohPreviewImageUrl});
-			var btnUpload = $("#btnUpload");
-			btnUpload.click(function(){
-				delete localStorage.template_userText; //by Joy just for hint text remove 
-				template.uploadToServer();
-				btnUpload.hide();
+			//var selectedPhoto = $("#selectedPhoto");
+//			$('input[type="file"]').change(function(){
+//		        var file = this.files[0];
+//		        console.dir(this.files);
+//       		$("#test").append('Filename : ' + file.name + '<br />Filesize : ' + file.size);
+//			});
+			
+			
+			btnChoosePhoto.click(function(){
+				btnWowPic.click();
 			});
+			
+			btnWowPic.click(function(){
+				//document.getElementById('wow_pic').addEventListener('change', template.handleFileSelected, true);
+				//console.log(localStorage.selectedPhoto);
+				//selectedPhoto.css("src", localStorage.selectedPhoto);			
+				
+				/*
+				$('input[type="file"]').change(function(e){
+					
+			        var file = this.files[0];
+			        //console.dir(this.files);
+	        		$("#test").append('Filename : ' + file.name + '<br />Filesize : ' + file.size);
+					var reader = new FileReader();
+					reader.readAsDataURL(file);
+					reader.onloadend = function(){
+
+				        //$("html").css("background-image", "url(" + this.result + ")");
+						console.log(this.result);
+						alert(this.result);
+				    }
+					
+
+					
+				});
+				*/
+			});
+			
+			btnSubmit.click(function(){
+				//template.choosePicFile();
+				$("form").submit(function(e){
+					$.ajax({
+						url: domainUrl + "/miix/videos/user_content_files",
+						type: "PUT",
+						formData: new FormData(this),
+						success:function(data,)
+					})
+				});
+			});
+			
 		}
 	</script>
+	
 	<!--[if lt IE 8]>
   		<div style='text-align:center'><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx?ocid=ie6_countdown_bannercode"><img src="http://www.theie6countdown.com/img/upgrade.jpg"border="0"alt=""/></a></div>  
  	<![endif]-->
@@ -86,7 +136,7 @@
       -->
 </head>
 
-	<body onload="init()">
+	<body onload="init();">
      <div class="spinner"></div> 
 <!-- header start -->
 <header>
@@ -96,8 +146,7 @@
         <div class="navbar navbar_">
               <div class="container">
             <h2 class="brand"><a href="index.html" style="color:#000;text-shadow:none;font-size:250%">我要上小巨蛋</a></h2>
-
-            <div class="nav-collapse nav-collapse_collapse"></div>
+            <div class="nav-collapse nav-collapse_  collapse"></div>
           </div>
             </div>
       </div>
@@ -108,25 +157,33 @@
       <div class="container">
     <div class="row">
           <div class="span12"> 
+          <h3>版型一</h3>
         <!-- slider -->
         <div class="slide">
-        <img id="imgPreview" src="img/preview.jpg">
+        	<img src="img/t1.jpg">
         </div>
         
         <span id="responsiveFlag"></span>
-        <div class="block-slogan" style="color:#FFF">
-              <h2>模擬完成!</h2>
-              <div>
-              <p style="font-size:20pt">請確定模擬圖中圖片、文字的排版是正確的，如要更改請<a href="./upload_text.html">回上頁</a>！謝謝</p>
-              <br>
-            <p>(1)送出後我們會經由您的facebook，發送播放通知。<br>
-              (2)我們會將您的播放內容利用攝影機拍攝下來，傳送到您的facebook!</p>
-              
+        <div class="block-slogan">
+            <!--  <p style="height:0px;overflow:hidden"> -->
+            <p>
+            	<!-- If let user only chosse CAMERA just use next line to do.-->
+				<!-- <input id="wow_pic" type="file" accept="image/*" capture="camera"/> -->
+				<div id="test" style="color:#FFF"></div>
+				<!--  <input type="file" accept="image/*"/>-->
+				<form action="/index.html" method="post">
+					<input id="wow_pic" type="file" accept="image/*" />
+					<input type="submit"/>
+				</form>
+				<img id="show" src="">
+           	</p>
+			<p style="text-align:right; padding-top:20px;">
+            	<button id="chossePic" class="btn btn-1">選擇圖片</button>
             <p style="text-align:right; padding-top:20px;">
-	            <button id="btnUpload" class="btn btn-1">送出！</button>
+            	<button id="btnSubmit" class="btn btn-1">上傳圖片</button>
             </p>
           </div>
-            </div>
+          </div>
       </div>
         </div>
   </div>

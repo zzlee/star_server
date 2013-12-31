@@ -416,6 +416,162 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
     
 
 };
+/**
+ * Saved a Miix image to system temporality. <br>  
+ * <br>
+ * Miix image content body (in base64 format) is saved as a PNG.
+ * It's just temp saved in server from web request.
+ * 
+ * @param {String} imgBase64 image date with base64 format
+ * @param {String} ugcProjectID Project ID of this UGC
+ * @param {Object} ugcInfo An object containing UGC info:
+ *     <ul>
+ *     <li>ownerId: ownerId An object containing owner's id info:
+ *         <ul>                                                                             
+ *         <li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)
+ *         <li>fbUserId: owner's Facebook user ID                                                    
+ *         </ul>                                                                            
+ *     <li>contentGenre: it is normally the template (id) that this UGC uses
+ *     <li>title: title of UGC 
+ *     </ul>
+ * @param {Function} cbOfAddMiixImage Callback function called when adding operation is done
+ */
+miixContentMgr.addMiixTempImage = function(imgBase64, imgDoohPreviewBase64, ugcProjectID, ugcInfo, cbOfAddMiixImage) {
+	logger.info("[miixContentMgr.addMiixTempImage()]ugcProjecID : " + ugcProjectID + " saved in star_server");
+    var imageUgcFile = null;
+    var imageUgcDoohPreviewFile = null;
+    
+    async.series([
+        function(callback){
+            //now save the base64 image to a PNG file
+            var base64Data = imgBase64.replace(/^data:image\/png;base64,/,"");
+            imageUgcFile = path.join(workingPath,"public/contents/user_project", ugcProjectID, ugcProjectID+".png");
+
+            fs.writeFile(imageUgcFile, base64Data, 'base64', function(errOfWriteFile) {
+                if (!errOfWriteFile){
+                	callback(null);
+                }
+                else {
+                	callback("Fail to save base64 image to a PNG file: "+errOfWriteFile);
+                }
+                
+            });
+        },
+        function(callback){
+            //now save the base64 image of DOOH preview to a PNG file
+            var base64Data = imgDoohPreviewBase64.replace(/^data:image\/png;base64,/,"");
+            imageUgcDoohPreviewFile = path.join(workingPath,"public/contents/user_project", ugcProjectID, ugcProjectID+"_dooh_preview.png");
+
+            fs.writeFile(imageUgcDoohPreviewFile, base64Data, 'base64', function(errOfWriteFile) {
+                if (!errOfWriteFile){
+                	callback(null);
+                }
+                else {
+                	callback("Fail to save base64 image of DOOH preview to a PNG file: " + errOfWriteFile);
+                }
+                
+            });
+        }
+    ], function (err) {
+    	if(err){
+    		logger.info("[miixContentMgr.addMiixTempImage()] Error " + err);
+    		cbOfAddMiixImage(err);
+    	}else{
+    		logger.info("[miixContentMgr.addMiixTempImage()]Saved temp UGCs in star_server successfully.");
+    		cbOfAddMiixImage(null);
+    	}
+    		
+    });
+};
+
+
+/**
+ * Upload a Miix image to S3 and write to DB. <br>  
+ * <br>
+ * 
+ * @param {String} imgBase64 image date with base64 format
+ * @param {String} ugcProjectID Project ID of this UGC
+ * @param {Object} ugcInfo An object containing UGC info:
+ *     <ul>
+ *     <li>ownerId: ownerId An object containing owner's id info:
+ *         <ul>                                                                             
+ *         <li>_id: owner's member ID (hex string representation of its ObjectID in MongoDB)
+ *         <li>fbUserId: owner's Facebook user ID                                                    
+ *         </ul>                                                                            
+ *     <li>contentGenre: it is normally the template (id) that this UGC uses
+ *     <li>title: title of UGC 
+ *     </ul>
+ * @param {Function} cbOfAddMiixImage Callback function called when adding operation is done
+ */
+miixContentMgr.uploadMiixTempImage = function(ugcProjectID, ugcInfo, cbOfUploadMiixTempImage) {
+	
+	logger.info("[miixContentMgr.uploadMiixTempImage()]ugcProjecID : " + ugcProjectID);
+    var imageUgcFile = path.join(workingPath,"public/contents/user_project", ugcProjectID, ugcProjectID+".png");
+    var imageUgcDoohPreviewFile = path.join(workingPath,"public/contents/user_project", ugcProjectID, ugcProjectID+"_dooh_preview.png");
+    var ugcS3Path = null;
+    var ugcDoohPreviewS3Path = null;
+    var ugcS3Url = null;  
+    
+    async.series([
+                  function(callback){
+                	  //Upload the PNG file of original image UGC to S3
+                	  ugcS3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+".png";
+                	  awsS3.uploadToAwsS3(imageUgcFile, ugcS3Path, 'image/png', function(err,result){
+                		  if (!err){
+                			  logger.info('[miixContentMgr.uploadMiixTempImage()]Miix image is successfully uploaded to S3 '+ugcS3Path);
+                			  callback(null, ugcS3Path);
+                		  }else {
+                			  logger.info('[miixContentMgr.uploadMiixTempImage()]Miix image is failed to be uploaded to S3 '+ugcS3Path);
+                			  callback('Miix movie is failed to be uploaded to S3 '+ugcS3Path, null);
+                		  }
+                	  });
+                  },
+                  function(callback){
+                	  //Upload the PNG file of image UGC's DOOH preview to S3
+                	  ugcDoohPreviewS3Path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID+"_dooh_preview.png";
+                	  awsS3.uploadToAwsS3(imageUgcDoohPreviewFile, ugcDoohPreviewS3Path, 'image/png', function(err,result){
+                		  if (!err){
+                			  logger.info('[miixContentMgr.uploadMiixTempImage()]DOOH preview of Miix image is successfully uploaded to S3 '+ugcDoohPreviewS3Path);
+                			  callback(null, ugcDoohPreviewS3Path);
+                		  }else {
+                			  logger.info('[miixContentMgr.uploadMiixTempImage()]DOOH preview of Miix image is failed to be uploaded to S3 '+ugcDoohPreviewS3Path);
+                			  callback('DOOH preview of Miix movie is failed to be uploaded to S3 '+ugcDoohPreviewS3Path, null);
+                		  }
+                	  });
+                  },
+                  function(callback){
+                	  //Add UGC info (including user content info) to UGC db
+                	  ugcS3Url = "https://s3.amazonaws.com/miix_content" + ugcS3Path;
+                	  var ugcDoohPreviewS3Url =  "https://s3.amazonaws.com/miix_content" + ugcDoohPreviewS3Path;
+                	  var vjson = {
+                			  "ownerId": {"_id": ugcInfo.ownerId._id, "userID": ugcInfo.ownerId.fbUserId, "fbUserId": ugcInfo.ownerId.fbUserId},
+                			  "projectId": ugcProjectID,
+                			  "genre": "miix_image",
+                			  "contentGenre": ugcInfo.contentGenre,
+                			  "mediaType": "PNG",
+                			  "fileExtension": "png",
+                			  "title": ugcInfo.title,
+                			  "url": {"s3":ugcS3Url},
+                			  "doohPreviewUrl": ugcDoohPreviewS3Url
+                	  };
+                	  
+                	  UGCDB.addUGC(vjson, function(errAddUgc){
+                		  if (!errAddUgc){
+                			  logger.info('[miixContentMgr.uploadMiixTempImage()]Miix image info saved to UGC db: '+ ugcProjectID);
+                			  callback(null, ugcProjectID);
+                		  }else {
+                			  logger.info('[miixContentMgr.uploadMiixTempImage()]Miix image info failed to saved to UGC db: '+errAddUgc);
+                			  callback('Miix image info failed to saved to UGC db: '+errAddUgc);
+                		  }
+                	  });
+                  },
+                  ],
+                  function(err, results){
+    				if (cbOfUploadMiixTempImage){
+    					cbOfUploadMiixTempImage(err);
+    				}
+    	});
+};
 
 /**
  * Add a Miix image to system. <br>  
