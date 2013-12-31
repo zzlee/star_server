@@ -47,9 +47,11 @@
 	
 	<script>
 		function init(){
-			var btnSend = $('#btnSend');
-			var btnWowPicText = $("#wow_pic_text");
 			var btnChoosePic = $("#chossePic");
+			var btnWowPicText = $("#wow_pic_text");
+			var btnUpload = $("#upload");
+			var btnSend = $('#btnSend');
+			
 			localStorage.selectedTemplate = "wow_pic_text";
 			localStorage.selectedSubTemplate = "picture_plus_text";
 			
@@ -57,9 +59,6 @@
 				btnWowPicText.click();
 			});
 			
-			btnWowPicText.click(function(){
-				document.getElementById('wow_pic_text').addEventListener('change', template.handleFileSelected, true);
-			});
 			
 			$("#inputText").focus(function(){
 				if(localStorage.template_userText){
@@ -89,7 +88,22 @@
 				              }
 				          ],
 				          function(err, results){
-								template.genImage(localStorage.selectedTemplate, localStorage.selectedSubTemplate, inputContent);
+							if(!err){
+					    		var ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
+								var form = $("#imgform");
+								localStorage.projectId = ugcProjectId;
+								$("#ugcId").attr("value", ugcProjectId);
+								$("#userId").attr("value", localStorage._id);
+								$("#fbId").attr("value", localStorage.fbId);
+								$("#contentGenre").attr("value", localStorage.selectedTemplate);
+								$("#text").attr("value", inputContent);
+								action = "/miix/ugcInfo/"; 
+						
+								form.attr("action", action);
+								btnUpload.click();
+							}
+
+							
 				          });
 
 				
@@ -212,6 +226,18 @@
         	<p style="text-align:left; padding-top:20px;">
             	<button id="chossePic" class="btn btn-1">選擇圖片</button>
            	</p>
+           	<div style="height:0px;overflow:hidden"> 
+				<form id="imgform" method="post" action="#" enctype="multipart/form-data">  
+					<!--	<form name="uploadFiles" id="imgform" method="post" action="/miix/video/user_content_files"> -->
+					<input name="file" id="wow_pic_text" type="file" accept="image/*" />
+					<input name="projectId" id="ugcId" type="hidden"/>
+					<input name="_id" id="userId" type="hidden" />
+					<input name="fbUserId" id="fbId" type="hidden" />
+					<input name="genre" id="contentGenre" type="hidden" />
+					<input name="text" id="text" type="hidden" />
+					<input name="filesSubmit" id="upload" type="submit" />
+				</form>
+			</div>
 		</div>
           <form id="form-search" action="search.php" method="GET" accept-charset="utf-8" >
            	  <div class="clearfix">
@@ -219,10 +245,6 @@
            	  </div>
             </form>
             <div class="block-slogan">
-			<p style="height:0px;overflow:hidden">
-				<input id="wow_pic_text" type="file" accept=".jpg" alt=" "/>
-           	</p>
-
 			<p style="text-align:left; padding-top:20px;">
             		<button id="btnSend" class="btn btn-1">送出</button>
             	</p>

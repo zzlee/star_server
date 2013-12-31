@@ -77,13 +77,13 @@
 					        //Check subTemplate : mood, cultural_and_creative
 							if((aryPara["text"] != null) && (aryPara["text"] != "undefined")){
 								userContent.text = decodeURI(aryPara["text"]);
+								
 						    }else{
 						       	userContent.text = "";
 						    }
 							if(aryPara["file"] != null){
 								userContent.picture.urlOfCropped = "/contents/user_project/" + aryPara["projectId"] + "/user_data/" + aryPara["file"];
 							}
-				        	
 
 				        //Template: mood, cultural_and_creative, check_in
 				        //SubTemplate:picture_plus_text, picture_only, text_only
