@@ -146,7 +146,7 @@ template.uploadToServer = function(){
 	                              };
 	                              async.eachSeries(data, iterator, function(err, results){
 	                                  if (!err){
-//	                                	  console.log("async.eachSeries no error");
+	                                	  console.log("async.eachSeries no error");
 	                                      callback(null);
 	                                  }
 	                                  else {
