@@ -2,6 +2,7 @@ var template = {};
 var remotesite = serverUrl;
 var url = domainUrl;
 
+
 template.uploadToServer = function(){
 	var ugcInfo = {
 			ownerId:{
@@ -9,13 +10,13 @@ template.uploadToServer = function(){
 				fbUserId : localStorage.fbId
 			},
 			contentGenre : localStorage.selectedTemplate,
-			title : "today's mood"
+			title : "today'smood"
 	};
     var ugcProjectId = localStorage.projectId;
     async.series([
                   function(callback){
                 	  //upload result image UGC to server
-                	    $.ajax( url + "/miix/web/ugcs_info/" + ugcProjectId, {
+                	    $.ajax( url+"/miix/base64_image_ugcs/" + ugcProjectId, {
                 	        type: "PUT",
                 	        data: {
 //                	            imgBase64: reultURI,
@@ -30,7 +31,57 @@ template.uploadToServer = function(){
                 	        },
                 	        success: function(data, textStatus, jqXHR ){
 //                	        	console.log("Upload result image UGC to server");
-                	            callback(null);
+//                	        	console.log("Upload result image UGC to server");
+                	        	async.series([
+                	        	              function(callback_vip){
+                	        	            	  var setting_updateVIPinUGC = {
+                	                                        type: "PUT",
+                	                                        cache: false,
+                	                                        data:{projectId:ugcProjectId},
+                	                                        success: function(data, textStatus, jqXHR ){
+                	                                        	console.log('update the vip field in ugc done');
+                	                                        	callback_vip(null);
+                	                                        },
+                	                                        error: function(jqXHR, textStatus, errorThrown){
+                	                                        	callback_vip("setting_updateVIPinUGC " + errorThrown);
+                	                                        }                       
+                	                                };
+                	                                if(localStorage.VIPCodeId){
+                	                                	 $.ajax(domainUrl + "/miix/updateVIPinUGC", setting_updateVIPinUGC);
+                	                                }else{
+                	                                	callback_vip(null);
+                	                                }
+                	        	              },
+                	        	              function(callback_vip){
+                	        	            	  var setting_updateVIP = {
+                	                                        type: "PUT",
+                	                                        cache: false,
+                	                                        data:{_id:localStorage.VIPCodeId},
+                	                                        success: function(data, textStatus, jqXHR ){
+                	                                        	delete localStorage.VIPCodeId;
+                	                                        	console.log('update the vip collection done');
+                	                                        	callback_vip(null);
+                	                                        },
+                	                                        error: function(jqXHR, textStatus, errorThrown){
+                	                                        	callback_vip("setting_updateVIP " + errorThrown);
+                	                                        }                       
+                	                                };
+                	                                if(localStorage.VIPCodeId){
+                	                                	 $.ajax(domainUrl + "/miix/updateVIPStatus", setting_updateVIP);
+                	                                }else{
+                	                                	callback_vip(null);
+                	                                }
+                	        	              }
+                	        	          ],
+                	        	          // optional callback
+                	        	          function(err, results){
+                	        		             if(!err){
+                	        		            	 
+                	        		            	 callback(null);
+                	        		             }else{
+                	        		            	 callback(null);
+                	        		             }
+                	        	          });
                 	        },
                 	        error: function(jqXHR, textStatus, errorThrown){
                 	            callback("Failed to upload image UGC to server: "+errorThrown);
@@ -82,8 +133,6 @@ template.uploadToServer = function(){
 	                  };
 	                  
 	                  $.ajax(url + "/miix/members/" + localStorage._id + "/message", settings_push_center);
-//                	  callback(null);
-
                   }],
                   function(err){
     					if(err){

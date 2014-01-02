@@ -1169,6 +1169,38 @@ miixContentMgr.updateMessage = function(messageId, vjson, cbOfUpdateMessage){
     
 };
 
+miixContentMgr.getVIPStatus = function(condition, limit, skip, cbOfGetVIPStatus){
+    var vipModel = db.getDocModel("vip");
+    
+    vipModel.find(condition).sort({"createdOn":-1}).skip(skip).exec(cbOfGetVIPStatus);
+    
+    
+};
+
+miixContentMgr.updateVIPStatus = function(VIPId, update, cbOfUpdateVIPStatus){
+	var vipModel = db.getDocModel("vip");
+    
+    db.updateAdoc(vipModel, VIPId, update, function(errOfUpdateVIPStatus, resOfUpdateVIPStatus){
+        if (!errOfUpdateVIPStatus){
+        	cbOfUpdateVIPStatus(null, "done");
+        }else
+        	cbOfUpdateVIPStatus("Fail to update VIPStatus Obj from DB: "+errOfUpdateVIPStatus, resOfUpdateVIPStatus);
+    });
+    
+};
+
+miixContentMgr.updateVIPinUGC = function(projectId, update, cbOfUpdateVIPinUGC){
+	var ugcModel = db.getDocModel("ugc");
+    
+    db.updateOne(ugcModel, {projectId: projectId}, update, null,function(errOfUpdateVIPinUGC, resOfUpdateVIPinUGC){
+        if (!errOfUpdateVIPinUGC){
+        	cbOfUpdateVIPinUGC(null, "done");
+        }else
+        	cbOfUpdateVIPinUGC("Fail to update VIPinUGC Obj from DB: "+errOfUpdateVIPinUGC, resOfUpdateVIPinUGC);
+    });
+    
+};
+
 
 module.exports = miixContentMgr;
 

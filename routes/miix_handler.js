@@ -311,6 +311,69 @@ miixHandler.updateMessage_cb = function(req, res) {
     
 };
 
+miixHandler.getVIPStatus_cb = function(req, res) {
+    logger.info('[GET '+req.path+'] is called');
+    var condition = null;
+    if(req.query.code){
+    	condition = {
+    			code: req.query.code
+    	};
+	}
+    
+    miixContentMgr.getVIPStatus( condition, null, 0, function(err, VIPStatus){
+        if (!err){
+            res.send(VIPStatus);
+        }
+        else {
+            logger.error('[GET /miix/getVIPStatus] failed: '+ err);
+            res.send(400, {error: err});
+        }
+    });    
+};
+
+
+miixHandler.updateVIPStatus_cb = function(req, res) {
+    logger.info('[PUT '+req.path+'] is called');
+    if (req.body._id){
+        var condition = {used: true};
+        
+        miixContentMgr.updateVIPStatus( req.body._id, condition, function(err){
+            if (!err){
+                res.send(200);
+            }
+            else {
+                logger.error('[PUT /miix/updateVIPStatus] failed: '+ err);
+                res.send(400, {error: err});
+            }
+        });
+    }
+    else {
+        res.send(400, {error: "Not all needed data are sent."});
+    }
+    
+};
+
+miixHandler.updateVIPinUGC_cb = function(req, res) {
+    logger.info('[PUT '+req.path+'] is called');
+    if (req.body.projectId){
+        var condition = {contentClass: 'vip'};
+        
+        miixContentMgr.updateVIPinUGC( req.body.projectId, condition, function(err){
+            if (!err){
+                res.send(200);
+            }
+            else {
+                logger.error('[PUT /miix/updateVIPinUGC] failed: '+ err);
+                res.send(400, {error: err});
+            }
+        });
+    }
+    else {
+        res.send(400, {error: "Not all needed data are sent."});
+    }
+    
+};
+
 //POST /miix/ugcInfo
 miixHandler.saveTmpImage_cb = function(req, res){
 	logger.info('[POST ' + req.path + '] is called');
