@@ -107,25 +107,57 @@ template.uploadToServer = function(){
                 	            time: (new Date()).getTime()
                 	        },
                 	        success: function(data, textStatus, jqXHR ){
+                	        	console.log(data);
                 	        	console.log("Upload result image UGC to server");
-                	        	var setting_updateVIP = {
-                                        type: "PUT",
-                                        cache: false,
-                                        data:{_id:localStorage.VIPCodeId},
-                                        success: function(data, textStatus, jqXHR ){
-                                        	delete localStorage.VIPCodeId;
-                                        	console.log('update the vip collection done');
-                                        	callback(null);
-                                        },
-                                        error: function(jqXHR, textStatus, errorThrown){
-                                            callback("setting_updateVIP " + errorThrown);
-                                        }                       
-                                };
-                                if(localStorage.VIPCodeId){
-                                	 $.ajax(domainUrl + "/miix/updateVIPStatus", setting_updateVIP);
-                                }else{
-                                	callback(null);
-                                }
+                	        	async.series([
+                	        	              function(callback_vip){
+                	        	            	  var setting_updateVIPinUGC = {
+                	                                        type: "PUT",
+                	                                        cache: false,
+                	                                        data:{projectId:ugcProjectId},
+                	                                        success: function(data, textStatus, jqXHR ){
+                	                                        	console.log('update the vip field in ugc done');
+                	                                        	callback_vip(null);
+                	                                        },
+                	                                        error: function(jqXHR, textStatus, errorThrown){
+                	                                        	callback_vip("setting_updateVIPinUGC " + errorThrown);
+                	                                        }                       
+                	                                };
+                	                                if(localStorage.VIPCodeId){
+                	                                	 $.ajax(domainUrl + "/miix/updateVIPinUGC", setting_updateVIPinUGC);
+                	                                }else{
+                	                                	callback_vip(null);
+                	                                }
+                	        	              },
+                	        	              function(callback_vip){
+                	        	            	  var setting_updateVIP = {
+                	                                        type: "PUT",
+                	                                        cache: false,
+                	                                        data:{_id:localStorage.VIPCodeId},
+                	                                        success: function(data, textStatus, jqXHR ){
+                	                                        	delete localStorage.VIPCodeId;
+                	                                        	console.log('update the vip collection done');
+                	                                        	callback_vip(null);
+                	                                        },
+                	                                        error: function(jqXHR, textStatus, errorThrown){
+                	                                        	callback_vip("setting_updateVIP " + errorThrown);
+                	                                        }                       
+                	                                };
+                	                                if(localStorage.VIPCodeId){
+                	                                	 $.ajax(domainUrl + "/miix/updateVIPStatus", setting_updateVIP);
+                	                                }else{
+                	                                	callback_vip(null);
+                	                                }
+                	        	              }
+                	        	          ],
+                	        	          // optional callback
+                	        	          function(err, results){
+                	        					callback(null);
+                	        	          });
+                	        	
+                	        	
+                	        	
+                	        	
                 	            
                 	        },
                 	        error: function(jqXHR, textStatus, errorThrown){

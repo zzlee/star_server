@@ -1033,6 +1033,18 @@ miixContentMgr.updateVIPStatus = function(VIPId, update, cbOfUpdateVIPStatus){
     
 };
 
+miixContentMgr.updateVIPinUGC = function(projectId, update, cbOfUpdateVIPinUGC){
+	var ugcModel = db.getDocModel("ugc");
+    
+    db.updateOne(ugcModel, {projectId: projectId}, update, null,function(errOfUpdateVIPinUGC, resOfUpdateVIPinUGC){
+        if (!errOfUpdateVIPinUGC){
+        	cbOfUpdateVIPinUGC(null, "done");
+        }else
+        	cbOfUpdateVIPinUGC("Fail to update VIPinUGC Obj from DB: "+errOfUpdateVIPinUGC, resOfUpdateVIPinUGC);
+    });
+    
+};
+
 
 module.exports = miixContentMgr;
 

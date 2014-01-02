@@ -319,6 +319,8 @@ exports.init = function() {
     app.get('/miix/getVIPStatus', routes.miixHandler.getVIPStatus_cb);
     
     app.put('/miix/updateVIPStatus', routes.miixHandler.updateVIPStatus_cb);
+    
+    app.put('/miix/updateVIPinUGC', routes.miixHandler.updateVIPinUGC_cb);
 
 
 };

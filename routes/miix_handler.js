@@ -284,5 +284,26 @@ miixHandler.updateVIPStatus_cb = function(req, res) {
     
 };
 
+miixHandler.updateVIPinUGC_cb = function(req, res) {
+    logger.info('[PUT '+req.path+'] is called');
+    if (req.body.projectId){
+        var condition = {vip: true};
+        
+        miixContentMgr.updateVIPinUGC( req.body.projectId, condition, function(err){
+            if (!err){
+                res.send(200);
+            }
+            else {
+                logger.error('[PUT /miix/updateVIPinUGC] failed: '+ err);
+                res.send(400, {error: err});
+            }
+        });
+    }
+    else {
+        res.send(400, {error: "Not all needed data are sent."});
+    }
+    
+};
+
 
 module.exports = miixHandler;

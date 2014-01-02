@@ -79,7 +79,8 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
         
         for(var wordCount = 0; wordCount < words.length; wordCount++){
             var regExp_CH = /[^\x00-\xff]/;
-            if(regExp_CH.test(words[wordCount][0])){
+            var regExp_Num = /[0-9]/;
+            if(regExp_CH.test(words[wordCount][0]) || regExp_Num.test(words[wordCount][0])){
                 for(var chWordCount = 0; chWordCount < words[wordCount].length; chWordCount++){
                     var testLine = line + words[wordCount][chWordCount];
                     var metrics = context.measureText(testLine);
