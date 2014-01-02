@@ -13,7 +13,7 @@ var EventEmitter = require('events').EventEmitter;
 var fbReportListener = new EventEmitter();
 
 //var starServerUrl = "http://internal.ondascreen.com/demo";
-var starServerUrl = "http://jean.ondascreen.com/demo";
+var starServerUrl = "http://joy.ondascreen.com/demo";
 
 var canvasMgr = {};
 

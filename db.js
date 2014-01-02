@@ -51,6 +51,7 @@ FM.DB = (function(){
             videoStatus = 'good soso bad waiting none'.split(' '), //DEPRECATE, keep for reference
             videoGenre = 'miix miix_street miix_story'.split(' '); //DEPRECATE, keep for reference 
             //programTimeSlotStatus = 'waiting proved'.split(' ');
+        	ugcContentClass = 'normal vip'.split(' ');
         
 		/****************** DB Schema ******************/
 		
@@ -138,7 +139,6 @@ FM.DB = (function(){
             doohTimes: { times: {type: Number, default: 0, min: 0}, event: [ObjectID], submited_time: Date},
             playedTimes: {type: Number, min: 0},
             review: {type: Number},
-            vip: {type: Boolean, default: false},
             genre: {type: String, enum: UGCGenre, default: 'miix'},
             contentGenre: {type: String, enum: ugcContentGenre}, //Is normally the id of main template that this UGC uses
             contentSubGenre: {type: String}, //Is normally the id of sub template that this UGC uses
@@ -158,7 +158,7 @@ FM.DB = (function(){
             highlight: {type: Boolean, default: false},
             hot: {type: Boolean, default: false},
             fbProfilePicture: {type: String},
-            vip: {type: Boolean, default: false}
+            contentClass: {type: String, enum: ugcContentClass,default:"normal"}
         }); //  UGC collection
         
         var CommentSchema = new Schema({

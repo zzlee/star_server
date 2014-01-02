@@ -107,7 +107,6 @@ template.uploadToServer = function(){
                 	            time: (new Date()).getTime()
                 	        },
                 	        success: function(data, textStatus, jqXHR ){
-                	        	console.log(data);
                 	        	console.log("Upload result image UGC to server");
                 	        	async.series([
                 	        	              function(callback_vip){
@@ -152,7 +151,12 @@ template.uploadToServer = function(){
                 	        	          ],
                 	        	          // optional callback
                 	        	          function(err, results){
-                	        					callback(null);
+                	        		             if(!err){
+                	        		            	 
+                	        		            	 callback(null);
+                	        		             }else{
+                	        		            	 callback(null);
+                	        		             }
                 	        	          });
                 	        	
                 	        	
