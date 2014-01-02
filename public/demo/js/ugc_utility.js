@@ -87,7 +87,7 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
                     var testWidth = metrics.width;
                     
                     if(testWidth > maxWidth){
-                    	if(true) {
+                    	if(cursorY < 137) {
                         	context.fillText(line, cursorX, cursorY);
                         }
                         line = words[wordCount][chWordCount];
@@ -103,7 +103,7 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
                 var testWidth = metrics.width;
                 
                 if(testWidth > maxWidth){
-                	if(true) {
+                	if(cursorY < 137) {
                     	context.fillText(line, cursorX, cursorY);
                     }
                     line = words[wordCount] + " ";
@@ -113,7 +113,7 @@ ugcUtility.drawChineseText = function(context, text, x, y, maxWidth, lineHeight,
                 }
             }
         }
-        if(true) {
+        if(cursorY < 137) {
         	context.fillText(line, cursorX, cursorY);
         }
         
