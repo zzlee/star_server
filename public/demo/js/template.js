@@ -16,7 +16,7 @@ template.uploadToServer = function(){
     async.series([
                   function(callback){
                 	  //upload result image UGC to server
-                	    $.ajax( url+"/miix/base64_image_ugcs/" + ugcProjectId, {
+                	    $.ajax( url+"/miix/web/ugcs_info/" + ugcProjectId, {
                 	        type: "PUT",
                 	        data: {
 //                	            imgBase64: reultURI,
