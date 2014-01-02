@@ -144,7 +144,7 @@ var path = require('path'),
 var workingPath = process.cwd();
 var canvasMgr = require('./canvas_mgr.js');
 app.post('/miix/ugcInfo/', function(req,res){
-	console.dir(req.body);
+	//console.dir(req.body);
 	var tempPath = req.files.file.path;
 	
 	 var projectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectId);
