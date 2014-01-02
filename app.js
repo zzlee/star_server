@@ -139,6 +139,113 @@ async.waterfall([
 });
 
 
+var path = require('path'),
+	fs = require('fs');
+var workingPath = process.cwd();
+var canvasMgr = require('./canvas_mgr.js');
+app.post('/miix/ugcInfo/', function(req,res){
+	console.dir(req.body);
+	var tempPath = req.files.file.path;
+	
+	 var projectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectId);
+     var userDataDir = path.join( projectDir, 'user_data');
+     if ( !fs.existsSync(projectDir) ) {
+         fs.mkdirSync( projectDir );  //TODO: check if this is expensive... 
+     }
+     if ( !fs.existsSync(userDataDir) ) {
+         fs.mkdirSync( userDataDir );  //TODO: check if this is expensive... 
+     }
+     target_path = path.join( userDataDir, req.files.file.name);
+	 
+    
+	    var moveFile = function( _tmp_path, _target_path, _moveFile_cb )  {
+	        var util = require('util');
+	            
+	        var is = fs.createReadStream(_tmp_path);
+	        var os = fs.createWriteStream(_target_path);
+	        
+	        util.pump(is, os, function(err) {
+	            if (!err) {
+	                fs.unlink(_tmp_path, function() {
+	                    if (!err) {
+	                        logger.info( 'Finished uploading to ' + _target_path );
+	                        
+	                        if ( _moveFile_cb ) {
+	                            _moveFile_cb();
+	                        }
+	                    }else {
+	                        logger.info('Fail to delete temporary uploaded file: '+err);
+	                        res.send( {err:'Fail to delete temporary uploaded file: '+err});
+	                    }
+	                });
+	            }
+	            else {
+	                logger.info('Fail to do util.pump(): '+err);
+	                res.send( {err:'Fail to do util.pump(): '+err } );
+	            }
+	        });			
+	    };
+	    async.series([
+	                  function(callback){
+	                	  moveFile(tempPath, target_path);
+	                	  callback(null);
+	                  },
+	                  function(callback){
+	                	  
+	                	  var tmpLength = req.body.genre.split("_").length;
+	                	  var subTemplate = req.body.genre.split("_")[tmpLength - 1];
+	                	  var text = "";
+	                	  if(req.body.text){
+	                		 text = req.body.text;
+	                	  }
+	                	  
+	                	  if(subTemplate == "pic"){
+	                		  subTemplate = "picture_only";
+	                	  }else if(subTemplate == "text"){
+	                		  subTemplate = "picture_plus_text";
+	                	  }
+	                	  var content = {
+	                			  "id" :  req.body._id,
+	                			  "fbId": req.body.fbUserId,
+	                			  "projectId": req.body.projectId,
+	                			  "template": req.body.genre,
+	                			  "file": req.files.file.name,
+	                			  "subTemplate" : subTemplate,
+	                			  "text": text
+	                	  }
+	                	  //console.dir(content);
+	                	  canvasMgr.genLongPhoto(content, function(err, res){
+	                		  if(err) logger.info( 'Finished genImageUGC Failed.');
+	                		  if(!err) {
+	                			  logger.info( 'Stat generate UGCs.');
+	                			  callback(null);
+	                		  }
+	                	  });
+	                  }
+	                  ],function(err){
+	    				if(err){
+	    					logger.info('Failed to upload and gen UGCs');
+	    				}else{
+	    					logger.info( 'Send redirect html to client side. ');
+	    				    res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+	    				    res.write('<html>');
+	    				    res.write('<script>');
+	    				    res.write('function init(){' +
+	    				    			'setTimeout(' +
+	    				    			"window.location = 'http://jean.ondascreen.com/demo/preview.html',15000);" +
+//	    				    				"window.location = 'http://internal.ondascreen.com/demo/preview.html',15000);" +
+	    				    			'}');
+	    				    res.write('</script>');
+	    				    res.write("<body onload='init();'><h4>圖片合成中，請稍候......</h4></body></html>");
+	    				    res.end();
+	    				}
+	    	
+	    });
+
+//	    res.send({message:'Upload successfully'});
+	    
+	
+});
 
 
 

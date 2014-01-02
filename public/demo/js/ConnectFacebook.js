@@ -34,7 +34,7 @@ ConnectFacebook.logIn = function(){
 	            	  		  userID = response.authResponse.userID;
 	            	  		  callback(null);
 	            	  	  }else{
-	            	  		  console.log("logIn :");
+//	            	  		  console.log("logIn :");
 	            	  		  callback("Log In not successfully");
 	            	  	  }
 	            	  	
@@ -51,6 +51,8 @@ ConnectFacebook.logIn = function(){
 	            					"email": response.email,
 	            					"accessToken": accessToken,
 	            					"expiresIn":  expiresIn,
+	            					"platform" : "WLS",
+	            					"deviceToken": "webapp", //Water Land Securities
 	            					"timestamp": Date.now()
 	            				}
 	            			};
