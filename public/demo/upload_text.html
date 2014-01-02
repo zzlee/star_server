@@ -48,7 +48,7 @@
 	<script>
 	$( document ).ready(function() {
 		if(localStorage.template_userText){
-			var text = localStorage.template_userText.replace("#",/\n/g);
+			var text = localStorage.template_userText.replace("_",/\n/g);
 			$("#inputText").val(text);
 		}
 	});
@@ -68,7 +68,7 @@
 			
 			$("#inputText").focus(function(){
 				if(localStorage.template_userText){
-					var text = localStorage.template_userText.replace("#",/\n/g);
+					var text = localStorage.template_userText.replace("_",/\n/g);
 					$("#inputText").val(text);
 				}else{
 					$("#inputText").val('');
@@ -78,7 +78,7 @@
 				if(btnWowPicText.val() == ""){
 					alert("您忘記選擇圖片！");
 				}else{
-					var inputContent = $("#inputText").val().replace(/\n/g,"#");
+					var inputContent = $("#inputText").val().replace(/\n/g,"_");
 					console.log(inputContent);
 				
 					async.series([
@@ -141,7 +141,7 @@
 		    var offSetPrevious = 0;
 		    
 		    for(var i = 0; i<sourceText.length; i++) {
-		        if(regExp_Chinese.test(sourceText[i]) && sourceText[i] != '#' && i != sourceText.length-1) {
+		        if(regExp_Chinese.test(sourceText[i]) && sourceText[i] != '_' && i != sourceText.length-1) {
 		            if(regExp_English.test(sourceText[i+1])) {
 		                getIndexNext.push(i);
 		            }
@@ -154,7 +154,7 @@
 		    }
 		    
 		    for(var i = 0; i<sourceText.length; i++) {
-		        if(regExp_Chinese.test(sourceText[i]) && sourceText[i] != '#' && i != 0) {
+		        if(regExp_Chinese.test(sourceText[i]) && sourceText[i] != '_' && i != 0) {
 		            if(regExp_English.test(sourceText[i-1])) {
 		                getIndexPrevious.push(i);
 		            }
