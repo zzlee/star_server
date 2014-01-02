@@ -214,8 +214,8 @@ ImageUgc = (function(){
                 cb_constructor(null, obj);
             }
             else {
-//                cb_constructor('Failed to initiate an ImageUgc object: '+err, null);
-            	cb_constructor("您忘了選擇圖片！", null);
+                cb_constructor('Failed to initiate an ImageUgc object: '+err, null);
+//            	cb_constructor("您忘了選擇圖片！", null);
             }
         });
     }
