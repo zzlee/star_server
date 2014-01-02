@@ -1,8 +1,6 @@
 var template = {};
-var imageUgcInstance = null;
 var remotesite = serverUrl;
 var url = domainUrl;
-
 
 template.uploadToServer = function(){
 	var ugcInfo = {
@@ -14,9 +12,6 @@ template.uploadToServer = function(){
 			title : "today's mood"
 	};
     var ugcProjectId = localStorage.projectId;
-//    var reultURI = localStorage.longImageUrl.replace('image/octet-stream');
-//    var doohPreviewResultURI = localStorage.doohPreviewImageUrl.replace('image/octet-stream');
-    
     async.series([
                   function(callback){
                 	  //upload result image UGC to server
@@ -34,8 +29,7 @@ template.uploadToServer = function(){
                 	            time: (new Date()).getTime()
                 	        },
                 	        success: function(data, textStatus, jqXHR ){
-                	        	console.log("Upload result image UGC to server");
-//                	        	alert("Upload image UGC sucessfully");
+//                	        	console.log("Upload result image UGC to server");
                 	            callback(null);
                 	        },
                 	        error: function(jqXHR, textStatus, errorThrown){
@@ -99,3 +93,4 @@ template.uploadToServer = function(){
     			});//end of async.series
    
 };
+
