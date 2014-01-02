@@ -144,7 +144,7 @@ var path = require('path'),
 var workingPath = process.cwd();
 var canvasMgr = require('./canvas_mgr.js');
 app.post('/miix/ugcInfo/', function(req,res){
-//	console.dir(req.body);
+	console.dir(req.body);
 	var tempPath = req.files.file.path;
 	
 	 var projectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectId);
@@ -232,8 +232,8 @@ app.post('/miix/ugcInfo/', function(req,res){
 	    				    res.write('<script>');
 	    				    res.write('function init(){' +
 	    				    			'setTimeout(' +
-//	    				    			"window.location = 'http://jean.ondascreen.com/demo/preview.html',15000);" +
-	    				    				"window.location = 'http://internal.ondascreen.com/demo/preview.html',15000);" +
+	    				    			"window.location = 'http://jean.ondascreen.com/demo/preview.html',15000);" +
+//	    				    				"window.location = 'http://internal.ondascreen.com/demo/preview.html',15000);" +
 	    				    			'}');
 	    				    res.write('</script>');
 	    				    res.write("<body onload='init();'><h4>圖片合成中，請稍候......</h4></body></html>");
