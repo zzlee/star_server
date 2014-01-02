@@ -155,7 +155,7 @@ ConnectFacebook.redirectLogIn = function(){
 	            		    				if(response.data){
 	            		    					localStorage._id = response.data._id;
 	            		    					localStorage.miixToken = response.data.miixToken;
-//	            		    					console.log("localStorage" + JSON.stringify(localStorage));
+	            		    					console.log("localStorage" + JSON.stringify(localStorage));
 	            		    					callback(null);
 	            		    					//window.open(serverUrl + "/template.html", "_self");
 	            		    				}else{
@@ -170,7 +170,7 @@ ConnectFacebook.redirectLogIn = function(){
 	          			
 	            		  req.open("GET", url);
 	            		  req.send({"timestamp": Date.now()});
-	            		  callback(null);
+	            		  //callback(null);
 	            	  }//End of If
 	              },
 	              function(callback){
