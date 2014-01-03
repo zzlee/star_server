@@ -116,6 +116,7 @@ template.uploadToServer = function(){
                                       alert("投稿成功！！" + aPush.content.substring(0,14) + "排定時段後，你會收到facebook預告，通知播出日期時間。");
                                       //Let DB know user read the msg
                                       $.ajax(url + "/miix/message/" + aPush._id ,settings_push_after_confirm);
+                                      window.location = remotesite + '/template.html';
 	                              };
 	                              async.eachSeries(data, iterator, function(err, results){
 	                                  if (!err){
