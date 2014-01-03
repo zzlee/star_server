@@ -110,8 +110,7 @@
            
         	<form id="form-search"  method="GET" accept-charset="utf-8" >
             	<div class="clearfix">
-                    <input id="code" name="s" type="text" onFocus="if(this.value =='' ) this.value=''" onBlur="if(this.value=='') this.value=''" value="輸入VIP碼，若無則免填" >
-                    <label style="color:#F25C27; font-size:14pt;">若有VIP碼請先填入再點選Facebook登入，若無則直接點選Facebook登入。</label>
+                    <input id="code" name="s" type="text" onFocus="if(this.value =='' ) this.value=''" onBlur="if(this.value=='') this.value=''" value="若有VIP碼請先填入再點選Facebook登入，若無則直接點選Facebook登入。" style="width:45%" >
                 </div>
             </form>
             <script>
@@ -123,14 +122,14 @@
 			<script>
 		
 		$('#code').bind('focus',function(){
-			if($('#code').val() != '輸入VIP碼，若無則免填'){
+			if($('#code').val() != '若有VIP碼請先填入再點選Facebook登入，若無則直接點選Facebook登入。'){
 			}else{
 				$('#code').val('');
 			}
 		});
 		$("#fbBtn").bind("click",function(){
 			var code = $('#code').val();
-			if(code != '輸入VIP碼，若無則免填' && code != ''){
+			if(code != '若有VIP碼請先填入再點選Facebook登入，若無則直接點選Facebook登入。' && code != ''){
 				
 				var setting_getVIP = {
                         type: "GET",
