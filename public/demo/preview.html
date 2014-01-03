@@ -50,10 +50,11 @@
 			setTimeout(function(){
 				var doohPreviewImageUrl = domainUrl + "/contents/user_project/" + localStorage.projectId + "/" + localStorage.projectId + "_dooh_preview.png";
 				preview.attr({src:doohPreviewImageUrl});
-			},15000);
+			},13000);
 			var btnUpload = $("#btnUpload");
 			btnUpload.click(function(){
-				delete localStorage.template_userText; //by Joy just for hint text remove 
+				delete localStorage.template_userText; //by Joy just for hint text remove
+				if(confirm())
 				template.uploadToServer();
 				btnUpload.hide();
 			});
