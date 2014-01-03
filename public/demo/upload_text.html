@@ -63,8 +63,13 @@
 			
 			btnChoosePic.click(function(){
 				btnWowPicText.click();
+
 			});
 			
+			btnWowPicText.change(function(){
+				var length = btnWowPicText.val().split('\\').length - 1;
+				$('#pic').html(btnWowPicText.val().split('\\')[length]);
+			});
 			
 			$("#inputText").focus(function(){
 				if(localStorage.template_userText){
@@ -210,8 +215,7 @@
           <div class="span12">
         <div class="navbar navbar_">
               <div class="container">
-            <h1 class="brand brand_"><a href="index.html"><img alt="" src="img/logo.png"> </a></h1>
-
+            <h2 class="brand"><a href="index.html" style="color:#000;text-shadow:none;font-size:250%">我要上小巨蛋</a></h2>
             <div class="nav-collapse nav-collapse_  collapse"></div>
           </div>
             </div>
@@ -234,6 +238,7 @@
         <div class="block-slogan">
         	<p style="text-align:left; padding-top:20px;">
             	<button id="chossePic" class="btn btn-1">選擇圖片</button>
+            	<button id="pic" class="btn btn-1" style="background:url(../img/bg-content.jpg) 50% 50%;"></button>
            	</p>
            	<div style="height:0px;overflow:hidden"> 
 				<form id="imgform" method="post" action="#" enctype="multipart/form-data">  
