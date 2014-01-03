@@ -113,14 +113,18 @@
                     <input id="code" name="s" type="text" onFocus="if(this.value =='' ) this.value=''" onBlur="if(this.value=='') this.value=''" value="若有VIP碼請先填入再點選Facebook登入，若無則直接點選Facebook登入。" style="width:45%" >
                 </div>
             </form>
+          	
             <script>
             
             </script>
 			<figure class="img-indent">
-            	  <input id="fbBtn" type="image" src="img/fb.png" />	
+            	  <input id="fbBtn" type="image" src="img/fb.png" value=""/><button id="hint" class="btn btn-1" style="color:#9CABAF;background:#fff">提醒您，記得開啟允許彈跳視窗，才能登入Facebook!</button>
 			</figure>
 			<script>
 		
+			if(navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone|iPad|iPod/i)){
+				$('#hint').html("");
+			}
 		$('#code').bind('focus',function(){
 			if($('#code').val() != '若有VIP碼請先填入再點選Facebook登入，若無則直接點選Facebook登入。'){
 			}else{
