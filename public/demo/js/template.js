@@ -113,7 +113,7 @@ template.uploadToServer = function(){
 	                          success: function(data, textStatus, jqXHR ){
 	                              var iterator = function(aPush){
 //	                            	  console.log('push msg: ' + aPush.content);
-                                      alert(aPush.content.substring(0,14) + "排定時段後，你會收到facebook預告，通知播出日期時間。");
+                                      alert("投稿成功！！" + aPush.content.substring(0,14) + "排定時段後，你會收到facebook預告，通知播出日期時間。");
                                       //Let DB know user read the msg
                                       $.ajax(url + "/miix/message/" + aPush._id ,settings_push_after_confirm);
 	                              };
