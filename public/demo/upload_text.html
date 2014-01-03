@@ -76,7 +76,9 @@
 					var text = localStorage.template_userText.replace(/\_/ig,"\n");
 					$("#inputText").val(text);
 				}else{
-					$("#inputText").val('');
+					if($("#inputText").val() == "請分三行，輸入24個文字"){
+						$("#inputText").val('');
+					}
 				}
 			});
 			btnSend.click(function(){
