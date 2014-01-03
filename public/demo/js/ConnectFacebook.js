@@ -62,7 +62,7 @@ ConnectFacebook.logIn = function(){
 	            					"email": response.email,
 	            					"accessToken": accessToken,
 	            					"expiresIn":  expiresIn,
-	            					"platform" : "WLS",
+	            					"devicePlatform" : "WLS",
 	            					"deviceToken": "webapp", //Water Land Securities
 	            					"timestamp": Date.now()
 	            				}
@@ -145,7 +145,7 @@ ConnectFacebook.redirectLogIn = function(){
 	            	    					"email": response.email,
 	            	    					"accessToken": accessToken,
 	            	    					"expiresIn":  expiresIn,
-	            	    					"platform" : "WLS",
+	            	    					"devicePlatform" : "WLS",
 	            	    					"deviceToken": "webapp", //Water Land Securities
 	            	    					"timestamp": Date.now()
 	            	    					}
