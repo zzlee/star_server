@@ -48,7 +48,7 @@
 	<script>
 	$( document ).ready(function() {
 		if(localStorage.template_userText){
-			var text = localStorage.template_userText.replace("_",/\n/g);
+			var text = localStorage.template_userText.replace(/\_/ig,"\n");
 			$("#inputText").val(text);
 		}
 	});
@@ -68,7 +68,7 @@
 			
 			$("#inputText").focus(function(){
 				if(localStorage.template_userText){
-					var text = localStorage.template_userText.replace("_",/\n/g);
+					var text = localStorage.template_userText.replace(/\_/ig,"\n");
 					$("#inputText").val(text);
 				}else{
 					$("#inputText").val('');
