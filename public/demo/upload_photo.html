@@ -61,6 +61,12 @@
 				btnWowPic.click();
 			});
 			
+			//Display file name after user choose the photo
+			btnWowPic.change(function(){
+				var length = btnWowPic.val().split('\\').length - 1;
+				$('#pic').html(btnWowPic.val().split('\\')[length]);
+			});
+			
 			btnSubmit.click(function(){
 				if(btnWowPic.val() == ""){
 					alert("別忘了選擇圖片！");
@@ -157,9 +163,11 @@
 					<input name="filesSubmit" id="upload" type="submit" />
 				</form>
            	</div>
-			<p style="text-align:right; padding-top:20px;">
+			<p style="text-align:left; padding-top:20px;">
             	<button id="chossePic" class="btn btn-1">選擇圖片</button>
-            <p style="text-align:right; padding-top:20px;">
+            	<button id="pic" class="btn btn-1" style="background:url(../img/bg-content.jpg) 50% 50%;"></button>
+			</p>
+			<p style="text-align:left; padding-top:20px;">
             	<button id="btnSubmit" class="btn btn-1">上傳圖片</button>
             </p>
           </div>
