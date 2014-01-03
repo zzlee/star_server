@@ -125,6 +125,12 @@
 			if(navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone|iPad|iPod/i)){
 				$('#hint').html("");
 			}
+			if(navigator.userAgent.match(/Android|iPhone|iPad|iPod/i)){
+				$('#code').css({"width":"100%"});
+			}else{
+				$('#code').css({"width":"45%"});
+			}
+			
 		$('#code').bind('focus',function(){
 			if($('#code').val() != '若有VIP碼請先填入再點選Facebook登入，若無則直接點選Facebook登入。'){
 			}else{
