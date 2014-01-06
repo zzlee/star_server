@@ -48,7 +48,7 @@ var _private = {
                      '&projectId=' + projectId + 
                      '&file=' + file +
                      '&subTemplate=' + subTemplate +
-                     '&text=' + text]);
+                     '&text=' + escape(text)]);
 		        chrome.stdout.on('data', function (data) {   FM_LOG('[_private.genLongPhoto] stdout: ' + data);   });
 		        chrome.stderr.on('data', function (data) {	 FM_LOG('[_private.genLongPhoto] stderr: ' + data);  });
 		        chrome.on('close', function (code) {

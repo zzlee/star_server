@@ -76,7 +76,8 @@
 				        
 					        //Check subTemplate : mood, cultural_and_creative
 							if((aryPara["text"] != null) && (aryPara["text"] != "undefined")){
-								userContent.text = decodeURI(aryPara["text"]);
+								//userContent.text = decodeURI(aryPara["text"]);
+								userContent.text = unescape(aryPara["text"]);
 								
 						    }else{
 						       	userContent.text = "";
