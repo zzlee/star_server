@@ -356,7 +356,7 @@ miixHandler.updateVIPStatus_cb = function(req, res) {
 miixHandler.updateVIPinUGC_cb = function(req, res) {
     logger.info('[PUT '+req.path+'] is called');
     if (req.body.projectId){
-        var condition = {contentClass: 'vip'};
+        var condition = {contentClass: 'VIP'};
         
         miixContentMgr.updateVIPinUGC( req.body.projectId, condition, function(err){
             if (!err){

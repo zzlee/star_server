@@ -51,7 +51,7 @@ FM.DB = (function(){
             videoStatus = 'good soso bad waiting none'.split(' '), //DEPRECATE, keep for reference
             videoGenre = 'miix miix_street miix_story'.split(' '); //DEPRECATE, keep for reference 
             //programTimeSlotStatus = 'waiting proved'.split(' ');
-        	ugcContentClass = 'normal vip'.split(' ');
+        	ugcContentClass = 'normal VIP'.split(' ');
         
 		/****************** DB Schema ******************/
 		
