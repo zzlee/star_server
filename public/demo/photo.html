@@ -45,65 +45,113 @@
 	<script src="js/ugc_utility.js"></script>
 	<script src="js/dooh_info.js"></script>
 	<script src="js/dooh_preview.js"></script>
-	<script src="js/jquery.form.js"></script>
+	<script src="js/photoCropper.js"></script>
+	<script src="js/kinetic-v4.0.5.min.js"></script>
 	
 	<script>
-		function init(){
-			var btnChoosePhoto = $("#chossePic");
-			var btnSubmit = $('#btnSubmit');
-			var btnWowPic = $("#wow_pic");
-			
-			var btnUpload = $("#upload");
-			
-			
-			btnChoosePhoto.click(function(){
-				localStorage.selectedTemplate = "wow_pic";
-				btnWowPic.click();
-			});
-			
-			//Display file name after user choose the photo
-			btnWowPic.change(function(){
-				var length = btnWowPic.val().split('\\').length - 1;
-				$('#pic').html(btnWowPic.val().split('\\')[length]);
-			});
-			
-			btnSubmit.click(function(){
-				if(btnWowPic.val() == ""){
-					alert("別忘了選擇圖片！");
-				}else{
-					/**
-				    var ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
-					var form = $("#imgform");
-					localStorage.projectId = ugcProjectId;
-					
-					$("#ugcId").attr("value", ugcProjectId);
-					$("#userId").attr("value", localStorage._id);
-					$("#fbId").attr("value", localStorage.fbId);
-					$("#contentGenre").attr("value", localStorage.selectedTemplate);
-					action = "/miix/ugcInfo/"; 
-					form.attr("action", action);
-					btnUpload.click();
-					*/
-					var ugcProjectId = null;
-					if(localStorage.projectId  != null){
-						ugcProjectId = localStorage.projectId;
-					}else{
-						ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
-					}
-				    
-					var form = $("#imgform");
-					var length = btnWowPic.val().split('\\').length - 1;
-					localStorage.projectId = ugcProjectId;
-					localStorage.fileName = btnWowPic.val().split('\\')[length];
-					$("#ugcId").attr("value", ugcProjectId);
-					action = "/miix/originalImage/"; 
-					form.attr("action", action);
-					btnUpload.click();
-				}
-
-			});
+    	function initCropper(divID, imgUrl, imgHeight, imgWidth) {
+		        var stageAllowableWidth = window.innerWidth * 0.7;
+		        var stageAllowableHeight = window.innerHeight * 0.7;
+		        var cropperWidthToHeightRatio = imgWidth / imgHeight;
+				var myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
+				var btnGenerate = $('#btnGenerate');
+				var croppedArea = {};
+				/** Start to generate longPhoto and doohPreview */
+				btnGenerate.click(function(){
 				
-		}
+					async.series([
+						function(callback){
+							//Cropper the photo when user wants
+							croppedArea = myPhotoCropper.getCroppedArea();
+							var rawPhotoImg = new Image();
+							rawPhotoImg.src = imgUrl;
+							rawPhotoImg.onload = function(){ 
+								console.log("[rawPhotoImg.onload]");		
+					
+								var sourceCanvas = document.createElement("canvas");
+								var sourceCanvasContext = sourceCanvas.getContext("2d");
+								sourceCanvas.width = rawPhotoImg.width;
+								sourceCanvas.height = rawPhotoImg.height;
+								sourceCanvasContext.drawImage(rawPhotoImg, 0, 0);
+								var destinationCanvas = document.createElement("canvas");
+								var destinationCanvasContext = destinationCanvas.getContext("2d");
+								destinationCanvas.width = rawPhotoImg.width * croppedArea.width;
+								destinationCanvas.height = rawPhotoImg.height * croppedArea.height;
+								destinationCanvasContext.drawImage(sourceCanvas,
+																		rawPhotoImg.width * croppedArea.x,
+																		rawPhotoImg.height * croppedArea.y,
+																		rawPhotoImg.width * croppedArea.width,
+																		rawPhotoImg.height * croppedArea.height,
+																		0, 0,
+																		destinationCanvas.width,
+																		destinationCanvas.height);
+								localStorage.photoCroppedURI = destinationCanvas.toDataURL();
+								console.log();
+								console.log("End to cropper photo");
+								callback(null);
+							};//end of rawPhotoImg.onload
+						},
+						function(callback){
+							//Start to generate longPhoto and the Preview of dooh.
+							var imageUgc;
+							var userContent = {
+								text: null,
+								picture: {
+									urlOfCropped: localStorage.photoCroppedURI, //the URL of the picture that the user crops. (It is normally a base64 string got from canvas.toDataURL() )
+									crop: {_x:0, _y:0, _w:0, _h:0},  // _x=x_crop/width_picture; _y=y_crop/height_picture; _w=width_crop/width_picture;  _h=height_crop/height_picture
+								},
+								thumbnail:{
+									url: localStorage.profilePhoto
+								}
+								
+							};
+							var template = localStorage.selectedTemplate;
+							//subTemplate is picture_only (For Test)
+							
+							ImageUgc.getInstance(template, "picture_only", userContent, function(err, _imageUgc){
+								if(!err){
+									imageUgc = _imageUgc;
+									localStorage.longphotoUrl = imageUgc.getImageUrl();
+									localStorage.doohPreviewUrl = imageUgc.getDoohPreviewImageUrl();
+									localStorage.customizableObjects = imageUgc.getCustomizableObjects();
+									window.location = serverUrl + "/preview.html";
+								}else{
+									console.log("[imageUgc.generate] Failed");
+								}
+							
+							});
+							
+						}],
+						function(err){
+							if(err){
+								console.log(err);
+							}
+					
+					});
+					
+			
+				});//End of btnGenerate.click
+				
+    	}
+    	
+    	
+		function init(){
+
+			//var btnSubmit = $('#btnSubmit');
+
+			
+			//var btnUpload = $("#upload");
+			//Display photo that user upload.
+			var imageUrl = "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
+			//document.getElementById("slide").src = 
+			
+			document.getElementById("slide").src = imageUrl;
+			var slide = $("#slide");
+			
+			initCropper("show", imageUrl, slide.height(), slide.width());
+			slide.hide();
+				
+		}//End of function init();
 
 	</script>
 	
@@ -157,33 +205,19 @@
     <div class="container">
 		<div class="row">
 			<div class="span12"> 
-				<h3>版型一</h3>
-				<!-- slider -->
 				<div class="slide">
-					<img src="img/t1.jpg">
+					<img id="slide" src="img/t1.jpg">
 				</div>
-                <span id="responsiveFlag"></span>
+				<div class="slide" id="show">
+				
+				</div>
+				<span id="responsiveFlag"></span>
 				<div class="block-slogan">
-					<div style="height:0px;overflow:hidden"> 
-						
-						<!-- If let user only chosse CAMERA just use next line to do.-->
-						<!-- <input id="wow_pic" type="file" accept="image/*" capture="camera"/> -->
-						<!--  <input type="file" accept="image/*"/>-->
-						<form id="imgform" method="post" action="#" enctype="multipart/form-data">  
-							<!--	<form name="uploadFiles" id="imgform" method="post" action="/miix/video/user_content_files"> -->
-							<input name="file" id="wow_pic" type="file"  />
-							<input name="projectId" id="ugcId" type="hidden"/>
-							<input name="filesSubmit" id="upload" type="submit" />
-						</form>
-					</div>
 					<p style="text-align:left; padding-top:20px;">
-						<button id="chossePic" class="btn btn-1">選擇圖片</button>
-						<button id="pic" class="btn btn-1" style="background:url(../img/bg-content.jpg) 50% 50%;"></button>
-					</p>
-					<p style="text-align:left; padding-top:20px;">
-						<button id="btnSubmit" class="btn btn-1">上傳圖片</button>
+						<button id="btnGenerate" class="btn btn-1">開始合成</button>
 					</p>
 				</div>
+        
 			</div>
 		</div>
 	</div>
@@ -204,10 +238,10 @@
 			<li><a class="icon-2" href="#"></a></li>
 			<li><a class="icon-3" href="#"></a></li>
 			<li><a class="icon-4" href="#"></a></li>
-		</ul>
-		<div class="privacy pull-left">&copy; 2013 | <a href="http://www.dzyngiri.com">Dzyngiri : Online Design Magazine</a> |</div>
+        </ul>
+    <div class="privacy pull-left">&copy; 2013 | <a href="http://www.dzyngiri.com">Dzyngiri : Online Design Magazine</a> |</div>
 	</div>
 </footer>
-<script type="text/javascript" src="js/bootstrap.js"></script>
+	<script type="text/javascript" src="js/bootstrap.js"></script>
 </body>
 </html>
