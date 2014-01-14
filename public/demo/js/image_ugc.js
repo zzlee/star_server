@@ -63,7 +63,8 @@ ImageUgc = (function(){
                                 ownerFbUserId: ugcInfo.ownerId.fbUserId,
                                 contentGenre: "mood",
                                 title: ugcInfo.title,
-                                customizableObjects: JSON.stringify(customizableObjects),
+                                //customizableObjects: JSON.stringify(customizableObjects),
+								customizableObjects: localStorage.customizableObjects,
                                 miixToken: "53768608",
                                 time: (new Date()).getTime()
                             },

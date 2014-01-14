@@ -48,9 +48,13 @@
 			var preview = $('#imgPreview');
 			//wow_pic-529dafa950ceec4015000005-20131230T085843037Z_dooh_preview.png
 			setTimeout(function(){
-				var doohPreviewImageUrl = domainUrl + "/contents/user_project/" + localStorage.projectId + "/" + localStorage.projectId + "_dooh_preview.png";
-				preview.attr({src:doohPreviewImageUrl});
-			},15000);
+				//var doohPreviewImageUrl = domainUrl + "/contents/user_project/" + localStorage.projectId + "/" + localStorage.projectId + "_dooh_preview.png";
+				preview.attr({src:localStorage.doohPreviewUrl});
+				console.log("localStorage.longphotoUrl");
+				console.log(localStorage.longphotoUrl);
+				console.log("localStorage.photoCroppedURI");
+				console.log(localStorage.photoCroppedURI);
+			},1000);
 			var btnUpload = $("#btnUpload");
 			btnUpload.click(function(){
 				if(localStorage.VIPCodeId){

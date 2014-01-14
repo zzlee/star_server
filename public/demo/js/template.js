@@ -16,16 +16,18 @@ template.uploadToServer = function(){
     async.series([
                   function(callback){
                 	  //upload result image UGC to server
-                	    $.ajax( url+"/miix/web/ugcs_info/" + ugcProjectId, {
+                	    //$.ajax( url+"/miix/web/ugcs_info/" + ugcProjectId, {
+						$.ajax( url + "/miix/base64_image_ugcs/" + ugcProjectId, {
                 	        type: "PUT",
                 	        data: {
-//                	            imgBase64: reultURI,
-//                	            imgDoohPreviewBase64: doohPreviewResultURI,
+                	            imgBase64: localStorage.longphotoUrl ,
+                	            imgDoohPreviewBase64: localStorage.doohPreviewUrl,
                 	            ownerId: ugcInfo.ownerId._id,
                 	            ownerFbUserId: ugcInfo.ownerId.fbUserId,
                 	            contentGenre: "mood",
                 	            title: ugcInfo.title,
 //                	            customizableObjects: localStorage.customizableObjects,
+								customizableObjects: localStorage.customizableObjects,
                 	            miixToken: localStorage.miixToken,
                 	            time: (new Date()).getTime()
                 	        },
