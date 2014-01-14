@@ -79,6 +79,13 @@ miixHandler.putBase64ImageUgcsFromWeb_cb = function(req, res){
 };
 
 //PUT /miix/web/ugcs_info/:ugcProjectId
+/**
+ * Upload ugc's information and let server upload files to S3.<br>
+ * The method handle ugc from web app because some browser can't use FileReader to generate long photo and dooh preview.<br>
+ * After upload S3 successfully, send the message which UGC's number to tell client side.  
+ * @method  miixHandler.putImageUgcsInfo_cb 
+ * @returns {Callback}
+ */
 miixHandler.putImageUgcsInfo_cb = function(req, res){
 	logger.info('[PUT '+req.path+'] is called');
 	var timeOfBeingCalled = (new Date()).getTime();
@@ -262,6 +269,7 @@ miixHandler.putFbPostIdUserLiveContents_cb = function(req, res) {
 
 //GET /miix/members/:memberId/message
 miixHandler.getMessageList_cb = function(req, res) {
+	console.dir(req.body);
     logger.info('[GET '+req.path+'] is called');
     if (req.params.memberId){
         var ugcInfo = req.body.fb_postId;

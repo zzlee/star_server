@@ -138,7 +138,11 @@ async.waterfall([
     }
 });
 
-
+/**
+ * Upload temp file from web app.
+ * @author Jean
+ * @todo need to move miix_handler.js
+ */
 var path = require('path'),
 	fs = require('fs');
 var workingPath = process.cwd();
@@ -246,8 +250,84 @@ app.post('/miix/ugcInfo/', function(req,res){
 	    
 	
 });
+//post/miix/originalImage
+/**
+ * Upload user's photo and saved in server temporily for croppering the photo
+ * @author Jean
+ * @todo Need to move to miix_handler.js
+ */
+app.post('/miix/originalImage/', function(req,res){
+	console.dir(req.body);
+	var tempPath = req.files.file.path;
+	
+	 var projectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectId);
+     var userDataDir = path.join( projectDir, 'user_data');
+     if ( !fs.existsSync(projectDir) ) {
+         fs.mkdirSync( projectDir );  //TODO: check if this is expensive... 
+     }
+     if ( !fs.existsSync(userDataDir) ) {
+         fs.mkdirSync( userDataDir );  //TODO: check if this is expensive... 
+     }
+     target_path = path.join( userDataDir, req.files.file.name);
 
+     
+     /**
+      * Save the temp file and then send the photo's url to cliend side.
+      */
+     async.series([
+                   function(callback){
+                	   var moveFile = function( _tmp_path, _target_path, _moveFile_cb )  {
+                		   var util = require('util');
+                		   var is = fs.createReadStream(_tmp_path);
+                		   var os = fs.createWriteStream(_target_path);
+                		   util.pump(is, os, function(err) {
+                			   if (!err) {
+                				   fs.unlink(_tmp_path, function() {
+                					   if (!err) {
+                						   logger.info( 'Finished uploading to ' + _target_path );
+                						   if ( _moveFile_cb ) {
+                							   _moveFile_cb();
+                							   
+                						   }
+                					   }else {
+                						   logger.info('Fail to delete temporary uploaded file: '+err);
+                						   res.send( {err:'Fail to delete temporary uploaded file: '+err});
+                						   callback('Fail to delete temporary uploaded file: '+err);
+                					   }
+                				   });
+                			   }else {
+                				   logger.info('Fail to do util.pump(): '+err);
+                				   res.send( {err:'Fail to do util.pump(): '+err } );
+                				   callback('Fail to do util.pump(): '+err);
+                			   }
+                		   });//end of util.pump			
+                	   };// end of function moveFile
+                	   moveFile(tempPath, target_path);
+                	   callback(null);
+                	   
+                   }],function(err){
+	    				if(err){
+	    					logger.info('Failed to upload and gen UGCs' + err);
+	    				}else{
+	    					logger.info( 'Send redirect html to client side. ');
+	    				    res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+	    				    res.write('<html>');
+	    				    res.write('<script>');
+	    				    res.write('function init(){' +
+	    				    			'setTimeout(' +
+//	    				    			"window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
+	    				    				"window.location = '/demo/photo.html',1000);" +
+	    				    			'}');
+	    				    res.write('</script>');
+	    				    res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
+	    				    res.end();
+	    				}
+	    	
+	    });//End of async.series
 
+	    
+	
+});
 
 //var globalConnectionMgr = require('./global_connection_mgr.js');
 //setInterval(function(){
