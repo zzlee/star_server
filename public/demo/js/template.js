@@ -140,7 +140,9 @@ template.uploadToServer = function(){
                   function(err){
     					if(err){
     						alert(err);
-    					}
+    					}else{
+							localStorage.projectId = null;
+						}
     	
     			});//end of async.series
    

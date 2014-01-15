@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-	<title>Demo | Select Template</title>
+	<title>Demo | Proto Cropper</title>
 	<meta charset="utf-8">
 	<link rel="icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon">
     <link rel="shortcut icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon" />
@@ -13,6 +13,8 @@
 	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="css/touchTouch.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="css/kwicks-slider.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.min.css" media="screen">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="js/jquery.js"></script>
     <script type="text/javascript" src="js/superfish.js"></script>
@@ -47,6 +49,7 @@
 	<script src="js/dooh_preview.js"></script>
 	<script src="js/photoCropper.js"></script>
 	<script src="js/kinetic-v4.0.5.min.js"></script>
+	<script src="js/jquery-ui.js"></script>
 	
 	<script>
     	function initCropper(divID, imgUrl, imgHeight, imgWidth) {
@@ -86,8 +89,6 @@
 																		destinationCanvas.width,
 																		destinationCanvas.height);
 								localStorage.photoCroppedURI = destinationCanvas.toDataURL();
-								console.log();
-								console.log("End to cropper photo");
 								callback(null);
 							};//end of rawPhotoImg.onload
 						},
@@ -143,7 +144,6 @@
 			//var btnUpload = $("#upload");
 			//Display photo that user upload.
 			var imageUrl = "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
-			//document.getElementById("slide").src = 
 			
 			document.getElementById("slide").src = imageUrl;
 			var slide = $("#slide");

@@ -12,6 +12,8 @@
 	<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="css/touchTouch.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.min.css" media="screen">
 	<link rel="stylesheet" href="css/kwicks-slider.css" type="text/css" media="screen">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="js/jquery.js"></script>
@@ -46,8 +48,19 @@
 	<script src="js/dooh_info.js"></script>
 	<script src="js/dooh_preview.js"></script>
 	<script src="js/jquery.form.js"></script>
+	<script src="js/jquery-ui.js"></script>
+	<script src="js/photoCropper.js"></script>
+	<script src="js/kinetic-v4.0.5.min.js"></script>
 	
 	<script>
+		var myPhotoCropper = null;
+		var imgUrl = null;
+		function initCropper(divID, imgUrl, imgHeight, imgWidth) {
+		        var stageAllowableWidth = window.innerWidth * 0.7;
+		        var stageAllowableHeight = window.innerHeight * 0.7;
+		        var cropperWidthToHeightRatio = imgWidth / imgHeight;
+				myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
+		}
 		function init(){
 			var btnChoosePhoto = $("#chossePic");
 			var btnSubmit = $('#btnSubmit');
@@ -55,7 +68,108 @@
 			
 			var btnUpload = $("#upload");
 			
-			
+			if(localStorage.flag){
+				//The original photo upload successfully.
+				//Show the UI to cropper the photo.
+				var originalImage = $("#originalImage");
+				imageUrl =  "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
+				
+				document.getElementById("originalImage").src = imageUrl;
+				var originalImage = $("#originalImage");
+				$("#croppedPopup").dialog({
+					//dialogClass: "btn btn-1",
+					resizable: false,
+					draggable: false,
+					width: window.innerWidth * 0.7,
+					//width : 
+					position: { 
+						my: "center center", 
+						at: "center top", 
+						//of: "#croppedPopup"
+						of : window
+					},
+					modal : true,
+					buttons: [{
+						text: "開始合成",
+						click: function() {
+							async.series([
+						function(callback){
+							//Cropper the photo when user wants
+							croppedArea = myPhotoCropper.getCroppedArea();
+							var rawPhotoImg = new Image();
+							rawPhotoImg.src = imageUrl;
+							rawPhotoImg.onload = function(){ 
+								console.log("[rawPhotoImg.onload]");		
+					
+								var sourceCanvas = document.createElement("canvas");
+								var sourceCanvasContext = sourceCanvas.getContext("2d");
+								sourceCanvas.width = rawPhotoImg.width;
+								sourceCanvas.height = rawPhotoImg.height;
+								sourceCanvasContext.drawImage(rawPhotoImg, 0, 0);
+								var destinationCanvas = document.createElement("canvas");
+								var destinationCanvasContext = destinationCanvas.getContext("2d");
+								destinationCanvas.width = rawPhotoImg.width * croppedArea.width;
+								destinationCanvas.height = rawPhotoImg.height * croppedArea.height;
+								destinationCanvasContext.drawImage(sourceCanvas,
+																		rawPhotoImg.width * croppedArea.x,
+																		rawPhotoImg.height * croppedArea.y,
+																		rawPhotoImg.width * croppedArea.width,
+																		rawPhotoImg.height * croppedArea.height,
+																		0, 0,
+																		destinationCanvas.width,
+																		destinationCanvas.height);
+								localStorage.photoCroppedURI = destinationCanvas.toDataURL();
+								callback(null);
+							};//end of rawPhotoImg.onload
+						},
+						function(callback){
+							//Start to generate longPhoto and the Preview of dooh.
+							var imageUgc;
+							var userContent = {
+								text: null,
+								picture: {
+									urlOfCropped: localStorage.photoCroppedURI, //the URL of the picture that the user crops. (It is normally a base64 string got from canvas.toDataURL() )
+									crop: {_x:0, _y:0, _w:0, _h:0},  // _x=x_crop/width_picture; _y=y_crop/height_picture; _w=width_crop/width_picture;  _h=height_crop/height_picture
+								},
+								thumbnail:{
+									url: localStorage.profilePhoto
+								}
+								
+							};
+							var template = localStorage.selectedTemplate;
+							//subTemplate is picture_only (For Test)
+							
+							ImageUgc.getInstance(template, "picture_only", userContent, function(err, _imageUgc){
+								if(!err){
+									imageUgc = _imageUgc;
+									localStorage.longphotoUrl = imageUgc.getImageUrl();
+									localStorage.doohPreviewUrl = imageUgc.getDoohPreviewImageUrl();
+									localStorage.customizableObjects = imageUgc.getCustomizableObjects();
+									window.location = serverUrl + "/preview.html";
+								}else{
+									console.log("[imageUgc.generate] Failed");
+								}
+							
+							});
+							
+						}],
+						function(err){
+							if(err){
+								console.log(err);
+							}
+					
+					});
+						}
+					}]
+				});
+				//$("#originalImage").attr("src", "/demo/img/preview.jpg");
+
+				
+				initCropper("show", imageUrl, originalImage.height(), originalImage.width());
+				originalImage.hide();
+			}else{
+				$("#croppedPopup").hide();
+			}
 			btnChoosePhoto.click(function(){
 				localStorage.selectedTemplate = "wow_pic";
 				btnWowPic.click();
@@ -96,9 +210,12 @@
 					localStorage.projectId = ugcProjectId;
 					localStorage.fileName = btnWowPic.val().split('\\')[length];
 					$("#ugcId").attr("value", ugcProjectId);
+					$("#template").attr("value", localStorage.selectedTemplate);
 					action = "/miix/originalImage/"; 
 					form.attr("action", action);
-					btnUpload.click();
+					localStorage.flag = true;
+					btnUpload.click();		
+					
 				}
 
 			});
@@ -173,6 +290,7 @@
 							<!--	<form name="uploadFiles" id="imgform" method="post" action="/miix/video/user_content_files"> -->
 							<input name="file" id="wow_pic" type="file"  />
 							<input name="projectId" id="ugcId" type="hidden"/>
+							<input name="template" id="template" type="hidden" />
 							<input name="filesSubmit" id="upload" type="submit" />
 						</form>
 					</div>
@@ -208,6 +326,11 @@
 		<div class="privacy pull-left">&copy; 2013 | <a href="http://www.dzyngiri.com">Dzyngiri : Online Design Magazine</a> |</div>
 	</div>
 </footer>
+<div id="croppedPopup" title="剪裁圖片">
+	<img id="originalImage">
+	<div id="show" style="align:center">
+	</div>
+</div>
 <script type="text/javascript" src="js/bootstrap.js"></script>
 </body>
 </html>

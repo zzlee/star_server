@@ -364,10 +364,10 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
         var cropperRect = new Kinetic.Rect({
                                           x: 0,
                                           y: 0,
-                                          //width: cropperImg.attrs.width,
-                                          //height: cropperImg.attrs.height,
-										  width: 480,
-										  height: 270,
+                                          width: cropperImg.attrs.width,
+                                          height: cropperImg.attrs.height,
+										  //width: 480,
+										  //height: 270,
                                           stroke: 'white',
                                           strokeWidth: 2,
                                           name: "cropperRect"

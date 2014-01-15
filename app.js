@@ -309,20 +309,43 @@ app.post('/miix/originalImage/', function(req,res){
 	    				if(err){
 	    					logger.info('Failed to upload and gen UGCs' + err);
 	    				}else{
-	    					logger.info( 'Send redirect html to client side. ');
-	    				    res.writeHead(200, "OK", {'Content-Type': 'text/html'});
-	    				    res.write('<html>');
-	    				    res.write('<script>');
-	    				    res.write('function init(){' +
+							logger.info( 'Send redirect html to client side. ');
+							var tmpLength = req.body.template.split("_").length;
+							var subTemplate = req.body.template.split("_")[tmpLength - 1];
+							var text = "";
+							if(req.body.text){
+								text = req.body.text;
+							}
+	                	  
+							if(subTemplate == "pic"){
+								res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+								res.write('<html>');
+								res.write('<script>');
+								res.write('function init(){' +
 	    				    			'setTimeout(' +
-//	    				    			"window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
-	    				    				"window.location = '/demo/photo.html',1000);" +
+//	    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
+	    				    				"window.location = '/demo/upload_photo.html',1000);" +
+											//"window.location.assign('/demo/upload_photo.html'),1000);" +
 	    				    			'}');
-	    				    res.write('</script>');
-	    				    res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
-	    				    res.end();
+								res.write('</script>');
+								res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
+								res.end();
+							}else if(subTemplate == "text"){
+								res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+								res.write('<html>');
+								res.write('<script>');
+								res.write('function init(){' +
+	    				    			'setTimeout(' +
+//	    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
+	    				    				"window.location = '/demo/upload_text.html',1000);" +
+											//"window.location.assign('/demo/upload_photo.html'),1000);" +
+	    				    			'}');
+								res.write('</script>');
+								res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
+								res.end();
+							}
+
 	    				}
-	    	
 	    });//End of async.series
 
 	    
