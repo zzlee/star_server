@@ -13,6 +13,8 @@
 	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="css/touchTouch.css" type="text/css" media="screen">
 	<link rel="stylesheet" href="css/kwicks-slider.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.min.css" media="screen">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="js/jquery.js"></script>
     <script type="text/javascript" src="js/superfish.js"></script>
@@ -44,14 +46,27 @@
 	<script src="js/ugc_utility.js"></script>
 	<script src="js/dooh_info.js"></script>
 	<script src="js/dooh_preview.js"></script>
+	<script src="js/jquery-ui.js"></script>
+	<script src="js/photoCropper.js"></script>
+	<script src="js/kinetic-v4.0.5.min.js"></script>
 	
 	<script>
-	$( document ).ready(function() {
-		if(localStorage.template_userText){
-			var text = localStorage.template_userText.replace(/\_/ig,"\n");
-			$("#inputText").val(text);
-		}
-	});
+		var myPhotoCropper = null;
+		var imgUrl = null;
+		function initCropper(divID, imgUrl, imgHeight, imgWidth) {
+	        var stageAllowableWidth = window.innerWidth * 0.7;
+	        var stageAllowableHeight = window.innerHeight * 0.7;
+	        var cropperWidthToHeightRatio = imgWidth / imgHeight;
+			myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
+		}//End of initCropper
+		
+		
+		$( document ).ready(function() {
+			if(localStorage.template_userText){
+				var text = localStorage.template_userText.replace(/\_/ig,"\n");
+				$("#inputText").val(text);
+			}
+		});
 		function init(){
 			var btnChoosePic = $("#chossePic");
 			var btnWowPicText = $("#wow_pic_text");
@@ -69,7 +84,102 @@
 			btnWowPicText.change(function(){
 				var length = btnWowPicText.val().split('\\').length - 1;
 				$('#pic').html(btnWowPicText.val().split('\\')[length]);
+				var ugcProjectId = null;
+				if(localStorage.projectId  != null){
+					ugcProjectId = localStorage.projectId;
+				}else{
+					ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
+				}
+				    
+				var form = $("#imgform");
+				var length = btnWowPicText.val().split('\\').length - 1;
+				localStorage.projectId = ugcProjectId;
+				localStorage.fileName = btnWowPicText.val().split('\\')[length];
+				$("#ugcId").attr("value", ugcProjectId);
+				$("#template").attr("value", localStorage.selectedTemplate);
+				action = "/miix/originalImage/"; 
+				form.attr("action", action);
+				localStorage.flag = true;
+				btnUpload.click();		
 			});
+			if(localStorage.flag){
+				//The original photo upload successfully.
+				//Show the UI to cropper the photo.
+				$("#pic").html(localStorage.fileName);
+				var originalImage = $("#originalImage");
+				imageUrl =  "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
+				
+				document.getElementById("originalImage").src = imageUrl;
+				var originalImage = $("#originalImage");
+				$("#croppedPopup").dialog({
+					//dialogClass: "btn btn-1",
+					resizable: false,
+					draggable: false,
+					width: window.innerWidth * 0.7,
+					//width : 
+					position: { 
+						my: "center center", 
+						at: "center top", 
+						//of: "#croppedPopup"
+						of : window
+					},
+					modal : true,
+					buttons: [{
+						text: "確認",
+						click: function() {
+							async.series([
+							              function(callback){
+							            	//Cropper the photo when user wants
+							            	  croppedArea = myPhotoCropper.getCroppedArea();
+												var rawPhotoImg = new Image();
+												rawPhotoImg.src = imageUrl;
+												rawPhotoImg.onload = function(){ 
+													console.log("[rawPhotoImg.onload]");		
+										
+													var sourceCanvas = document.createElement("canvas");
+													var sourceCanvasContext = sourceCanvas.getContext("2d");
+													sourceCanvas.width = rawPhotoImg.width;
+													sourceCanvas.height = rawPhotoImg.height;
+													sourceCanvasContext.drawImage(rawPhotoImg, 0, 0);
+													var destinationCanvas = document.createElement("canvas");
+													var destinationCanvasContext = destinationCanvas.getContext("2d");
+													destinationCanvas.width = rawPhotoImg.width * croppedArea.width;
+													destinationCanvas.height = rawPhotoImg.height * croppedArea.height;
+													destinationCanvasContext.drawImage(sourceCanvas,
+																							rawPhotoImg.width * croppedArea.x,
+																							rawPhotoImg.height * croppedArea.y,
+																							rawPhotoImg.width * croppedArea.width,
+																							rawPhotoImg.height * croppedArea.height,
+																							0, 0,
+																							destinationCanvas.width,
+																							destinationCanvas.height);
+													localStorage.photoCroppedURI = destinationCanvas.toDataURL();
+													callback(null);
+												};//end of rawPhotoImg.onload
+										  },
+							              function(callback){
+							            	  $("#croppedPopup").dialog('close');
+							            	  callback(null);
+							              }],
+							              function(err){
+												if(err){
+													alert(err);
+												}
+												
+								
+							});//end of async.series
+							
+						}
+					}]
+				});//End of $.dialog
+				//$("#originalImage").attr("src", "/demo/img/preview.jpg");
+
+				
+				initCropper("show", imageUrl, originalImage.height(), originalImage.width());
+				originalImage.hide();
+			}else{
+				$("#croppedPopup").hide();
+			}//End of if(localStorage.flag)
 			
 			$("#inputText").focus(function(){
 				if(localStorage.template_userText){
@@ -82,9 +192,9 @@
 				}
 			});
 			btnSend.click(function(){
-				if(btnWowPicText.val() == ""){
-					alert("您忘記選擇圖片！");
-				}else{
+				//if(btnWowPicText.val() != ""){
+				//	alert("您忘記選擇圖片！");
+				//}else{
 					var inputContent = $("#inputText").val().replace(/\n/g,"_");
 					console.log(inputContent);
 				
@@ -105,25 +215,40 @@
 				          ],
 				          function(err, results){
 							if(!err){
-					    		var ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
-								var form = $("#imgform");
-								localStorage.projectId = ugcProjectId;
-								$("#ugcId").attr("value", ugcProjectId);
-								$("#userId").attr("value", localStorage._id);
-								$("#fbId").attr("value", localStorage.fbId);
-								$("#contentGenre").attr("value", localStorage.selectedTemplate);
-								$("#text").attr("value", inputContent);
-								action = "/miix/ugcInfo/"; 
-						
-								form.attr("action", action);
-								btnUpload.click();
+								var imageUgc;
+								var userContent = {
+									text: localStorage.template_userText,
+									picture: {
+										urlOfCropped: localStorage.photoCroppedURI, //the URL of the picture that the user crops. (It is normally a base64 string got from canvas.toDataURL() )
+										crop: {_x:0, _y:0, _w:0, _h:0},  // _x=x_crop/width_picture; _y=y_crop/height_picture; _w=width_crop/width_picture;  _h=height_crop/height_picture
+									},
+									thumbnail:{
+										url: localStorage.profilePhoto
+									}
+									
+								};
+								var template = localStorage.selectedTemplate;
+								//subTemplate is picture_only (For Test)
+								
+								ImageUgc.getInstance(template, "picture_plus_text", userContent, function(err, _imageUgc){
+									if(!err){
+										imageUgc = _imageUgc;
+										localStorage.longphotoUrl = imageUgc.getImageUrl();
+										localStorage.doohPreviewUrl = imageUgc.getDoohPreviewImageUrl();
+										localStorage.customizableObjects = imageUgc.getCustomizableObjects();
+										window.location = serverUrl + "/preview.html";
+									}else{
+										console.log("[imageUgc.generate] Failed");
+									}
+								
+								});
 							}
 
 							
 				          });
 
-				}
-			});
+				//}//end of if
+			});//end of btnSend.click
 			
 		}
 		function check(words){
@@ -247,10 +372,7 @@
 					<!--	<form name="uploadFiles" id="imgform" method="post" action="/miix/video/user_content_files"> -->
 					<input name="file" id="wow_pic_text" type="file" accept="image/*" />
 					<input name="projectId" id="ugcId" type="hidden"/>
-					<input name="_id" id="userId" type="hidden" />
-					<input name="fbUserId" id="fbId" type="hidden" />
-					<input name="genre" id="contentGenre" type="hidden" />
-					<input name="text" id="text" type="hidden" />
+					<input name="template" id="template" type="hidden" />
 					<input name="filesSubmit" id="upload" type="submit" />
 				</form>
 			</div>
@@ -262,7 +384,7 @@
             </form>
             <div class="block-slogan">
 			<p style="text-align:left; padding-top:20px;">
-            		<button id="btnSend" class="btn btn-1">送出</button>
+            		<button id="btnSend" class="btn btn-1">開始合成</button>
             	</p>
           </div>
             </div>
@@ -293,4 +415,9 @@
     </footer>
 	<script type="text/javascript" src="js/bootstrap.js"></script>
 </body>
+<div id="croppedPopup" title="剪裁圖片">
+	<img id="originalImage">
+	<div id="show" style="align:center">
+	</div>
+</div>
 </html>

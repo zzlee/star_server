@@ -257,7 +257,7 @@ app.post('/miix/ugcInfo/', function(req,res){
  * @todo Need to move to miix_handler.js
  */
 app.post('/miix/originalImage/', function(req,res){
-	//console.dir(req.body);
+//	console.dir(req.body);
 	var tempPath = req.files.file.path;
 	
 	 var projectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectId);
@@ -338,7 +338,7 @@ app.post('/miix/originalImage/', function(req,res){
 	    				    			'setTimeout(' +
 //	    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
 	    				    				//"window.location = '/demo/upload_text.html',1000);" +
-											"window.location.replace('/demo/upload_photo.html'),1000);" +
+											"window.location.replace('/demo/upload_text.html'),1000);" +
 	    				    			'}');
 								res.write('</script>');
 								res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
