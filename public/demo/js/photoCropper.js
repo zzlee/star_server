@@ -20,6 +20,8 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 	}
 
 	var updateAnchor = function(group, activeAnchor) {
+		console.dir(group.get(".topRight"));
+		//localStorage.temp = JSON.parse(group);
 		var topLeft = group.get(".topLeft")[0];
 		var topRight = group.get(".topRight")[0];
 		var bottomRight = group.get(".bottomRight")[0];
@@ -27,7 +29,13 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 		var image = group.get(".image")[0];
         var cropperRect = group.get(".cropperRect")[0];
         var markerCircle = group.get(".markerCircle")[0];
-		
+		//console.log();
+		console.log("activeAnchor.getName() " + activeAnchor.getName());
+		console.dir("topLeft " + topLeft);
+		console.dir("topRight " + topRight);
+		console.dir("bottomRight " + bottomRight);
+		console.dir("bottomLeft " + bottomLeft);
+		console.log("------------------------------");
 		//GZ
 		var center = { x:0, y:0 };  
 		var imageWidthToHeightRatio = image.attrs.width / image.attrs.height; 
@@ -37,6 +45,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 		switch (activeAnchor.getName()) {
 			case "topLeft":
 				center.x = (bottomLeft.attrs.x+bottomRight.attrs.x)/2;
+				//center.x = (bottomLeft.getAttr('x') + bottomRight.getAttr('x')) / 2;
 				center.y = (topRight.attrs.y+bottomRight.attrs.y)/2;
 				
 				newHalfWidth = center.x - topLeft.attrs.x;
@@ -213,6 +222,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 	}
 
 	var addAnchor = function(group, x, y, name) {
+		console.log("name " + name);
 		var stage = group.getStage();
 		var layer = group.getLayer();
 
@@ -227,9 +237,9 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 			draggable: true
 		});
 		
-		anchor.setOpacity(0.0);
+		//anchor.setOpacity(0.0);
 		
-		anchor.on("dragmove", function() {
+		anchor.on("dragmove", function() {		
 			updateAnchor(group, this);
 			layer.draw();
 		});
@@ -352,12 +362,12 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 			x: 0,
 			y: 0,
 			image: images.cropper,
-			//width: cropperImgWidth,
+			width: cropperImgWidth,
 			//width: widthFrame,
-			width: 480,
-			//height: cropperImgHeight,
+			//width: 480,
+			height: cropperImgHeight,
 			//height: heightFrame,
-			height: 270,
+			//height: 270,
 			name: "image"
 		});
         
