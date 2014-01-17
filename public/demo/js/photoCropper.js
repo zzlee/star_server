@@ -20,7 +20,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 	}
 
 	var updateAnchor = function(group, activeAnchor) {
-		console.dir(group.get(".topRight"));
+		group.add(activeAnchor);
 		//localStorage.temp = JSON.parse(group);
 		var topLeft = group.get(".topLeft")[0];
 		var topRight = group.get(".topRight")[0];
@@ -30,12 +30,12 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
         var cropperRect = group.get(".cropperRect")[0];
         var markerCircle = group.get(".markerCircle")[0];
 		//console.log();
-		console.log("activeAnchor.getName() " + activeAnchor.getName());
-		console.dir("topLeft " + topLeft);
-		console.dir("topRight " + topRight);
-		console.dir("bottomRight " + bottomRight);
-		console.dir("bottomLeft " + bottomLeft);
-		console.log("------------------------------");
+		//console.log("activeAnchor.getName() " + activeAnchor.getName());
+		//console.dir("topLeft " + topLeft);
+		//console.dir("topRight " + topRight);
+		//console.dir("bottomRight " + bottomRight);
+		//console.dir("bottomLeft " + bottomLeft);
+		//console.log("------------------------------");
 		//GZ
 		var center = { x:0, y:0 };  
 		var imageWidthToHeightRatio = image.attrs.width / image.attrs.height; 
@@ -222,7 +222,6 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 	}
 
 	var addAnchor = function(group, x, y, name) {
-		console.log("name " + name);
 		var stage = group.getStage();
 		var layer = group.getLayer();
 
@@ -236,10 +235,11 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 			name: name,
 			draggable: true
 		});
+		//console.dir(anchor);
+		anchor.setOpacity(0.0);
 		
-		//anchor.setOpacity(0.0);
-		
-		anchor.on("dragmove", function() {		
+		anchor.on("dragmove", function() {	
+			//console.dir(group);
 			updateAnchor(group, this);
 			layer.draw();
 		});
@@ -275,6 +275,8 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 		for(var src in sources) {
 			numImages++;
 		}
+		
+		
 		for(var src in sources) {
 			images[src] = new Image();
 			images[src].onload = function() {
@@ -363,11 +365,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 			y: 0,
 			image: images.cropper,
 			width: cropperImgWidth,
-			//width: widthFrame,
-			//width: 480,
 			height: cropperImgHeight,
-			//height: heightFrame,
-			//height: 270,
 			name: "image"
 		});
         
@@ -376,8 +374,6 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
                                           y: 0,
                                           width: cropperImg.attrs.width,
                                           height: cropperImg.attrs.height,
-										  //width: 480,
-										  //height: 270,
                                           stroke: 'white',
                                           strokeWidth: 2,
                                           name: "cropperRect"
@@ -394,6 +390,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
                                         });
         
 		cropperGroup.add(cropperImg);
+
 		addAnchor(cropperGroup, 0, 0, "topLeft");
 		addAnchor(cropperGroup, cropperImg.attrs.width, 0, "topRight");
 		addAnchor(cropperGroup, cropperImg.attrs.width, cropperImg.attrs.height, "bottomRight");
@@ -438,4 +435,8 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 
 PhotoCropper.prototype.getCroppedArea = function() {
 	return this.croppedArea;
+}
+
+function showCropper(templete){
+
 }

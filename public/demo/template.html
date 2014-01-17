@@ -51,6 +51,8 @@
 		function init(){
 
 			var btnChoosePhoto = $("#templatePic");
+			//Go to next page.
+			localStorage.flag = "none";
 			btnChoosePhoto.click(function(){
 				window.location = serverUrl + "/upload_photo.html";
 			});

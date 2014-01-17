@@ -139,9 +139,19 @@ async.waterfall([
 });
 
 /**
- * Upload temp file from web app.
+ * Upload temp file from web app.<br>
+ * At first we want to our users upload their files and then our server will generate long photo and preview of dooh.<br>
+ * Saved the picture in server and call canvasMgr to generate images.
+ * @method post /miix/ugcInfo/
+ * @param {String} req.body.projectId - The UGC's specific ID.
+ * @param {String} req.body._id - User's unique ID.
+ * @param {String} req.body.fbUserId - User's Facebook ID
+ * @param {String} req.body.genre - The UGC's type ie. mood, check_in or cultural and creative.
+ * @param {String} req.files.file.name - File name which user uploaded.
+ * @param {String} req.body.text - Texts which user's input in browser.
  * @author Jean
- * @todo need to move miix_handler.js
+ * @todo Need to move miix_handler.js
+ * @returns {HTML} - After upload file successfully then go to next page which we want to user go(Default is "preview.html").
  */
 var path = require('path'),
 	fs = require('fs');
@@ -250,11 +260,15 @@ app.post('/miix/ugcInfo/', function(req,res){
 	    
 	
 });
-//post/miix/originalImage
-/**
- * Upload user's photo and saved in server temporily for croppering the photo
+
+ /**
+ * Upload user's photo and saved in server temporily for croppering the photo. 
+ * @method post /miix/originalImage
+ * @param {String} req.body.projectId - The UGC's specific ID.
+ * @param {String} req.body.template - The UGC's type ie. mood, check_in or cultural and creative.
  * @author Jean
- * @todo Need to move to miix_handler.js
+ * @todo Need to move miix_handler.js
+ * @returns {HTML} - After upload file successfully then go to next page which we want to user go(This case is "upload_text.html" or "upload_photo.html").
  */
 app.post('/miix/originalImage/', function(req,res){
 //	console.dir(req.body);
@@ -312,10 +326,6 @@ app.post('/miix/originalImage/', function(req,res){
 							logger.info( 'Send redirect html to client side. ');
 							var tmpLength = req.body.template.split("_").length;
 							var subTemplate = req.body.template.split("_")[tmpLength - 1];
-							var text = "";
-							if(req.body.text){
-								text = req.body.text;
-							}
 	                	  
 							if(subTemplate == "pic"){
 								res.writeHead(200, "OK", {'Content-Type': 'text/html'});
@@ -325,7 +335,8 @@ app.post('/miix/originalImage/', function(req,res){
 	    				    			'setTimeout(' +
 //	    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
 	    				    				//"window.location = '/demo/upload_photo.html',1000);" +
-											"window.location.replace('/demo/upload_photo.html'),1000);" +
+											//"window.location.replace('/demo/upload_photo.html'),1000);" +
+												"'window.history.go(-1)',1000);" +
 	    				    			'}');
 								res.write('</script>');
 								res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
@@ -338,7 +349,8 @@ app.post('/miix/originalImage/', function(req,res){
 	    				    			'setTimeout(' +
 //	    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
 	    				    				//"window.location = '/demo/upload_text.html',1000);" +
-											"window.location.replace('/demo/upload_text.html'),1000);" +
+											//"window.location.replace('/demo/upload_text.html'),1000);" +
+												"'window.history.go(-1)',1000);" +
 	    				    			'}');
 								res.write('</script>');
 								res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");

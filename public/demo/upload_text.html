@@ -67,43 +67,9 @@
 				$("#inputText").val(text);
 			}
 		});
-		function init(){
-			var btnChoosePic = $("#chossePic");
-			var btnWowPicText = $("#wow_pic_text");
-			var btnUpload = $("#upload");
-			var btnSend = $('#btnSend');
-			
-			localStorage.selectedTemplate = "wow_pic_text";
-			localStorage.selectedSubTemplate = "picture_plus_text";
-			
-			btnChoosePic.click(function(){
-				btnWowPicText.click();
-
-			});
-			
-			btnWowPicText.change(function(){
-				var length = btnWowPicText.val().split('\\').length - 1;
-				$('#pic').html(btnWowPicText.val().split('\\')[length]);
-				var ugcProjectId = null;
-				if(localStorage.projectId  != null){
-					ugcProjectId = localStorage.projectId;
-				}else{
-					ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
-				}
-				    
-				var form = $("#imgform");
-				var length = btnWowPicText.val().split('\\').length - 1;
-				localStorage.projectId = ugcProjectId;
-				localStorage.fileName = btnWowPicText.val().split('\\')[length];
-				$("#ugcId").attr("value", ugcProjectId);
-				$("#template").attr("value", localStorage.selectedTemplate);
-				action = "/miix/originalImage/"; 
-				form.attr("action", action);
-				localStorage.flag = true;
-				btnUpload.click();		
-			});
-			if(localStorage.flag){
-				//The original photo upload successfully.
+		
+		function showCropper(){
+			//The original photo upload successfully.
 				//Show the UI to cropper the photo.
 				$("#pic").html(localStorage.fileName);
 				var originalImage = $("#originalImage");
@@ -177,9 +143,50 @@
 				
 				initCropper("show", imageUrl, originalImage.height(), originalImage.width());
 				originalImage.hide();
-			}else{
+		}
+		
+		function init(){
+			var btnChoosePic = $("#chossePic");
+			var btnWowPicText = $("#wow_pic_text");
+			var btnUpload = $("#upload");
+			var btnSend = $('#btnSend');
+			
+			localStorage.selectedTemplate = "wow_pic_text";
+			localStorage.selectedSubTemplate = "picture_plus_text";
+			
+			btnChoosePic.click(function(){
+				btnWowPicText.click();
+
+			});
+			if(localStorage.flag == "none"){
+				//$( "#croppedPopup" ).dialog( "close" );
 				$("#croppedPopup").hide();
-			}//End of if(localStorage.flag)
+			}else{
+				$("#croppedPopup").show();
+				showCropper();
+			}
+			btnWowPicText.change(function(){
+				var length = btnWowPicText.val().split('\\').length - 1;
+				$('#pic').html(btnWowPicText.val().split('\\')[length]);
+				var ugcProjectId = null;
+				if(localStorage.projectId  != null){
+					ugcProjectId = localStorage.projectId;
+				}else{
+					ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
+				}
+				    
+				var form = $("#imgform");
+				var length = btnWowPicText.val().split('\\').length - 1;
+				localStorage.projectId = ugcProjectId;
+				localStorage.fileName = btnWowPicText.val().split('\\')[length];
+				$("#ugcId").attr("value", ugcProjectId);
+				$("#template").attr("value", localStorage.selectedTemplate);
+				action = "/miix/originalImage/"; 
+				form.attr("action", action);
+				localStorage.flag = "photo";
+				btnUpload.click();		
+			});
+
 			
 			$("#inputText").focus(function(){
 				if(localStorage.template_userText){
@@ -192,9 +199,6 @@
 				}
 			});
 			btnSend.click(function(){
-				//if(btnWowPicText.val() != ""){
-				//	alert("您忘記選擇圖片！");
-				//}else{
 					var inputContent = $("#inputText").val().replace(/\n/g,"_");
 					console.log(inputContent);
 				

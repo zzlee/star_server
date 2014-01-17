@@ -23,6 +23,7 @@
 	<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>    
 	<script type="text/javascript" src="js/touchTouch.jquery.js"></script>
+	<script src="js/jquery-ui-1.9.2.custom.js"></script>
 	<script type="text/javascript">if($(window).width()>1024){document.write("<"+"script src='js/jquery.preloader.js'></"+"script>");}	</script>
 
 	<script>		
@@ -47,40 +48,58 @@
 	<script src="js/ugc_utility.js"></script>
 	<script src="js/dooh_info.js"></script>
 	<script src="js/dooh_preview.js"></script>
-	<script src="js/jquery.form.js"></script>
-	<script src="js/jquery-ui.js"></script>
+	
 	<script src="js/photoCropper.js"></script>
-	<script src="js/kinetic-v5.0.0.js"></script>
+	<script src="js/kinetic-v4.3.3.js"></script>
 	
 	<script>
 		var myPhotoCropper = null;
 		var imgUrl = null;
 		function initCropper(divID, imgUrl, imgHeight, imgWidth) {
-		        var stageAllowableWidth = window.innerWidth * 0.7;
-		        var stageAllowableHeight = window.innerHeight * 0.7;
-		        var cropperWidthToHeightRatio = imgWidth / imgHeight;
+		        var stageAllowableWidth = 0;
+		        var stageAllowableHeight = 0;
+				var cropperWidthToHeightRatio = 0;
+				
+				if(imgWidth > imgHeight){
+					stageAllowableWidth = window.innerWidth;
+					stageAllowableHeight = window.innerHeight * 0.7;
+					cropperWidthToHeightRatio = imgWidth / imgHeight;
+				}else{
+					stageAllowableWidth = window.innerHeight * 0.7;
+					stageAllowableHeight = window.innerWidth;
+					cropperWidthToHeightRatio = imgHeight / imgWidth;
+				}
+		        //var cropperWidthToHeightRatio = imgWidth / imgHeight;
 				myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
 		}
-		function init(){
-			var btnChoosePhoto = $("#chossePic");
-			
-			var btnWowPic = $("#wow_pic");
-			
-			var btnUpload = $("#upload");
-			
-			if(localStorage.flag){
-				//The original photo upload successfully.
+	
+		function showCropper(){
+		//The original photo upload successfully.
 				//Show the UI to cropper the photo.
-				var originalImage = $("#originalImage");
+				var originalImage = $(document.getElementById("originalImage"));
 				imageUrl =  "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
 				
-				document.getElementById("originalImage").src = imageUrl;
-				var originalImage = $("#originalImage");
+				//originalImage.src = imageUrl;
+				
+				//console.dir(originalImage);
+				initCropper("show", imageUrl, originalImage.height(), originalImage.width());
+				async.series([
+						function(callback){
+						},
+						function(callback){
+						
+						}],
+						function(err){
+							if(err){
+								alert(err);
+							}
+					
+				});
 				$("#croppedPopup").dialog({
 					//dialogClass: "btn btn-1",
 					resizable: false,
 					draggable: false,
-					width: window.innerWidth * 0.7,
+					width: originalImage.width() * 0.7,
 					//width : 
 					position: { 
 						my: "center center", 
@@ -146,6 +165,7 @@
 									localStorage.doohPreviewUrl = imageUgc.getDoohPreviewImageUrl();
 									localStorage.customizableObjects = imageUgc.getCustomizableObjects();
 									window.location = serverUrl + "/preview.html";
+									callback(null);
 								}else{
 									console.log("[imageUgc.generate] Failed");
 								}
@@ -162,24 +182,36 @@
 						}
 					}]
 				});
-				//$("#originalImage").attr("src", "/demo/img/preview.jpg");
 
-				
-				initCropper("show", imageUrl, originalImage.height(), originalImage.width());
-				originalImage.hide();
-			}else{
+				//originalImage.hide();
+		
+		
+		};
+		function init(){
+			var btnChoosePhoto = $("#chossePic");
+			
+			var btnWowPic = $("#wow_pic");
+			
+			var btnUpload = $("#upload");
+			//$( "#croppedPopup" ).dialog( "destroy" );
+			//$("#croppedPopup").closest('.ui-dialog-content').dialog('close');
+			
+			if(localStorage.flag == "none"){
+				//$( "#croppedPopup" ).dialog( "close" );
 				$("#croppedPopup").hide();
+			}else{
+				$("#croppedPopup").show();
+				showCropper();
 			}
-			
-			
+	
 			
 			btnChoosePhoto.click(function(){
 				localStorage.selectedTemplate = "wow_pic";
 				btnWowPic.click();
 			});
 			
-			//Display file name after user choose the photo
-			btnWowPic.change(function(){
+							//Display file name after user choose the photo
+				btnWowPic.change(function(){
 				var length = btnWowPic.val().split('\\').length - 1;
 				$('#pic').html(btnWowPic.val().split('\\')[length]);
 				var ugcProjectId = null;
@@ -197,7 +229,7 @@
 				$("#template").attr("value", localStorage.selectedTemplate);
 				action = "/miix/originalImage/"; 
 				form.attr("action", action);
-				localStorage.flag = true;
+				localStorage.flag = "photo";
 				btnUpload.click();		
 			});
 
