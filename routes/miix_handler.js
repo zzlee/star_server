@@ -269,7 +269,7 @@ miixHandler.putFbPostIdUserLiveContents_cb = function(req, res) {
 
 //GET /miix/members/:memberId/message
 miixHandler.getMessageList_cb = function(req, res) {
-	console.dir(req.body);
+//	console.dir(req.body);
     logger.info('[GET '+req.path+'] is called');
     if (req.params.memberId){
         var ugcInfo = req.body.fb_postId;
