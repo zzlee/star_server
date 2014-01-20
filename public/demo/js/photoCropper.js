@@ -231,12 +231,12 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 			stroke: "#fff",
 			fill: "#fff",
 			strokeWidth: 2,
-			radius: 40,
+			radius: 12,
 			name: name,
 			draggable: true
 		});
 		//console.dir(anchor);
-		anchor.setOpacity(0.0);
+		//anchor.setOpacity(0.0);
 		
 		anchor.on("dragmove", function() {	
 			//console.dir(group);
@@ -388,7 +388,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
                                         radius: 5,
                                         name: "markerCircle"
                                         });
-        
+
 		cropperGroup.add(cropperImg);
 
 		addAnchor(cropperGroup, 0, 0, "topLeft");
