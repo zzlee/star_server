@@ -371,6 +371,8 @@ exports.init = function() {
     app.put('/miix/updateVIPStatus', routes.miixHandler.updateVIPStatus_cb);
     
     app.put('/miix/updateVIPinUGC', routes.miixHandler.updateVIPinUGC_cb);
+    
+    app.put('/miix/updateUnReadMessage', routes.miixHandler.updateUnReadMessage_cb);
 
 
 };
