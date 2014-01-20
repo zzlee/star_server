@@ -55,20 +55,21 @@
 	<script>
 		var myPhotoCropper = null;
 		var imgUrl = null;
-		function initCropper(divID, imgUrl, imgHeight, imgWidth) {
+		var height, width;
+		function initCropper(divID, imgUrl) {
 		        var stageAllowableWidth = 0;
 		        var stageAllowableHeight = 0;
 				var cropperWidthToHeightRatio = 0;
 				
-				if(imgWidth > imgHeight){
+				//if(imgWidth > imgHeight){
 					stageAllowableWidth = window.innerWidth;
 					stageAllowableHeight = window.innerHeight * 0.7;
-					cropperWidthToHeightRatio = imgWidth / imgHeight;
-				}else{
-					stageAllowableWidth = window.innerHeight * 0.7;
-					stageAllowableHeight = window.innerWidth;
-					cropperWidthToHeightRatio = imgHeight / imgWidth;
-				}
+					cropperWidthToHeightRatio = 210/ 130;
+				//}else{
+				//	stageAllowableWidth = window.innerHeight * 0.7;
+				//	stageAllowableHeight = window.innerWidth;
+				//	cropperWidthToHeightRatio = imgHeight / imgWidth;
+				//}
 		        //var cropperWidthToHeightRatio = imgWidth / imgHeight;
 				myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
 		}
@@ -76,30 +77,25 @@
 		function showCropper(){
 		//The original photo upload successfully.
 				//Show the UI to cropper the photo.
-				var originalImage = $(document.getElementById("originalImage"));
-				imageUrl =  "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
 				
+
+				
+				//var originalImage = $(document.getElementById("originalImage"));
+				imageUrl =  "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
+
+				//originalImage.src = imageUrl;
+
 				//originalImage.src = imageUrl;
 				
 				//console.dir(originalImage);
-				initCropper("show", imageUrl, originalImage.height(), originalImage.width());
-				async.series([
-						function(callback){
-						},
-						function(callback){
-						
-						}],
-						function(err){
-							if(err){
-								alert(err);
-							}
-					
-				});
+				//initCropper("show", imageUrl, localStorage.height, localStorage.width);
+				initCropper("show", imageUrl);
+
 				$("#croppedPopup").dialog({
 					//dialogClass: "btn btn-1",
 					resizable: false,
 					draggable: false,
-					width: originalImage.width() * 0.7,
+					width: window.innerWidth * 0.9,
 					//width : 
 					position: { 
 						my: "center center", 
@@ -184,7 +180,7 @@
 				});
 
 				//originalImage.hide();
-		
+				$("#croppedPopup").show();
 		
 		};
 		function init(){
@@ -200,8 +196,9 @@
 				//$( "#croppedPopup" ).dialog( "close" );
 				$("#croppedPopup").hide();
 			}else{
-				$("#croppedPopup").show();
 				showCropper();
+				
+				
 			}
 	
 			
@@ -209,11 +206,15 @@
 				localStorage.selectedTemplate = "wow_pic";
 				btnWowPic.click();
 			});
-			
-							//Display file name after user choose the photo
-				btnWowPic.change(function(){
-				var length = btnWowPic.val().split('\\').length - 1;
-				$('#pic').html(btnWowPic.val().split('\\')[length]);
+
+
+			//Display file name after user choose the photo
+			btnWowPic.change(function(){
+
+
+				
+				
+				$('#pic').html(this.files[0].name);
 				var ugcProjectId = null;
 				if(localStorage.projectId  != null){
 					ugcProjectId = localStorage.projectId;
@@ -222,18 +223,26 @@
 				}
 				    
 				var form = $("#imgform");
-				var length = btnWowPic.val().split('\\').length - 1;
+			
 				localStorage.projectId = ugcProjectId;
-				localStorage.fileName = btnWowPic.val().split('\\')[length];
+				localStorage.fileName = this.files[0].name;
 				$("#ugcId").attr("value", ugcProjectId);
 				$("#template").attr("value", localStorage.selectedTemplate);
+				//$("#width").attr("value", width);
+				//$("#height").attr('value', height);
 				action = "/miix/originalImage/"; 
 				form.attr("action", action);
 				localStorage.flag = "photo";
+				
+				
+				
+				
+				
 				btnUpload.click();		
 			});
 
-				
+			
+
 		}//End of init()
 
 	</script>
@@ -305,9 +314,12 @@
 							<input name="file" id="wow_pic" type="file"  />
 							<input name="projectId" id="ugcId" type="hidden"/>
 							<input name="template" id="template" type="hidden" />
+							<input name="width" id="width" type="hidden" />
+							<input name="height" id="height" type="hidden" />
 							<input name="filesSubmit" id="upload" type="submit" />
 						</form>
 					</div>
+
 					<p style="text-align:left; padding-top:20px;">
 						<button id="chossePic" class="btn btn-1">選擇圖片</button>
 						<button id="pic" class="btn btn-1" style="background:url(../img/bg-content.jpg) 50% 50%;"></button>
@@ -339,7 +351,6 @@
 	</div>
 </footer>
 <div id="croppedPopup" title="剪裁圖片">
-	<img id="originalImage">
 	<div id="show" style="align:center">
 	</div>
 </div>
