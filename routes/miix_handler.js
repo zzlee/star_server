@@ -281,7 +281,15 @@ miixHandler.getMessageList_cb = function(req, res) {
             limit = 3;
         }
         
-        miixContentMgr.getMessageList( req.params.memberId, limit, 0, function(err, messageList){
+        if(req.query.read == null){
+        	read = false;
+        }else if (req.query.read == 'getReadMessage'){
+        	read = 'getReadMessage';
+        }else if (req.query.read == 'getAllMessage'){
+        	read = 'getAllMessage';
+        }
+        
+        miixContentMgr.getMessageList( req.params.memberId, read,limit, 0, function(err, messageList){
             if (!err){
                 res.send(messageList);
             }
@@ -434,4 +442,25 @@ miixHandler.saveTmpImage_cb = function(req, res){
 	}
 };
 
+
+miixHandler.updateUnReadMessage_cb = function(req, res) {
+//	console.log(req.body.userId);
+    logger.info('[PUT '+req.path+'] is called');
+    if (req.body.userId){
+        
+        miixContentMgr.updateUnReadMessage( req.body.userId, function(err){
+            if (!err){
+                res.send(200);
+            }
+            else {
+                logger.error('[PUT /miix/updateUnReadMessage] failed: '+ err);
+                res.send(400, {error: err});
+            }
+        });
+    }
+    else {
+        res.send(400, {error: "Not all needed data are sent."});
+    }
+    
+};
 module.exports = miixHandler;

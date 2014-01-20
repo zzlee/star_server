@@ -1149,10 +1149,40 @@ miixContentMgr.putFbPostIduserLiveContents = function(userLiveContentProjectID, 
     });
 };
 
-miixContentMgr.getMessageList = function(memberId, limit, skip, cbOfGetMessageList){
+miixContentMgr.getMessageList = function(memberId, read,limit, skip, cbOfGetMessageList){
     var messageModel = db.getDocModel("message");
+
+   if(read == false) { //取出未讀訊息
+        messageModel.find({"ownerId._id": memberId, "read": false}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(function(err, result){
+        	
+        	for(var i = 0; i < result.length; i++){
+        		result[i].messageTime = result[i]._id.getTimestamp().getTime();
+        	}
+        	
+        	cbOfGetMessageList(null,result);
+        });
+    }else if(read == 'getReadMessage') { //取出該user已讀訊息
+        messageModel.find({"ownerId._id": memberId, "read": true}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(function(err, result){
+        	
+        	for(var i = 0; i < result.length; i++){
+        		result[i].messageTime = result[i]._id.getTimestamp().getTime();
+        	}
+        	
+        	cbOfGetMessageList(null,result);
+        });
+
+    }else if(read == 'getAllMessage'){ //取出所有訊息
+        messageModel.find({"ownerId._id": memberId}).sort({"messageTime":1}).skip(skip).exec(function(err, result){
+        	
+        	for(var i = 0; i < result.length; i++){
+        		result[i].messageTime = result[i]._id.getTimestamp().getTime();
+        	}
+        	
+        	cbOfGetMessageList(null,result);
+        });
+
+    }
     
-    messageModel.find({"ownerId._id": memberId, "read": false}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(cbOfGetMessageList);
     
     
 };
@@ -1198,6 +1228,40 @@ miixContentMgr.updateVIPinUGC = function(projectId, update, cbOfUpdateVIPinUGC){
         }else
         	cbOfUpdateVIPinUGC("Fail to update VIPinUGC Obj from DB: "+errOfUpdateVIPinUGC, resOfUpdateVIPinUGC);
     });
+    
+};
+
+miixContentMgr.updateUnReadMessage = function(userId, cbOfUpdateUnReadMessage){
+    var messageModel = db.getDocModel("message");
+    
+    messageModel.find({"ownerId._id": userId, "read": false}).sort({"createdOn":-1}).exec(function(err, result){
+    	var messageList = result;
+    	var iterator_message = function(aList, cb_each){
+    		
+    		db.updateAdoc(messageModel, aList._id, {read: true}, function(errOfUpdateMessage, resOfUpdateMessage){
+    	        if (!errOfUpdateMessage){
+    	        	cb_each(null);
+    	        }else
+    	        	cb_each("Fail to update userLiveContent Obj from DB: "+errOfUpdateMessage, resOfUpdateMessage);
+    	    });
+    		
+    	};
+    	async.eachSeries(messageList, iterator_message, function(err, result){
+    		if(!err){
+    			cbOfUpdateUnReadMessage(null, result);
+    		}else{
+    			cbOfUpdateUnReadMessage(err, null);
+    		}
+    	});
+    });
+    
+    /*
+    db.updateAdoc(messageModel, messageId, vjson, function(errOfUpdateMessage, resOfUpdateMessage){
+        if (!errOfUpdateMessage){
+        	cbOfUpdateMessage(null, "done");
+        }else
+        	cbOfUpdateMessage("Fail to update userLiveContent Obj from DB: "+errOfUpdateMessage, resOfUpdateMessage);
+    });*/
     
 };
 
