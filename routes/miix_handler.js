@@ -468,7 +468,6 @@ miixHandler.getUnReadCount_cb = function(req, res){
 	miixContentMgr.getUnReadCount(req.query.userId, function(err, result){
 		
 		if(!err){
-			console.log(result);
 			res.send({unReadCount: result});
 		}else{
 			res.send(400, {error: err});
