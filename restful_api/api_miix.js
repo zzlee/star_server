@@ -373,6 +373,8 @@ exports.init = function() {
     app.put('/miix/updateVIPinUGC', routes.miixHandler.updateVIPinUGC_cb);
     
     app.put('/miix/updateUnReadMessage', routes.miixHandler.updateUnReadMessage_cb);
+    
+    app.get('/miix/getUnReadCount', routes.miixHandler.getUnReadCount_cb);
 
 
 };

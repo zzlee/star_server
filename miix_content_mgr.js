@@ -1254,17 +1254,14 @@ miixContentMgr.updateUnReadMessage = function(userId, cbOfUpdateUnReadMessage){
     		}
     	});
     });
-    
-    /*
-    db.updateAdoc(messageModel, messageId, vjson, function(errOfUpdateMessage, resOfUpdateMessage){
-        if (!errOfUpdateMessage){
-        	cbOfUpdateMessage(null, "done");
-        }else
-        	cbOfUpdateMessage("Fail to update userLiveContent Obj from DB: "+errOfUpdateMessage, resOfUpdateMessage);
-    });*/
-    
 };
 
+miixContentMgr.getUnReadCount = function(userId, cbOfGetUnReadCount){
+	
+	var messageModel = db.getDocModel("message");
+	
+	messageModel.count({"ownerId._id": userId, "read": false}).exec(cbOfGetUnReadCount);
+};
 
 module.exports = miixContentMgr;
 
