@@ -52,43 +52,49 @@
 	<script src="js/jquery-ui.js"></script>
 	
 	<script>
-    	function initCropper(divID, imgUrl, imgHeight, imgWidth) {
+    	function initCropper(divID, imgUrl) {
 		        var stageAllowableWidth = window.innerWidth * 0.7;
 		        var stageAllowableHeight = window.innerHeight * 0.7;
-		        var cropperWidthToHeightRatio = imgWidth / imgHeight;
+		        var cropperWidthToHeightRatio = 210 / 130;
 				var myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
 				var btnGenerate = $('#btnGenerate');
 				var croppedArea = {};
 				/** Start to generate longPhoto and doohPreview */
 				btnGenerate.click(function(){
 				
-					async.series([
-						function(callback){
-							//Cropper the photo when user wants
-							croppedArea = myPhotoCropper.getCroppedArea();
-							var rawPhotoImg = new Image();
-							rawPhotoImg.src = imgUrl;
-							rawPhotoImg.onload = function(){ 
-								console.log("[rawPhotoImg.onload]");		
 					
-								var sourceCanvas = document.createElement("canvas");
-								var sourceCanvasContext = sourceCanvas.getContext("2d");
-								sourceCanvas.width = rawPhotoImg.width;
-								sourceCanvas.height = rawPhotoImg.height;
-								sourceCanvasContext.drawImage(rawPhotoImg, 0, 0);
-								var destinationCanvas = document.createElement("canvas");
-								var destinationCanvasContext = destinationCanvas.getContext("2d");
-								destinationCanvas.width = rawPhotoImg.width * croppedArea.width;
-								destinationCanvas.height = rawPhotoImg.height * croppedArea.height;
-								destinationCanvasContext.drawImage(sourceCanvas,
-																		rawPhotoImg.width * croppedArea.x,
-																		rawPhotoImg.height * croppedArea.y,
-																		rawPhotoImg.width * croppedArea.width,
-																		rawPhotoImg.height * croppedArea.height,
-																		0, 0,
-																		destinationCanvas.width,
-																		destinationCanvas.height);
-								localStorage.photoCroppedURI = destinationCanvas.toDataURL();
+					
+			
+				});//End of btnGenerate.click
+				
+    	}
+    	
+    	
+		function init(){
+
+			//Display photo that user upload.
+			var imageUrl = "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
+			async.series([
+						function(callback){
+							//get the dimension of customizable image 
+							var widthOfCustomizableImage = null;
+							var heightOfcustomizableImage = null;
+                      
+							var customizableObjects = templateMgr.getSubTemplate(FmMobile.selectedTemplate, FmMobile.selectedSubTemplate).customizableObjects;
+							for (var i=0; i<customizableObjects.length; i++) {	
+								if (customizableObjects[i].type == 'image') {
+									widthOfCustomizableImage = customizableObjects[i].width;
+									heightOfcustomizableImage = customizableObjects[i].height;
+        		break;
+        	}
+        }//end of loop
+//        }
+         
+        
+        if ( (!widthOfCustomizableImage) || (!heightOfcustomizableImage) ) {
+            FM_LOG("[template_photoCropperPg] Failed to get dimensions of customizable image!!");
+            return;
+        }
 								callback(null);
 							};//end of rawPhotoImg.onload
 						},
@@ -129,27 +135,7 @@
 							}
 					
 					});
-					
-			
-				});//End of btnGenerate.click
-				
-    	}
-    	
-    	
-		function init(){
 
-			//var btnSubmit = $('#btnSubmit');
-
-			
-			//var btnUpload = $("#upload");
-			//Display photo that user upload.
-			var imageUrl = "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
-			
-			document.getElementById("slide").src = imageUrl;
-			var slide = $("#slide");
-			
-			initCropper("show", imageUrl, slide.height(), slide.width());
-			slide.hide();
 				
 		}//End of function init();
 
@@ -205,12 +191,10 @@
     <div class="container">
 		<div class="row">
 			<div class="span12"> 
-				<div class="slide">
-					<img id="slide" src="img/t1.jpg">
+				<div class="slide" id="show">				
 				</div>
-				<div class="slide" id="show">
-				
-				</div>
+				<canvas id="photoViewingCanvas">
+				</canvas>
 				<span id="responsiveFlag"></span>
 				<div class="block-slogan">
 					<p style="text-align:left; padding-top:20px;">

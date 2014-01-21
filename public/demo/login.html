@@ -123,12 +123,16 @@
 			<script>
 		
 			if(navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone|iPad|iPod/i)){
+				localStorage.device = "mobile";
 				$('#hint').html("");
 			}
 			if(navigator.userAgent.match(/Android|iPhone|iPad|iPod/i)){
 				$('#code').css({"width":"100%"});
+				localStorage.device = "mobile";
 			}else{
+				localStorage.device = "PC";
 				$('#code').css({"width":"45%"});
+				
 			}
 			
 		$('#code').bind('focus',function(){

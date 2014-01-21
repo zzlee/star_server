@@ -57,42 +57,26 @@
 		var imgUrl = null;
 		var height, width;
 		function initCropper(divID, imgUrl) {
-		        var stageAllowableWidth = 0;
-		        var stageAllowableHeight = 0;
-				var cropperWidthToHeightRatio = 0;
+		    var stageAllowableWidth = 0;
+			var stageAllowableHeight = 0;
+			var cropperWidthToHeightRatio = 0;
 				
-				//if(imgWidth > imgHeight){
-					stageAllowableWidth = window.innerWidth;
-					stageAllowableHeight = window.innerHeight * 0.7;
-					cropperWidthToHeightRatio = 210/ 130;
-				//}else{
-				//	stageAllowableWidth = window.innerHeight * 0.7;
-				//	stageAllowableHeight = window.innerWidth;
-				//	cropperWidthToHeightRatio = imgHeight / imgWidth;
-				//}
-		        //var cropperWidthToHeightRatio = imgWidth / imgHeight;
-				myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
+			stageAllowableWidth = window.innerWidth;
+			stageAllowableHeight = window.innerHeight * 0.7;
+			cropperWidthToHeightRatio = 210/ 130;
+
+			myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
 		}
 	
 		function showCropper(){
 		//The original photo upload successfully.
 				//Show the UI to cropper the photo.
-				
 
-				
-				//var originalImage = $(document.getElementById("originalImage"));
-				imageUrl =  "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
+			imageUrl =  "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
 
-				//originalImage.src = imageUrl;
+			initCropper("show", imageUrl);
 
-				//originalImage.src = imageUrl;
-				
-				//console.dir(originalImage);
-				//initCropper("show", imageUrl, localStorage.height, localStorage.width);
-				initCropper("show", imageUrl);
-
-				$("#croppedPopup").dialog({
-					//dialogClass: "btn btn-1",
+			$("#croppedPopup").dialog({
 					resizable: false,
 					draggable: false,
 					width: window.innerWidth * 0.9,
@@ -195,9 +179,11 @@
 			if(localStorage.flag == "none"){
 				//$( "#croppedPopup" ).dialog( "close" );
 				$("#croppedPopup").hide();
-			}else{
-				showCropper();
+			}else if(localStorage.device == "mobile"){
+				$("#croppedPopup").hide();
 				
+			}else{
+				showCropper();				
 				
 			}
 	
@@ -211,9 +197,6 @@
 			//Display file name after user choose the photo
 			btnWowPic.change(function(){
 
-
-				
-				
 				$('#pic').html(this.files[0].name);
 				var ugcProjectId = null;
 				if(localStorage.projectId  != null){
@@ -223,21 +206,17 @@
 				}
 				    
 				var form = $("#imgform");
-			
 				localStorage.projectId = ugcProjectId;
 				localStorage.fileName = this.files[0].name;
 				$("#ugcId").attr("value", ugcProjectId);
 				$("#template").attr("value", localStorage.selectedTemplate);
+				$("#device").attr('value', localStorage.device);
 				//$("#width").attr("value", width);
 				//$("#height").attr('value', height);
 				action = "/miix/originalImage/"; 
 				form.attr("action", action);
 				localStorage.flag = "photo";
-				
-				
-				
-				
-				
+
 				btnUpload.click();		
 			});
 
@@ -311,11 +290,10 @@
 						<!--  <input type="file" accept="image/*"/>-->
 						<form id="imgform" method="post" action="#" enctype="multipart/form-data">  
 							<!--	<form name="uploadFiles" id="imgform" method="post" action="/miix/video/user_content_files"> -->
-							<input name="file" id="wow_pic" type="file"  />
+							<input name="file" id="wow_pic" type="file" accept="image/*" />
 							<input name="projectId" id="ugcId" type="hidden"/>
 							<input name="template" id="template" type="hidden" />
-							<input name="width" id="width" type="hidden" />
-							<input name="height" id="height" type="hidden" />
+							<input name="device" id="device" type="hidden" />
 							<input name="filesSubmit" id="upload" type="submit" />
 						</form>
 					</div>
