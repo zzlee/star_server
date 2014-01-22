@@ -34,7 +34,7 @@ var app = express();
 
 var workingPath = process.cwd();
 
-var mongoDbServerUrlObj = url.parse(systemConfig.HOST_MONGO_DB_SERVER_URL);
+var mongoDbServerUrlObj = url.parse(systemConfig.HOST_MONGO_DB_SERVER_FORLOG_URL);
 var mongoDbServerPort;
 if ( mongoDbServerUrlObj.port  ){
     mongoDbServerPort = Number(mongoDbServerUrlObj.port);
@@ -53,10 +53,10 @@ if (!fs.existsSync(logDir) ){
 require('winston-mongodb').MongoDB;
 var logger = new(winston.Logger)({
 	transports: [ 
-		new winston.transports.MongoDB({host:systemConfig.MONGO_DB_SERVER_ADDRESS, db: 'feltmeng', level: 'info', username: systemConfig.HOST_MONGO_DB_USER_NAME, password: systemConfig.HOST_MONGO_DB_PASSWORD}),
+		new winston.transports.MongoDB({host:mongoDbServerUrlObj.hostname, db: 'feltmeng', level: 'info', username: systemConfig.HOST_MONGO_DB_USER_NAME, password: systemConfig.HOST_MONGO_DB_PASSWORD}),
 		new winston.transports.File({ filename: './log/winston.log'})	
 	],
-	exceptionHandlers: [new winston.transports.MongoDB({host:systemConfig.MONGO_DB_SERVER_ADDRESS, db: 'feltmeng', level: 'info', username: systemConfig.HOST_MONGO_DB_USER_NAME, password: systemConfig.HOST_MONGO_DB_PASSWORD}),
+	exceptionHandlers: [new winston.transports.MongoDB({host:mongoDbServerUrlObj.hostname, db: 'feltmeng', level: 'info', username: systemConfig.HOST_MONGO_DB_USER_NAME, password: systemConfig.HOST_MONGO_DB_PASSWORD}),
                     new winston.transports.File({filename: './log/exceptions.log'})
 	]
 	
