@@ -24,7 +24,7 @@ template.uploadToServer = function(){
                 	            imgDoohPreviewBase64: localStorage.doohPreviewUrl,
                 	            ownerId: ugcInfo.ownerId._id,
                 	            ownerFbUserId: ugcInfo.ownerId.fbUserId,
-                	            contentGenre: "mood",
+                	            contentGenre: "wls",
                 	            title: ugcInfo.title,
 //                	            customizableObjects: localStorage.customizableObjects,
 								customizableObjects: localStorage.customizableObjects,
