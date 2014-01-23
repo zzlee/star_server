@@ -86,7 +86,7 @@ template.uploadToServer = function(){
                 	        	          });
                 	        },
                 	        error: function(jqXHR, textStatus, errorThrown){
-                	            callback("Failed to upload image UGC to server: "+errorThrown);
+                	            callback("Failed to upload image UGC to server: " + errorThrown);
                 	        }
                 	    });
                   },
