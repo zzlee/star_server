@@ -53,10 +53,10 @@
 	<script>
 		var myPhotoCropper = null;
 		var imgUrl = null;
-		function initCropper(divID, imgUrl, imgHeight, imgWidth) {
+		function initCropper(divID, imgUrl) {
 	        var stageAllowableWidth = window.innerWidth * 0.7;
 	        var stageAllowableHeight = window.innerHeight * 0.7;
-	        var cropperWidthToHeightRatio = imgWidth / imgHeight;
+	        var cropperWidthToHeightRatio = 210 / 130;
 			myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
 		}//End of initCropper
 		
@@ -72,16 +72,15 @@
 			//The original photo upload successfully.
 				//Show the UI to cropper the photo.
 				$("#pic").html(localStorage.fileName);
-				var originalImage = $("#originalImage");
+				
 				imageUrl =  "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
 				
-				document.getElementById("originalImage").src = imageUrl;
-				var originalImage = $("#originalImage");
+
 				$("#croppedPopup").dialog({
 					//dialogClass: "btn btn-1",
 					resizable: false,
 					draggable: false,
-					width: window.innerWidth * 0.7,
+					width: window.innerWidth * 0.9,
 					//width : 
 					position: { 
 						my: "center center", 
@@ -141,8 +140,8 @@
 				//$("#originalImage").attr("src", "/demo/img/preview.jpg");
 
 				
-				initCropper("show", imageUrl, originalImage.height(), originalImage.width());
-				originalImage.hide();
+				initCropper("show", imageUrl);
+
 		}
 		
 		function init(){
@@ -414,13 +413,13 @@
           <li><a class="icon-3" href="#"></a></li>
           <li><a class="icon-4" href="#"></a></li>
         </ul>
-    <div class="privacy pull-left">&copy; 2013 | <a href="http://www.dzyngiri.com">Dzyngiri : Online Design Magazine</a> |</div>
+     <div class="privacy pull-left">&copy; 2014 | <a href="http://www.feltmeng.com">夢蝶股份有限公司 Feltmeng Inc.</a> |</div>
   </div>
     </footer>
 	<script type="text/javascript" src="js/bootstrap.js"></script>
 </body>
 <div id="croppedPopup" title="剪裁圖片">
-	<img id="originalImage">
+
 	<div id="show" style="align:center">
 	</div>
 </div>

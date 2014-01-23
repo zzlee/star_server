@@ -271,7 +271,7 @@ app.post('/miix/ugcInfo/', function(req,res){
  * @returns {HTML} - After upload file successfully then go to next page which we want to user go(This case is "upload_text.html" or "upload_photo.html").
  */
 app.post('/miix/originalImage/', function(req,res){
-//	console.dir(req.body);
+	//console.dir(req.body);
 	var tempPath = req.files.file.path;
 	
 	 var projectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectId);
@@ -324,10 +324,8 @@ app.post('/miix/originalImage/', function(req,res){
 	    					logger.info('Failed to upload and gen UGCs' + err);
 	    				}else{
 							logger.info( 'Send redirect html to client side. ');
-							var tmpLength = req.body.template.split("_").length;
-							var subTemplate = req.body.template.split("_")[tmpLength - 1];
 	                	  
-							if(subTemplate == "pic"){
+							if(req.body.device != "mobile"){
 								res.writeHead(200, "OK", {'Content-Type': 'text/html'});
 								res.write('<html>');
 								res.write('<script>');
@@ -341,16 +339,16 @@ app.post('/miix/originalImage/', function(req,res){
 								res.write('</script>');
 								res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
 								res.end();
-							}else if(subTemplate == "text"){
+							}else{
 								res.writeHead(200, "OK", {'Content-Type': 'text/html'});
 								res.write('<html>');
 								res.write('<script>');
 								res.write('function init(){' +
 	    				    			'setTimeout(' +
 //	    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
-	    				    				//"window.location = '/demo/upload_text.html',1000);" +
+	    				    				"window.location = '/demo/photo.html',1000);" +
 											//"window.location.replace('/demo/upload_text.html'),1000);" +
-												"'window.history.go(-1)',1000);" +
+											//	"'window.history.go(-1)',1000);" +
 	    				    			'}');
 								res.write('</script>');
 								res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
