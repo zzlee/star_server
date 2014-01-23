@@ -56,7 +56,7 @@ ConnectFacebook.logIn = function(){
 	            		FB.api('/me', function(response) {
 //	            			console.dir(response);
 	            			data = {"authResponse": {
-	            					"appGenre":"wowtaipeiarena", 
+	            					"appGenre":"waterlandsecuries", 
 	            					"userID": userID,
 	            					"userName": response.name,
 	            					"email": response.email,
