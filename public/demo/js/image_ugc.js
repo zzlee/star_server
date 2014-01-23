@@ -61,7 +61,7 @@ ImageUgc = (function(){
                                 imgDoohPreviewBase64: doohPreviewResultURI,
                                 ownerId: ugcInfo.ownerId._id,
                                 ownerFbUserId: ugcInfo.ownerId.fbUserId,
-                                contentGenre: "mood",
+                                contentGenre: "wls",
                                 title: ugcInfo.title,
                                 //customizableObjects: JSON.stringify(customizableObjects),
 								customizableObjects: localStorage.customizableObjects,

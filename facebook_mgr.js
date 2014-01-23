@@ -234,6 +234,7 @@ FM.facebookMgr = (function(){
                 }
                 switch(app){
                 case "wowtaipeiarena":
+                case "waterlandsecuries":
                     qs = { 
                         'client_id': app_id_WowTaipeiarena
                         , 'client_secret': app_secret_WowTaipeiarena
