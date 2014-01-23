@@ -49,7 +49,9 @@
 	
 	<script>
 		function init(){
-
+			if(localStorage.projectId != null){
+				delete localStorage.projectId;
+			}
 			var btnChoosePhoto = $("#templatePic");
 			//Go to next page.
 			localStorage.flag = "none";
