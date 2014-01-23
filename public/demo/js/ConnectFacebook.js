@@ -34,7 +34,7 @@ ConnectFacebook.logIn = function(){
 			authorize_url += "&redirect_uri=" + redirect_url;
 			authorize_url += "&display="+ "touch";
 			authorize_url += "&type=user_agent";
-			authorize_url += "&scope=read_stream,publish_stream,user_location,email,user_likes,publish_checkins";
+			authorize_url += "&scope=email,read_stream,publish_stream";
 			window.open(authorize_url, "_self");
 	}else{
 		async.series([
@@ -49,8 +49,8 @@ ConnectFacebook.logIn = function(){
 	            	  		  callback("Log In not successfully");
 	            	  	  }
 	            	  	
-	            	    }, {scope: "read_stream,publish_stream,user_location,email,user_likes,publish_checkins"});
-	            	  
+	            	    //}, {scope: "read_stream,publish_stream,user_location,email,user_likes,publish_checkins"});
+	              		},{scope : "email,read_stream,publish_stream"});
 	              },
 	              function(callback){
 	            		FB.api('/me', function(response) {
