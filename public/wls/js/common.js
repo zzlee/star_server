@@ -1,6 +1,6 @@
-//var serverUrl = "http://joy.ondascreen.com/demo";
-var serverUrl = "http://jean.ondascreen.com/demo";
-//var serverUrl = "http://internal.ondascreen.com/demo";
+//var serverUrl = "http://joy.ondascreen.com/wls";
+var serverUrl = "http://jean.ondascreen.com/wls";
+//var serverUrl = "http://internal.ondascreen.com/wls";
 /** --------------------------------------------------- */
 
 //var domainUrl = "http://internal.ondascreen.com";

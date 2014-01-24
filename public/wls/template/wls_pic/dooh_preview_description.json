@@ -1,0 +1,42 @@
+{
+    "taipei_arena":{
+        
+        "picture_only":{
+            "backgroundImageUrl":"template_resource/wow_dooh_pic.jpg",
+            "logoImgUrl":"template_resource/wow_dooh_pic_logo.png",
+            "logoPosition_left":{"x":"213.848","y":"254.674"},
+            "logoPosition_right":{"x":"1041.661","y":"261.11"},
+            "customizableObjects":[
+                                   {
+                                   "id":"picture0",
+                                   "type":"image",
+                                   "quadrilateral":{
+                                   "x_ul":"718",
+                                   "y_ul":"250",
+                                   "x_ur":"987",
+                                   "y_ur":"256",
+                                   "x_ll":"713",
+                                   "y_ll":"444",
+                                   "x_lr":"975",
+                                   "y_lr":"439"
+                                   }
+                                   },
+                                   {
+                                   "id":"thumbnail0",
+                                   "type":"thumbnail",
+                                   "quadrilateral":{
+                                   "x_ul":"494",
+                                   "y_ul":"256",
+                                   "x_ur":"656",
+                                   "y_ur":"256",
+                                   "x_ll":"494",
+                                   "y_ll":"439",
+                                   "x_lr":"656",
+                                   "y_lr":"439"
+                                   }
+                                  }
+                                   ]
+        }
+        
+    }
+}

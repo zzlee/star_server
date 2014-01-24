@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<title>國票證券 | Select Template</title>
+	<meta charset="utf-8">
+	<link rel="icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon" />
+    <meta name="description" content="Codester is a free responsive Bootstrap template by Dzyngiri">
+    <meta name="keywords" content="free, template, bootstrap, responsive">
+    <meta name="author" content="Inbetwin Networks">  
+	<link rel="stylesheet" href="css/bootstrap.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/touchTouch.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.min.css" media="screen">
+	<link rel="stylesheet" href="css/kwicks-slider.css" type="text/css" media="screen">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+	<script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/superfish.js"></script>
+	<script type="text/javascript" src="js/jquery.flexslider-min.js"></script>
+	<script type="text/javascript" src="js/jquery.kwicks-1.5.1.js"></script>
+	<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
+	<script type="text/javascript" src="js/jquery.cookie.js"></script>    
+	<script type="text/javascript" src="js/touchTouch.jquery.js"></script>
+	<script src="js/jquery-ui-1.9.2.custom.js"></script>
+	<script type="text/javascript">if($(window).width()>1024){document.write("<"+"script src='js/jquery.preloader.js'></"+"script>");}	</script>
+
+	<script>		
+		 jQuery(window).load(function() {	
+		 $x = $(window).width();		
+	if($x > 1024)
+	{			
+	jQuery("#content .row").preloader();    }	
+		 
+     jQuery('.magnifier').touchTouch();			
+    jQuery('.spinner').animate({'opacity':0},1000,'easeOutCubic',function (){jQuery(this).css('display','none')});	
+  		  }); 
+				
+	</script>
+	
+	<!-- CUSTOM CODE -->
+	<script src="js/async.js"></script>
+	<script src="js/common.js"></script>
+	<script src="js/template.js"></script>
+	<script src="js/image_ugc.js"></script>
+	<script src="js/template_mgr.js"></script>
+	<script src="js/ugc_utility.js"></script>
+	<script src="js/dooh_info.js"></script>
+	<script src="js/dooh_preview.js"></script>
+	
+	<script src="js/photoCropper.js"></script>
+	<script src="js/kinetic-v4.3.3.js"></script>
+	
+	<script>
+		var myPhotoCropper = null;
+		var imgUrl = null;
+		var height, width;
+		function initCropper(divID, imgUrl) {
+		    var stageAllowableWidth = 0;
+			var stageAllowableHeight = 0;
+			var cropperWidthToHeightRatio = 0;
+				
+			stageAllowableWidth = window.innerWidth;
+			stageAllowableHeight = window.innerHeight * 0.7;
+			cropperWidthToHeightRatio = 210/ 130;
+
+			myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
+		}
+	
+		function showCropper(){
+		//The original photo upload successfully.
+				//Show the UI to cropper the photo.
+
+			imageUrl =  "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
+
+			initCropper("show", imageUrl);
+
+			$("#croppedPopup").dialog({
+					resizable: false,
+					draggable: false,
+					width: window.innerWidth * 0.9,
+					//width : 
+					position: { 
+						my: "center center", 
+						at: "center top", 
+						//of: "#croppedPopup"
+						of : window
+					},
+					modal : true,
+					buttons: [{
+						text: "開始合成",
+						click: function() {
+							async.series([
+						function(callback){
+							//Cropper the photo when user wants
+							croppedArea = myPhotoCropper.getCroppedArea();
+							var rawPhotoImg = new Image();
+							rawPhotoImg.src = imageUrl;
+							rawPhotoImg.onload = function(){ 
+								console.log("[rawPhotoImg.onload]");		
+					
+								var sourceCanvas = document.createElement("canvas");
+								var sourceCanvasContext = sourceCanvas.getContext("2d");
+								sourceCanvas.width = rawPhotoImg.width;
+								sourceCanvas.height = rawPhotoImg.height;
+								sourceCanvasContext.drawImage(rawPhotoImg, 0, 0);
+								var destinationCanvas = document.createElement("canvas");
+								var destinationCanvasContext = destinationCanvas.getContext("2d");
+								destinationCanvas.width = rawPhotoImg.width * croppedArea.width;
+								destinationCanvas.height = rawPhotoImg.height * croppedArea.height;
+								destinationCanvasContext.drawImage(sourceCanvas,
+																		rawPhotoImg.width * croppedArea.x,
+																		rawPhotoImg.height * croppedArea.y,
+																		rawPhotoImg.width * croppedArea.width,
+																		rawPhotoImg.height * croppedArea.height,
+																		0, 0,
+																		destinationCanvas.width,
+																		destinationCanvas.height);
+								localStorage.photoCroppedURI = destinationCanvas.toDataURL();
+								callback(null);
+							};//end of rawPhotoImg.onload
+						},
+						function(callback){
+							//Start to generate longPhoto and the Preview of dooh.
+							var imageUgc;
+							var userContent = {
+								text: null,
+								picture: {
+									urlOfCropped: localStorage.photoCroppedURI, //the URL of the picture that the user crops. (It is normally a base64 string got from canvas.toDataURL() )
+									crop: {_x:0, _y:0, _w:0, _h:0},  // _x=x_crop/width_picture; _y=y_crop/height_picture; _w=width_crop/width_picture;  _h=height_crop/height_picture
+								},
+								thumbnail:{
+									url: localStorage.profilePhoto
+								}
+								
+							};
+							var template = localStorage.selectedTemplate;
+							//subTemplate is picture_only (For Test)
+							
+							ImageUgc.getInstance(template, "picture_only", userContent, function(err, _imageUgc){
+								if(!err){
+									imageUgc = _imageUgc;
+									localStorage.longphotoUrl = imageUgc.getImageUrl();
+									localStorage.doohPreviewUrl = imageUgc.getDoohPreviewImageUrl();
+									localStorage.customizableObjects = imageUgc.getCustomizableObjects();
+									window.location = serverUrl + "/preview.html";
+									callback(null);
+								}else{
+									console.log("[imageUgc.generate] Failed");
+								}
+							
+							});
+							
+						}],
+						function(err){
+							if(err){
+								console.log(err);
+							}
+					
+					});
+						}
+					}]
+				});
+
+				//originalImage.hide();
+				$("#croppedPopup").show();
+		
+		};
+		function init(){
+			var btnChoosePhoto = $("#chossePic");
+			
+			var btnWowPic = $("#wow_pic");
+			
+			var btnUpload = $("#upload");
+			//$( "#croppedPopup" ).dialog( "destroy" );
+			//$("#croppedPopup").closest('.ui-dialog-content').dialog('close');
+			
+			if(localStorage.flag == "none"){
+				//$( "#croppedPopup" ).dialog( "close" );
+				$("#croppedPopup").hide();
+			}else if(localStorage.device == "mobile"){
+				$("#croppedPopup").hide();
+				
+			}else{
+				showCropper();				
+				
+			}
+	
+			
+			btnChoosePhoto.click(function(){
+				localStorage.selectedTemplate = "wow_pic";
+				btnWowPic.click();
+			});
+
+
+			//Display file name after user choose the photo
+			btnWowPic.change(function(){
+
+				$('#pic').html(this.files[0].name);
+				var ugcProjectId = null;
+				if(localStorage.projectId  != null){
+					ugcProjectId = localStorage.projectId;
+				}else{
+					ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
+				}
+				    
+				var form = $("#imgform");
+				localStorage.projectId = ugcProjectId;
+				localStorage.fileName = this.files[0].name;
+				$("#ugcId").attr("value", ugcProjectId);
+				$("#template").attr("value", localStorage.selectedTemplate);
+				$("#device").attr('value', localStorage.device);
+				//$("#width").attr("value", width);
+				//$("#height").attr('value', height);
+				action = "/miix/originalImage/"; 
+				form.attr("action", action);
+				localStorage.flag = "photo";
+
+				btnUpload.click();		
+			});
+
+			
+
+		}//End of init()
+
+	</script>
+	
+	<!--[if lt IE 8]>
+  		<div style='text-align:center'><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx?ocid=ie6_countdown_bannercode"><img src="http://www.theie6countdown.com/img/upgrade.jpg"border="0"alt=""/></a></div>  
+ 	<![endif]-->
+	<!--[if (gt IE 9)|!(IE)]><!-->
+	<!--<![endif]-->
+	<!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <link rel="stylesheet" href="css/docs.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/ie.css" type="text/css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'>
+  <![endif]-->
+  
+  <!--Google analytics code	  
+	  <script type="text/javascript">
+           var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-29231762-1']);
+          _gaq.push(['_setDomainName', 'dzyngiri.com']);
+          _gaq.push(['_trackPageview']);
+        
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+      </script>
+      -->
+</head>
+
+	<body onload="init();">
+     <div class="spinner"></div> 
+<!-- header start -->
+<header>
+      <div class="container clearfix">
+    <div class="row">
+          <div class="span12">
+        <div class="navbar navbar_">
+              <div class="container">
+            <h2 class="brand"><a href="index.html" style="color:#000;text-shadow:none;font-size:250%">我要上小巨蛋</a></h2>
+            <div class="nav-collapse nav-collapse_  collapse"></div>
+          </div>
+            </div>
+      </div>
+        </div>
+  </div>
+    </header>
+<div class="bg-content">
+    <div class="container">
+		<div class="row">
+			<div class="span12"> 
+				<h3>版型一</h3>
+				<!-- slider -->
+				<div class="slide">
+					<img src="img/t1.jpg">
+				</div>
+                <span id="responsiveFlag"></span>
+				<div class="block-slogan">
+					<div style="height:0px;overflow:hidden"> 
+						
+						<!-- If let user only chosse CAMERA just use next line to do.-->
+						<!-- <input id="wow_pic" type="file" accept="image/*" capture="camera"/> -->
+						<!--  <input type="file" accept="image/*"/>-->
+						<form id="imgform" method="post" action="#" enctype="multipart/form-data">  
+							<!--	<form name="uploadFiles" id="imgform" method="post" action="/miix/video/user_content_files"> -->
+							<input name="file" id="wow_pic" type="file" accept="image/*" />
+							<input name="projectId" id="ugcId" type="hidden"/>
+							<input name="template" id="template" type="hidden" />
+							<input name="device" id="device" type="hidden" />
+							<input name="filesSubmit" id="upload" type="submit" />
+						</form>
+					</div>
+
+					<p style="text-align:left; padding-top:20px;">
+						<button id="chossePic" class="btn btn-1">選擇圖片</button>
+						<button id="pic" class="btn btn-1" style="background:url(../img/bg-content.jpg) 50% 50%;"></button>
+					</p>
+
+				</div>
+			</div>
+		</div>
+	</div>
+      
+      <!-- content -->
+      
+	<div id="content" class="content-extra"><div class="ic"></div>
+
+
+	</div>
+</div>
+
+<!-- footer -->
+<footer>
+	<div class="container clearfix">
+		<ul class="list-social pull-right">
+			<li><a class="icon-1" href="#"></a></li>
+			<li><a class="icon-2" href="#"></a></li>
+			<li><a class="icon-3" href="#"></a></li>
+			<li><a class="icon-4" href="#"></a></li>
+		</ul>
+		 <div class="privacy pull-left">&copy; 2014 | <a href="http://www.feltmeng.com">夢蝶股份有限公司 Feltmeng Inc.</a> |</div>
+	</div>
+</footer>
+<div id="croppedPopup" title="剪裁圖片">
+	<div id="show" style="align:center">
+	</div>
+</div>
+<script type="text/javascript" src="js/bootstrap.js"></script>
+</body>
+</html>

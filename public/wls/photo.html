@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<title>國票證券 | Proto Cropper</title>
+	<meta charset="utf-8">
+	<link rel="icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon" />
+    <meta name="description" content="Codester is a free responsive Bootstrap template by Dzyngiri">
+    <meta name="keywords" content="free, template, bootstrap, responsive">
+    <meta name="author" content="Inbetwin Networks">  
+	<link rel="stylesheet" href="css/bootstrap.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/touchTouch.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/kwicks-slider.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.min.css" media="screen">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+	<script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/superfish.js"></script>
+	<script type="text/javascript" src="js/jquery.flexslider-min.js"></script>
+	<script type="text/javascript" src="js/jquery.kwicks-1.5.1.js"></script>
+	<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
+	<script type="text/javascript" src="js/jquery.cookie.js"></script>    
+	<script type="text/javascript" src="js/touchTouch.jquery.js"></script>
+	<script type="text/javascript">if($(window).width()>1024){document.write("<"+"script src='js/jquery.preloader.js'></"+"script>");}	</script>
+
+	<script>		
+		 jQuery(window).load(function() {	
+		 $x = $(window).width();		
+	if($x > 1024)
+	{			
+	jQuery("#content .row").preloader();    }	
+		 
+     jQuery('.magnifier').touchTouch();			
+    jQuery('.spinner').animate({'opacity':0},1000,'easeOutCubic',function (){jQuery(this).css('display','none')});	
+  		  }); 
+				
+	</script>
+	
+	<!-- CUSTOM CODE -->
+	<script src="js/async.js"></script>
+	<script src="js/common.js"></script>
+	<script src="js/template.js"></script>
+	<script src="js/image_ugc.js"></script>
+	<script src="js/template_mgr.js"></script>
+	<script src="js/ugc_utility.js"></script>
+	<script src="js/dooh_info.js"></script>
+	<script src="js/dooh_preview.js"></script>
+	<script src="js/photoCropper.js"></script>
+	<script src="js/kinetic-v4.0.5.min.js"></script>
+	<script src="js/jquery-ui.js"></script>
+	
+	<script>
+    	function initCropper(divID, imgUrl) {
+		        var stageAllowableWidth = window.innerWidth * 0.7;
+		        var stageAllowableHeight = window.innerHeight * 0.7;
+		        var cropperWidthToHeightRatio = 210 / 130;
+				var myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
+				var btnGenerate = $('#btnGenerate');
+				var croppedArea = {};
+				/** Start to generate longPhoto and doohPreview */
+				btnGenerate.click(function(){
+				
+					
+					
+			
+				});//End of btnGenerate.click
+				
+    	}
+    	
+    	
+		function init(){
+
+			//Display photo that user upload.
+			var imageUrl = "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
+			async.series([
+						function(callback){
+							//get the dimension of customizable image 
+							var widthOfCustomizableImage = null;
+							var heightOfcustomizableImage = null;
+                      
+							var customizableObjects = templateMgr.getSubTemplate(FmMobile.selectedTemplate, FmMobile.selectedSubTemplate).customizableObjects;
+							for (var i=0; i<customizableObjects.length; i++) {	
+								if (customizableObjects[i].type == 'image') {
+									widthOfCustomizableImage = customizableObjects[i].width;
+									heightOfcustomizableImage = customizableObjects[i].height;
+        		break;
+        	}
+        }//end of loop
+//        }
+         
+        
+        if ( (!widthOfCustomizableImage) || (!heightOfcustomizableImage) ) {
+            FM_LOG("[template_photoCropperPg] Failed to get dimensions of customizable image!!");
+            return;
+        }
+								callback(null);
+							};//end of rawPhotoImg.onload
+						},
+						function(callback){
+							//Start to generate longPhoto and the Preview of dooh.
+							var imageUgc;
+							var userContent = {
+								text: null,
+								picture: {
+									urlOfCropped: localStorage.photoCroppedURI, //the URL of the picture that the user crops. (It is normally a base64 string got from canvas.toDataURL() )
+									crop: {_x:0, _y:0, _w:0, _h:0},  // _x=x_crop/width_picture; _y=y_crop/height_picture; _w=width_crop/width_picture;  _h=height_crop/height_picture
+								},
+								thumbnail:{
+									url: localStorage.profilePhoto
+								}
+								
+							};
+							var template = localStorage.selectedTemplate;
+							//subTemplate is picture_only (For Test)
+							
+							ImageUgc.getInstance(template, "picture_only", userContent, function(err, _imageUgc){
+								if(!err){
+									imageUgc = _imageUgc;
+									localStorage.longphotoUrl = imageUgc.getImageUrl();
+									localStorage.doohPreviewUrl = imageUgc.getDoohPreviewImageUrl();
+									localStorage.customizableObjects = imageUgc.getCustomizableObjects();
+									window.location = serverUrl + "/preview.html";
+								}else{
+									console.log("[imageUgc.generate] Failed");
+								}
+							
+							});
+							
+						}],
+						function(err){
+							if(err){
+								console.log(err);
+							}
+					
+					});
+
+				
+		}//End of function init();
+
+	</script>
+	
+	<!--[if lt IE 8]>
+  		<div style='text-align:center'><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx?ocid=ie6_countdown_bannercode"><img src="http://www.theie6countdown.com/img/upgrade.jpg"border="0"alt=""/></a></div>  
+ 	<![endif]-->
+	<!--[if (gt IE 9)|!(IE)]><!-->
+	<!--<![endif]-->
+	<!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <link rel="stylesheet" href="css/docs.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/ie.css" type="text/css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'>
+  <![endif]-->
+  
+  <!--Google analytics code	  
+	  <script type="text/javascript">
+           var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-29231762-1']);
+          _gaq.push(['_setDomainName', 'dzyngiri.com']);
+          _gaq.push(['_trackPageview']);
+        
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+      </script>
+      -->
+</head>
+
+	<body onload="init();">
+     <div class="spinner"></div> 
+<!-- header start -->
+<header>
+      <div class="container clearfix">
+    <div class="row">
+          <div class="span12">
+        <div class="navbar navbar_">
+              <div class="container">
+            <h2 class="brand"><a href="index.html" style="color:#000;text-shadow:none;font-size:250%">我要上小巨蛋</a></h2>
+            <div class="nav-collapse nav-collapse_  collapse"></div>
+          </div>
+            </div>
+      </div>
+        </div>
+  </div>
+    </header>
+<div class="bg-content">
+    <div class="container">
+		<div class="row">
+			<div class="span12"> 
+				<div class="slide" id="show">				
+				</div>
+				<canvas id="photoViewingCanvas">
+				</canvas>
+				<span id="responsiveFlag"></span>
+				<div class="block-slogan">
+					<p style="text-align:left; padding-top:20px;">
+						<button id="btnGenerate" class="btn btn-1">開始合成</button>
+					</p>
+				</div>
+        
+			</div>
+		</div>
+	</div>
+      
+      <!-- content -->
+      
+	<div id="content" class="content-extra"><div class="ic"></div>
+
+
+	</div>
+</div>
+
+<!-- footer -->
+<footer>
+	<div class="container clearfix">
+		<ul class="list-social pull-right">
+			<li><a class="icon-1" href="#"></a></li>
+			<li><a class="icon-2" href="#"></a></li>
+			<li><a class="icon-3" href="#"></a></li>
+			<li><a class="icon-4" href="#"></a></li>
+        </ul>
+     <div class="privacy pull-left">&copy; 2014 | <a href="http://www.feltmeng.com">夢蝶股份有限公司 Feltmeng Inc.</a> |</div>
+	</div>
+</footer>
+	<script type="text/javascript" src="js/bootstrap.js"></script>
+</body>
+</html>

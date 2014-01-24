@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<title>國票證券 | Preview</title>
+	<meta charset="utf-8">
+	<link rel="icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon" />
+    <meta name="description" content="Codester is a free responsive Bootstrap template by Dzyngiri">
+    <meta name="keywords" content="free, template, bootstrap, responsive">
+    <meta name="author" content="Inbetwin Networks">  
+	<link rel="stylesheet" href="css/bootstrap.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/touchTouch.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/kwicks-slider.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.min.css" media="screen">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+	<script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/superfish.js"></script>
+	<script type="text/javascript" src="js/jquery.flexslider-min.js"></script>
+	<script type="text/javascript" src="js/jquery.kwicks-1.5.1.js"></script>
+	<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
+	<script type="text/javascript" src="js/jquery.cookie.js"></script>    
+	<script type="text/javascript" src="js/touchTouch.jquery.js"></script>
+	<script type="text/javascript">if($(window).width()>1024){document.write("<"+"script src='js/jquery.preloader.js'></"+"script>");}	</script>
+
+	<script>		
+		 jQuery(window).load(function() {	
+		 $x = $(window).width();		
+	if($x > 1024)
+	{			
+	jQuery("#content .row").preloader();    }	
+		 
+     jQuery('.magnifier').touchTouch();			
+    jQuery('.spinner').animate({'opacity':0},1000,'easeOutCubic',function (){jQuery(this).css('display','none')});	
+  		  }); 
+				
+	</script>
+
+	<!-- CUSTOM CODES -->
+	<script src="js/common.js"></script>
+	<script src="js/image_ugc.js"></script>
+	<script src="js/template.js"></script>
+	<script src="js/async.js"></script>
+	<script src="js/jquery-ui.js"></script>
+
+	<script>
+		function init(){
+
+			
+			var preview = $('#imgPreview');
+			//wow_pic-529dafa950ceec4015000005-20131230T085843037Z_dooh_preview.png
+			setTimeout(function(){
+				//var doohPreviewImageUrl = domainUrl + "/contents/user_project/" + localStorage.projectId + "/" + localStorage.projectId + "_dooh_preview.png";
+				preview.attr({src:localStorage.doohPreviewUrl});
+				console.log("localStorage.longphotoUrl");
+				console.log(localStorage.longphotoUrl);
+				console.log("localStorage.photoCroppedURI");
+				console.log(localStorage.photoCroppedURI);
+			},1000);
+			var btnUpload = $("#btnUpload");
+			btnUpload.click(function(){
+				if(localStorage.VIPCodeId){
+					var forComfirm = confirm("請注意!\nVIP只有一次投稿機會\n請確認再送出!");
+					if (forComfirm==true) {
+						delete localStorage.template_userText; //by Joy just for hint text remove 
+						template.uploadToServer();
+						btnUpload.hide();
+	                }else{
+	                    return false;
+	                }
+				}else{
+					var forComfirm = confirm("請注意!\n投稿後就有可能登上台北小巨蛋螢幕!\n請確認再送出!");
+					if (forComfirm==true) {
+						delete localStorage.template_userText; //by Joy just for hint text remove 
+						template.uploadToServer();
+						btnUpload.hide();
+	                }else{
+	                    return false;
+	                }
+				}
+			});
+		}
+	</script>
+	<!--[if lt IE 8]>
+  		<div style='text-align:center'><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx?ocid=ie6_countdown_bannercode"><img src="http://www.theie6countdown.com/img/upgrade.jpg"border="0"alt=""/></a></div>  
+ 	<![endif]-->
+	<!--[if (gt IE 9)|!(IE)]><!-->
+	<!--<![endif]-->
+	<!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <link rel="stylesheet" href="css/docs.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/ie.css" type="text/css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'>
+  <![endif]-->
+  
+  <!--Google analytics code	  
+	  <script type="text/javascript">
+           var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-29231762-1']);
+          _gaq.push(['_setDomainName', 'dzyngiri.com']);
+          _gaq.push(['_trackPageview']);
+        
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+      </script>
+      -->
+</head>
+
+	<body onload="init()">
+     <div class="spinner"></div> 
+<!-- header start -->
+<header>
+      <div class="container clearfix">
+    <div class="row">
+          <div class="span12">
+        <div class="navbar navbar_">
+              <div class="container">
+            <h2 class="brand"><a href="index.html" style="color:#000;text-shadow:none;font-size:250%">我要上小巨蛋</a></h2>
+
+            <div class="nav-collapse nav-collapse_collapse"></div>
+          </div>
+            </div>
+      </div>
+        </div>
+  </div>
+    </header>
+<div class="bg-content">
+      <div class="container">
+    <div class="row">
+          <div class="span12"> 
+        <!-- slider -->
+        <div class="slide">
+        <img id="imgPreview" src="img/loading.jpg">
+        </div>
+        
+        <span id="responsiveFlag"></span>
+        <div class="block-slogan" style="color:#FFF">
+              <h2>模擬完成!</h2>
+              <div>
+              <p style="font-size:20pt">請確定模擬圖中圖片、文字的排版是正確的，如要更改請<a href="javascript: window.history.go(-1)">回上頁</a>！謝謝</p>
+              <br>
+            <p>(1)送出後我們會經由您的facebook，發送播放通知。<br>
+              (2)我們會將您的播放內容利用攝影機拍攝下來，傳送到您的facebook!</p>
+              
+            <p style="text-align:right; padding-top:20px;">
+	            <button id="btnUpload" class="btn btn-1">送出！</button>
+            </p>
+          </div>
+            </div>
+      </div>
+        </div>
+  </div>
+      
+      <!-- content -->
+      
+      <div id="content" class="content-extra"><div class="ic"></div>
+
+
+  </div>
+    </div>
+
+<!-- footer -->
+<footer>
+	<div class="container clearfix">
+		<ul class="list-social pull-right">
+			<li><a class="icon-1" href="#"></a></li>
+			<li><a class="icon-2" href="#"></a></li>
+			<li><a class="icon-3" href="#"></a></li>
+			<li><a class="icon-4" href="#"></a></li>
+		</ul>
+		 <div class="privacy pull-left">&copy; 2014 | <a href="http://www.feltmeng.com">夢蝶股份有限公司 Feltmeng Inc.</a> |</div>
+	</div>
+</footer>
+<script type="text/javascript" src="js/bootstrap.js"></script>
+</body>
+</html>
