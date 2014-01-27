@@ -17,6 +17,9 @@
 	<link rel="stylesheet" href="css/kwicks-slider.css" type="text/css" media="screen">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="js/jquery.js"></script>
+	<!--<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+	-->
     <script type="text/javascript" src="js/superfish.js"></script>
 	<script type="text/javascript" src="js/jquery.flexslider-min.js"></script>
 	<script type="text/javascript" src="js/jquery.kwicks-1.5.1.js"></script>
@@ -26,7 +29,7 @@
 	<script src="js/jquery-ui-1.10.3.custom.js"></script>
 	<script src="js/jquery-ui-1.9.2.custom.min.js"></script>
 
-		<script type="text/javascript">if($(window).width()>1024){document.write("<"+"script src='js/jquery.preloader.js'></"+"script>");}	</script>
+	<script type="text/javascript">if($(window).width()>1024){document.write("<"+"script src='js/jquery.preloader.js'></"+"script>");}</script>
 
 	<script>		
 		 jQuery(window).load(function() {	
@@ -53,6 +56,7 @@
 	
 	<script src="js/photoCropper.js"></script>
 	<script src="js/kinetic-v4.3.3.js"></script>
+
 	
 	<script>
 		var myPhotoCropper = null;
@@ -231,7 +235,8 @@
 			//}else{
 			//	localstorage.refresh = true;
 				//window.location.reload();
-			//	window.location = window.location;
+				//window.location = window.location;
+			//	$.mobile.reloadPage(true);
 			//}
 
 		}//End of init()

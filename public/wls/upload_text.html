@@ -175,7 +175,10 @@
 				}else{
 					ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
 				}
-				    
+				if($("#inputText").val() != null){
+					localStorage.template_userText = $("#inputText").val();
+				}
+
 				var form = $("#imgform");
 				var length = btnWowPicText.val().split('\\').length - 1;
 				localStorage.projectId = ugcProjectId;
@@ -201,23 +204,26 @@
 			});
 			btnSend.click(function(){
 					var inputContent = $("#inputText").val().replace(/\n/g,"_");
-					console.log(inputContent);
+					//console.log(inputContent);
 				
 					async.series([
-				              function(callback){
-				            	  insertSpace(inputContent, function(res){
-				            		  console.log(res);
-				            		  inputContent = res;
-				            		  localStorage.template_userText = res;
-				            		  callback(null, 'one');
-				            	  
-				            	  });
+								function(callback){
+									if(localStorage.photoCroppedURI != null)
+										callback(null, 'one');
+									else 
+										callback("別忘了選擇圖片!");
 				                  
-				              },
-				              function(callback){
-				                  callback(null, 'two');
-				              }
-				          ],
+								},
+								function(callback){
+									insertSpace(inputContent, function(res){
+				            		//console.log(res);
+				            		inputContent = res;
+				            		localStorage.template_userText = res;
+				            		callback(null, 'two');
+				            	  
+									});
+				                  
+								}],
 				          function(err, results){
 							if(!err){
 								var imageUgc;
@@ -247,6 +253,8 @@
 									}
 								
 								});
+							}else{
+								alert(err);
 							}
 
 							
