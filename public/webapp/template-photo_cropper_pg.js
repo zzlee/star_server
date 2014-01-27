@@ -37,12 +37,20 @@ var WidthOfCustomizableImage = null;
 var HeightOfcustomizableImage = null;
 
 
+FmMobile.template_photoCropperPg = {
 
     //myPhotoCropper: null,
+    stageAllowableWidth : 0,
+    stageAllowableHeight : 0,
 
     //  Page methods.
+    load : function(event, data) {
+        FM_LOG("[template_photoCropperPg]load");
+        $("#nav-bar").show();
         
         //get the dimension of customizable image 
+        WidthOfCustomizableImage = null;
+        HeightOfcustomizableImage = null;
         /*
         if ( FmMobile.selectedTemplate == "miix_it" ) {
             //TODO: parse templateMgr.getSubTemplate(FmMobile.selectedTemplate, FmMobile.selectedSubTemplate).customizableObjectsXml 
@@ -96,12 +104,63 @@ var HeightOfcustomizableImage = null;
 //        };
 //
 //        $('#submitPhotoBtn').click(onSubmitBtnClick);
-       
+        $('#cancelBtn').click(function() {
+
+            if (FmMobile.selectedSubTemplate == "picture_only") {
+                $.mobile.changePage("template-input_pic.html");
+            } else if (FmMobile.selectedSubTemplate == "picture_plus_text") {
+                $.mobile.changePage("template-input_text_pic.html");
+            } else if (FmMobile.selectedSubTemplate == "check_in") {
+                $.mobile.changePage("template-input_text_pic.html");
+          }else if (FmMobile.selectedSubTemplate == "miix_one_image") {
+          $.mobile.changePage("template_input_miixit.html");
+          }
+        });
+
         //Rewrite #submitBtn click function
         
+        $('#submitBtnToPreview').click(function() {
+            
+            $.mobile.showPageLoadingMsg();
+            FmMobile.userContent.picture.urlOfCropped = canvas.toDataURL();
+            //------ processing img (avoid preview pg long time loading) ------
+            //for 圖 / 圖+文 /video img (文 & 打卡 不能, 因為沒到cropper pg)
+            if(FmMobile.selectedTemplate == "miix_it"){
+                VideoUgc.getInstance('miix_it', 'miix_one_image', FmMobile.userContent, function(err, _videoUgc) {
+                    if (!err) {
+                        FmMobile.videoImgUgcInstance = _videoUgc;
+                        FmMobile.viewerBackFlag='backPreview';
+                        FmMobile.imgForFullPageViewer=FmMobile.videoImgUgcInstance.getDoohPreviewImageUrl();
+                        $.mobile.changePage("template-preview.html");
+                        $.mobile.hidePageLoadingMsg();
+                    }else{
+                        console.log(err);
+                        }
+                    });
+            }else{
+            ImageUgc.getInstance(FmMobile.selectedTemplate, FmMobile.selectedSubTemplate, FmMobile.userContent, function(err, _imageUgc) {
+                if (!err) {
+                    FmMobile.imageUgcInstance = _imageUgc;
+                    FmMobile.viewerBackFlag='backPreview';
+                    FmMobile.imgForFullPageViewer=FmMobile.imageUgcInstance.getDoohPreviewImageUrl();
+                    $.mobile.changePage("template-preview.html");
+                    $.mobile.hidePageLoadingMsg();
+                 }else{
+                 console.log(err);
+                     }
+                });
+            }
+            //------- end of processing-------------------
        
+            
+            
+            
+        });
+    },
 
 
+    show : function(event, data) {
+        FM_LOG("[photoCropperPg]show");
         /*
         if ( (!WidthOfCustomizableImage) || (!HeightOfcustomizableImage) ) {
             return;
@@ -123,9 +182,85 @@ var HeightOfcustomizableImage = null;
         canvas.width = $('.movie-pic-dummy').width();
         canvas.height = canvas.width / 1280 * 735;
         
-       
-         image.src = "http://l.yimg.com/bt/api/res/1.2/PmV48R2z0v_c1D_oFrsg7Q--/YXBwaWQ9eW5ld3M7Zmk9aW5zZXQ7aD00MjI7cT03OTt3PTYzMA--/http://media.zenfs.com/en_us/News/Lihpao/54450_201401262233391RfNJ.jpg";
+        var rotation_tag=false;
+         image.src = fileProcessedForCropperURI;
+        $('#rotation').click(function(){
+        	if(rotation_tag==false ){
+        		if( FmMobile.forCropperRotateVal==6){
+        		FmMobile.rotateValue=180;
+        		}else{
+        		
+        		FmMobile.rotateValue=90;
+        		}
+        		
+         subsamplingResize(fileProcessedForCropperURI, { maxWidth: 960, maxHeight: 960, orientation: 6 }, function(resultURI){
+                                                       image.src = resultURI;
+                                                       
+                                                       image.onload = function() {
 
+                                                       	 
+                                  
+                                     
+            option.scope.w = canvas.width;
+            option.scope.h = image.height / image.width * canvas.width;
+
+            option.destination.x = 0;
+            option.destination.y = -0.5 * (option.scope.h - canvas.height);
+
+            context.drawImage(image, option.destination.x,
+                    option.destination.y, option.scope.w, option.scope.h);
+
+            croppedArea = {
+                x : -option.destination.x / option.scope.w, //fraction relative to its width
+                y : -option.destination.y / option.scope.h, //fraction relative to its height
+                width : canvas.width / option.scope.w, //fraction relative to its width
+                height : canvas.height / option.scope.h //fraction relative to its height
+            };
+            
+            FmMobile.userContent.picture.crop._x = croppedArea.x;
+            FmMobile.userContent.picture.crop._y = croppedArea.y;
+            FmMobile.userContent.picture.crop._w = croppedArea.width;
+            FmMobile.userContent.picture.crop._h = croppedArea.height;
+            //alert(croppedArea.x);
+
+        };
+
+                                                       rotation_tag=true;
+                                                       });
+        	}else{
+        		FmMobile.rotateValue=0;
+        	subsamplingResize(fileProcessedForCropperURI, { maxWidth: 960, maxHeight: 960, orientation: 1}, function(resultURI){
+                                                       image.src = resultURI;
+                                                       image.onload = function() {
+
+            option.scope.w = canvas.width;
+            option.scope.h = image.height / image.width * canvas.width;
+
+            option.destination.x = 0;
+            option.destination.y = -0.5 * (option.scope.h - canvas.height);
+
+            context.drawImage(image, option.destination.x,
+                    option.destination.y, option.scope.w, option.scope.h);
+
+            croppedArea = {
+                x : -option.destination.x / option.scope.w, //fraction relative to its width
+                y : -option.destination.y / option.scope.h, //fraction relative to its height
+                width : canvas.width / option.scope.w, //fraction relative to its width
+                height : canvas.height / option.scope.h //fraction relative to its height
+            };
+            
+            FmMobile.userContent.picture.crop._x = croppedArea.x;
+            FmMobile.userContent.picture.crop._y = croppedArea.y;
+            FmMobile.userContent.picture.crop._w = croppedArea.width;
+            FmMobile.userContent.picture.crop._h = croppedArea.height;
+            //alert(croppedArea.x);
+rotation_tag=false;
+        };
+
+                                                       });
+        	}
+        });
+        
        
 
         image.onload = function() {
@@ -300,5 +435,9 @@ var HeightOfcustomizableImage = null;
 
        // FmMobile.analysis.trackPage("/template_photoCropperPg");
 //        recordUserAction("enters template_photoCropperPg");
+        FmMobile.dummyDiv();
+    }
    
+}
+
 
