@@ -54,13 +54,16 @@
 			}
 			var btnChoosePhoto = $("#templatePic");
 			//Go to next page.
-			localStorage.flag = "none";
+			//localStorage.flag = "none";
+			//localStorage.refresh = true;
 			btnChoosePhoto.click(function(){
+				localStorage.flag = "none";
 				window.location = serverUrl + "/upload_photo.html";
 			});
 			
 			var btnChoosePhotoText = $("#templatePicText");
 			btnChoosePhotoText.click(function(){
+				localStorage.flag = "none";
 				window.location = serverUrl + "/upload_text.html";
 			});
 			
