@@ -13,16 +13,11 @@ p_now = { x: 0, y: 0, v: 0 };
 var canvasInner = { width: 0, height: 0},
 canvasInnerMargins = { top: 0, left: 0, right: 0, bottom: 0};
 
-FmMobile.imgZoomViewerPg = {
 	//  Page constants.
-    PAGE_ID: "imgZoomViewerPg",
 	
 	//myPhotoCropper: null,
-    stageAllowableWidth: 0,
-    stageAllowableHeight: 0,
     
     //  Page methods.
-    load: function(event, data){
          $("#nav-bar").hide();
         
         /*  back previous page dynamically*/
@@ -48,9 +43,7 @@ FmMobile.imgZoomViewerPg = {
         
         //JF - image initial
        
-    },
     
-    show: function(event, data){
         canvas = document.getElementById('photoZoom');
         context = canvas.getContext('2d');
         image = new Image();
@@ -273,6 +266,4 @@ canvas.width = $(document).width();
         
         //FmMobile.analysis.trackPage("/imgZoomViewerPg");
 //        recordUserAction("enters imgZoomViewerPg");
-    }
-}
 

@@ -1309,3 +1309,25 @@ footer {
 .img-profile{
  width:5%;
  }
+ 
+ .content-movie{
+	background-image:url(../img/loading_cropper.jpg);
+	background-repeat:no-repeat;
+	background-size:100%;
+	width: 90%;
+	margin-top: 5%;
+	margin-left: 5%;
+	position:relative;
+}
+
+.content-movie-img_crossPlatform{
+    position:absolute;
+	top: 5%;
+    bottom: 0;
+
+	width:95%;
+		margin-left:3%;
+}
+.movie-pic-dummy{
+	padding-top: 60%; /* 16:9 aspect ratio */
+}

@@ -346,7 +346,7 @@ app.post('/miix/originalImage/', function(req,res){
 								res.write('function init(){' +
 	    				    			'setTimeout(' +
 //	    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
-	    				    				"window.location = '/demo/photo.html',1000);" +
+	    				    				"window.location = '/wls/photo.html',1000);" +
 											//"window.location.replace('/demo/upload_text.html'),1000);" +
 											//	"'window.history.go(-1)',1000);" +
 	    				    			'}');
