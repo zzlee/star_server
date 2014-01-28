@@ -142,37 +142,40 @@
 				        imageEXIF.onload = function(){
 				        	EXIF.getData( imageEXIF, function(){
 	                            var orientation = EXIF.getTag(imageEXIF, "Orientation");
-	                            alert('test');
+	                           
 	                            alert(orientation);
+	                            
+	                            
+	                            subsamplingResize(imageUrlBig, { maxWidth: 960, maxHeight: 960, orientation:orientation }, function(resultURI){
+	                                image.src = resultURI;
+	                                image.onload = function() {
+	                               	
+	        				            option.scope.w = canvas.width;
+	        				            option.scope.h = image.height / image.width * canvas.width;
+
+	        				            option.destination.x = 0;
+	        				            option.destination.y = -0.5 * (option.scope.h - canvas.height);
+
+	        				            context.drawImage(image, option.destination.x,
+	        				                    option.destination.y, option.scope.w, option.scope.h);
+
+	        				            croppedArea = {
+	        				                x : -option.destination.x / option.scope.w, //fraction relative to its width
+	        				                y : -option.destination.y / option.scope.h, //fraction relative to its height
+	        				                width : canvas.width / option.scope.w, //fraction relative to its width
+	        				                height : canvas.height / option.scope.h //fraction relative to its height
+	        				            };
+	        				            
+
+
+	        				        };
+	   				         });
 	                           
 	                            });
 				        };
 				        
 				         //image.src =  domainUrl+"/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
-				         subsamplingResize(imageUrlBig, { maxWidth: 960, maxHeight: 960 }, function(resultURI){
-                             image.src = resultURI;
-                             image.onload = function() {
-                            	
-     				            option.scope.w = canvas.width;
-     				            option.scope.h = image.height / image.width * canvas.width;
-
-     				            option.destination.x = 0;
-     				            option.destination.y = -0.5 * (option.scope.h - canvas.height);
-
-     				            context.drawImage(image, option.destination.x,
-     				                    option.destination.y, option.scope.w, option.scope.h);
-
-     				            croppedArea = {
-     				                x : -option.destination.x / option.scope.w, //fraction relative to its width
-     				                y : -option.destination.y / option.scope.h, //fraction relative to its height
-     				                width : canvas.width / option.scope.w, //fraction relative to its width
-     				                height : canvas.height / option.scope.h //fraction relative to its height
-     				            };
-     				            
-
-
-     				        };
-				         });
+				        
 				         
 				         
 				         
@@ -309,66 +312,39 @@
 				                    option.destination.y, option.scope.w, option.scope.h);
 				        };
 
-				        var rotateFlag = 'unRotate';
-				   $('#rotate').click(function(){
-					   
-					   if(rotateFlag == 'unRotate' || rotateFlag == '1'){
-						   subsamplingResize(imageUrlBig, { maxWidth: 960, maxHeight: 960, orientation:6 }, function(resultURI){
-							    rotateFlag = '6';
-							   image.src = resultURI;
-	                           image.onload = function() {
-	                          	
-	   				            option.scope.w = canvas.width;
-	   				            option.scope.h = image.height / image.width * canvas.width;
+				   
 
-	   				            option.destination.x = 0;
-	   				            option.destination.y = -0.5 * (option.scope.h - canvas.height);
-
-	   				            context.drawImage(image, option.destination.x,
-	   				                    option.destination.y, option.scope.w, option.scope.h);
-
-	   				            croppedArea = {
-	   				                x : -option.destination.x / option.scope.w, //fraction relative to its width
-	   				                y : -option.destination.y / option.scope.h, //fraction relative to its height
-	   				                width : canvas.width / option.scope.w, //fraction relative to its width
-	   				                height : canvas.height / option.scope.h //fraction relative to its height
-	   				            };
-	   				            
-
-
-	   				        };
-					         });
-					   }else if(rotateFlag == '6'){
-						   subsamplingResize(imageUrlBig, { maxWidth: 960, maxHeight: 960, orientation:1 }, function(resultURI){
-							    rotateFlag = '1';
-							   image.src = resultURI;
-	                           image.onload = function() {
-	                          	
-	   				            option.scope.w = canvas.width;
-	   				            option.scope.h = image.height / image.width * canvas.width;
-
-	   				            option.destination.x = 0;
-	   				            option.destination.y = -0.5 * (option.scope.h - canvas.height);
-
-	   				            context.drawImage(image, option.destination.x,
-	   				                    option.destination.y, option.scope.w, option.scope.h);
-
-	   				            croppedArea = {
-	   				                x : -option.destination.x / option.scope.w, //fraction relative to its width
-	   				                y : -option.destination.y / option.scope.h, //fraction relative to its height
-	   				                width : canvas.width / option.scope.w, //fraction relative to its width
-	   				                height : canvas.height / option.scope.h //fraction relative to its height
-	   				            };
-	   				            
-
-
-	   				        };
-					         });
-					   }
-					
-					   
-				   });
-
+				        $('#btnGenerate').click(function(){
+				        	localStorage.photoCroppedURI = document.getElementById('photoZoom').toDataURL();
+				        	var imageUgc;
+							var userContent = {
+								text: null,
+								picture: {
+									urlOfCropped: localStorage.photoCroppedURI, //the URL of the picture that the user crops. (It is normally a base64 string got from canvas.toDataURL() )
+									crop: {_x:0, _y:0, _w:0, _h:0},  // _x=x_crop/width_picture; _y=y_crop/height_picture; _w=width_crop/width_picture;  _h=height_crop/height_picture
+								},
+								thumbnail:{
+									url: localStorage.profilePhoto
+								}
+								
+							};
+							var template = localStorage.selectedTemplate;
+							//subTemplate is picture_only (For Test)
+							
+							ImageUgc.getInstance(template, "picture_only", userContent, function(err, _imageUgc){
+								if(!err){
+									imageUgc = _imageUgc;
+									localStorage.longphotoUrl = imageUgc.getImageUrl();
+									localStorage.doohPreviewUrl = imageUgc.getDoohPreviewImageUrl();
+									localStorage.customizableObjects = imageUgc.getCustomizableObjects();
+									window.location = serverUrl + "/preview.html";
+									callback(null);
+								}else{
+									console.log("[imageUgc.generate] Failed");
+								}
+							
+							});
+				        });
 				
 		}//End of function init();
 
