@@ -1311,12 +1311,13 @@ footer {
  }
  
  .content-movie{
+	/* background-image:url(../img/bg-content.jpg); */
 	background-image:url(../img/loading_cropper.jpg);
 	background-repeat:no-repeat;
 	background-size:100%;
-	width: 90%;
-	margin-top: 5%;
-	margin-left: 5%;
+	/* width: 90%; */
+	/* margin-top: 5%; */
+	/* margin-left: 5%; */
 	position:relative;
 }
 
