@@ -49,21 +49,35 @@
 	
 	<script>
 		function init(){
-			if(localStorage.projectId != null){
-				delete localStorage.projectId;
-			}
 			var btnChoosePhoto = $("#templatePic");
 			//Go to next page.
-			localStorage.flag = "none";
+			localStorage.refresh = true;
 			btnChoosePhoto.click(function(){
+				clear();
+				localStorage.flag = "none";
 				window.location = serverUrl + "/upload_photo.html";
 			});
 			
 			var btnChoosePhotoText = $("#templatePicText");
 			btnChoosePhotoText.click(function(){
+				clear();
+				localStorage.flag = "none";
 				window.location = serverUrl + "/upload_text.html";
 			});
 			
+		}
+		
+		function clear(){
+			if(localStorage.projectId != null){
+				delete localStorage.projectId;
+			}
+			if(localStorage.photoCroppedURI != null){
+				delete localStorage.photoCroppedURI;
+			}
+				
+			if(localStorage.template_userText != null){
+				delete localStorage.template_userText;
+			}
 		}
 	</script>
 	

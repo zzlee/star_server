@@ -23,6 +23,8 @@
 	<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>    
 	<script type="text/javascript" src="js/touchTouch.jquery.js"></script>
+	<script src="js/jquery-ui-1.9.2.custom.js"></script>
+	<script src="js/jquery-ui-1.9.2.custom.min.js"></script>
 	<script type="text/javascript">if($(window).width()>1024){document.write("<"+"script src='js/jquery.preloader.js'></"+"script>");}	</script>
 
 	<script>		
@@ -160,6 +162,8 @@
 			if(localStorage.flag == "none"){
 				//$( "#croppedPopup" ).dialog( "close" );
 				$("#croppedPopup").hide();
+			}else if(localStorage.device == "mobile"){
+				$("#croppedPopup").hide();
 			}else{
 				$("#croppedPopup").show();
 				showCropper();
@@ -173,13 +177,17 @@
 				}else{
 					ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
 				}
-				    
+				if($("#inputText").val() != null){
+					localStorage.template_userText = $("#inputText").val();
+				}
+
 				var form = $("#imgform");
 				var length = btnWowPicText.val().split('\\').length - 1;
 				localStorage.projectId = ugcProjectId;
 				localStorage.fileName = btnWowPicText.val().split('\\')[length];
 				$("#ugcId").attr("value", ugcProjectId);
 				$("#template").attr("value", localStorage.selectedTemplate);
+				$("#device").attr('value', localStorage.device);
 				action = "/miix/originalImage/"; 
 				form.attr("action", action);
 				localStorage.flag = "photo";
@@ -197,25 +205,28 @@
 					}
 				}
 			});
-			btnSend.click(function(){
+			btnSend.click(function(){ 
 					var inputContent = $("#inputText").val().replace(/\n/g,"_");
-					console.log(inputContent);
+					//console.log(inputContent);
 				
 					async.series([
-				              function(callback){
-				            	  insertSpace(inputContent, function(res){
-				            		  console.log(res);
-				            		  inputContent = res;
-				            		  localStorage.template_userText = res;
-				            		  callback(null, 'one');
-				            	  
-				            	  });
+								function(callback){
+									if(localStorage.photoCroppedURI != null)
+										callback(null, 'one');
+									else 
+										callback("別忘了選擇圖片!");
 				                  
-				              },
-				              function(callback){
-				                  callback(null, 'two');
-				              }
-				          ],
+								},
+								function(callback){
+									insertSpace(inputContent, function(res){
+				            		//console.log(res);
+				            		inputContent = res;
+				            		localStorage.template_userText = res;
+				            		callback(null, 'two');
+				            	  
+									});
+				                  
+								}],
 				          function(err, results){
 							if(!err){
 								var imageUgc;
@@ -245,6 +256,8 @@
 									}
 								
 								});
+							}else{
+								alert(err);
 							}
 
 							
@@ -377,6 +390,7 @@
 					<input name="projectId" id="ugcId" type="hidden"/>
 					<input name="template" id="template" type="hidden" />
 					<input name="filesSubmit" id="upload" type="submit" />
+					<input name="device" id="device" type="hidden" />
 				</form>
 			</div>
 		</div>
