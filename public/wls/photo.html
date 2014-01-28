@@ -20,6 +20,10 @@
 	<script type="text/javascript" src="js/quo.js"></script>
 	<script type="text/javascript" src="js/kinetic-v4.0.5.min.js"></script>
 	
+	<script type="text/javascript" src="js/exif.js"></script>
+	<script type="text/javascript" src="js/binaryajax.js"></script>
+	
+	<script type="text/javascript" src="js/megapix-image-gz.js"></script>
 	<script type="text/javascript" src="js/jquery.js"></script>
     <script type="text/javascript" src="js/superfish.js"></script>
 	<script type="text/javascript" src="js/jquery.flexslider-min.js"></script>
@@ -117,76 +121,7 @@
 
 
 
-				    //myPhotoCropper: null,
-
-				    //  Page methods.
-				        
-				        //get the dimension of customizable image 
-				        /*
-				        if ( FmMobile.selectedTemplate == "miix_it" ) {
-				            //TODO: parse templateMgr.getSubTemplate(FmMobile.selectedTemplate, FmMobile.selectedSubTemplate).customizableObjectsXml 
-				            // hard coded them for now
-				            WidthOfCustomizableImage = 1280;
-				            HeightOfcustomizableImage = 722;
-				        }
-				        else {
-				            var customizableObjects = templateMgr.getSubTemplate(FmMobile.selectedTemplate, FmMobile.selectedSubTemplate).customizableObjects;
-				            for (var i=0; i<customizableObjects.length; i++) {
-				                if (customizableObjects[i].type == 'image') {
-				                    //WidthOfCustomizableImage = customizableObjects[i].width;
-				                    //HeightOfcustomizableImage = customizableObjects[i].height;
-				                    //TODO: get the dimensions of customizable image from templateMgr
-				                    WidthOfCustomizableImage = 1280;
-				                    HeightOfcustomizableImage = 722;
-				                    break;
-				                }
-				            }
-				        }
-				         */
-				        /*
-				        if ( (!WidthOfCustomizableImage) || (!HeightOfcustomizableImage) ) {
-				            return;
-				        }
-				        */
-
-				        
-
-
-//				        if (FmMobile.selectedTemplate == 'miix_it') {
-				//
-//				            $("#submitBtn").click(function() {
-//				                FmMobile.userContent.picture.urlOfOriginal = fileSelectedURI;
-//				                FmMobile.userContent.picture.urlOfCropped = canvas.toDataURL();
-//				                $.mobile.changePage("template-preview.html");
-//				            });
-				//
-//				        } else {
-//				            $("#submitBtn").click(function() {
-				//
-//				                FmMobile.userContent.picture.urlOfCropped = canvas.toDataURL();
-//				                $.mobile.changePage("template-preview.html");
-//				            });
-				//
-//				        }
-				        //Deprecated
-//				        var onSubmitBtnClick = function() {
-//				            FmMobile.userContent.picture.urlOfCropped = canvas.toDataURL();
-//				            FmMobile.analysis.trackEvent("Button", "Click", "Submit", 24);
-//				        };
-				//
-//				        $('#submitPhotoBtn').click(onSubmitBtnClick);
-				       
-				        //Rewrite #submitBtn click function
-				        
-				       
-
-
-				        /*
-				        if ( (!WidthOfCustomizableImage) || (!HeightOfcustomizableImage) ) {
-				            return;
-				        }
-				*/
-				        //JF - image initial
+				   
 				        canvas = document.getElementById('photoZoom');
 				        context = canvas.getContext('2d');
 				        image = new Image();
@@ -195,50 +130,56 @@
 				        
 				        $('.content-movie-img').css({
 				            'width' : change_css,
-				            //'margin-top' : '5.5%'
 				        });
 
-				        //canvas.width = screen.availWidth;
 				        canvas.width = $('.movie-pic-dummy').width();
 				        canvas.height = canvas.width / 1280 * 735;
 				        
-				       
-				         image.src = "http://l.yimg.com/bt/api/res/1.2/PmV48R2z0v_c1D_oFrsg7Q--/YXBwaWQ9eW5ld3M7Zmk9aW5zZXQ7aD00MjI7cT03OTt3PTYzMA--/http://media.zenfs.com/en_us/News/Lihpao/54450_201401262233391RfNJ.jpg";
-
-				       
-
-				        image.onload = function() {
-
-				            option.scope.w = canvas.width;
-				            option.scope.h = image.height / image.width * canvas.width;
-
-				            option.destination.x = 0;
-				            option.destination.y = -0.5 * (option.scope.h - canvas.height);
-
-				            context.drawImage(image, option.destination.x,
-				                    option.destination.y, option.scope.w, option.scope.h);
-
-				            croppedArea = {
-				                x : -option.destination.x / option.scope.w, //fraction relative to its width
-				                y : -option.destination.y / option.scope.h, //fraction relative to its height
-				                width : canvas.width / option.scope.w, //fraction relative to its width
-				                height : canvas.height / option.scope.h //fraction relative to its height
-				            };
-				            
-//				            FmMobile.userContent.picture.crop._x = croppedArea.x;
-//				            FmMobile.userContent.picture.crop._y = croppedArea.y;
-//				            FmMobile.userContent.picture.crop._w = croppedArea.width;
-//				            FmMobile.userContent.picture.crop._h = croppedArea.height;
-				            //alert(croppedArea.x);
-
+				        var imageUrlBig = domainUrl+"/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
+				        
+				        var imageEXIF = new Image();
+				        imageEXIF.src = imageUrlBig;
+				        imageEXIF.onload = function(){
+				        	EXIF.getData( imageEXIF, function(){
+	                            var orientation = EXIF.getTag(image, "Orientation");
+	                            alert('test');
+	                            alert(orientation);
+	                           
+	                            });
 				        };
+				        
+				         //image.src =  domainUrl+"/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
+				         subsamplingResize(imageUrlBig, { maxWidth: 960, maxHeight: 960 }, function(resultURI){
+                             image.src = resultURI;
+                             image.onload = function() {
+                            	
+     				            option.scope.w = canvas.width;
+     				            option.scope.h = image.height / image.width * canvas.width;
 
-				        //image.src = "images/test.jpg";  //for test
+     				            option.destination.x = 0;
+     				            option.destination.y = -0.5 * (option.scope.h - canvas.height);
+
+     				            context.drawImage(image, option.destination.x,
+     				                    option.destination.y, option.scope.w, option.scope.h);
+
+     				            croppedArea = {
+     				                x : -option.destination.x / option.scope.w, //fraction relative to its width
+     				                y : -option.destination.y / option.scope.h, //fraction relative to its height
+     				                width : canvas.width / option.scope.w, //fraction relative to its width
+     				                height : canvas.height / option.scope.h //fraction relative to its height
+     				            };
+     				            
+
+
+     				        };
+				         });
+				         
+				         
+				         
 
 				       
-				        // FmMobile.userContent.picture.url=fileProcessedForCropperURI;
 
-				        //JF - image event
+				     
 				        $$('#photoZoom').pinching(
 				                function(e) {
 				                    if (e.type == 'pinching') {
@@ -248,10 +189,7 @@
 				                        p_now.y = (e.currentTouch[0].y + e.currentTouch[1].y)
 				                                / 2 - canvas.offsetTop;
 
-				                        //var delta = Math.sqrt(Math.sqrt(Math.pow(e.iniTouch[0].x - e.iniTouch[1].x, 2) +
-				                        //                                Math.pow(e.iniTouch[0].y - e.iniTouch[1].y, 2) -
-				                        //                                Math.pow(e.currentTouch[0].x - e.currentTouch[1].x, 2) +
-				                        //                                Math.pow(e.currentTouch[0].y - e.currentTouch[1].y, 2)));
+				                       
 				                        p_now.v = Math.pow(e.currentTouch[0].x
 				                                - e.currentTouch[1].x, 2)
 				                                + Math.pow(e.currentTouch[0].y
@@ -311,10 +249,7 @@
 				                height : canvas.height / option.scope.h //fraction relative to its height
 				            };
 				                               
-//				                               FmMobile.userContent.picture.crop._x = croppedArea.x;
-//				                               FmMobile.userContent.picture.crop._y = croppedArea.y;
-//				                               FmMobile.userContent.picture.crop._w = croppedArea.width;
-//				                               FmMobile.userContent.picture.crop._h = croppedArea.height;
+
 				        });
 
 				        $$('#photoZoom').swiping(function(e) {
@@ -352,10 +287,7 @@
 				                height : canvas.height / option.scope.h //fraction relative to its height
 				            };
 
-//				            FmMobile.userContent.picture.crop._x = croppedArea.x;
-//				            FmMobile.userContent.picture.crop._y = croppedArea.y;
-//				            FmMobile.userContent.picture.crop._w = croppedArea.width;
-//				            FmMobile.userContent.picture.crop._h = croppedArea.height;
+
 
 				        });
 
@@ -377,8 +309,7 @@
 				                    option.destination.y, option.scope.w, option.scope.h);
 				        };
 
-				       // FmMobile.analysis.trackPage("/template_photoCropperPg");
-//				        recordUserAction("enters template_photoCropperPg");
+				      
 				   
 
 				
