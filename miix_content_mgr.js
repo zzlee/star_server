@@ -249,9 +249,10 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
         },
         
         function(callback){
-        
+            // Get user FB profile picture and upload to aws S3
             async.waterfall( [
                 function( member_cb ){
+                    // Find user info
                     memberModel.findById( ugcInfo.ownerId._id, 'app fb', function (err, doc) {
                         if( !err ) {
                             logger.info( 'Member search is successfully, user _id: ' + ugcInfo.ownerId._id );
@@ -264,6 +265,7 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
                     } );
                 },
                 function( member, fb_picture_cb ){
+                    // Get user FB profile picture url
                     fbMgr.getUserProfilePicture( member.fb.userID, member.app, function(err, res){
                         if ( !err ){
                             var pictureUrl = res.picture.data.url.toString().replace('_q.','_n.');
@@ -277,7 +279,7 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
                     } );
                 },
                 function( picture, download_cb ){
-                    
+                    // Download user FB profile picture
                     var filename = picture.toString().split('/');
                     filename = path.join(__dirname, filename[filename.length - 1]);
                     
@@ -295,7 +297,7 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
                     // });
                 // },
                 function( filepath, uploadS3_cb ){
-                    
+                    // Upload user FB profile picture to aws S3
                     var S3Path = filepath.toString().split('\\');
                     S3Path = S3Path[S3Path.length - 1];
                     S3Path = '/user_project/' + ugcProjectID + '/user_data/' + S3Path;
