@@ -141,7 +141,7 @@
 				        imageEXIF.src = imageUrlBig;
 				        imageEXIF.onload = function(){
 				        	EXIF.getData( imageEXIF, function(){
-	                            var orientation = EXIF.getTag(image, "Orientation");
+	                            var orientation = EXIF.getTag(imageEXIF, "Orientation");
 	                            alert('test');
 	                            alert(orientation);
 	                           
@@ -309,8 +309,65 @@
 				                    option.destination.y, option.scope.w, option.scope.h);
 				        };
 
-				      
-				   
+				        var rotateFlag = 'unRotate';
+				   $('#rotate').click(function(){
+					   
+					   if(rotateFlag == 'unRotate' || rotateFlag == '1'){
+						   subsamplingResize(imageUrlBig, { maxWidth: 960, maxHeight: 960, orientation:6 }, function(resultURI){
+							    rotateFlag = '6';
+							   image.src = resultURI;
+	                           image.onload = function() {
+	                          	
+	   				            option.scope.w = canvas.width;
+	   				            option.scope.h = image.height / image.width * canvas.width;
+
+	   				            option.destination.x = 0;
+	   				            option.destination.y = -0.5 * (option.scope.h - canvas.height);
+
+	   				            context.drawImage(image, option.destination.x,
+	   				                    option.destination.y, option.scope.w, option.scope.h);
+
+	   				            croppedArea = {
+	   				                x : -option.destination.x / option.scope.w, //fraction relative to its width
+	   				                y : -option.destination.y / option.scope.h, //fraction relative to its height
+	   				                width : canvas.width / option.scope.w, //fraction relative to its width
+	   				                height : canvas.height / option.scope.h //fraction relative to its height
+	   				            };
+	   				            
+
+
+	   				        };
+					         });
+					   }else if(rotateFlag == '6'){
+						   subsamplingResize(imageUrlBig, { maxWidth: 960, maxHeight: 960, orientation:1 }, function(resultURI){
+							    rotateFlag = '1';
+							   image.src = resultURI;
+	                           image.onload = function() {
+	                          	
+	   				            option.scope.w = canvas.width;
+	   				            option.scope.h = image.height / image.width * canvas.width;
+
+	   				            option.destination.x = 0;
+	   				            option.destination.y = -0.5 * (option.scope.h - canvas.height);
+
+	   				            context.drawImage(image, option.destination.x,
+	   				                    option.destination.y, option.scope.w, option.scope.h);
+
+	   				            croppedArea = {
+	   				                x : -option.destination.x / option.scope.w, //fraction relative to its width
+	   				                y : -option.destination.y / option.scope.h, //fraction relative to its height
+	   				                width : canvas.width / option.scope.w, //fraction relative to its width
+	   				                height : canvas.height / option.scope.h //fraction relative to its height
+	   				            };
+	   				            
+
+
+	   				        };
+					         });
+					   }
+					
+					   
+				   });
 
 				
 		}//End of function init();
@@ -380,6 +437,7 @@
 				<div class="block-slogan">
 					<p style="text-align:left; padding-top:20px;">
 						<button id="btnGenerate" class="btn btn-1">開始合成</button>
+						<img id='rotate' src="img/rotate.png" style="width:10%;height:10%">
 					</p>
 				</div>
         
