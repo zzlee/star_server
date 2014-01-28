@@ -324,21 +324,38 @@ app.post('/miix/originalImage/', function(req,res){
 	    					logger.info('Failed to upload and gen UGCs' + err);
 	    				}else{
 							logger.info( 'Send redirect html to client side. ');
-	                	  
+							var tmpTemplate = req.body.template;
 							if(req.body.device != "mobile"){
-								res.writeHead(200, "OK", {'Content-Type': 'text/html'});
-								res.write('<html>');
-								res.write('<script>');
-								res.write('function init(){' +
-	    				    			'setTimeout(' +
-//	    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
-	    				    				//"window.location = '/demo/upload_photo.html',1000);" +
-											//"window.location.replace('/demo/upload_photo.html'),1000);" +
-												"'window.history.go(-1)',1000);" +
-	    				    			'}');
-								res.write('</script>');
-								res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
-								res.end();
+								if(tmpTemplate.split("wls_")[1] == "pic"){
+									res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+									res.write('<html>');
+									res.write('<script>');
+									res.write('function init(){' +
+												'setTimeout(' +
+												//"window.location = '/demo/upload_photo.html',1000);" +
+												"window.location.replace('/wls/upload_photo.html'),1000);" +
+												//	"'window.history.go(-1)',1000);" +
+												//"$.mobile.changePage('/wls/upload_photo.html'), 1000);" +
+											//"'history.back()', 1000);" + 
+											//'history.back();' +
+											//'window.location.assign("/wls/upload_photo.html");' + 
+											//"window.history.go(-1);" + 
+												'}');
+									res.write('</script>');
+									res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
+									res.end();
+								}else if(tmpTemplate.split("wls_")[1] == "pic_text"){
+									res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+									res.write('<html>');
+									res.write('<script>');
+									res.write('function init(){' +
+												'setTimeout(' +
+													"window.location.replace('/wls/upload_text.html'),1000);" +
+												'}');
+									res.write('</script>');
+									res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
+									res.end();
+								}
 							}else{
 								res.writeHead(200, "OK", {'Content-Type': 'text/html'});
 								res.write('<html>');

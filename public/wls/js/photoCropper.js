@@ -32,7 +32,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 		var bottomLeft = group.get(".bottomLeft")[0];
 		var image = group.get(".image")[0];
         var cropperRect = group.get(".cropperRect")[0];
-        var markerCircle = group.get(".markerCircle")[0];
+        //var markerCircle = group.get(".markerCircle")[0];
 		//var underTop = underCropperGroup.get(".underRectTop")[0];
 		//var underLeft = photoToCropGroup.get(".underRectLeft")[0];
 		//var underRight = photoToCropGroup.get(".underRectRight")[0];
@@ -241,8 +241,8 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
         cropperRect.attrs.width = newHalfWidth*2;
         cropperRect.attrs.height = newHalfHeight*2;
 
-        markerCircle.attrs.x = bottomRight.attrs.x;
-        markerCircle.attrs.y = bottomRight.attrs.y;
+        //markerCircle.attrs.x = bottomRight.attrs.x;
+        //markerCircle.attrs.y = bottomRight.attrs.y;
 		
 		undateCropperArea();
 	}
@@ -258,7 +258,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 			stroke: "#F25C27",
 			fill: "#F25C27",
 			strokeWidth: 1,
-			radius: 8,
+			radius: 10,
 			name: name,
 			draggable: true
 		});
@@ -377,18 +377,9 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 			height: stage.attrs.height,
 			name: "image"
 		});
-		blackImg = new Kinetic.Image({
-			x : 0,
-			y : 0,
-			//fill : 'black',
-			//opacity: 0.8,
-			width: stage.attrs.width,
-			height: stage.attrs.height,
-			name : "underCover"
-		});
+
 
 		photoToCropGroup.add(photoToCropImg);
-		photoToCropGroup.add(blackImg);
 
 		
 		//photoToCropGroup.add(underCropper);
@@ -404,7 +395,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 		}
         cropperGroup.attrs.x = photoToCropImg.attrs.width/2 - cropperImgWidth/2;
         cropperGroup.attrs.y = photoToCropImg.attrs.height/2 - cropperImgHeight/2;
-		
+		/*
         var underRectTop = new Kinetic.Rect({
 										  x: 0,
                                           y: 0,
@@ -449,6 +440,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 										  opacity: 0.5,
                                           name: "underRectBottom"
 										});
+										*/
 
 		cropperImg = new Kinetic.Image({
 			x: 0,
@@ -486,18 +478,18 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 											});
 											*/
 		//descriptionText.offsetX(descriptionText.attr.width/2);
-										  
+		/*								  
 		var markerCircle = new Kinetic.Circle({
                                         x: cropperImg.attrs.width,
                                         y: cropperImg.attrs.height,
                                         stroke: "#F25C27",
                                         fill: "#F25C27",
                                         strokeWidth: 1,
-                                        radius: 3,
+                                        radius: 8,
                                         name: "markerCircle"
                                         });
 										
-
+		*/
 
 		cropperGroup.add(cropperImg);
 		//cropperGroup.add(underCropper);
@@ -507,10 +499,11 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 		addAnchor(cropperGroup, 0, cropperImg.attrs.height, "bottomLeft");
 		//cropperGroup.add(descriptionText);
         cropperGroup.add(cropperRect);
-		cropperGroup.add(markerCircle);
+		//cropperGroup.add(markerCircle);
         
 		undateCropperArea();
 		
+
 		cropperGroup.get(".bottomRight")[0].on('mouseover', function(){
 			 document.body.style.cursor = 'se-resize';
 		});

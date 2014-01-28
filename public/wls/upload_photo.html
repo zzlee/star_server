@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-	<title>國票證券 | Select Template</title>
+	<title>國票證券 | Choose Photo</title>
 	<meta charset="utf-8">
 	<link rel="icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon">
     <link rel="shortcut icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon" />
@@ -17,14 +17,19 @@
 	<link rel="stylesheet" href="css/kwicks-slider.css" type="text/css" media="screen">
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
 	<script type="text/javascript" src="js/jquery.js"></script>
+	<!--<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+	-->
     <script type="text/javascript" src="js/superfish.js"></script>
 	<script type="text/javascript" src="js/jquery.flexslider-min.js"></script>
 	<script type="text/javascript" src="js/jquery.kwicks-1.5.1.js"></script>
 	<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>    
 	<script type="text/javascript" src="js/touchTouch.jquery.js"></script>
-	<script src="js/jquery-ui-1.9.2.custom.js"></script>
-	<script type="text/javascript">if($(window).width()>1024){document.write("<"+"script src='js/jquery.preloader.js'></"+"script>");}	</script>
+	<script src="js/jquery-ui-1.10.3.custom.js"></script>
+	<script src="js/jquery-ui-1.9.2.custom.min.js"></script>
+
+	<script type="text/javascript">if($(window).width()>1024){document.write("<"+"script src='js/jquery.preloader.js'></"+"script>");}</script>
 
 	<script>		
 		 jQuery(window).load(function() {	
@@ -51,6 +56,7 @@
 	
 	<script src="js/photoCropper.js"></script>
 	<script src="js/kinetic-v4.3.3.js"></script>
+
 	
 	<script>
 		var myPhotoCropper = null;
@@ -71,7 +77,7 @@
 		function showCropper(){
 		//The original photo upload successfully.
 				//Show the UI to cropper the photo.
-
+			//$("#croppedPopup").dialog("open");
 			imageUrl =  "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
 
 			initCropper("show", imageUrl);
@@ -80,11 +86,11 @@
 					resizable: false,
 					draggable: false,
 					width: window.innerWidth * 0.9,
+					height: window.innerHeight * 0.9,
 					//width : 
 					position: { 
-						my: "center center", 
-						at: "center top", 
-						//of: "#croppedPopup"
+						my: "center", 
+						at: "center", 
 						of : window
 					},
 					modal : true,
@@ -92,24 +98,24 @@
 						text: "開始合成",
 						click: function() {
 							async.series([
-						function(callback){
-							//Cropper the photo when user wants
-							croppedArea = myPhotoCropper.getCroppedArea();
-							var rawPhotoImg = new Image();
-							rawPhotoImg.src = imageUrl;
-							rawPhotoImg.onload = function(){ 
-								console.log("[rawPhotoImg.onload]");		
+								function(callback){
+									//Cropper the photo when user wants
+									croppedArea = myPhotoCropper.getCroppedArea();
+									var rawPhotoImg = new Image();
+									rawPhotoImg.src = imageUrl;
+									rawPhotoImg.onload = function(){ 
+										console.log("[rawPhotoImg.onload]");		
 					
-								var sourceCanvas = document.createElement("canvas");
-								var sourceCanvasContext = sourceCanvas.getContext("2d");
-								sourceCanvas.width = rawPhotoImg.width;
-								sourceCanvas.height = rawPhotoImg.height;
-								sourceCanvasContext.drawImage(rawPhotoImg, 0, 0);
-								var destinationCanvas = document.createElement("canvas");
-								var destinationCanvasContext = destinationCanvas.getContext("2d");
-								destinationCanvas.width = rawPhotoImg.width * croppedArea.width;
-								destinationCanvas.height = rawPhotoImg.height * croppedArea.height;
-								destinationCanvasContext.drawImage(sourceCanvas,
+										var sourceCanvas = document.createElement("canvas");
+										var sourceCanvasContext = sourceCanvas.getContext("2d");
+										sourceCanvas.width = rawPhotoImg.width;
+										sourceCanvas.height = rawPhotoImg.height;
+										sourceCanvasContext.drawImage(rawPhotoImg, 0, 0);
+										var destinationCanvas = document.createElement("canvas");
+										var destinationCanvasContext = destinationCanvas.getContext("2d");
+										destinationCanvas.width = rawPhotoImg.width * croppedArea.width;
+										destinationCanvas.height = rawPhotoImg.height * croppedArea.height;
+										destinationCanvasContext.drawImage(sourceCanvas,
 																		rawPhotoImg.width * croppedArea.x,
 																		rawPhotoImg.height * croppedArea.y,
 																		rawPhotoImg.width * croppedArea.width,
@@ -117,48 +123,52 @@
 																		0, 0,
 																		destinationCanvas.width,
 																		destinationCanvas.height);
-								localStorage.photoCroppedURI = destinationCanvas.toDataURL();
-								callback(null);
-							};//end of rawPhotoImg.onload
-						},
-						function(callback){
-							//Start to generate longPhoto and the Preview of dooh.
-							var imageUgc;
-							var userContent = {
-								text: null,
-								picture: {
-									urlOfCropped: localStorage.photoCroppedURI, //the URL of the picture that the user crops. (It is normally a base64 string got from canvas.toDataURL() )
-									crop: {_x:0, _y:0, _w:0, _h:0},  // _x=x_crop/width_picture; _y=y_crop/height_picture; _w=width_crop/width_picture;  _h=height_crop/height_picture
+										localStorage.photoCroppedURI = destinationCanvas.toDataURL();
+										callback(null);
+									};//end of rawPhotoImg.onload
+									rawPhotoImg.onerror = function(){
+										console.log("[rawPhotoImg.onload] error");
+									}
 								},
-								thumbnail:{
-									url: localStorage.profilePhoto
-								}
+								function(callback){
+									//Start to generate longPhoto and the Preview of dooh.
+									var imageUgc;
+									var userContent = {
+										text: null,
+										picture: {
+											urlOfCropped: localStorage.photoCroppedURI, //the URL of the picture that the user crops. (It is normally a base64 string got from canvas.toDataURL() )
+											crop: {_x:0, _y:0, _w:0, _h:0},  // _x=x_crop/width_picture; _y=y_crop/height_picture; _w=width_crop/width_picture;  _h=height_crop/height_picture
+										},
+										thumbnail:{
+											url: localStorage.profilePhoto
+										}
 								
-							};
-							var template = localStorage.selectedTemplate;
-							//subTemplate is picture_only (For Test)
+									};
+									var template = localStorage.selectedTemplate;
+									//subTemplate is picture_only (For Test)
 							
-							ImageUgc.getInstance(template, "picture_only", userContent, function(err, _imageUgc){
-								if(!err){
-									imageUgc = _imageUgc;
-									localStorage.longphotoUrl = imageUgc.getImageUrl();
-									localStorage.doohPreviewUrl = imageUgc.getDoohPreviewImageUrl();
-									localStorage.customizableObjects = imageUgc.getCustomizableObjects();
-									window.location = serverUrl + "/preview.html";
-									callback(null);
-								}else{
-									console.log("[imageUgc.generate] Failed");
+									ImageUgc.getInstance(template, "picture_only", userContent, function(err, _imageUgc){
+									if(!err){
+										imageUgc = _imageUgc;
+										localStorage.longphotoUrl = imageUgc.getImageUrl();
+										localStorage.doohPreviewUrl = imageUgc.getDoohPreviewImageUrl();
+										localStorage.customizableObjects = imageUgc.getCustomizableObjects();
+										//localStorage.photoCroppedURI = null;
+										window.location = serverUrl + "/preview.html";
+										callback(null);
+									}else{
+										console.log("[imageUgc.generate] Failed");
+									}
+							
+								});
+							
+							}],
+							function(err){
+								if(err){
+									console.log(err);
 								}
-							
-							});
-							
-						}],
-						function(err){
-							if(err){
-								console.log(err);
-							}
 					
-					});
+							});
 						}
 					}]
 				});
@@ -168,6 +178,7 @@
 		
 		};
 		function init(){
+			//if(localStorage.refresh){
 			var btnChoosePhoto = $("#chossePic");
 			
 			var btnWowPic = $("#wow_pic");
@@ -182,7 +193,7 @@
 			}else if(localStorage.device == "mobile"){
 				$("#croppedPopup").hide();
 				
-			}else{
+			}else if(localStorage.flag == "photo"){
 				showCropper();				
 				
 			}
@@ -216,11 +227,17 @@
 				action = "/miix/originalImage/"; 
 				form.attr("action", action);
 				localStorage.flag = "photo";
+				localStorage.refresh = false;
 
 				btnUpload.click();		
 			});
 
-			
+			//}else{
+			//	localstorage.refresh = true;
+				//window.location.reload();
+				//window.location = window.location;
+			//	$.mobile.reloadPage(true);
+			//}
 
 		}//End of init()
 
