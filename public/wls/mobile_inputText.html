@@ -53,159 +53,25 @@
 	<script src="js/kinetic-v4.3.3.js"></script>
 	
 	<script>
-		var myPhotoCropper = null;
-		var imgUrl = null;
-		function initCropper(divID, imgUrl) {
-	        var stageAllowableWidth = window.innerWidth * 0.7;
-	        var stageAllowableHeight = window.innerHeight * 0.7;
-	        var cropperWidthToHeightRatio = 210 / 130;
-			myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
-		}//End of initCropper
 		
+	$( document ).ready(function() {
 		
-		$( document ).ready(function() {
-			
-			if(localStorage.template_userText){
-				var text = localStorage.template_userText.replace(/\_/ig,"\n");
-				$("#inputText").val(text);
-			}
-		});
-		
-		function showCropper(){
-			//The original photo upload successfully.
-				//Show the UI to cropper the photo.
-				$("#pic").html(localStorage.fileName);
-				
-				imageUrl =  "/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
-				
-
-				$("#croppedPopup").dialog({
-					//dialogClass: "btn btn-1",
-					resizable: false,
-					draggable: false,
-					width: window.innerWidth * 0.9,
-					//width : 
-					position: { 
-						my: "center center", 
-						at: "center top", 
-						//of: "#croppedPopup"
-						of : window
-					},
-					modal : true,
-					buttons: [{
-						text: "確認",
-						click: function() {
-							async.series([
-							              function(callback){
-							            	//Cropper the photo when user wants
-							            	  croppedArea = myPhotoCropper.getCroppedArea();
-												var rawPhotoImg = new Image();
-												rawPhotoImg.src = imageUrl;
-												rawPhotoImg.onload = function(){ 
-													console.log("[rawPhotoImg.onload]");		
-										
-													var sourceCanvas = document.createElement("canvas");
-													var sourceCanvasContext = sourceCanvas.getContext("2d");
-													sourceCanvas.width = rawPhotoImg.width;
-													sourceCanvas.height = rawPhotoImg.height;
-													sourceCanvasContext.drawImage(rawPhotoImg, 0, 0);
-													var destinationCanvas = document.createElement("canvas");
-													var destinationCanvasContext = destinationCanvas.getContext("2d");
-													destinationCanvas.width = rawPhotoImg.width * croppedArea.width;
-													destinationCanvas.height = rawPhotoImg.height * croppedArea.height;
-													destinationCanvasContext.drawImage(sourceCanvas,
-																							rawPhotoImg.width * croppedArea.x,
-																							rawPhotoImg.height * croppedArea.y,
-																							rawPhotoImg.width * croppedArea.width,
-																							rawPhotoImg.height * croppedArea.height,
-																							0, 0,
-																							destinationCanvas.width,
-																							destinationCanvas.height);
-													localStorage.photoCroppedURI = destinationCanvas.toDataURL();
-													callback(null);
-												};//end of rawPhotoImg.onload
-										  },
-							              function(callback){
-							            	  $("#croppedPopup").dialog('close');
-							            	  callback(null);
-							              }],
-							              function(err){
-												if(err){
-													alert(err);
-												}
-												
-								
-							});//end of async.series
-							
-						}
-					}]
-				});//End of $.dialog
-				//$("#originalImage").attr("src", "/demo/img/preview.jpg");
-
-				
-				initCropper("show", imageUrl);
-
+		if(localStorage.template_userText){
+			var text = localStorage.template_userText.replace(/\_/ig,"\n");
+			$("#inputText").val(text);
 		}
-		
+	});
+	
 		function init(){
 			
-			
-			if(localStorage.device == 'mobile'){
-				$('#textClearfix').hide();
-				$('#btnSend').hide();
-				$('#mobileHint').text('請先選照片接著再輸入文字');
-				
-				
-			}
-			
-			
-			var btnChoosePic = $("#chossePic");
-			var btnWowPicText = $("#wow_pic_text");
-			var btnUpload = $("#upload");
 			var btnSend = $('#btnSend');
 			
 			localStorage.selectedTemplate = "wls_pic_text";
 			localStorage.selectedSubTemplate = "picture_plus_text";
 			
-			btnChoosePic.click(function(){
-				btnWowPicText.click();
-
-			});
-			if(localStorage.flag == "none"){
-				//$( "#croppedPopup" ).dialog( "close" );
-				$("#croppedPopup").hide();
-			}else if(localStorage.device == "mobile"){
-				$("#croppedPopup").hide();
-			}else{
-				$("#croppedPopup").show();
-				showCropper();
-			}
-			btnWowPicText.change(function(){
-				var length = btnWowPicText.val().split('\\').length - 1;
-				$('#pic').html(btnWowPicText.val().split('\\')[length]);
-				var ugcProjectId = null;
-				if(localStorage.projectId  != null){
-					ugcProjectId = localStorage.projectId;
-				}else{
-					ugcProjectId = localStorage.selectedTemplate +'-'+ localStorage._id +'-'+ (new Date()).toISOString().replace(/[-:.]/g, "");
-				}
-				if($("#inputText").val() != null){
-					localStorage.template_userText = $("#inputText").val();
-				}
-
-				var form = $("#imgform");
-				var length = btnWowPicText.val().split('\\').length - 1;
-				localStorage.projectId = ugcProjectId;
-				localStorage.fileName = btnWowPicText.val().split('\\')[length];
-				$("#ugcId").attr("value", ugcProjectId);
-				$("#template").attr("value", localStorage.selectedTemplate);
-				$("#device").attr('value', localStorage.device);
-				action = "/miix/originalImage/"; 
-				form.attr("action", action);
-				localStorage.flag = "photo";
-				btnUpload.click();		
-			});
-
+			
+			
+			
 			
 			$("#inputText").focus(function(){
 				if(localStorage.template_userText){
@@ -383,20 +249,14 @@
     <div class="row"></div>
       <div class="row">
           <div class="span12"> 
-          <h3>版型二</h3>
+          
         <!-- slider -->
-        <div class="slide">
-        <img src="img/t2.jpg">
-         
         </div>
-       <div id="mobileHint" style="color:#FFF"></div>
+        
         <span id="responsiveFlag"></span>
         <div class="block-slogan">
         	<p style="text-align:left; padding-top:20px;">
-        	
-            	<button id="chossePic" class="btn btn-1">選擇圖片</button>
             	
-            	<button id="pic" class="btn btn-1" style="background:url(../img/bg-content.jpg) 50% 50%;"></button>
            	</p>
            	<div style="height:0px;overflow:hidden"> 
 				<form id="imgform" method="post" action="#" enctype="multipart/form-data">  
@@ -410,10 +270,9 @@
 			</div>
 		</div>
           <form id="form-search" action="search.php" method="GET" accept-charset="utf-8" >
-           	  <div id='textClearfix' class="clearfix">
+           	  <div class="clearfix">
                 <textarea id="inputText" rows="3" onFocus="if(this.value =='' ) this.value=''" onBlur="if(this.value=='') this.value=''">請分三行，輸入24個文字</textarea>
            	  </div>
-           	 
             </form>
             <div class="block-slogan">
 			<p style="text-align:left; padding-top:20px;">

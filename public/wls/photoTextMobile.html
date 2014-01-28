@@ -74,7 +74,7 @@
     	
     	
 		function init(){
-
+			delete localStorage.template_userText;
 			//Display photo that user upload.
 			var option = {
 				    source : {
@@ -314,6 +314,9 @@
 				        	var a = typeof localStorage.template_userText;
 				        	console.log(localStorage.template_userText);
 				        	localStorage.photoCroppedURI = document.getElementById('photoZoom').toDataURL();
+				        	window.location = serverUrl + "/mobile_inputText.html";
+				        	
+				        	/*
 				        	var imageUgc;
 							var userContent = {
 								text: localStorage.template_userText,
@@ -341,7 +344,7 @@
 									console.log("[imageUgc.generate] Failed");
 								}
 							
-							});
+							});*/
 				        });
 				
 		}//End of function init();
