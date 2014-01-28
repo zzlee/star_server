@@ -162,6 +162,8 @@
 			if(localStorage.flag == "none"){
 				//$( "#croppedPopup" ).dialog( "close" );
 				$("#croppedPopup").hide();
+			}else if(localStorage.device == "mobile"){
+				$("#croppedPopup").hide();
 			}else{
 				$("#croppedPopup").show();
 				showCropper();
@@ -185,6 +187,7 @@
 				localStorage.fileName = btnWowPicText.val().split('\\')[length];
 				$("#ugcId").attr("value", ugcProjectId);
 				$("#template").attr("value", localStorage.selectedTemplate);
+				$("#device").attr('value', localStorage.device);
 				action = "/miix/originalImage/"; 
 				form.attr("action", action);
 				localStorage.flag = "photo";
@@ -202,7 +205,7 @@
 					}
 				}
 			});
-			btnSend.click(function(){
+			btnSend.click(function(){ 
 					var inputContent = $("#inputText").val().replace(/\n/g,"_");
 					//console.log(inputContent);
 				
@@ -387,6 +390,7 @@
 					<input name="projectId" id="ugcId" type="hidden"/>
 					<input name="template" id="template" type="hidden" />
 					<input name="filesSubmit" id="upload" type="submit" />
+					<input name="device" id="device" type="hidden" />
 				</form>
 			</div>
 		</div>

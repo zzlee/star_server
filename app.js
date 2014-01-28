@@ -357,19 +357,36 @@ app.post('/miix/originalImage/', function(req,res){
 									res.end();
 								}
 							}else{
-								res.writeHead(200, "OK", {'Content-Type': 'text/html'});
-								res.write('<html>');
-								res.write('<script>');
-								res.write('function init(){' +
-	    				    			'setTimeout(' +
-//	    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
-	    				    				"window.location = '/wls/photo.html',1000);" +
-											//"window.location.replace('/demo/upload_text.html'),1000);" +
-											//	"'window.history.go(-1)',1000);" +
-	    				    			'}');
-								res.write('</script>');
-								res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
-								res.end();
+								if(tmpTemplate.split("wls_")[1] == "pic"){
+									res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+									res.write('<html>');
+									res.write('<script>');
+									res.write('function init(){' +
+		    				    			'setTimeout(' +
+//		    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
+		    				    				"window.location = '/wls/photo.html',1000);" +
+												//"window.location.replace('/demo/upload_text.html'),1000);" +
+												//	"'window.history.go(-1)',1000);" +
+		    				    			'}');
+									res.write('</script>');
+									res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
+									res.end();
+								}else if(tmpTemplate.split("wls_")[1] == "pic_text"){
+									res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+									res.write('<html>');
+									res.write('<script>');
+									res.write('function init(){' +
+		    				    			'setTimeout(' +
+//		    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
+		    				    				"window.location = '/wls/photoTextMobile.html',1000);" +
+												//"window.location.replace('/demo/upload_text.html'),1000);" +
+												//	"'window.history.go(-1)',1000);" +
+		    				    			'}');
+									res.write('</script>');
+									res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
+									res.end();
+								}
+								
 							}
 
 	    				}
