@@ -75,10 +75,10 @@ DoohPreview = (function(){
                 
                 context = doohPreviewCanvas.getContext('2d');
                 context.webkitImageSmoothingEnabled = true;
-                var bgImage = null;
-                bgImage = new Image();
-                bgImage.src = doohPreviewTemplate.backgroundImageUrl;
-                bgImage.onload = function(){
+                bgImage_dooh = null;
+                bgImage_dooh = new Image();
+                bgImage_dooh.src = doohPreviewTemplate.backgroundImageUrl;
+                bgImage_dooh.onload = function(){
                     //console.log("bgImage.width="+bgImage.width+"  bgImage.height="+bgImage.height);
                    // doohPreviewCanvas.width = bgImage.width;
                     //doohPreviewCanvas.height = bgImage.height;
@@ -88,16 +88,16 @@ DoohPreview = (function(){
 //                      doohPreviewCanvas.height = 405;
 //                      context.drawImage(bgImage,0,0,720,405);
 //                      }else{
-                      doohPreviewCanvas.width = 1334;
-                      doohPreviewCanvas.height = 750;
-                    context.drawImage(bgImage,0,0,1334,750);
+                      doohPreviewCanvas.width = bgImage_dooh.width;
+                      doohPreviewCanvas.height = bgImage_dooh.height;
+                    context.drawImage(bgImage_dooh,0,0);
 //                      }
                     callback(null);
                 };
-                bgImage.onerror = function(){
+                bgImage_dooh.onerror = function(){
                     callback("Failed to load the background image "+doohPreviewTemplate.backgroundImageUrl);
                 };
-                bgImage.onabort = function(){
+                bgImage_dooh.onabort = function(){
                     callback("Failed to load the background image "+doohPreviewTemplate.backgroundImageUrl+" (aborted)");
                 };
             }, 
