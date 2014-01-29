@@ -39,18 +39,25 @@ ConnectFacebook.logIn = function(){
 	}else{
 		async.series([
 	              function(callback){
-	            	  FB.login(function(response){
-	            	  	  if(response.authResponse){
-	            	  		  accessToken = response.authResponse.accessToken;
-	            	  		  expiresIn = Date.now() + response.authResponse.expiresIn;
-	            	  		  userID = response.authResponse.userID;
-	            	  		  callback(null);
-	            	  	  }else{
-	            	  		  callback("Log In not successfully");
-	            	  	  }
+						try{
+													
+							FB.login(function(response){
+								if(response.authResponse){
+									accessToken = response.authResponse.accessToken;
+									expiresIn = Date.now() + response.authResponse.expiresIn;
+									userID = response.authResponse.userID;
+									callback(null);
+								}else{
+									callback("Log In not successfully");
+								}
 	            	  	
-	            	    //}, {scope: "read_stream,publish_stream,user_location,email,user_likes,publish_checkins"});
-	              		},{scope : "email,read_stream,publish_stream"});
+							},{scope : "email,read_stream,publish_stream"});
+
+						}catch(e){
+							alert("提醒您，由於部分網頁防護軟體，會影響網頁的功能操作，請先將網頁防護軟體關閉，以便您的操作順利。");
+							callback("Log In not successfully");
+						}
+
 	              },
 	              function(callback){
 	            		FB.api('/me', function(response) {
