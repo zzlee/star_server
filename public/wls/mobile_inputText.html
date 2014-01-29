@@ -86,7 +86,7 @@
 			btnSend.click(function(){ 
 					var inputContent = $("#inputText").val().replace(/\n/g,"_");
 					//console.log(inputContent);
-				
+				$('#btnSend').hide();
 					async.series([
 								function(callback){
 									if(localStorage.photoCroppedURI != null)
