@@ -374,6 +374,7 @@ app.post('/miix/originalImage/', function(req,res){
 								}else if(tmpTemplate.split("wls_")[1] == "pic_text"){
 									res.writeHead(200, "OK", {'Content-Type': 'text/html'});
 									res.write('<html>');
+									res.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
 									res.write('<script>');
 									res.write('function init(){' +
 		    				    			'setTimeout(' +
@@ -383,7 +384,7 @@ app.post('/miix/originalImage/', function(req,res){
 												//	"'window.history.go(-1)',1000);" +
 		    				    			'}');
 									res.write('</script>');
-									res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
+									res.write("<body onload='init();'><div style='font-size:50pt'>您好，網頁載入中，請稍等…<br><br>如果網頁載入等待過久，您可以選擇回上一頁。</div></body></html>");
 									res.end();
 								}
 								

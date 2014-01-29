@@ -128,26 +128,26 @@ ImageUgc = (function(){
             },
             function(callback){
                 //initiate canvas related variables
-                var bgImage = null;
+                bgImage_long = null;
                 ugcCanvas = document.createElement('canvas');
                 ugcCanvas.setAttribute("id","ugcCanvas");
                 
                 context = ugcCanvas.getContext('2d');
                 context.webkitImageSmoothingEnabled = true;
-                bgImage = new Image();
-                bgImage.src = template.backgroundImageUrl; //TODO: TemplateMgr output cleaner url
-                bgImage.onload = function(){
+                bgImage_long = new Image();
+                bgImage_long.src = template.backgroundImageUrl; //TODO: TemplateMgr output cleaner url
+                bgImage_long.onload = function(){
                     //ugcCanvas.width = bgImage.width;
                     //ugcCanvas.height = bgImage.height;
-                		 ugcCanvas.width = 1743;
-                    	ugcCanvas.height = 260;
-                   		 context.drawImage(bgImage,0,0,1743,260);
+                		 ugcCanvas.width = bgImage_long.width;
+                    	ugcCanvas.height = bgImage_long.height;
+                   		 context.drawImage(bgImage_long,0,0);
                     callback(null);
                 };
-                bgImage.onerror = function(){
+                bgImage_long.onerror = function(){
                     callback("Failed to load the background image "+imageUrl);
                 };
-                bgImage.onabort = function(){
+                bgImage_long.onabort = function(){
                     callback("Failed to load the background image "+imageUrl+" (aborted)");
                 };
             },
