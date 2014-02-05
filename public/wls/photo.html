@@ -32,6 +32,17 @@
 	<script type="text/javascript" src="js/jquery.cookie.js"></script>    
 	<script type="text/javascript" src="js/touchTouch.jquery.js"></script>
 	<script type="text/javascript">
+if ((/iphone|ipod|ipad.*os 5/gi).test(navigator.appVersion)) {
+  window.onpageshow = function(evt) {
+    // If persisted then it is in the page cache, force a reload of the page.
+    if (evt.persisted) {
+      document.body.style.display = "none";
+      location.reload();
+    }
+  };
+}
+</script>
+	<script type="text/javascript">
 $(document).bind(
   'touchmove',
   function(e) {
@@ -87,7 +98,7 @@ $(document).bind(
     	
     	
 		function init(){
-
+			$('#waitText').hide();
 			//Display photo that user upload.
 			var option = {
 				    source : {
@@ -324,6 +335,7 @@ $(document).bind(
 
 				        $('#btnGenerate').click(function(){
 				        	 $('#btnGenerate').hide();
+				        	 $('#waitText').show();
 				        	localStorage.photoCroppedURI = document.getElementById('photoZoom').toDataURL();
 				        	var imageUgc;
 							var userContent = {
@@ -429,6 +441,7 @@ $(document).bind(
 				<div style='color:#FFF'>請您拖曳或移動照片，調整要合成的影像範圍。</div>
 					<p style="text-align:left; padding-top:10px;">
 						<button id="btnGenerate" class="btn btn-1">開始合成</button>
+						<div id='waitText' style='color:#fff'>合成中...請稍等</div>
 					</p>
 				</div>
         

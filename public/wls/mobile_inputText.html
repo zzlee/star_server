@@ -25,6 +25,20 @@
 	<script type="text/javascript" src="js/touchTouch.jquery.js"></script>
 	<script src="js/jquery-ui-1.9.2.custom.js"></script>
 	<script src="js/jquery-ui-1.9.2.custom.min.js"></script>
+	<script type="text/javascript">
+
+	
+if ((/iphone|ipod|ipad.*os 5/gi).test(navigator.appVersion)) {
+  window.onpageshow = function(evt) {
+    // If persisted then it is in the page cache, force a reload of the page.
+    if (evt.persisted) {
+      document.body.style.display = "none";
+      location.reload();
+    }
+  };
+}
+</script>
+	
 	<script type="text/javascript">if($(window).width()>1024){document.write("<"+"script src='js/jquery.preloader.js'></"+"script>");}	</script>
 
 	<script>		
@@ -55,6 +69,7 @@
 	<script>
 		
 	$( document ).ready(function() {
+		$('#waitText').hide();
 		
 		if(localStorage.template_userText){
 			var text = localStorage.template_userText.replace(/\_/ig,"\n");
@@ -87,6 +102,7 @@
 					var inputContent = $("#inputText").val().replace(/\n/g,"_");
 					//console.log(inputContent);
 				$('#btnSend').hide();
+				$('#waitText').show();
 					async.series([
 								function(callback){
 									if(localStorage.photoCroppedURI != null)
@@ -277,6 +293,7 @@
             <div class="block-slogan">
 			<p style="text-align:left; padding-top:20px;">
             		<button id="btnSend" class="btn btn-1">開始合成</button>
+            		<div id='waitText' style="color:#FFF">合成中...請稍等</div>
             	</p>
           </div>
             </div>
