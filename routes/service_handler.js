@@ -58,7 +58,7 @@ FM.service.getCustomerServiceItems_get_cb = function(req, res){
         }
 
         else{
-            console.log(err);
+           // console.log(err);
             res.send(400, {error: "Parameters are not correct"});
         }
     });
@@ -80,7 +80,7 @@ FM.service.createCustomerServiceItems_get_cb = function(req, res){
 //          console.log('createItems'+result);
         }
         else{
-            console.log('createItems'+err);
+          //  console.log('createItems'+err);
             res.send(400, {error: "Parameters are not correct"});
         }
     });
