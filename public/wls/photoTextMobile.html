@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<title>國票證券 | Proto Cropper</title>
+	<meta charset="utf-8">
+	<link rel="icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="http://dzyngiri.com/favicon.png" type="image/x-icon" />
+    <meta name="description" content="Codester is a free responsive Bootstrap template by Dzyngiri">
+    <meta name="keywords" content="free, template, bootstrap, responsive">
+    <meta name="author" content="Inbetwin Networks">  
+	<link rel="stylesheet" href="css/bootstrap.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/responsive.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/style.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/touchTouch.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/kwicks-slider.css" type="text/css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.css" media="screen">
+	<link rel="stylesheet" href="css/ui-darkness/jquery-ui-1.10.3.custom.min.css" media="screen">
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300' rel='stylesheet' type='text/css'>
+	
+	<script type="text/javascript" src="js/quo.js"></script>
+	<script type="text/javascript" src="js/kinetic-v4.0.5.min.js"></script>
+	
+	<script type="text/javascript" src="js/exif.js"></script>
+	<script type="text/javascript" src="js/binaryajax.js"></script>
+	
+	<script type="text/javascript" src="js/megapix-image-gz.js"></script>
+	<script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/superfish.js"></script>
+	<script type="text/javascript" src="js/jquery.flexslider-min.js"></script>
+	<script type="text/javascript" src="js/jquery.kwicks-1.5.1.js"></script>
+	<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
+	<script type="text/javascript" src="js/jquery.cookie.js"></script>    
+	<script type="text/javascript" src="js/touchTouch.jquery.js"></script>
+	<script type="text/javascript">
+$(document).bind(
+  'touchmove',
+  function(e) {
+    e.preventDefault();
+  }
+);
+</script>
+	<script type="text/javascript">if($(window).width()>1024){document.write("<"+"script src='js/jquery.preloader.js'></"+"script>");}	</script>
+
+	<script>		
+		 jQuery(window).load(function() {	
+		 $x = $(window).width();		
+	if($x > 1024)
+	{			
+	jQuery("#content .row").preloader();    }	
+		 
+     jQuery('.magnifier').touchTouch();			
+    jQuery('.spinner').animate({'opacity':0},1000,'easeOutCubic',function (){jQuery(this).css('display','none')});	
+  		  }); 
+				
+	</script>
+	
+	<!-- CUSTOM CODE -->
+	<script src="js/async.js"></script>
+	<script src="js/common.js"></script>
+	<script src="js/template.js"></script>
+	<script src="js/image_ugc.js"></script>
+	<script src="js/template_mgr.js"></script>
+	<script src="js/ugc_utility.js"></script>
+	<script src="js/dooh_info.js"></script>
+	<script src="js/dooh_preview.js"></script>
+	<script src="js/photoCropper.js"></script>
+	<script src="js/kinetic-v4.0.5.min.js"></script>
+	<script src="js/jquery-ui.js"></script>
+	
+	<script>
+    	function initCropper(divID, imgUrl) {
+		        var stageAllowableWidth = window.innerWidth * 0.7;
+		        var stageAllowableHeight = window.innerHeight * 0.7;
+		        var cropperWidthToHeightRatio = 210 / 130;
+				var myPhotoCropper = new PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight,  imgUrl, cropperWidthToHeightRatio);
+				var btnGenerate = $('#btnGenerate');
+				var croppedArea = {};
+				/** Start to generate longPhoto and doohPreview */
+				
+				
+    	}
+    	
+    	
+		function init(){
+			delete localStorage.template_userText;
+			//Display photo that user upload.
+			var option = {
+				    source : {
+				        x : 0,
+				        y : 0
+				    },
+				    scale : {
+				        w : 0,
+				        h : 0
+				    },
+				    destination : {
+				        x : 0,
+				        y : 0
+				    },
+				    scope : {
+				        w : 0,
+				        h : 0
+				    }
+				};
+				var canvas, context, image;
+
+				var s_now = {
+				    x : 0,
+				    y : 0,
+				    status : 0
+				}, p_before = {
+				    x : 0,
+				    y : 0,
+				    v : 0,
+				    status : 0
+				}, p_now = {
+				    x : 0,
+				    y : 0,
+				    v : 0
+				};
+
+				var WidthOfCustomizableImage = null;
+				var HeightOfcustomizableImage = null;
+
+
+
+				   
+				        canvas = document.getElementById('photoZoom');
+				        context = canvas.getContext('2d');
+				        image = new Image();
+
+				        var change_css = ($('.movie-pic-dummy').width()) * 0.95;
+				        
+				        $('.content-movie-img').css({
+				            'width' : change_css,
+				        });
+
+				        canvas.width = $('.movie-pic-dummy').width();
+				        canvas.height = canvas.width / 1280 * 735;
+				        
+				        var imageUrlBig = domainUrl+"/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
+				        
+				        var imageEXIF = new Image();
+				        imageEXIF.src = imageUrlBig;
+				        imageEXIF.onload = function(){
+				        	EXIF.getData( imageEXIF, function(){
+	                            var orientation = EXIF.getTag(imageEXIF, "Orientation");
+	                           
+	                            //alert(orientation);
+	                            
+	                            
+	                            subsamplingResize(imageUrlBig, { maxWidth: 960, maxHeight: 960, orientation:orientation }, function(resultURI){
+	                                image.src = resultURI;
+	                                image.onload = function() {
+	                               	
+	        				            option.scope.w = canvas.width;
+	        				            option.scope.h = image.height / image.width * canvas.width;
+
+	        				            option.destination.x = 0;
+	        				            option.destination.y = -0.5 * (option.scope.h - canvas.height);
+
+	        				            context.drawImage(image, option.destination.x,
+	        				                    option.destination.y, option.scope.w, option.scope.h);
+
+	        				            croppedArea = {
+	        				                x : -option.destination.x / option.scope.w, //fraction relative to its width
+	        				                y : -option.destination.y / option.scope.h, //fraction relative to its height
+	        				                width : canvas.width / option.scope.w, //fraction relative to its width
+	        				                height : canvas.height / option.scope.h //fraction relative to its height
+	        				            };
+	        				            
+
+
+	        				        };
+	   				         });
+	                           
+	                            });
+				        };
+				        
+				         //image.src =  domainUrl+"/contents/user_project/" + localStorage.projectId + "/user_data/" + localStorage.fileName;
+				        
+				         
+				         
+				         
+
+				       
+
+				     
+				        $$('#photoZoom').pinching(
+				                function(e) {
+				                    if (e.type == 'pinching') {
+
+				                        p_now.x = (e.currentTouch[0].x + e.currentTouch[1].x)
+				                                / 2 - canvas.offsetLeft;
+				                        p_now.y = (e.currentTouch[0].y + e.currentTouch[1].y)
+				                                / 2 - canvas.offsetTop;
+
+				                       
+				                        p_now.v = Math.pow(e.currentTouch[0].x
+				                                - e.currentTouch[1].x, 2)
+				                                + Math.pow(e.currentTouch[0].y
+				                                        - e.currentTouch[1].y, 2);
+
+				                        //zoom in/out
+
+				                        var n = Math.sqrt(p_now.v / p_before.v);
+
+				                        if (p_before.status) {
+
+				                            //zoom limit: width * n
+				                            if (option.scope.w > image.width * 2 && n > 1)
+				                                n = 1;
+
+				                            option.scope.w *= n;
+				                            option.scope.h *= n;
+
+				                            //center point mapping
+				                            option.destination.x = p_before.x - n
+				                                    * (p_before.x - option.destination.x)
+				                                    + (p_now.x - p_before.x);
+				                            option.destination.y = p_before.y - n
+				                                    * (p_before.y - option.destination.y)
+				                                    + (p_now.y - p_before.y);
+
+				                            //zoom limit: width
+				                            if (option.scope.w < canvas.width) {
+				                                option.destination.x = 0;
+				                                option.destination.y = 0;
+				                                option.scope.w = canvas.width;
+				                                option.scope.h = image.height / image.width
+				                                        * canvas.width;
+				                            }
+
+				                            showImage();
+				                        }
+				                        ;
+
+				                        p_before.x = p_now.x;
+				                        p_before.y = p_now.y;
+				                        p_before.v = p_now.v;
+				                        p_before.status = 1;
+
+				                    }
+				                    //console.log(option.source.x + ', ' + option.source.y);
+				                });
+
+				        $$('#photoZoom').pinch(function(e) {
+				        	
+				            p_before.status = 0;
+
+				            croppedArea = {
+				                x : -option.destination.x / option.scope.w, //fraction relative to its width
+				                y : -option.destination.y / option.scope.h, //fraction relative to its height
+				                width : canvas.width / option.scope.w, //fraction relative to its width
+				                height : canvas.height / option.scope.h //fraction relative to its height
+				            };
+				                               
+
+				        });
+
+				        $$('#photoZoom').swiping(function(e) {
+
+				            //console.log('[swiping]');
+
+				            if (!isNaN(e.iniTouch.x) && (e.type == 'swiping')) {
+
+				                if (s_now.status == 0) {
+				                    s_now.x = e.iniTouch.x;
+				                    s_now.y = e.iniTouch.y;
+				                    s_now.status = 1;
+				                }
+
+				                option.destination.x += e.currentTouch.x - s_now.x;
+				                option.destination.y += e.currentTouch.y - s_now.y;
+
+				                showImage();
+
+				                s_now.x = e.currentTouch.x;
+				                s_now.y = e.currentTouch.y;
+
+				            }
+
+				        });
+
+				        $$('#photoZoom').swipe(function(e) {
+				            //console.log('[swipe]');
+				            s_now.status = 0;
+
+				            croppedArea = {
+				                x : -option.destination.x / option.scope.w, //fraction relative to its width
+				                y : -option.destination.y / option.scope.h, //fraction relative to its height
+				                width : canvas.width / option.scope.w, //fraction relative to its width
+				                height : canvas.height / option.scope.h //fraction relative to its height
+				            };
+
+
+
+				        });
+
+				        showImage = function() {
+
+				            //limit
+				            if (option.destination.x < canvas.width - option.scope.w)
+				                option.destination.x = canvas.width - option.scope.w;
+				            if (option.destination.y < canvas.height - option.scope.h)
+				                option.destination.y = canvas.height - option.scope.h;
+				            if (option.destination.x > 0)
+				                option.destination.x = 0;
+				            if (option.destination.y > 0)
+				                option.destination.y = 0;
+
+				            //clear and draw image
+				            context.clearRect(0, 0, canvas.width, canvas.height);
+				            context.drawImage(image, option.destination.x,
+				                    option.destination.y, option.scope.w, option.scope.h);
+				        };
+
+				   
+
+				        $('#btnGenerate').click(function(){
+				        	console.log('test');
+				        	var a = typeof localStorage.template_userText;
+				        	console.log(localStorage.template_userText);
+				        	localStorage.photoCroppedURI = document.getElementById('photoZoom').toDataURL();
+				        	window.location = serverUrl + "/mobile_inputText.html";
+				        	
+				        	/*
+				        	var imageUgc;
+							var userContent = {
+								text: localStorage.template_userText,
+								picture: {
+									urlOfCropped: localStorage.photoCroppedURI, //the URL of the picture that the user crops. (It is normally a base64 string got from canvas.toDataURL() )
+									crop: {_x:0, _y:0, _w:0, _h:0},  // _x=x_crop/width_picture; _y=y_crop/height_picture; _w=width_crop/width_picture;  _h=height_crop/height_picture
+								},
+								thumbnail:{
+									url: localStorage.profilePhoto
+								}
+								
+							};
+							var template = localStorage.selectedTemplate;
+							//subTemplate is picture_only (For Test)
+							
+							ImageUgc.getInstance(template, "picture_plus_text", userContent, function(err, _imageUgc){
+								if(!err){
+									imageUgc = _imageUgc;
+									localStorage.longphotoUrl = imageUgc.getImageUrl();
+									localStorage.doohPreviewUrl = imageUgc.getDoohPreviewImageUrl();
+									localStorage.customizableObjects = imageUgc.getCustomizableObjects();
+									window.location = serverUrl + "/preview.html";
+									callback(null);
+								}else{
+									console.log("[imageUgc.generate] Failed");
+								}
+							
+							});*/
+				        });
+				
+		}//End of function init();
+
+	</script>
+	
+	<!--[if lt IE 8]>
+  		<div style='text-align:center'><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx?ocid=ie6_countdown_bannercode"><img src="http://www.theie6countdown.com/img/upgrade.jpg"border="0"alt=""/></a></div>  
+ 	<![endif]-->
+	<!--[if (gt IE 9)|!(IE)]><!-->
+	<!--<![endif]-->
+	<!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <link rel="stylesheet" href="css/docs.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/ie.css" type="text/css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400' rel='stylesheet' type='text/css'>
+  <![endif]-->
+  
+  <!--Google analytics code	  
+	  <script type="text/javascript">
+           var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-29231762-1']);
+          _gaq.push(['_setDomainName', 'dzyngiri.com']);
+          _gaq.push(['_trackPageview']);
+        
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+      </script>
+      -->
+</head>
+
+	<body onload="init();">
+     <div class="spinner"></div> 
+<!-- header start -->
+<!--
+<header>
+      <div class="container clearfix">
+    <div class="row">
+          <div class="span12">
+        <div class="navbar navbar_">
+              <div class="container">
+            <h2 class="brand"><a href="index.html" style="color:#000;text-shadow:none;font-size:250%">我要上小巨蛋</a></h2>
+            <div class="nav-collapse nav-collapse_  collapse"></div>
+          </div>
+            </div>
+      </div>
+        </div>
+  </div>
+    </header>
+	-->
+    <div class="content-movie">
+            <canvas id="photoZoom" class="content-movie-img_crossPlatform" ></canvas>
+
+            <div class="movie-pic-dummy" id="cropper_pic_dummy"></div>
+            <!-- <img class="content-movie-img" src="images/movie_pic.png"></img> -->
+        </div>
+<div class="bg-content">
+    <div class="container">
+		<div class="row">
+			<div class="span12"> 
+				<div class="slide" id="show">				
+				</div>
+				
+				<span id="responsiveFlag"></span>
+				<div class="block-slogan">
+				<div style='color:#FFF'>請您拖曳或移動照片，調整要合成的影像範圍。</div>
+					<p style="text-align:left; padding-top:10px;">
+						<button id="btnGenerate" class="btn btn-1">輸入文字</button>
+						<!-- <img id='rotate' src="img/rotate.png" style="width:10%;height:10%"> -->
+					</p>
+				</div>
+        
+			</div>
+		</div>
+	</div>
+      
+      <!-- content -->
+      
+	<div id="content" class="content-extra"><div class="ic"></div>
+
+
+	</div>
+</div>
+
+<!-- footer -->
+<footer>
+	<div class="container clearfix">
+		<ul class="list-social pull-right">
+			<li><a class="icon-1" href="#"></a></li>
+			<li><a class="icon-2" href="#"></a></li>
+			<li><a class="icon-3" href="#"></a></li>
+			<li><a class="icon-4" href="#"></a></li>
+        </ul>
+     <div class="privacy pull-left">&copy; 2014 | <a href="http://www.feltmeng.com">夢蝶股份有限公司 Feltmeng Inc.</a> |</div>
+	</div>
+</footer>
+	<script type="text/javascript" src="js/bootstrap.js"></script>
+</body>
+</html>

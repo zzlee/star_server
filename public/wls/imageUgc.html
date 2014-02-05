@@ -1,0 +1,171 @@
+<!DOCTYPE html> 
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    
+    <!-- LIBLARIES -->
+    <script src="js//jquery.js"></script>
+    <script src="js/async.js"></script>
+    <!-- CUSTOM INITIALIZATION CODE -->
+    <script src="js/image_ugc.js"></script>
+    <script src="js/template_mgr.js"></script>
+    <script src="js/ugc_utility.js"></script>
+    <!-- ABOUT DOOH CODE -->
+    <script src="js/dooh_info.js"></script>
+    <script src="js/dooh_preview.js"></script>
+    <script src="js/common.js"></script>
+    
+	<script>
+	
+	function init(){
+		/*
+		http://127.0.0.1/imageUgc.html?id=100004790103783&name=Jeff Chai&projectId=mood-521c19aeb4c146740f000005-20130830T094018567Z&file=_cdv_photo_016.jpg&template=cultural_and_creative&subTemplate=picture_only&text=test
+				
+		Three subTemplates:
+			http://127.0.0.1/imageUgc.html?id=1348211980&name=%E9%A1%8F%E9%80%B8%E9%88%9E&template=mood&file=null&subTemplate=text_only&text=%E8%AA%AA%E5%A5%BD%E7%9A%84%E5%B9%B8%E7%A6%8F
+		http://127.0.0.1/imageUgc.html?id=1348211980&name=顏逸鈞&projectId=mood-521c19aeb4c146740f000005-20130830T094018567Z&file=_cdv_photo_016.jpg&subTemplate=picture_plus_text&text=Merry Christmas
+		http://127.0.0.1/imageUgc.html?id=1348211980&name=顏逸鈞&projectId=mood-521c19aeb4c146740f000005-20130830T094018567Z&file=_cdv_photo_016.jpg&subTemplate=picture_only&text=null
+				
+		check_in:
+			http://127.0.0.1/imageUgc.html?id=1348211980&name=顏逸鈞&template=check_in&file=null&subTemplate=text_only&text=null
+			
+		*/
+		
+		//Handle query string after "?", "&" and "="
+		var strUrl = location.search;
+		var getPara = null;
+		var ParaVal = null;
+		var aryPara = [];
+		var template = null;
+		if (strUrl.indexOf("?") != -1) {
+		    var getSearch = strUrl.split("?");
+		    getPara = getSearch[1].split("&");
+		    for (i = 0; i < getPara.length; i++) {
+		      ParaVal = getPara[i].split("=");
+		      aryPara.push(ParaVal[1]);
+		      aryPara[ParaVal[0]] = ParaVal[1];
+		    }
+		    
+		}
+		
+		//Init userContent
+		var userContent = {
+				text: null,
+				picture: {
+					urlOfCropped: null, //the URL of the picture that the user crops. (It is normally a base64 string got from canvas.toDataURL() )
+					crop: {_x:0, _y:0, _w:0, _h:0},  // _x=x_crop/width_picture; _y=y_crop/height_picture; _w=width_crop/width_picture;  _h=height_crop/height_picture
+				},
+				thumbnail:{
+					url: null
+				}
+		};
+		if(aryPara["id"] && aryPara["template"]){
+			//Get profile's photo from Facebook
+			var img64url = "/members/" + aryPara["fbId"] + "/thumbnail";
+
+			$.ajax({
+				type: 'GET',
+				url: img64url,
+				async: true,
+				success: function(res){
+					if(res){
+						userContent.thumbnail.url = res;
+				        //userContent.fb_name = decodeURI(aryPara["name"]);
+				        template = aryPara["template"];
+				        
+					        //Check subTemplate : mood, cultural_and_creative
+							if((aryPara["text"] != null) && (aryPara["text"] != "undefined")){
+								//userContent.text = decodeURI(aryPara["text"]);
+								userContent.text = unescape(aryPara["text"]);
+								
+						    }else{
+						       	userContent.text = "";
+						    }
+							if(aryPara["file"] != null){
+								userContent.picture.urlOfCropped = "/contents/user_project/" + aryPara["projectId"] + "/user_data/" + aryPara["file"];
+							}
+
+				        //Template: mood, cultural_and_creative, check_in
+				        //SubTemplate:picture_plus_text, picture_only, text_only
+						var imageUgc;
+				        ImageUgc.getInstance(template, aryPara["subTemplate"], userContent, function(err, _imageUgc) {
+				            if (!err) {
+				                imageUgc = _imageUgc;
+				                $("#longPhoto").attr("src", imageUgc.getImageUrl());
+				                $("#doohPreview").attr("src", imageUgc.getDoohPreviewImageUrl());
+				                //$("#preview").attr("src", imageUgc.getDoohPreviewImageUrl());
+								//Need to upload to server
+								
+								
+								var ugcInfo = {
+											ownerId : {
+                                        		_id : aryPara["id"],
+												fbUserId : aryPara["fbId"]
+												},
+											contentGenre : template,
+											title : "today's mood",
+											projectId : aryPara["projectId"]
+									};
+								
+								imageUgc.uploadToServer(ugcInfo, function(err){
+									if(!err){
+										console.log("[imageUgc.uploadToServer] Success");
+										window.close();
+									}else{
+										console.log("[imageUgc.uploadToServer] Failed");
+									}
+								});
+								
+				            }else {
+				                console.log(err);
+				            }
+				        });
+				        
+					}
+				},
+          		error: function(jqXHR, textStatus, errorThrown ){
+     	   			//FM_LOG("[error]jqXHR : " + JSON.stringify(jqXHR));
+     	   			//FM_LOG("[error]textStatus : " + JSON.stringify(textStatus));
+     	   			//FM_LOG("[error]errorThrown : " + errorThrown);
+     	   			console.log("error");
+     	   
+        		}
+			});
+		}else{
+			console.log("[imageUgc.genLongPhoto] error");
+		}
+	}
+	
+	
+	</script>
+        
+</head>
+<body onLoad="init()">
+	<p>Long photo:</p>
+	<img src="" id="longPhoto">
+	<p>Dooh Preview :</p>
+	<img src="" id="doohPreview">
+		<!-- 
+<p>Image to use:</p>
+<img id="scream" src="" alt="The Scream" width="150" height="150"><p>Canvas:</p>
+<canvas id="myCanvas" width="250" height="250" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+
+ 
+	<div id="drawImageContent">
+		<img id="pic" src="sheep.jpg">
+		 
+	</div>
+
+	<button id="send" type="button">Click Me!</button>
+ 
+	<p>Image to use:</p>
+	<img id="scream" src="sheep.jpg" height="250px">
+
+	<p>Canvas:</p>
+	<canvas id="myCanvas">
+	Your browser does not support the HTML5 canvas tag.</canvas>
+	-->
+</body>
+</html>

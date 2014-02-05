@@ -1151,44 +1151,76 @@ miixContentMgr.putFbPostIduserLiveContents = function(userLiveContentProjectID, 
     });
 };
 
-miixContentMgr.getMessageList = function(memberId, read,limit, skip, cbOfGetMessageList){
+miixContentMgr.getMessageList = function(memberId, read,limit, skip, cbOfGetMessageList){ //Joy
+	
+	logger.info('into miixContentMgr.getMessageList');
+	
     var messageModel = db.getDocModel("message");
 
    if(read == false) { //取出未讀訊息
         messageModel.find({"ownerId._id": memberId, "read": false}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(function(err, result){
         	
-        	if(result.length != 0){
-        		for(var i = 0; i < result.length; i++){
-            		result[i].messageTime = result[i]._id.getTimestamp().getTime();
+        	if(!err){
+        		if(typeof result !== 'undefined'){ //important!!! without this due to server crash!
+            		if(result.length != 0){
+            			for(var i = 0; i < result.length; i++){
+                    		result[i].messageTime = result[i]._id.getTimestamp().getTime();
+                    	}
+            			logger.info('[miixContentMgr.getMessageList]: get read message');
+            		}        		
             	}
+            	
+            	cbOfGetMessageList(null,result);
+        		
+        	}else{
+        		logger.info('[miixContentMgr.getMessageList]: '+err);
+        		cbOfGetMessageList(err,result);
         	}
         	
         	
-        	
-        	cbOfGetMessageList(null,result);
         });
     }else if(read == 'getReadMessage') { //取出該user已讀訊息
         messageModel.find({"ownerId._id": memberId, "read": true}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(function(err, result){
         	
-        	if(result.length != 0){
-        		for(var i = 0; i < result.length; i++){
-            		result[i].messageTime = result[i]._id.getTimestamp().getTime();
+        	if(!err){
+        		if(typeof result !== 'undefined'){ //important!!! without this due to server crash!
+            		if(result.length != 0){
+            			for(var i = 0; i < result.length; i++){
+                    		result[i].messageTime = result[i]._id.getTimestamp().getTime();
+                    	}
+            			logger.info('[miixContentMgr.getMessageList]: get read message');
+            		}        		
             	}
+            	
+            	
+            	cbOfGetMessageList(null,result);
+        	}else{
+        		logger.info('[miixContentMgr.getMessageList]: '+err);
+        		cbOfGetMessageList(err,result);
         	}
         	
-        	cbOfGetMessageList(null,result);
+        	
         });
 
     }else if(read == 'getAllMessage'){ //取出所有訊息
         messageModel.find({"ownerId._id": memberId}).sort({"messageTime":1}).skip(skip).exec(function(err, result){
         	
-        	if(result.length != 0){
-        		for(var i = 0; i < result.length; i++){
-            		result[i].messageTime = result[i]._id.getTimestamp().getTime();
+        	if(!err){
+        		if(typeof result !== 'undefined'){ //important!!! without this due to server crash!
+            		if(result.length != 0){
+            			for(var i = 0; i < result.length; i++){
+                    		result[i].messageTime = result[i]._id.getTimestamp().getTime();
+                    	}
+            			logger.info('[miixContentMgr.getMessageList]: Success get all message(include read and unread)');
+            		}        		
             	}
+            	
+            	cbOfGetMessageList(null,result);
+        	}else{
+        		logger.info('[miixContentMgr.getMessageList]: '+err);
+            	cbOfGetMessageList(err,result);
         	}
         	
-        	cbOfGetMessageList(null,result);
         });
 
     }

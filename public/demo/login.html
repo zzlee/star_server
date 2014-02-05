@@ -123,12 +123,16 @@
 			<script>
 		
 			if(navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/iPhone|iPad|iPod/i)){
+				localStorage.device = "mobile";
 				$('#hint').html("");
 			}
 			if(navigator.userAgent.match(/Android|iPhone|iPad|iPod/i)){
 				$('#code').css({"width":"100%"});
+				localStorage.device = "mobile";
 			}else{
+				localStorage.device = "PC";
 				$('#code').css({"width":"45%"});
+				
 			}
 			
 		$('#code').bind('focus',function(){
@@ -188,7 +192,7 @@
           <li><a class="icon-3" href="#"></a></li>
           <li><a class="icon-4" href="#"></a></li>
         </ul>
-    <div class="privacy pull-left">&copy; 2013 | <a href="http://www.dzyngiri.com">Dzyngiri : Online Design Magazine</a> |</div>
+     <div class="privacy pull-left">&copy; 2014 | <a href="http://www.feltmeng.com">夢蝶股份有限公司 Feltmeng Inc.</a> |</div>
   </div>
     </footer>
 	<script type="text/javascript" src="js/bootstrap.js"></script>

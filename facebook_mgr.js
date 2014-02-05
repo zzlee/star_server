@@ -110,6 +110,7 @@ FM.facebookMgr = (function(){
                 }
                 switch(app){
                 case "wowtaipeiarena":
+                case "waterlandsecuries":
                     qs = { 'input_token': user_token, 'access_token': app_access_token_WowTaipeiarena };
                     break;
                 default:
@@ -234,6 +235,7 @@ FM.facebookMgr = (function(){
                 }
                 switch(app){
                 case "wowtaipeiarena":
+                case "waterlandsecuries":
                     qs = { 
                         'client_id': app_id_WowTaipeiarena
                         , 'client_secret': app_secret_WowTaipeiarena

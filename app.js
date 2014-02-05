@@ -271,7 +271,7 @@ app.post('/miix/ugcInfo/', function(req,res){
  * @returns {HTML} - After upload file successfully then go to next page which we want to user go(This case is "upload_text.html" or "upload_photo.html").
  */
 app.post('/miix/originalImage/', function(req,res){
-//	console.dir(req.body);
+	//console.dir(req.body);
 	var tempPath = req.files.file.path;
 	
 	 var projectDir = path.join( workingPath, 'public/contents/user_project', req.body.projectId);
@@ -324,37 +324,71 @@ app.post('/miix/originalImage/', function(req,res){
 	    					logger.info('Failed to upload and gen UGCs' + err);
 	    				}else{
 							logger.info( 'Send redirect html to client side. ');
-							var tmpLength = req.body.template.split("_").length;
-							var subTemplate = req.body.template.split("_")[tmpLength - 1];
-	                	  
-							if(subTemplate == "pic"){
-								res.writeHead(200, "OK", {'Content-Type': 'text/html'});
-								res.write('<html>');
-								res.write('<script>');
-								res.write('function init(){' +
-	    				    			'setTimeout(' +
-//	    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
-	    				    				//"window.location = '/demo/upload_photo.html',1000);" +
-											//"window.location.replace('/demo/upload_photo.html'),1000);" +
-												"'window.history.go(-1)',1000);" +
-	    				    			'}');
-								res.write('</script>');
-								res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
-								res.end();
-							}else if(subTemplate == "text"){
-								res.writeHead(200, "OK", {'Content-Type': 'text/html'});
-								res.write('<html>');
-								res.write('<script>');
-								res.write('function init(){' +
-	    				    			'setTimeout(' +
-//	    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
-	    				    				//"window.location = '/demo/upload_text.html',1000);" +
-											//"window.location.replace('/demo/upload_text.html'),1000);" +
-												"'window.history.go(-1)',1000);" +
-	    				    			'}');
-								res.write('</script>');
-								res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
-								res.end();
+							var tmpTemplate = req.body.template;
+							if(req.body.device != "mobile"){
+								if(tmpTemplate.split("wls_")[1] == "pic"){
+									res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+									res.write('<html>');
+									res.write('<script>');
+									res.write('function init(){' +
+												'setTimeout(' +
+												//"window.location = '/demo/upload_photo.html',1000);" +
+												"window.location.replace('/wls/upload_photo.html'),1000);" +
+												//	"'window.history.go(-1)',1000);" +
+												//"$.mobile.changePage('/wls/upload_photo.html'), 1000);" +
+											//"'history.back()', 1000);" + 
+											//'history.back();' +
+											//'window.location.assign("/wls/upload_photo.html");' + 
+											//"window.history.go(-1);" + 
+												'}');
+									res.write('</script>');
+									res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
+									res.end();
+								}else if(tmpTemplate.split("wls_")[1] == "pic_text"){
+									res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+									res.write('<html>');
+									res.write('<script>');
+									res.write('function init(){' +
+												'setTimeout(' +
+													"window.location.replace('/wls/upload_text.html'),1000);" +
+												'}');
+									res.write('</script>');
+									res.write("<body onload='init();'><h4>畫面待轉中，請稍候......</h4></body></html>");
+									res.end();
+								}
+							}else{
+								if(tmpTemplate.split("wls_")[1] == "pic"){
+									res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+									res.write('<html>');
+									res.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
+									res.write('<script>');
+									res.write('function init(){' +
+		    				    			'setTimeout(' +
+//		    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
+		    				    				"window.location = '/wls/photo.html',1000);" +
+												//"window.location.replace('/demo/upload_text.html'),1000);" +
+												//	"'window.history.go(-1)',1000);" +
+		    				    			'}');
+									res.write('</script>');
+									res.write("<body onload='init();'><div style='font-size:50pt'>您好，網頁載入中，請稍等…<br><br>如果網頁載入等待過久，您可以選擇回上一頁。</div></body></html>");
+									res.end();
+								}else if(tmpTemplate.split("wls_")[1] == "pic_text"){
+									res.writeHead(200, "OK", {'Content-Type': 'text/html'});
+									res.write('<html>');
+									res.write('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">');
+									res.write('<script>');
+									res.write('function init(){' +
+		    				    			'setTimeout(' +
+//		    				    			window.location = 'http://joy.ondascreen.com/demo/preview.html',15000);" +
+		    				    				"window.location = '/wls/photoTextMobile.html',1000);" +
+												//"window.location.replace('/demo/upload_text.html'),1000);" +
+												//	"'window.history.go(-1)',1000);" +
+		    				    			'}');
+									res.write('</script>');
+									res.write("<body onload='init();'><div style='font-size:50pt'>您好，網頁載入中，請稍等…<br><br>如果網頁載入等待過久，您可以選擇回上一頁。</div></body></html>");
+									res.end();
+								}
+								
 							}
 
 	    				}

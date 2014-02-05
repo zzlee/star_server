@@ -9,8 +9,12 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 	var stage;
 	var photoToCropGroup, photoToCropImg, cropperGroup, cropperImg;
 	var photoWidthToHeightRatio;
+	var underCropperGroup;
 	var _this = this;
-	
+	var tmpTopHeight, tmpLeftBottomY, tmpLeftWidth;
+	var tmpLeftPostionY;//underLeft's position.
+	var tmpBottomHeight;
+	var flag = true;
 	var undateCropperArea = function()
 	{
 		_this.croppedArea.x = (cropperGroup.attrs.x+cropperGroup.get(".topLeft")[0].attrs.x) / photoToCropImg.attrs.width;
@@ -29,18 +33,17 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 		var image = group.get(".image")[0];
         var cropperRect = group.get(".cropperRect")[0];
         var markerCircle = group.get(".markerCircle")[0];
-		//console.log();
-		//console.log("activeAnchor.getName() " + activeAnchor.getName());
-		//console.dir("topLeft " + topLeft);
-		//console.dir("topRight " + topRight);
-		//console.dir("bottomRight " + bottomRight);
-		//console.dir("bottomLeft " + bottomLeft);
-		//console.log("------------------------------");
+		//var underTop = underCropperGroup.get(".underRectTop")[0];
+		//var underLeft = photoToCropGroup.get(".underRectLeft")[0];
+		//var underRight = photoToCropGroup.get(".underRectRight")[0];
+		//var underBottom = photoToCropGroup.get(".underRectBottom")[0];
+
 		//GZ
 		var center = { x:0, y:0 };  
 		var imageWidthToHeightRatio = image.attrs.width / image.attrs.height; 
 		var newHalfWidth, newHalfHeight;
 
+		
 		// update anchor positions with the one being dragged
 		switch (activeAnchor.getName()) {
 			case "topLeft":
@@ -53,9 +56,11 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 									
 				if ( newHalfWidth/newHalfHeight < imageWidthToHeightRatio) {
 					topLeft.attrs.y = center.y - newHalfWidth/imageWidthToHeightRatio;
+					
 				}
 				else {
 					topLeft.attrs.x = center.x - newHalfHeight*imageWidthToHeightRatio;
+					
 				}
 				
 				newHalfWidth = center.x - topLeft.attrs.x;
@@ -67,7 +72,8 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 				bottomRight.attrs.y = center.y + newHalfHeight;
 				bottomLeft.attrs.x = center.x - newHalfWidth;
 				bottomLeft.attrs.y = center.y + newHalfHeight;
-			
+				//--------------------------------
+
 				break;
 				
 			case "topRight":
@@ -119,7 +125,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 				topRight.attrs.y = center.y - newHalfHeight;
 				bottomLeft.attrs.x = center.x - newHalfWidth;
 				bottomLeft.attrs.y = center.y + newHalfHeight;
-			
+				
 				break;
 				
 			case "bottomLeft":
@@ -198,10 +204,29 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 			bottomRight.attrs.y = center.y + newHalfHeight;
 			bottomLeft.attrs.x = center.x - newHalfWidth;
 			bottomLeft.attrs.y = center.y + newHalfHeight;
+			
+			
 		}
+		
+		/**
+		 * Show the opacity black rect to let user know the cropper position.
+		 */
+		 /*
+		photoToCropGroup.get(".underRectBottom")[0].attrs.height = tmpTopHeight + topRight.attrs.y + 0.1;
+		
+		underLeft.attrs.width = tmpLeftWidth + topLeft.attrs.x;
+		underLeft.attrs.height = (bottomLeft.attrs.y - topLeft.attrs.y) + 0.08;
+		underLeft.attrs.y = tmpLeftPostionY + topLeft.attrs.y;
+		
+		underRight.attrs.x = underLeft.attrs.width + newHalfWidth * 2;
+		underRight.attrs.y = underLeft.attrs.y;
+		underRight.attrs.width = photoToCropImg.attrs.width - (tmpLeftWidth + topLeft.attrs.x + newHalfWidth * 2);
+		underRight.attrs.height = underLeft.attrs.height + 0.08;
+		
+		underBottom.attrs.height = tmpBottomHeight + bottomRight.attrs.y;
+		underBottom.attrs.y = tmpBottomHeight + bottomRight.attrs.y;
 
-
-
+*/
 		image.setPosition(topLeft.attrs.x, topLeft.attrs.y);
 
 		var width = newHalfWidth*2;
@@ -210,64 +235,73 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 			image.setSize(width, height);
 		}
 /**/
+		
         cropperRect.attrs.x = topLeft.attrs.x;
         cropperRect.attrs.y = topLeft.attrs.y;
         cropperRect.attrs.width = newHalfWidth*2;
         cropperRect.attrs.height = newHalfHeight*2;
+
         markerCircle.attrs.x = bottomRight.attrs.x;
         markerCircle.attrs.y = bottomRight.attrs.y;
-        
 		
 		undateCropperArea();
 	}
-
+	//Add the anchor to let user drag move the cropper frame.
 	var addAnchor = function(group, x, y, name) {
 		var stage = group.getStage();
 		var layer = group.getLayer();
+		//var underLayer = photoToCropGroup.getLayer();
 
 		var anchor = new Kinetic.Circle({
 			x: x,
 			y: y,
-			stroke: "#fff",
-			fill: "#fff",
-			strokeWidth: 2,
-			radius: 40,
+			stroke: "#F25C27",
+			fill: "#F25C27",
+			strokeWidth: 1,
+			radius: 8,
 			name: name,
 			draggable: true
 		});
 		//console.dir(anchor);
-		anchor.setOpacity(0.0);
+		//anchor.setOpacity(0.0);
 		
 		anchor.on("dragmove", function() {	
-			//console.dir(group);
 			updateAnchor(group, this);
 			layer.draw();
+			//underLayer.draw();
 		});
 		anchor.on("mousedown touchstart", function() {
 			group.setDraggable(false);
 			this.moveToTop();
+			
 		});
 		anchor.on("dragend", function() {
 			group.setDraggable(true);
 			layer.draw();
+			//underLayer.draw();
 		});
 		// add hover styling
 		anchor.on("mouseover", function() {
 			var layer = this.getLayer();
-			document.body.style.cursor = "pointer";
+			//document.body.style.cursor = "pointer";
 			this.setStrokeWidth(4);
 			layer.draw();
+			//underLayer.draw();
 		});
 		anchor.on("mouseout", function() {
 			var layer = this.getLayer();
 			document.body.style.cursor = "default";
 			this.setStrokeWidth(2);
 			layer.draw();
+			//underLayer.draw();
 		});
 
 		group.add(anchor);
 	}
 
+	
+	
+	
 	var loadImages = function(sources, callback) {
 		var images = {};
 		var loadedImages = 0;
@@ -331,6 +365,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 		*/
 		layer.add(photoToCropGroup);
 		layer.add(cropperGroup);
+
 		stage.add(layer);
 
 		// photo to crop
@@ -342,9 +377,21 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 			height: stage.attrs.height,
 			name: "image"
 		});
+		blackImg = new Kinetic.Image({
+			x : 0,
+			y : 0,
+			//fill : 'black',
+			//opacity: 0.8,
+			width: stage.attrs.width,
+			height: stage.attrs.height,
+			name : "underCover"
+		});
 
 		photoToCropGroup.add(photoToCropImg);
+		photoToCropGroup.add(blackImg);
 
+		
+		//photoToCropGroup.add(underCropper);
 		// cropper
 		var cropperImgWidth, cropperImgHeight;
 		if ( cropperWidthToHeightRatio <= photoWidthToHeightRatio) {
@@ -357,9 +404,52 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 		}
         cropperGroup.attrs.x = photoToCropImg.attrs.width/2 - cropperImgWidth/2;
         cropperGroup.attrs.y = photoToCropImg.attrs.height/2 - cropperImgHeight/2;
-        
-	//	var widthFrame = (stageAllowableWidth / 20) * 16;
-	//	var heightFrame = (stageAllowableHeight / 20) * 9;
+		
+        var underRectTop = new Kinetic.Rect({
+										  x: 0,
+                                          y: 0,
+                                          width: photoToCropImg.attrs.width,
+                                          height: cropperGroup.attrs.y,
+                                          //stroke: 'white',
+                                          //strokeWidth: 2,
+										  fill: 'black',
+										  opacity: 0.5,
+                                          name: "underRectTop"
+										});
+		var underRectLeft = new Kinetic.Rect({
+										  x: 0,
+                                          y: cropperGroup.attrs.y,
+                                          width: cropperGroup.attrs.x,
+                                          height: cropperImgHeight,
+                                          //stroke: 'white',
+                                          //strokeWidth: 2,
+										  fill: 'black',
+										  opacity: 0.5,
+                                          name: "underRectLeft"
+										});
+		var underRectRight = new Kinetic.Rect({
+										  x: cropperGroup.attrs.x + cropperImgWidth,
+                                          y: cropperGroup.attrs.y,
+                                          width: photoToCropImg.attrs.width - (cropperGroup.attrs.x + cropperImgWidth),
+                                          height: cropperImgHeight,
+                                          //stroke: 'white',
+                                          //strokeWidth: 2,
+										  fill: 'black',
+										  opacity: 0.5,
+                                          name: "underRectRight"
+										});
+		var underBottom = new Kinetic.Rect({
+										  x: 0 ,
+                                          y: cropperImgHeight + cropperGroup.attrs.y ,
+                                          width: photoToCropImg.attrs.width,
+                                          height: photoToCropImg.attrs.height - (cropperGroup.attrs.y + cropperImgHeight),
+                                          //stroke: 'white',
+                                          //strokeWidth: 2,
+										  fill: 'black',
+										  opacity: 0.5,
+                                          name: "underRectBottom"
+										});
+
 		cropperImg = new Kinetic.Image({
 			x: 0,
 			y: 0,
@@ -368,43 +458,107 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 			height: cropperImgHeight,
 			name: "image"
 		});
+		
         
         var cropperRect = new Kinetic.Rect({
                                           x: 0,
                                           y: 0,
                                           width: cropperImg.attrs.width,
                                           height: cropperImg.attrs.height,
-                                          stroke: 'white',
-                                          strokeWidth: 2,
+                                          stroke: '#F25C27',
+                                          strokeWidth: 3,
                                           name: "cropperRect"
                                           });
-
+/*
+		var descriptionText = new Kinetic.Text({
+											align: 'center',
+											lineHeight : 2,
+											fontSize: 20,
+											width: cropperImg.attrs.width,
+											height: cropperImg.attrs.height / 2,
+											fontFamily: '微軟正黑體',
+											text: '請拖曳節點或移動裁切範圍\n 調整要合成的影像',
+											fill: '#F25C27',
+											shadowColor : "black",
+											padding: 10,
+											opacity : 0.7,
+											name : "descriptionText"
+											});
+											*/
+		//descriptionText.offsetX(descriptionText.attr.width/2);
+										  
 		var markerCircle = new Kinetic.Circle({
                                         x: cropperImg.attrs.width,
                                         y: cropperImg.attrs.height,
-                                        stroke: "white",
-                                        fill: "white",
+                                        stroke: "#F25C27",
+                                        fill: "#F25C27",
                                         strokeWidth: 1,
-                                        radius: 5,
+                                        radius: 3,
                                         name: "markerCircle"
                                         });
-        
-		cropperGroup.add(cropperImg);
+										
 
+
+		cropperGroup.add(cropperImg);
+		//cropperGroup.add(underCropper);
 		addAnchor(cropperGroup, 0, 0, "topLeft");
 		addAnchor(cropperGroup, cropperImg.attrs.width, 0, "topRight");
 		addAnchor(cropperGroup, cropperImg.attrs.width, cropperImg.attrs.height, "bottomRight");
 		addAnchor(cropperGroup, 0, cropperImg.attrs.height, "bottomLeft");
+		//cropperGroup.add(descriptionText);
         cropperGroup.add(cropperRect);
 		cropperGroup.add(markerCircle);
         
 		undateCropperArea();
-
+		
+		cropperGroup.get(".bottomRight")[0].on('mouseover', function(){
+			 document.body.style.cursor = 'se-resize';
+		});
+		
+		cropperGroup.get(".bottomRight")[0].on('mouseout', function(){
+			 document.body.style.cursor = 'default';
+		});
+		
+		cropperGroup.get(".topLeft")[0].on('mouseover', function(){
+			 document.body.style.cursor = 'nw-resize';
+		});
+		
+		cropperGroup.get(".topLeft")[0].on('mouseout', function(){
+			 document.body.style.cursor = 'default';
+		});
+		
+		cropperGroup.get(".topRight")[0].on('mouseover', function(){
+			 document.body.style.cursor = 'ne-resize';
+		});
+		
+		cropperGroup.get(".topRight")[0].on('mouseout', function(){
+			 document.body.style.cursor = 'default';
+		});
+		
+		cropperGroup.get(".bottomLeft")[0].on('mouseover', function(){
+			 document.body.style.cursor = 'sw-resize';
+		});
+		
+		cropperGroup.get(".bottomLeft")[0].on('mouseout', function(){
+			 document.body.style.cursor = 'default';
+		});
+		
+		cropperGroup.get(".cropperRect")[0].on('mouseover', function(){
+			 document.body.style.cursor = 'move';
+		});
+		
+		cropperGroup.get(".cropperRect")[0].on('mouseout', function(){
+			 document.body.style.cursor = 'default';
+		});
+		
+		
 		cropperGroup.on("dragstart", function() {
 			this.moveToTop();
+			
 		});
-
+		
 		cropperGroup.on("dragmove", function() {
+			//document.body.style.cursor = 'move';
 			// limit the cropper within the boundaries
 			if ( cropperGroup.attrs.x+cropperGroup.get(".topLeft")[0].attrs.x < 0 ) {
 				cropperGroup.attrs.x = -cropperGroup.get(".topLeft")[0].attrs.x;
@@ -418,7 +572,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 			if ( cropperGroup.attrs.y+cropperGroup.get(".bottomRight")[0].attrs.y > stage.attrs.height ) {
 				cropperGroup.attrs.y = stage.attrs.height - cropperGroup.get(".bottomRight")[0].attrs.y;
 			}
-			
+
 			undateCropperArea();
 		});
 
@@ -428,7 +582,7 @@ function PhotoCropper(divID, stageAllowableWidth, stageAllowableHeight, photoUrl
 	
 	var sources = {
 		photoToCrop: photoUrl,
-		cropper: "./img/cropper.png"
+		cropper: "./img/__cropper.png"
 	};
 	loadImages(sources, initStage);
 }
@@ -437,6 +591,3 @@ PhotoCropper.prototype.getCroppedArea = function() {
 	return this.croppedArea;
 }
 
-function showCropper(templete){
-
-}

@@ -275,4 +275,3 @@ canvas.width = $(document).width();
 //        recordUserAction("enters imgZoomViewerPg");
     }
 }
-
