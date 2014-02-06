@@ -153,16 +153,35 @@ ImageUgc = (function(){
             },
             function(callback){
                 //draw the customizable objects
+
+				var imageUrl = userContent.picture.urlOfCropped;
+				//template.customizableObjects
+				for(var i = 0 ; i < template.customizableObjects.length ; i++){
+					if(i < 2){
+						ugcUtility.drawImage( context, imageUrl, template.customizableObjects[i].x, template.customizableObjects[i].y, template.customizableObjects[i].width, template.customizableObjects[i].height, template.customizableObjects[i].angle, function(errOfDrawImage){
+							callback(errOfDrawImage);
+						});
+					}else{
+						break;
+						callback(null);
+					}
+				}
+				
+				/*
                 var imageUrl = null;
                 var iteratorDrawCustomizalbeObjects = function(aCustomizableObject, cbOfIterator){
+					
                     if (aCustomizableObject.type == "image"){
                         imageUrl = userContent.picture.urlOfCropped;
                         ugcUtility.drawImage( context, imageUrl, aCustomizableObject.x, aCustomizableObject.y, aCustomizableObject.width, aCustomizableObject.height, aCustomizableObject.angle, function(errOfDrawImage){
                             cbOfIterator(errOfDrawImage);
                         });
                     }
+					
                     else if (aCustomizableObject.type == "thumbnail"){
+						
                         imageUrl = userContent.thumbnail.url;
+						
                         ugcUtility.drawFbNameText( context, localStorage.fb_name, aCustomizableObject.fb_x, aCustomizableObject.fb_y, aCustomizableObject.fbNameWidth, aCustomizableObject.lineHeight, aCustomizableObject.fb_angle,aCustomizableObject.fb_color);
                         ugcUtility.drawImage( context, imageUrl, aCustomizableObject.x, aCustomizableObject.y, aCustomizableObject.width, aCustomizableObject.height, aCustomizableObject.angle, function(errOfDrawImage){
                             if(aCustomizableObject.x2){
@@ -174,11 +193,13 @@ ImageUgc = (function(){
                                 cbOfIterator(errOfDrawImage);
                             }
                         });
+						
                     }
                     else if (aCustomizableObject.type == "text"){
                         ugcUtility.drawChineseText( context, userContent.text, aCustomizableObject.x, aCustomizableObject.y, aCustomizableObject.width, aCustomizableObject.lineHeight, aCustomizableObject.angle,aCustomizableObject.fontColor);
                         cbOfIterator(null);
                     }
+					
                 };
                 async.eachSeries(template.customizableObjects, iteratorDrawCustomizalbeObjects, function(err){
                     if (!err) {
@@ -188,6 +209,8 @@ ImageUgc = (function(){
                         callback('Failed to draw the customizable objects: '+err);
                     }
                 });
+				
+				*/
             },
             function(callback){
                 //create DOOH preview

@@ -2,7 +2,7 @@
     "taipei_arena":{
         
         "picture_only":{
-            "backgroundImageUrl":"template_resource/wow_dooh_pic.jpg",
+            "backgroundImageUrl":"template_resource/wls_dooh_pic.jpg",
             "logoImgUrl":"template_resource/wow_dooh_pic_logo.png",
             "logoPosition_left":{"x":"213.848","y":"254.674"},
             "logoPosition_right":{"x":"1041.661","y":"261.11"},
@@ -11,28 +11,28 @@
                                    "id":"picture0",
                                    "type":"image",
                                    "quadrilateral":{
-                                   "x_ul":"718",
+                                   "x_ul":"885",
                                    "y_ul":"250",
-                                   "x_ur":"987",
-                                   "y_ur":"256",
+                                   "x_ur":"1090",
+                                   "y_ur":"260",
                                    "x_ll":"713",
-                                   "y_ll":"444",
-                                   "x_lr":"975",
-                                   "y_lr":"439"
+                                   "y_ll":"360",
+                                   "x_lr":"1200",
+                                   "y_lr":"360"
                                    }
                                    },
                                    {
-                                   "id":"thumbnail0",
-                                   "type":"thumbnail",
+                                   "id":"picture1",
+                                   "type":"image",
                                    "quadrilateral":{
-                                   "x_ul":"494",
-                                   "y_ul":"256",
-                                   "x_ur":"656",
-                                   "y_ur":"256",
-                                   "x_ll":"494",
-                                   "y_ll":"439",
-                                   "x_lr":"656",
-                                   "y_lr":"439"
+                                   "x_ul":"275",
+                                   "y_ul":"270",
+                                   "x_ur":"450",
+                                   "y_ur":"266",
+                                   "x_ll":"285",
+                                   "y_ll":"455",
+                                   "x_lr":"450",
+                                   "y_lr":"460"
                                    }
                                   }
                                    ]
