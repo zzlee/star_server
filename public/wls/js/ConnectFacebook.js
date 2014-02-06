@@ -115,6 +115,8 @@ ConnectFacebook.logIn = function(){
 	              function(err){
 					if(err){
 						alert('登入時發生錯誤，請重新再試');
+					}else{
+						 
 					}
 						
 		});//End of async
@@ -146,7 +148,7 @@ ConnectFacebook.redirectLogIn = function(){
 	            				  if(response.email){
 	            					  localStorage.email = response.email;
 	            					  data = {"authResponse": {
-	            	    					"appGenre":"wowtaipeiarena", 
+	            	    					"appGenre":"waterlandsecuries", 
 	            	    					"userID": localStorage.fbId,
 	            	    					"userName": response.name,
 	            	    					"email": response.email,
@@ -156,6 +158,7 @@ ConnectFacebook.redirectLogIn = function(){
 	            	    					"deviceToken": "webapp", //Water Land Securities
 	            	    					"timestamp": Date.now()
 	            	    					}
+
 	            	    				};
 	            		    	  		var url = domainUrl + "/members/fb_info";
 	            		    			$.post(url, data, function(response){
