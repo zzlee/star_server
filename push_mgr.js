@@ -7,7 +7,6 @@ var DEBUG = true, FM_LOG = (DEBUG) ? function(str) {
 FM.pushMgr = (function() {
 	var uInstance = null;
 	var db = require('./db.js');
-	var messageModel = db.getDocModel("message");
 
 	function constructor() {
 	    var async = require('async');
@@ -198,23 +197,23 @@ FM.pushMgr = (function() {
                          FM_LOG('[pus_mgr.sendMessageToDeviceByMemberId] error = result is null'+err);
                          cbOfSendMessageToDeviceByMemberId(err, result);
                      }else if(result.deviceToken){
-                         //createMessage for message center
-                         FM.pushMgr.getInstance().createMessage(memberId, message, function(err, res){});
                          
                          FM_LOG("deviceToken Array: " + JSON.stringify(result.deviceToken) );
                          for( var devicePlatform in result.deviceToken){
-                        	 
                              var deviceTokenCheck = result.deviceToken[devicePlatform];
                              if(!deviceTokenCheck){
                                  logger.info("[push_mgr]deviceToken is null" + JSON.stringify(result.deviceToken)+"memberId="+memberId  );
                                  FM_LOG("[push_mgr]deviceToken is null" + JSON.stringify(result.deviceToken)+"memberId="+memberId ); 
+                             }else if(deviceTokenCheck == 'webapp'){
+                                 logger.info("[push_mgr]deviceToken is webapp" + JSON.stringify(result.deviceToken)+"memberId="+memberId );
+                                 FM_LOG("[push_mgr]deviceToken is webapp" + JSON.stringify(result.deviceToken)+"memberId="+memberId ); 
                              }
                              else if(deviceTokenCheck == "undefined"){
                                  logger.info("[push_mgr]deviceToken is undefined" + JSON.stringify(result.deviceToken)+"memberId="+memberId );
                                  FM_LOG("[push_mgr]deviceToken is undefined" + JSON.stringify(result.deviceToken)+"memberId="+memberId ); 
-                             }                            	 
-                             else if(deviceTokenCheck != "webapp"){
-                            		 FM.pushMgr.getInstance().sendMessageToDevice(devicePlatform, result.deviceToken[devicePlatform], result.app, message);
+                             }
+                             else if(deviceTokenCheck){
+                                 FM.pushMgr.getInstance().sendMessageToDevice(devicePlatform, result.deviceToken[devicePlatform], result.app, message);
                              }else{
                                  logger.info("[push_mgr]deviceToken error" + JSON.stringify(result.deviceToken)+"memberId="+memberId );
                                  FM_LOG("[push_mgr]deviceToken error" + JSON.stringify(result.deviceToken)+"memberId="+memberId );
@@ -224,50 +223,15 @@ FM.pushMgr = (function() {
                          logger.info('[pus_mgr.sendMessageToDeviceByMemberId] Push Successful result.deviceToken= '+result.deviceToken);
                          cbOfSendMessageToDeviceByMemberId(err, "Push Successful");
                      }else{
-                         FM_LOG('[pus_mgr.sendMessageToDeviceByMemberId] error = deviceToken is null ;'+result);
+//                         FM_LOG('[pus_mgr.sendMessageToDeviceByMemberId] error = deviceToken is null ;'+result);
                          logger.info('[pus_mgr.sendMessageToDeviceByMemberId] error = deviceToken is null ;result= '+result);
                          cbOfSendMessageToDeviceByMemberId(err, result);
+                         //console.log("else");
                      }
                      
                  });
 
             },
-
-			createMessage : function(memberId,  message, cbOfCreateMessage){
-				var jsonOfNewMessage = {
-					content: message,
-					ownerId: {_id: memberId},
-					showInCenter: false
-				}
-				
-				var newMessage = new messageModel(jsonOfNewMessage);
-				newMessage.save(function(err, res){
-					if(!err) {
-						logger.info('[createMessage] done ,memberId: ', memberId);
-						cbOfCreateMessage(null, "done");
-					}
-					else{
-						logger.error('[createMessage] error', err);
-						cbOfCreateMessage("new message save to db error: "+err, null);
-					}
-				});
-			
-			},
-			
-			updateMessage : function(messageId,  vjson, cbOfUpdateMessage){
-				
-				db.updateAdoc(messageModel, messageId, vjson, function(err, result){
-					if(!err) {
-						logger.info('[updateMessage_updateAdoc] done ,messageId: ', messageId);
-						cbOfUpdateMessage(null,'done');
-					}
-					else{
-						logger.error('[updateMessage_updateAdoc] error: ', err);
-						cbOfUpdateMessage(err,null);
-					}
-				});
-			
-			},
 			
             sendMessageToAllMemberByApp : function(message, app, cbOfSendMessageToDeviceByMemberId){
                 var memberModel = db.getDocModel("member");
@@ -279,6 +243,7 @@ FM.pushMgr = (function() {
                    //console.log(data._id, message);
                    logger.info("iteratorSendMessageToDeviceByMemberId member_id  ="+ data._id+',message='+ message);
                     FM.pushMgr.getInstance().sendMessageToDeviceByMemberId( data._id, message, function(err, result){
+                        
                         if(!err){
                             logger.info("iteratorSendMessageToDeviceByMemberId result"+ result);
                             cbOfIteratorSendMessageToDeviceByMemberId(null, result);
@@ -304,6 +269,7 @@ FM.pushMgr = (function() {
                                  // console.log(memberList.length);
                                   logger.info("sendMessageToAllMemberByApp memberList.length"+ memberList.length);
                                   async.eachSeries(memberList, iteratorSendMessageToDeviceByMemberId, function(errOfEachSeries){
+                                      //console.log('iter end');
                                       //console.log(errOfEachSeries);
                                       if (!errOfEachSeries) {
                                           callback2(null, "done");
@@ -315,6 +281,7 @@ FM.pushMgr = (function() {
                               }
                               ],
                               function(err, results){
+                                //console.log('end');
                                 //console.log(err, results);
                                 if(!err){
                                     logger.info("sendMessageToAllMemberByApp results "+results);
@@ -330,11 +297,14 @@ FM.pushMgr = (function() {
             /** TEST */
             _testkaiser: function(){
                 var userNo = 1234;
-                var memberId = '52a0351ff07b1cec1000000a';
+                var memberId = '52b7e3f115678eec0a000103';
                 var message = "★哇！聖誕祝福來囉★ 哇！上小巨蛋，提供聖誕特別模板， 今年聖誕，給朋友史上最大的聖誕祝福吧！";
                 this.sendMessageToDeviceByMemberId( memberId, message, function(err, result){
                         //console.log(err, result);
                 });
+				// this.saveMessageToDataBase( memberId, message, function(err, result){
+					// console.log(err, result);
+                // });
             },
 		};// end return
 	}
