@@ -249,9 +249,10 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
         },
         
         function(callback){
-        
+            // Get user FB profile picture and upload to aws S3
             async.waterfall( [
                 function( member_cb ){
+                    // Find user info
                     memberModel.findById( ugcInfo.ownerId._id, 'app fb', function (err, doc) {
                         if( !err ) {
                             logger.info( 'Member search is successfully, user _id: ' + ugcInfo.ownerId._id );
@@ -264,6 +265,7 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
                     } );
                 },
                 function( member, fb_picture_cb ){
+                    // Get user FB profile picture url
                     fbMgr.getUserProfilePicture( member.fb.userID, member.app, function(err, res){
                         if ( !err ){
                             var pictureUrl = res.picture.data.url.toString().replace('_q.','_n.');
@@ -277,7 +279,7 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
                     } );
                 },
                 function( picture, download_cb ){
-                    
+                    // Download user FB profile picture
                     var filename = picture.toString().split('/');
                     filename = path.join(__dirname, filename[filename.length - 1]);
                     
@@ -295,7 +297,7 @@ miixContentMgr.preAddMiixMovie = function(imgDoohPreviewBase64, ugcProjectID, ug
                     // });
                 // },
                 function( filepath, uploadS3_cb ){
-                    
+                    // Upload user FB profile picture to aws S3
                     var S3Path = filepath.toString().split('\\');
                     S3Path = S3Path[S3Path.length - 1];
                     S3Path = '/user_project/' + ugcProjectID + '/user_data/' + S3Path;
@@ -690,6 +692,58 @@ miixContentMgr.addMiixImage = function(imgBase64, imgDoohPreviewBase64, ugcProje
                     logger.info('DOOH preview of Miix image is failed to be uploaded to S3 '+ugcDoohPreviewS3Path);
                     callback('DOOH preview of Miix movie is failed to be uploaded to S3 '+ugcDoohPreviewS3Path, null);
                 }
+            });
+        },
+        function(callback){
+            // Jeff - Get thumbnail (png convert to jpg)
+            var image_path = imageUgcFile,
+                save_path = path.join(workingPath, 'public/contents/user_project', ugcProjectID, ugcProjectID + '_s.jpg'),
+                tb_s3_path =  '/user_project/' + ugcProjectID + '/'+ ugcProjectID + '_s.jpg';
+            
+            var uploadS3 = function( filepath, s3path, upload_cb ) {
+                awsS3.uploadToAwsS3(filepath, s3path, 'image/jpg', function(err,result){
+                    if (!err){
+                        logger.info('Thumbnail of Miix image is successfully uploaded to S3 ' + s3path);
+                        upload_cb(null, s3path);
+                    }
+                    else {
+                        logger.info('Thumbnail of Miix image is failed to be uploaded to S3 ' + s3path);
+                        upload_cb('Thumbnail of Miix movie is failed to be uploaded to S3 ' + s3path, null);
+                    }
+                });
+            };
+            
+            var convert = function(source, target, convert_cb) {
+                var readStream = fs.createReadStream( source );
+                gm( readStream,  'img.jpg' )
+                .size({bufferStream: true}, function(err, size) {
+                    this.noProfile();
+                    this.write(target, function (err) {
+                        // if (!err) console.log('done');
+                        if( err ) {
+                            logger.info('Convert thumbnail is failed ' + target);
+                            convert_cb('Convert thumbnail is failed ' + target, null);
+                        }
+                        else {
+                            logger.info('Convert thumbnail is successfully ' + target);
+                            convert_cb(null, target);
+                        }
+                    });
+                });
+            };
+            
+            convert(image_path, save_path, function(cvt_err, cvt_res) {
+                if(cvt_err) {
+                    callback(err, null);
+                    return;
+                }
+                uploadS3(save_path, tb_s3_path, function(s3_err, s3_res) {
+                    if(s3_err) {
+                        callback(s3_err, null);
+                        return;
+                    }
+                    callback(null, tb_s3_path);
+                });
             });
         },
         function(callback){
