@@ -1,0 +1,70 @@
+{
+    "selected":"wow_pic",
+    "name":"圖",
+    "topBarImageUrl":"template_resource/valentine_pic_bar.png",
+    "representingImageUrl":"template_resource/valentine_pic_demo.jpg",
+    "introdcutionContentUrl":"template_resource/mood_template_instruction.html",
+    "outputSize":{
+        "width":720,
+        "height":480
+    },
+    "subTemplate":{
+        "picture_only":{
+            "representingImageUrlSub":"template_resource/mood_02.jpg",
+            "selected":"picture_only",
+            "name":"版型二",
+            "outputType":"image",
+            "description":"一張圖",
+            "backgroundImageUrl":"template_resource/valentine_pic_bg.jpg",
+             "logoImgUrl":"template_resource/wow_long_pic_logo.png",
+            "logoPosition_left":{"x":"650","y":"60"},
+            "logoPosition_right":{"x":"1467","y":"60"},
+            "customizableObjects":[
+                                   {
+                                   "id":"picture0",
+                                   "type":"image",
+                                   "x":"329.361",
+                                   "y":"46.416",
+                                   "width":"260",
+                                   "height":"170",
+                                   "angle":"0",
+                                   "description":"心情照片"
+                                   },
+                                   {
+                                   "id":"picture1",
+                                   "type":"image",
+                                   "x":"1162.892",
+                                   "y":"46.416",
+                                   "width":"260",
+                                   "height":"170",
+                                   "angle":"0",
+                                   "description":"心情照片"
+                                   },
+                                   {
+                                   "id":"thumbnail0",
+                                   "type":"thumbnail",
+                                   "x":"943.888",
+                                   "y":"52.199",
+                                   "width":"160",
+                                   "height":"160",
+                                   "angle":"0",
+                                   "description":"大頭貼"
+                                   
+                                   },
+                                   {
+                                   "id":"thumbnail1",
+                                   "type":"thumbnail",
+                                   "x":"131.22",
+                                   "y":"52.199",
+                                   "width":"160",
+                                   "height":"160",
+                                   "angle":"0",
+                                   "description":"大頭貼"
+                       
+                                  }
+                                   
+                                   ]
+        }
+        
+    }
+}

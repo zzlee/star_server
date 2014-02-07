@@ -1,0 +1,81 @@
+{
+    "selected":"wow_pic_text",
+    "name":"圖加文",
+    "topBarImageUrl":"template_resource/valentine_pic_text_bar.png",
+    "representingImageUrl":"template_resource/valentine_pic_text_demo.jpg",
+    "introdcutionContentUrl":"template_resource/mood_template_instruction.html",
+    "outputSize":{
+        "width":720,
+        "height":480
+    },
+    "subTemplate":{
+        "picture_plus_text":{
+            "representingImageUrlSub":"template_resource/mood_01.jpg",
+            "selected":"picture_plus_text",
+            "name":"圖加文",
+            "outputType":"image",
+            "description":"一張圖 + 24個字",
+            "backgroundImageUrl":"template_resource/valentine_pic_text_bg.jpg",
+            "logoImgUrl":"template_resource/wow_long_pic_text_logo.png",
+            "logoPosition":{"x":"610","y":"75"},
+            "customizableObjects":[
+                                   {
+                                   "id":"text0",
+                                   "type":"text",
+                                   "x":"1346.162",
+                                   "y":"78",
+                                   "width":"288",
+                                   "lineHeight":"68",
+                                   "angle":"0",
+                                   "description":"心情文字",
+                                   "maxTextLength":"39",
+                                   "fontColor":"white",
+                                   "font":"34pt 華康歐陽詢體W5"
+                                   },
+                                   {
+                                   "id":"picture0",
+                                   "type":"image",
+                                   "x":"329.361",
+                                   "y":"54.416",
+                                   "width":"260",
+                                   "height":"170",
+                                   "angle":"0",
+                                   "description":"心情照片"
+                                   },
+                                   {
+                                   "id":"picture1",
+                                   "type":"image",
+                                   "x":"1052.232",
+                                   "y":"54.416",
+                                   "width":"260",
+                                   "height":"170",
+                                   "angle":"0",
+                                   "description":"心情照片"
+                                   },
+                                   {
+                                   "id":"thumbnail0",
+                                   "type":"thumbnail",
+                                   "x":"131.22",
+                                   "y":"59.199",
+                                   "width":"160",
+                                   "height":"160",
+                                   "angle":"0",
+                                   "description":"大頭貼"
+                                  },
+                                   
+                                   {
+                                   "id":"thumbnail1",
+                                   "type":"thumbnail",
+                                   "x":"846.505",
+                                   "y":"59.199",
+                                   "width":"160",
+                                   "height":"160",
+                                   "angle":"0",
+                                   "description":"大頭貼"
+                                   
+                                   }
+                                   ]
+        }
+        
+    }
+}
