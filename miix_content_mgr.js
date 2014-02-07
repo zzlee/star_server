@@ -1213,14 +1213,14 @@ miixContentMgr.putFbPostIduserLiveContents = function(userLiveContentProjectID, 
     });
 };
 
-miixContentMgr.getMessageList = function(memberId, read,limit, skip, cbOfGetMessageList){ //Joy
+miixContentMgr.getMessageList = function(memberId, read, limit, skip, cbOfGetMessageList){ //Joy
 	
 	logger.info('into miixContentMgr.getMessageList');
 	
     var messageModel = db.getDocModel("message");
 
    if(read == false) { //取出未讀訊息
-        messageModel.find({"ownerId._id": memberId, "read": false}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(function(err, result){
+        messageModel.find({"ownerId._id": memberId, "read": false}).sort({"messageTime":-1}).limit(limit).skip(skip).exec(function(err, result){
         	
         	if(!err){
         		if(typeof result !== 'undefined'){ //important!!! without this due to server crash!
@@ -1228,7 +1228,7 @@ miixContentMgr.getMessageList = function(memberId, read,limit, skip, cbOfGetMess
             			for(var i = 0; i < result.length; i++){
                     		result[i].messageTime = result[i]._id.getTimestamp().getTime();
                     	}
-            			logger.info('[miixContentMgr.getMessageList]: get read message');
+            			logger.info('[miixContentMgr.getMessageList]: get unread message result:'+result);
             		}        		
             	}
             	
@@ -1242,7 +1242,7 @@ miixContentMgr.getMessageList = function(memberId, read,limit, skip, cbOfGetMess
         	
         });
     }else if(read == 'getReadMessage') { //取出該user已讀訊息
-        messageModel.find({"ownerId._id": memberId, "read": true}).sort({"createdOn":-1}).limit(limit).skip(skip).exec(function(err, result){
+        messageModel.find({"ownerId._id": memberId, "read": true}).sort({"messageTime":-1}).limit(limit).skip(skip).exec(function(err, result){
         	
         	if(!err){
         		if(typeof result !== 'undefined'){ //important!!! without this due to server crash!
@@ -1250,7 +1250,7 @@ miixContentMgr.getMessageList = function(memberId, read,limit, skip, cbOfGetMess
             			for(var i = 0; i < result.length; i++){
                     		result[i].messageTime = result[i]._id.getTimestamp().getTime();
                     	}
-            			logger.info('[miixContentMgr.getMessageList]: get read message');
+            			logger.info('[miixContentMgr.getMessageList]: get read message result:'+result);
             		}        		
             	}
             	
