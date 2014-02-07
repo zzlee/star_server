@@ -153,7 +153,7 @@ ImageUgc = (function(){
             },
             function(callback){
                 //draw the customizable objects
-
+				/*
 				var imageUrl = userContent.picture.urlOfCropped;
 				//template.customizableObjects
 				for(var i = 0 ; i < template.customizableObjects.length ; i++){
@@ -166,8 +166,8 @@ ImageUgc = (function(){
 						callback(null);
 					}
 				}
+				*/
 				
-				/*
                 var imageUrl = null;
                 var iteratorDrawCustomizalbeObjects = function(aCustomizableObject, cbOfIterator){
 					
@@ -210,7 +210,7 @@ ImageUgc = (function(){
                     }
                 });
 				
-				*/
+				
             },
             function(callback){
                 //create DOOH preview
