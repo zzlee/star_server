@@ -62,6 +62,7 @@
 		var myPhotoCropper = null;
 		var imgUrl = null;
 		var height, width;
+		var cropperedURI = null;
 		function initCropper(divID, imgUrl) {
 		    var stageAllowableWidth = 0;
 			var stageAllowableHeight = 0;
@@ -123,7 +124,8 @@
 																		0, 0,
 																		destinationCanvas.width,
 																		destinationCanvas.height);
-										localStorage.photoCroppedURI = destinationCanvas.toDataURL();
+										//localStorage.photoCroppedURI = destinationCanvas.toDataURL();
+										cropperedURI = destinationCanvas.toDataURL();
 										callback(null);
 									};//end of rawPhotoImg.onload
 									rawPhotoImg.onerror = function(){
@@ -136,7 +138,8 @@
 									var userContent = {
 										text: null,
 										picture: {
-											urlOfCropped: localStorage.photoCroppedURI, //the URL of the picture that the user crops. (It is normally a base64 string got from canvas.toDataURL() )
+											//urlOfCropped: localStorage.photoCroppedURI, //the URL of the picture that the user crops. (It is normally a base64 string got from canvas.toDataURL() )
+											urlOfCropped : cropperedURI,
 											crop: {_x:0, _y:0, _w:0, _h:0},  // _x=x_crop/width_picture; _y=y_crop/height_picture; _w=width_crop/width_picture;  _h=height_crop/height_picture
 										},
 										thumbnail:{
