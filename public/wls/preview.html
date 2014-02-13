@@ -60,25 +60,25 @@
 			},1000);
 			var btnUpload = $("#btnUpload");
 			btnUpload.click(function(){
-				if(localStorage.VIPCodeId){
-					var forComfirm = confirm("請注意!\nVIP只有一次投稿機會\n請確認再送出!");
-					if (forComfirm==true) {
+				//if(localStorage.VIPCodeId){
+				//	var forComfirm = confirm("請注意!\nVIP只有一次投稿機會\n請確認再送出!");
+				//	if (forComfirm==true) {
+				//		delete localStorage.template_userText; //by Joy just for hint text remove 
+				//		template.uploadToServer();
+				//		btnUpload.hide();
+	             //   }else{
+	             //       return false;
+	             //   }
+				//}else{
+				//	var forComfirm = confirm("請注意!\n投稿後就有可能登上台北小巨蛋螢幕!\n請確認再送出!");
+				//	if (forComfirm==true) {
 						delete localStorage.template_userText; //by Joy just for hint text remove 
 						template.uploadToServer();
 						btnUpload.hide();
-	                }else{
-	                    return false;
-	                }
-				}else{
-					var forComfirm = confirm("請注意!\n投稿後就有可能登上台北小巨蛋螢幕!\n請確認再送出!");
-					if (forComfirm==true) {
-						delete localStorage.template_userText; //by Joy just for hint text remove 
-						template.uploadToServer();
-						btnUpload.hide();
-	                }else{
-	                    return false;
-	                }
-				}
+	              //  }else{
+	               //     return false;
+	                //}
+				//}
 			});
 		}
 	</script>

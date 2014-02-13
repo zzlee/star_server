@@ -42,49 +42,20 @@
 				$('#code').css({"width":"45%"});
 				
 			}
-			
+		/*	
 		$('#code').bind('focus',function(){
 			if($('#code').val() != '若有VIP碼請先填入再點選Facebook登入，若無則直接點選Facebook登入。'){
 			}else{
 				$('#code').val('');
 			}
 		});
+		*/
 		$("#fbBtn").click(function(){
-			var code = $('#code').val();
-			if(code != '若有VIP碼請先填入再點選Facebook登入，若無則直接點選Facebook登入。' && code != ''){
-				
-				var setting_getVIP = {
-                        type: "GET",
-                        cache: false,
-                        data:{code:code},
-                        success: function(data, textStatus, jqXHR ){
-                           console.log(data);
-                           if(data.length == 0){
-                        	   alert('沒有此VIP code喔!\n麻煩您再檢查一下，謝謝您!\n(或免填VIP code使用一般身分登入)')
-                           }else if(data[0].used == true) {
-                        	   alert('此組VIP code已經用過囉!\n但您還是可以用一般身分登入\n(免填VIP code)');
-                        	   $('#code').val('');
-                           }else {
-                        	   alert('恭喜您!!\n將使用VIP身份躍上小巨蛋!');
-                        	   localStorage.VIPCodeId = data[0]._id;
-                        	   ConnectFacebook.logIn();
-                           }
-                           
-                           
-                           
-                        },
-                        error: function(jqXHR, textStatus, errorThrown){
-                            callback("setting_getVIP " + errorThrown);
-                        }                       
-                };
-                
-                $.ajax(domainUrl + "/miix/getVIPStatus", setting_getVIP);
-			}else{
-				ConnectFacebook.logIn();
-			}
+
+			ConnectFacebook.logIn();
 		});
-		}
 		
+	}
 		
 	</script>
   <script>

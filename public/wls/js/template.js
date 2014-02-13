@@ -34,57 +34,8 @@ template.uploadToServer = function(){
                 	        success: function(data, textStatus, jqXHR ){
 //                	        	console.log("Upload result image UGC to server");
 //                	        	console.log("Upload result image UGC to server");
-								
-                	        	async.series([
-                	        	              function(callback_vip){
-                	        	            	  var setting_updateVIPinUGC = {
-                	                                        type: "PUT",
-                	                                        cache: false,
-                	                                        data:{projectId:ugcProjectId},
-                	                                        success: function(data, textStatus, jqXHR ){
-                	                                        	console.log('update the vip field in ugc done');
-                	                                        	callback_vip(null);
-                	                                        },
-                	                                        error: function(jqXHR, textStatus, errorThrown){
-                	                                        	callback_vip("setting_updateVIPinUGC " + errorThrown);
-                	                                        }                       
-                	                                };
-                	                                if(localStorage.VIPCodeId){
-                	                                	 $.ajax(domainUrl + "/miix/updateVIPinUGC", setting_updateVIPinUGC);
-                	                                }else{
-                	                                	callback_vip(null);
-                	                                }
-                	        	              },
-                	        	              function(callback_vip){
-                	        	            	  var setting_updateVIP = {
-                	                                        type: "PUT",
-                	                                        cache: false,
-                	                                        data:{_id:localStorage.VIPCodeId},
-                	                                        success: function(data, textStatus, jqXHR ){
-                	                                        	delete localStorage.VIPCodeId;
-                	                                        	console.log('update the vip collection done');
-                	                                        	callback_vip(null);
-                	                                        },
-                	                                        error: function(jqXHR, textStatus, errorThrown){
-                	                                        	callback_vip("setting_updateVIP " + errorThrown);
-                	                                        }                       
-                	                                };
-                	                                if(localStorage.VIPCodeId){
-                	                                	 $.ajax(domainUrl + "/miix/updateVIPStatus", setting_updateVIP);
-                	                                }else{
-                	                                	callback_vip(null);
-                	                                }
-                	        	              }
-                	        	          ],
-                	        	          // optional callback
-                	        	          function(err, results){
-                	        		             if(!err){
-                	        		            	 
-                	        		            	 callback(null);
-                	        		             }else{
-                	        		            	 callback(null);
-                	        		             }
-                	        	          });
+								callback(null);
+
                 	        },
                 	        error: function(jqXHR, textStatus, errorThrown){
                 	            callback("Failed to upload image UGC to server: " + errorThrown);
