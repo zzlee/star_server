@@ -34,6 +34,7 @@ template.uploadToServer = function(){
                 	        success: function(data, textStatus, jqXHR ){
 //                	        	console.log("Upload result image UGC to server");
 //                	        	console.log("Upload result image UGC to server");
+								
                 	        	async.series([
                 	        	              function(callback_vip){
                 	        	            	  var setting_updateVIPinUGC = {
@@ -116,6 +117,7 @@ template.uploadToServer = function(){
 	                          success: function(data, textStatus, jqXHR ){
 	                              var iterator = function(aPush){
 //	                            	  console.log('push msg: ' + aPush.content);
+										ga('send', 'event', 'button', 'click', localStorage.selectedTemplate);
                                       alert("投稿成功！！" + aPush.content.substring(0,14) + "排定時段後，你會收到facebook預告，通知播出日期時間。");
                                       //Let DB know user read the msg
                                       $.ajax(url + "/miix/message/" + aPush._id ,settings_push_after_confirm);
