@@ -32,7 +32,7 @@ template.uploadToServer = function(){
                 	            time: (new Date()).getTime()
                 	        },
                 	        success: function(data, textStatus, jqXHR ){
-//                	        	console.log("Upload result image UGC to server");
+                	        	console.log("Upload result image UGC to server");
 //                	        	console.log("Upload result image UGC to server");
 								callback(null);
 
